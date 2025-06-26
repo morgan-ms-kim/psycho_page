@@ -1,0 +1,43 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'DungGeunMo', 'Pretendard', 'Arial', sans-serif;
+  background: linear-gradient(135deg, #fffbe7 0%, #ffe066 100%);
+  color: #222;
+}
+
+@font-face {
+  font-family: 'DungGeunMo';
+  src: url('/fonts/DungGeunMo.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  border-radius: 16px;
+  background: #ff5e5e;
+  color: #fff;
+  padding: 10px 24px;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 12px #ffe06644;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button:hover {
+  background: #ffb3e6;
+  color: #222;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px #00e0ca33;
+  padding: 24px;
+  margin: 16px 0;
+  transition: box-shadow 0.2s;
+}
+.card:hover {
+  box-shadow: 0 6px 24px #6c63ff33;
+} 
