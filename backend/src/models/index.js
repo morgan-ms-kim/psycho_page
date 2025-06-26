@@ -1,9 +1,5 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
-import Test from './Test.js';
-import Comment from './Comment.js';
-import Like from './Like.js';
-import Visitor from './Visitor.js';
 dotenv.config();
 
 const sequelize = new Sequelize(
@@ -17,6 +13,131 @@ const sequelize = new Sequelize(
     logging: false,
   }
 );
+
+// 모델 정의
+const Test = sequelize.define('Test', {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  description: {
+    type: Sequelize.TEXT,
+    allowNull: false,
+  },
+  thumbnail: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  views: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  likes: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  createdAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+  },
+  updatedAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+  },
+});
+
+const Comment = sequelize.define('Comment', {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  testId: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  nickname: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  content: {
+    type: Sequelize.TEXT,
+    allowNull: false,
+  },
+  likes: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  createdAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+  },
+  updatedAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+  },
+});
+
+const Like = sequelize.define('Like', {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  testId: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  commentId: {
+    type: Sequelize.INTEGER,
+    allowNull: true,
+  },
+  ip: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  createdAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+  },
+});
+
+const Visitor = sequelize.define('Visitor', {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  testId: {
+    type: Sequelize.INTEGER,
+    allowNull: true,
+  },
+  ip: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  country: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  region: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  userAgent: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  visitedAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+  },
+});
 
 // 관계 정의
 Test.hasMany(Comment, { foreignKey: 'testId' });
