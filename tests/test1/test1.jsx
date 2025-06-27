@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import testData from './test1/test.json';
+import testData from './test.json';
 
 export default function Test1() {
   const [step, setStep] = useState(0); // 0: intro, 1~N: 질문, N+1: 결과

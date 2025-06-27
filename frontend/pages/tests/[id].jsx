@@ -3,8 +3,8 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
 
-// API 기본 URL
-const API_BASE = '/psycho-api';
+// API 기본 URL - nginx 리버스 프록시 사용
+const API_BASE = '/api';
 
 export default function TestDetail() {
   const router = useRouter();
@@ -20,48 +20,104 @@ export default function TestDetail() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState({ nickname: '', content: '' });
   const [showCommentForm, setShowCommentForm] = useState(false);
+  const [commentPage, setCommentPage] = useState(1);
+  const [hasMoreComments, setHasMoreComments] = useState(true);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [error, setError] = useState(null);
+  const [testCompleted, setTestCompleted] = useState(false);
+
+  // 이미지 로드 실패 처리
+  const handleImageError = (e) => {
+    // 기본 이미지로 대체
+    if (e.target.src.includes('result.png')) {
+      e.target.src = '/default-result.png';
+    } else {
+      e.target.style.display = 'none';
+    }
+  };
 
   // 테스트 데이터 로드
   useEffect(() => {
     if (id) {
       loadTestData();
       loadComments();
+      recordVisit();
     }
   }, [id]);
+
+  // 방문 기록
+  const recordVisit = async () => {
+    try {
+      await axios.post(`${API_BASE}/visitors`, {
+        testId: id
+      });
+    } catch (error) {
+      console.error('방문 기록 실패:', error);
+    }
+  };
 
   // 테스트 데이터 로드
   const loadTestData = async () => {
     try {
       const response = await axios.get(`${API_BASE}/tests/${id}`);
       setTest(response.data);
+      setLiked(response.data.userLiked || false);
       setLoading(false);
     } catch (error) {
       console.error('테스트 데이터 로드 실패:', error);
+      setError('테스트를 불러오는데 실패했습니다.');
       setLoading(false);
     }
   };
 
   // 댓글 로드
-  const loadComments = async () => {
+  const loadComments = async (page = 1) => {
     try {
-      const response = await axios.get(`${API_BASE}/tests/${id}/comments`);
-      setComments(response.data);
+      setLoadingComments(true);
+      const response = await axios.get(`${API_BASE}/tests/${id}/comments?page=${page}&limit=10`);
+      
+      if (page === 1) {
+        setComments(response.data.comments);
+      } else {
+        setComments(prev => [...prev, ...response.data.comments]);
+      }
+      
+      setHasMoreComments(response.data.currentPage < response.data.pages);
+      setCommentPage(response.data.currentPage);
+      setLoadingComments(false);
     } catch (error) {
       console.error('댓글 로드 실패:', error);
+      setLoadingComments(false);
+    }
+  };
+
+  // 더 많은 댓글 로드
+  const loadMoreComments = () => {
+    if (!loadingComments && hasMoreComments) {
+      loadComments(commentPage + 1);
     }
   };
 
   // 좋아요 토글
   const toggleLike = async () => {
     try {
-      const response = await axios.post(`${API_BASE}/tests/${id}/like`, {
-        ip: 'client-ip' // 실제로는 서버에서 IP를 가져와야 함
-      });
+      const response = await axios.post(`${API_BASE}/tests/${id}/like`);
       setLiked(response.data.liked);
       // 테스트 데이터 새로고침
       loadTestData();
     } catch (error) {
       console.error('좋아요 처리 실패:', error);
+    }
+  };
+
+  // 댓글 좋아요 토글
+  const toggleCommentLike = async (commentId) => {
+    try {
+      await axios.post(`${API_BASE}/comments/${commentId}/like`);
+      // 댓글 목록 새로고침
+      loadComments(1);
+    } catch (error) {
+      console.error('댓글 좋아요 처리 실패:', error);
     }
   };
 
@@ -73,7 +129,7 @@ export default function TestDetail() {
       await axios.post(`${API_BASE}/tests/${id}/comments`, newComment);
       setNewComment({ nickname: '', content: '' });
       setShowCommentForm(false);
-      loadComments();
+      loadComments(1);
     } catch (error) {
       console.error('댓글 작성 실패:', error);
     }
@@ -99,6 +155,19 @@ export default function TestDetail() {
     const resultIndex = Math.floor(Math.random() * test.results.length);
     setResult(test.results[resultIndex]);
     setShowResult(true);
+    setTestCompleted(true);
+    
+    // 결과를 로컬 스토리지에 저장
+    const testResult = {
+      testId: id,
+      testTitle: test.title,
+      result: test.results[resultIndex],
+      completedAt: new Date().toISOString()
+    };
+    
+    const savedResults = JSON.parse(localStorage.getItem('testResults') || '[]');
+    savedResults.push(testResult);
+    localStorage.setItem('testResults', JSON.stringify(savedResults));
   };
 
   // 테스트 다시 시작
@@ -107,6 +176,53 @@ export default function TestDetail() {
     setAnswers([]);
     setShowResult(false);
     setResult(null);
+    setTestCompleted(false);
+  };
+
+  // 결과 공유
+  const shareResult = async () => {
+    const shareData = {
+      title: `${test.title} - ${result.title}`,
+      text: `${test.title} 테스트 결과: ${result.title}\n${result.description}`,
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // 클립보드에 복사
+        await navigator.clipboard.writeText(
+          `${shareData.title}\n${shareData.text}\n${shareData.url}`
+        );
+        alert('결과가 클립보드에 복사되었습니다!');
+      }
+    } catch (error) {
+      console.error('공유 실패:', error);
+    }
+  };
+
+  // 소셜 미디어 공유
+  const shareToSocial = (platform) => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`${test.title} - ${result.title}`);
+    
+    let shareUrl = '';
+    switch (platform) {
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+        break;
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        break;
+      case 'kakao':
+        shareUrl = `https://story.kakao.com/share?url=${url}`;
+        break;
+      default:
+        return;
+    }
+    
+    window.open(shareUrl, '_blank', 'width=600,height=400');
   };
 
   if (loading) {
@@ -122,7 +238,7 @@ export default function TestDetail() {
     return (
       <ErrorWrap>
         <h2>테스트를 찾을 수 없습니다</h2>
-        <button onClick={() => router.push('/psycho')}>메인으로 돌아가기</button>
+        <button onClick={() => router.push('/psycho_page')}>메인으로 돌아가기</button>
       </ErrorWrap>
     );
   }
@@ -131,7 +247,7 @@ export default function TestDetail() {
     <MainWrap>
       {/* 헤더 */}
       <Header>
-        <BackButton onClick={() => router.push('/psycho')}>
+        <BackButton onClick={() => router.push('/psycho_page')}>
           ← 메인으로
         </BackButton>
         <TestTitle>{test.title}</TestTitle>
@@ -139,6 +255,14 @@ export default function TestDetail() {
           {liked ? '❤️' : '🤍'} {test.likes}
         </LikeButton>
       </Header>
+
+      {/* 에러 메시지 */}
+      {error && (
+        <ErrorMessage>
+          <p>{error}</p>
+          <button onClick={loadTestData}>다시 시도</button>
+        </ErrorMessage>
+      )}
 
       {/* 테스트 진행 중 */}
       {!showResult && (
@@ -171,13 +295,24 @@ export default function TestDetail() {
         <ResultSection>
           <ResultCard>
             <ResultTitle>{result.title}</ResultTitle>
-            <ResultImage src={result.image || '/default-result.png'} alt={result.title} />
+            <ResultImage src={result.image || '/default-result.png'} alt={result.title} onError={handleImageError} />
             <ResultDescription>{result.description}</ResultDescription>
             
             <ShareSection>
-              <ShareButton onClick={() => navigator.share?.({ title: test.title, text: result.title })}>
+              <ShareButton onClick={shareResult}>
                 📤 결과 공유하기
               </ShareButton>
+              <SocialShareButtons>
+                <SocialButton onClick={() => shareToSocial('twitter')}>
+                  🐦 트위터
+                </SocialButton>
+                <SocialButton onClick={() => shareToSocial('facebook')}>
+                  📘 페이스북
+                </SocialButton>
+                <SocialButton onClick={() => shareToSocial('kakao')}>
+                  💬 카카오톡
+                </SocialButton>
+              </SocialShareButtons>
               <RestartButton onClick={restartTest}>
                 🔄 다시 테스트하기
               </RestartButton>
@@ -190,47 +325,59 @@ export default function TestDetail() {
       <InfoSection>
         <InfoCard>
           <InfoTitle>📊 테스트 정보</InfoTitle>
-          <InfoStats>
-            <StatItem>👁 조회수: {test.views.toLocaleString()}</StatItem>
-            <StatItem>❤️ 좋아요: {test.likes.toLocaleString()}</StatItem>
-            <StatItem>💬 댓글: {comments.length}개</StatItem>
-            <StatItem>📅 생성일: {new Date(test.createdAt).toLocaleDateString()}</StatItem>
-          </InfoStats>
+          <InfoGrid>
+            <InfoItem>
+              <InfoLabel>조회수</InfoLabel>
+              <InfoValue>{test.views.toLocaleString()}</InfoValue>
+            </InfoItem>
+            <InfoItem>
+              <InfoLabel>좋아요</InfoLabel>
+              <InfoValue>{test.likes.toLocaleString()}</InfoValue>
+            </InfoItem>
+            <InfoItem>
+              <InfoLabel>댓글</InfoLabel>
+              <InfoValue>{test.commentCount || 0}</InfoValue>
+            </InfoItem>
+            <InfoItem>
+              <InfoLabel>생성일</InfoLabel>
+              <InfoValue>{new Date(test.createdAt).toLocaleDateString()}</InfoValue>
+            </InfoItem>
+          </InfoGrid>
         </InfoCard>
       </InfoSection>
 
       {/* 댓글 섹션 */}
       <CommentSection>
         <CommentHeader>
-          <CommentTitle>💬 댓글 ({comments.length})</CommentTitle>
-          <AddCommentButton onClick={() => setShowCommentForm(true)}>
-            댓글 작성
-          </AddCommentButton>
+          <CommentTitle>💬 댓글 ({test.commentCount || 0})</CommentTitle>
+          <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>
+            {showCommentForm ? '취소' : '댓글 작성'}
+          </CommentButton>
         </CommentHeader>
 
+        {/* 댓글 작성 폼 */}
         {showCommentForm && (
           <CommentForm>
-            <FormInput
+            <CommentInput
+              type="text"
               placeholder="닉네임"
               value={newComment.nickname}
-              onChange={e => setNewComment({...newComment, nickname: e.target.value})}
+              onChange={(e) => setNewComment({...newComment, nickname: e.target.value})}
+              maxLength={20}
             />
-            <FormTextarea
+            <CommentTextarea
               placeholder="댓글을 작성해주세요..."
               value={newComment.content}
-              onChange={e => setNewComment({...newComment, content: e.target.value})}
+              onChange={(e) => setNewComment({...newComment, content: e.target.value})}
+              maxLength={500}
             />
-            <FormButtons>
-              <CancelButton onClick={() => setShowCommentForm(false)}>
-                취소
-              </CancelButton>
-              <SubmitButton onClick={submitComment}>
-                작성
-              </SubmitButton>
-            </FormButtons>
+            <CommentSubmitButton onClick={submitComment}>
+              댓글 작성
+            </CommentSubmitButton>
           </CommentForm>
         )}
 
+        {/* 댓글 목록 */}
         <CommentList>
           {comments.map(comment => (
             <CommentItem key={comment.id}>
@@ -239,10 +386,27 @@ export default function TestDetail() {
                 <CommentDate>{new Date(comment.createdAt).toLocaleDateString()}</CommentDate>
               </CommentHeader>
               <CommentContent>{comment.content}</CommentContent>
+              <CommentActions>
+                <CommentLikeButton onClick={() => toggleCommentLike(comment.id)}>
+                  👍 좋아요
+                </CommentLikeButton>
+              </CommentActions>
             </CommentItem>
           ))}
+          
+          {/* 더 많은 댓글 로드 */}
+          {hasMoreComments && (
+            <LoadMoreButton onClick={loadMoreComments} disabled={loadingComments}>
+              {loadingComments ? '로딩 중...' : '더 많은 댓글 보기'}
+            </LoadMoreButton>
+          )}
         </CommentList>
       </CommentSection>
+
+      {/* 푸터 */}
+      <Footer>
+        <p>© 2024 PSYCHO - 재미있는 심리테스트 모음</p>
+      </Footer>
     </MainWrap>
   );
 }
@@ -252,73 +416,31 @@ const MainWrap = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 20px;
-`;
-
-const LoadingWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-`;
-
-const LoadingSpinner = styled.div`
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(255,255,255,0.3);
-  border-top: 3px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-`;
-
-const ErrorWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  
-  button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    border-radius: 10px;
-    cursor: pointer;
-  }
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 `;
 
 const Header = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
-  padding: 20px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 15px;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
 const BackButton = styled.button`
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
   color: white;
-  padding: 10px 15px;
-  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
   cursor: pointer;
   font-size: 1rem;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
 `;
 
 const TestTitle = styled.h1`
@@ -329,13 +451,36 @@ const TestTitle = styled.h1`
 `;
 
 const LikeButton = styled.button`
-  background: ${props => props.liked ? 'rgba(255,105,180,0.3)' : 'rgba(255,255,255,0.2)'};
-  border: 1px solid rgba(255,255,255,0.3);
+  background: ${props => props.liked ? 'rgba(255, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.2)'};
+  border: none;
   color: white;
-  padding: 10px 15px;
-  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
   cursor: pointer;
   font-size: 1rem;
+  
+  &:hover {
+    background: ${props => props.liked ? 'rgba(255, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.3)'};
+  }
+`;
+
+// 에러 메시지
+const ErrorMessage = styled.div`
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 0, 0, 0.1);
+  margin: 1rem 2rem;
+  border-radius: 10px;
+  
+  button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    background: #ff6b6b;
+    color: white;
+    cursor: pointer;
+  }
 `;
 
 const TestSection = styled.div`
@@ -463,6 +608,21 @@ const ShareButton = styled.button`
   font-weight: bold;
 `;
 
+const SocialShareButtons = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const SocialButton = styled.button`
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+`;
+
 const RestartButton = styled.button`
   background: rgba(255,255,255,0.2);
   border: 1px solid rgba(255,255,255,0.3);
@@ -490,15 +650,24 @@ const InfoTitle = styled.h3`
   margin: 0 0 20px 0;
 `;
 
-const InfoStats = styled.div`
+const InfoGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 15px;
 `;
 
-const StatItem = styled.div`
+const InfoItem = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const InfoLabel = styled.span`
+  font-size: 0.9rem;
+  opacity: 0.6;
+`;
+
+const InfoValue = styled.span`
   font-size: 1rem;
-  opacity: 0.9;
 `;
 
 const CommentSection = styled.div`
@@ -518,7 +687,7 @@ const CommentTitle = styled.h3`
   margin: 0;
 `;
 
-const AddCommentButton = styled.button`
+const CommentButton = styled.button`
   background: rgba(255,255,255,0.2);
   border: 1px solid rgba(255,255,255,0.3);
   color: white;
@@ -535,7 +704,7 @@ const CommentForm = styled.div`
   backdrop-filter: blur(10px);
 `;
 
-const FormInput = styled.input`
+const CommentInput = styled.input`
   width: 100%;
   background: rgba(255,255,255,0.2);
   border: 1px solid rgba(255,255,255,0.3);
@@ -550,7 +719,7 @@ const FormInput = styled.input`
   }
 `;
 
-const FormTextarea = styled.textarea`
+const CommentTextarea = styled.textarea`
   width: 100%;
   background: rgba(255,255,255,0.2);
   border: 1px solid rgba(255,255,255,0.3);
@@ -567,22 +736,7 @@ const FormTextarea = styled.textarea`
   }
 `;
 
-const FormButtons = styled.div`
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-`;
-
-const CancelButton = styled.button`
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-`;
-
-const SubmitButton = styled.button`
+const CommentSubmitButton = styled.button`
   background: linear-gradient(45deg, #ff6b6b, #ffa500);
   border: none;
   color: white;
@@ -618,4 +772,40 @@ const CommentDate = styled.div`
 
 const CommentContent = styled.div`
   line-height: 1.5;
+`;
+
+const CommentActions = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const CommentLikeButton = styled.button`
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
+const LoadMoreButton = styled.button`
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  ${props => props.disabled && `
+    opacity: 0.5;
+    cursor: not-allowed;
+  `}
+`;
+
+const Footer = styled.footer`
+  text-align: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 `; 
