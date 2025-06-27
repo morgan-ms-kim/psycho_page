@@ -2,6 +2,36 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
+import {
+  MainWrap,
+  Header,
+  BackButton,
+  LoadingWrap,
+  LoadingSpinner,
+  ErrorMessage,
+  Footer,
+  PrimaryButton,
+  SecondaryButton,
+  SocialButton,
+  QuestionCard,
+  ResultCard,
+  InfoCard,
+  CommentForm,
+  CommentItem,
+  Input,
+  Textarea,
+  Grid,
+  FlexRow,
+  Section,
+  CommentSection,
+  Title,
+  SubTitle,
+  SectionTitle,
+  Image,
+  ProgressBar,
+  ProgressFill,
+  ProgressText
+} from '../../components/StyledComponents';
 
 // API 기본 URL - nginx 리버스 프록시 사용
 const API_BASE = '/api';
@@ -28,7 +58,6 @@ export default function TestDetail() {
 
   // 이미지 로드 실패 처리
   const handleImageError = (e) => {
-    // 기본 이미지로 대체
     if (e.target.src.includes('result.png')) {
       e.target.src = '/default-result.png';
     } else {
@@ -103,7 +132,6 @@ export default function TestDetail() {
     try {
       const response = await axios.post(`${API_BASE}/tests/${id}/like`);
       setLiked(response.data.liked);
-      // 테스트 데이터 새로고침
       loadTestData();
     } catch (error) {
       console.error('좋아요 처리 실패:', error);
@@ -114,7 +142,6 @@ export default function TestDetail() {
   const toggleCommentLike = async (commentId) => {
     try {
       await axios.post(`${API_BASE}/comments/${commentId}/like`);
-      // 댓글 목록 새로고침
       loadComments(1);
     } catch (error) {
       console.error('댓글 좋아요 처리 실패:', error);
@@ -144,20 +171,17 @@ export default function TestDetail() {
     if (currentQuestion < test.questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      // 결과 계산
       calculateResult(newAnswers);
     }
   };
 
   // 결과 계산
   const calculateResult = (finalAnswers) => {
-    // 간단한 결과 계산 로직 (실제로는 더 복잡할 수 있음)
     const resultIndex = Math.floor(Math.random() * test.results.length);
     setResult(test.results[resultIndex]);
     setShowResult(true);
     setTestCompleted(true);
     
-    // 결과를 로컬 스토리지에 저장
     const testResult = {
       testId: id,
       testTitle: test.title,
@@ -191,7 +215,6 @@ export default function TestDetail() {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        // 클립보드에 복사
         await navigator.clipboard.writeText(
           `${shareData.title}\n${shareData.text}\n${shareData.url}`
         );
@@ -245,7 +268,6 @@ export default function TestDetail() {
 
   return (
     <MainWrap>
-      {/* 헤더 */}
       <Header>
         <BackButton onClick={() => router.push('/psycho_page')}>
           ← 메인으로
@@ -256,7 +278,6 @@ export default function TestDetail() {
         </LikeButton>
       </Header>
 
-      {/* 에러 메시지 */}
       {error && (
         <ErrorMessage>
           <p>{error}</p>
@@ -264,7 +285,6 @@ export default function TestDetail() {
         </ErrorMessage>
       )}
 
-      {/* 테스트 진행 중 */}
       {!showResult && (
         <TestSection>
           <ProgressBar>
@@ -290,7 +310,6 @@ export default function TestDetail() {
         </TestSection>
       )}
 
-      {/* 결과 표시 */}
       {showResult && result && (
         <ResultSection>
           <ResultCard>
@@ -321,7 +340,6 @@ export default function TestDetail() {
         </ResultSection>
       )}
 
-      {/* 테스트 정보 */}
       <InfoSection>
         <InfoCard>
           <InfoTitle>📊 테스트 정보</InfoTitle>
@@ -346,7 +364,6 @@ export default function TestDetail() {
         </InfoCard>
       </InfoSection>
 
-      {/* 댓글 섹션 */}
       <CommentSection>
         <CommentHeader>
           <CommentTitle>💬 댓글 ({test.commentCount || 0})</CommentTitle>
@@ -355,7 +372,6 @@ export default function TestDetail() {
           </CommentButton>
         </CommentHeader>
 
-        {/* 댓글 작성 폼 */}
         {showCommentForm && (
           <CommentForm>
             <CommentInput
@@ -377,7 +393,6 @@ export default function TestDetail() {
           </CommentForm>
         )}
 
-        {/* 댓글 목록 */}
         <CommentList>
           {comments.map(comment => (
             <CommentItem key={comment.id}>
@@ -394,7 +409,6 @@ export default function TestDetail() {
             </CommentItem>
           ))}
           
-          {/* 더 많은 댓글 로드 */}
           {hasMoreComments && (
             <LoadMoreButton onClick={loadMoreComments} disabled={loadingComments}>
               {loadingComments ? '로딩 중...' : '더 많은 댓글 보기'}
@@ -403,7 +417,6 @@ export default function TestDetail() {
         </CommentList>
       </CommentSection>
 
-      {/* 푸터 */}
       <Footer>
         <p>© 2024 PSYCHO - 재미있는 심리테스트 모음</p>
       </Footer>
@@ -412,42 +425,31 @@ export default function TestDetail() {
 }
 
 // 스타일 컴포넌트들
-const MainWrap = styled.div`
-  min-height: 100vh;
+const TestTitle = styled(Title)``;
+
+const ErrorWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-`;
-
-const Header = styled.header`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-`;
-
-const BackButton = styled.button`
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 1rem;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-`;
-
-const TestTitle = styled.h1`
-  font-size: 1.5rem;
-  margin: 0;
   text-align: center;
-  flex: 1;
+  
+  h2 {
+    margin-bottom: 1rem;
+  }
+  
+  button {
+    background: linear-gradient(45deg, #ff6b6b, #ffa500);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+  }
 `;
 
 const LikeButton = styled.button`
@@ -464,62 +466,7 @@ const LikeButton = styled.button`
   }
 `;
 
-// 에러 메시지
-const ErrorMessage = styled.div`
-  text-align: center;
-  padding: 2rem;
-  background: rgba(255, 0, 0, 0.1);
-  margin: 1rem 2rem;
-  border-radius: 10px;
-  
-  button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 5px;
-    background: #ff6b6b;
-    color: white;
-    cursor: pointer;
-  }
-`;
-
-const TestSection = styled.div`
-  max-width: 800px;
-  margin: 0 auto 30px;
-`;
-
-const ProgressBar = styled.div`
-  background: rgba(255,255,255,0.2);
-  border-radius: 10px;
-  height: 20px;
-  margin-bottom: 30px;
-  position: relative;
-  overflow: hidden;
-`;
-
-const ProgressFill = styled.div`
-  background: linear-gradient(90deg, #ff6b6b, #ffa500);
-  height: 100%;
-  width: ${props => props.progress}%;
-  transition: width 0.3s ease;
-`;
-
-const ProgressText = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 0.9rem;
-  font-weight: bold;
-`;
-
-const QuestionCard = styled.div`
-  background: rgba(255,255,255,0.1);
-  border-radius: 20px;
-  padding: 40px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-`;
+const TestSection = styled(Section)``;
 
 const QuestionNumber = styled.div`
   font-size: 1.2rem;
@@ -528,16 +475,9 @@ const QuestionNumber = styled.div`
   margin-bottom: 20px;
 `;
 
-const QuestionText = styled.h2`
-  font-size: 1.8rem;
-  margin: 0 0 30px 0;
-  line-height: 1.4;
-`;
+const QuestionText = styled(SubTitle)``;
 
-const AnswerGrid = styled.div`
-  display: grid;
-  gap: 15px;
-`;
+const AnswerGrid = styled(Grid)``;
 
 const AnswerButton = styled.button`
   background: rgba(255,255,255,0.1);
@@ -556,19 +496,7 @@ const AnswerButton = styled.button`
   }
 `;
 
-const ResultSection = styled.div`
-  max-width: 800px;
-  margin: 0 auto 30px;
-`;
-
-const ResultCard = styled.div`
-  background: rgba(255,255,255,0.1);
-  border-radius: 20px;
-  padding: 40px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  text-align: center;
-`;
+const ResultSection = styled(Section)``;
 
 const ResultTitle = styled.h2`
   font-size: 2rem;
@@ -576,13 +504,7 @@ const ResultTitle = styled.h2`
   color: #ffa500;
 `;
 
-const ResultImage = styled.img`
-  width: 200px;
-  height: 200px;
-  border-radius: 20px;
-  margin: 20px 0;
-  object-fit: cover;
-`;
+const ResultImage = styled(Image)``;
 
 const ResultDescription = styled.p`
   font-size: 1.2rem;
@@ -597,58 +519,18 @@ const ShareSection = styled.div`
   margin-top: 30px;
 `;
 
-const ShareButton = styled.button`
-  background: linear-gradient(45deg, #ff6b6b, #ffa500);
-  border: none;
-  color: white;
-  padding: 15px 25px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-`;
+const ShareButton = styled(PrimaryButton)``;
 
 const SocialShareButtons = styled.div`
   display: flex;
   gap: 10px;
 `;
 
-const SocialButton = styled.button`
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 1rem;
-`;
+const RestartButton = styled(SecondaryButton)``;
 
-const RestartButton = styled.button`
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  padding: 15px 25px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 1rem;
-`;
+const InfoSection = styled(Section)``;
 
-const InfoSection = styled.div`
-  max-width: 800px;
-  margin: 0 auto 30px;
-`;
-
-const InfoCard = styled.div`
-  background: rgba(255,255,255,0.1);
-  border-radius: 15px;
-  padding: 25px;
-  backdrop-filter: blur(10px);
-`;
-
-const InfoTitle = styled.h3`
-  font-size: 1.3rem;
-  margin: 0 0 20px 0;
-`;
+const InfoTitle = styled(SectionTitle)``;
 
 const InfoGrid = styled.div`
   display: grid;
@@ -670,93 +552,28 @@ const InfoValue = styled.span`
   font-size: 1rem;
 `;
 
-const CommentSection = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-`;
-
-const CommentHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+const CommentHeader = styled(FlexRow)`
   margin-bottom: 20px;
 `;
 
-const CommentTitle = styled.h3`
-  font-size: 1.3rem;
-  margin: 0;
-`;
+const CommentTitle = styled(SectionTitle)``;
 
-const CommentButton = styled.button`
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
+const CommentButton = styled(SecondaryButton)`
   padding: 10px 20px;
-  border-radius: 10px;
-  cursor: pointer;
 `;
 
-const CommentForm = styled.div`
-  background: rgba(255,255,255,0.1);
-  border-radius: 15px;
-  padding: 25px;
-  margin-bottom: 20px;
-  backdrop-filter: blur(10px);
-`;
+const CommentInput = styled(Input)``;
 
-const CommentInput = styled.input`
-  width: 100%;
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  font-size: 1rem;
-  
-  &::placeholder {
-    color: rgba(255,255,255,0.6);
-  }
-`;
+const CommentTextarea = styled(Textarea)``;
 
-const CommentTextarea = styled.textarea`
-  width: 100%;
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  font-size: 1rem;
-  min-height: 100px;
-  resize: vertical;
-  
-  &::placeholder {
-    color: rgba(255,255,255,0.6);
-  }
-`;
-
-const CommentSubmitButton = styled.button`
-  background: linear-gradient(45deg, #ff6b6b, #ffa500);
-  border: none;
-  color: white;
+const CommentSubmitButton = styled(PrimaryButton)`
   padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
 `;
 
 const CommentList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 15px;
-`;
-
-const CommentItem = styled.div`
-  background: rgba(255,255,255,0.1);
-  border-radius: 15px;
-  padding: 20px;
-  backdrop-filter: blur(10px);
 `;
 
 const CommentAuthor = styled.div`
@@ -800,12 +617,4 @@ const LoadMoreButton = styled.button`
     opacity: 0.5;
     cursor: not-allowed;
   `}
-`;
-
-const Footer = styled.footer`
-  text-align: center;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
 `; 

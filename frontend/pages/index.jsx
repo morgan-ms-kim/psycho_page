@@ -1,6 +1,22 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import {
+  MainWrap,
+  Header,
+  LoadingWrap,
+  LoadingSpinner,
+  ErrorMessage,
+  Footer,
+  PrimaryButton,
+  SecondaryButton,
+  Grid,
+  FlexRow,
+  Section,
+  Title,
+  SectionTitle,
+  Card
+} from '../components/StyledComponents';
 
 // API 기본 URL - nginx 리버스 프록시 사용
 const API_BASE = '/api';
@@ -316,49 +332,7 @@ export default function Home() {
   );
 }
 
-// 스타일 컴포넌트들
-const MainWrap = styled.div`
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-`;
-
-const LoadingWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-`;
-
-const LoadingSpinner = styled.div`
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(255,255,255,0.3);
-  border-top: 3px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-`;
-
-const Header = styled.header`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-`;
-
+// 스타일 컴포넌트들 (페이지 전용)
 const Logo = styled.h1`
   font-size: 2rem;
   font-weight: bold;
@@ -381,17 +355,9 @@ const StatItem = styled.span`
   backdrop-filter: blur(5px);
 `;
 
-const HistoryButton = styled.button`
+const HistoryButton = styled(SecondaryButton)`
   padding: 0.5rem 1rem;
-  border: none;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  cursor: pointer;
   font-size: 0.9rem;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
 `;
 
 // 검색 및 필터 섹션
@@ -475,25 +441,6 @@ const SortSelect = styled.select`
   }
 `;
 
-// 에러 메시지
-const ErrorMessage = styled.div`
-  text-align: center;
-  padding: 2rem;
-  background: rgba(255, 0, 0, 0.1);
-  margin: 1rem 2rem;
-  border-radius: 10px;
-  
-  button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 5px;
-    background: #ff6b6b;
-    color: white;
-    cursor: pointer;
-  }
-`;
-
 // 더 보기 로딩
 const LoadingMore = styled.div`
   text-align: center;
@@ -506,41 +453,47 @@ const NoResults = styled.div`
   padding: 4rem 2rem;
   
   h3 {
-    margin-bottom: 1rem;
     font-size: 1.5rem;
+    margin-bottom: 1rem;
   }
   
   p {
-    color: rgba(255, 255, 255, 0.7);
+    opacity: 0.8;
   }
 `;
 
+// 배너 섹션
 const BannerSection = styled.div`
-  margin: 40px 0;
+  margin: 2rem 0;
   position: relative;
 `;
 
 const BannerSlider = styled.div`
-  display: flex;
+  position: relative;
+  height: 300px;
   overflow: hidden;
   border-radius: 20px;
-  margin: 0 40px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 `;
 
 const BannerSlide = styled.div`
-  min-width: 100%;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: ${props => props.active ? 1 : 0};
+  transition: opacity 0.5s ease;
   cursor: pointer;
-  transition: transform 0.5s ease;
-  transform: translateX(-${props => props.active * 100}%);
+  
+  &:hover {
+    transform: scale(1.02);
+  }
 `;
 
 const BannerImg = styled.img`
   width: 100%;
-  height: 300px;
+  height: 100%;
   object-fit: cover;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 `;
 
 const BannerOverlay = styled.div`
@@ -549,75 +502,82 @@ const BannerOverlay = styled.div`
   left: 0;
   right: 0;
   background: linear-gradient(transparent, rgba(0,0,0,0.8));
-  padding: 40px 30px 30px;
+  padding: 2rem;
+  color: white;
 `;
 
 const BannerTitle = styled.h2`
   font-size: 1.8rem;
-  margin: 0 0 10px 0;
+  margin: 0 0 0.5rem 0;
 `;
 
 const BannerDesc = styled.p`
   font-size: 1rem;
-  margin: 0 0 15px 0;
+  margin: 0 0 1rem 0;
   opacity: 0.9;
 `;
 
 const BannerStats = styled.div`
   display: flex;
-  gap: 15px;
+  gap: 1rem;
   font-size: 0.9rem;
 `;
 
 const BannerDots = styled.div`
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 0.5rem;
+  margin-top: 1rem;
 `;
 
 const Dot = styled.div`
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: ${props => props.active ? 'white' : 'rgba(255,255,255,0.3)'};
   cursor: pointer;
-  transition: background 0.3s;
 `;
 
+// 테스트 목록
 const TestListContainer = styled.div`
-  display: flex;
-  gap: 40px;
-  padding: 0 40px 40px;
+  padding: 2rem;
+`;
+
+const TestCount = styled.div`
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.8;
 `;
 
 const TestListSection = styled.div`
-  flex: 1;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.8rem;
-  margin: 0 0 20px 0;
+  margin-bottom: 3rem;
 `;
 
 const TestList = styled.ul`
   list-style: none;
   padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
 `;
 
 const TestListItem = styled.li`
   background: rgba(255,255,255,0.1);
-  border-radius: 20px;
-  overflow: hidden;
+  border-radius: 15px;
+  padding: 1.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
   
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     
-    .test-item-hover {
+    .hover-content {
       opacity: 1;
     }
   }
@@ -625,31 +585,39 @@ const TestListItem = styled.li`
 
 const TestItemImage = styled.img`
   width: 100%;
-  height: 200px;
+  height: 150px;
   object-fit: cover;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+  margin-bottom: 1rem;
 `;
 
 const TestItemContent = styled.div`
-  padding: 20px;
+  position: relative;
+  z-index: 1;
 `;
 
 const TestItemTitle = styled.h3`
-  font-size: 1.3rem;
-  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
 `;
 
 const TestItemDesc = styled.p`
   font-size: 0.9rem;
-  margin: 0 0 15px 0;
+  margin: 0 0 1rem 0;
   opacity: 0.8;
   line-height: 1.4;
 `;
 
 const TestItemStats = styled.div`
   display: flex;
-  gap: 15px;
-  margin-bottom: 10px;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+`;
+
+const Stat = styled.span`
+  font-size: 0.8rem;
+  opacity: 0.7;
 `;
 
 const TestItemDate = styled.div`
@@ -663,24 +631,16 @@ const TestItemHover = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.8);
+  background: rgba(255,255,255,0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s;
-  font-size: 1.1rem;
-  font-weight: bold;
-`;
-
-const Footer = styled.footer`
-  text-align: center;
-  padding: 40px;
-  background: rgba(0,0,0,0.2);
-  margin-top: 40px;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(5px);
   
-  p {
-    margin: 0;
-    opacity: 0.7;
+  span {
+    font-size: 1.1rem;
+    font-weight: bold;
   }
 `; 

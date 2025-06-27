@@ -1,6 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
+import {
+  MainWrap,
+  Header,
+  BackButton,
+  LoadingWrap,
+  LoadingSpinner,
+  Footer,
+  PrimaryButton,
+  SecondaryButton,
+  Card,
+  FlexRow,
+  Section,
+  Title
+} from '../components/StyledComponents';
 
 export default function History() {
   const router = useRouter();
@@ -119,44 +133,8 @@ export default function History() {
   );
 }
 
-// 스타일 컴포넌트들
-const MainWrap = styled.div`
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-`;
-
-const Header = styled.header`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-`;
-
-const BackButton = styled.button`
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 1rem;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-`;
-
-const PageTitle = styled.h1`
-  font-size: 1.5rem;
-  margin: 0;
-  text-align: center;
-  flex: 1;
-`;
+// 스타일 컴포넌트들 (페이지 전용)
+const PageTitle = styled(Title)``;
 
 const ClearButton = styled.button`
   background: rgba(255, 0, 0, 0.3);
@@ -172,38 +150,9 @@ const ClearButton = styled.button`
   }
 `;
 
-const LoadingWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-`;
-
-const LoadingSpinner = styled.div`
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(255,255,255,0.3);
-  border-top: 3px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-`;
-
 const EmptyState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
   text-align: center;
+  padding: 4rem 2rem;
 `;
 
 const EmptyIcon = styled.div`
@@ -217,49 +166,31 @@ const EmptyTitle = styled.h2`
 `;
 
 const EmptyDesc = styled.p`
-  color: rgba(255, 255, 255, 0.7);
+  opacity: 0.8;
   margin-bottom: 2rem;
 `;
 
-const StartButton = styled.button`
-  background: linear-gradient(45deg, #ff6b6b, #ffa500);
-  border: none;
-  color: white;
-  padding: 1rem 2rem;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: bold;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  }
-`;
+const StartButton = styled(PrimaryButton)``;
 
 const ResultsContainer = styled.div`
   padding: 2rem;
 `;
 
-const ResultsHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+const ResultsHeader = styled(FlexRow)`
   margin-bottom: 2rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.1);
   border-radius: 10px;
-  backdrop-filter: blur(10px);
 `;
 
-const ResultsCount = styled.h3`
-  margin: 0;
+const ResultsCount = styled.div`
   font-size: 1.2rem;
+  font-weight: bold;
 `;
 
-const ResultsDate = styled.span`
-  color: rgba(255, 255, 255, 0.7);
+const ResultsDate = styled.div`
   font-size: 0.9rem;
+  opacity: 0.8;
 `;
 
 const ResultsList = styled.div`
@@ -268,37 +199,22 @@ const ResultsList = styled.div`
   gap: 1.5rem;
 `;
 
-const ResultCard = styled.div`
-  background: rgba(255, 255, 255, 0.1);
+const ResultCard = styled(Card)`
   border-radius: 15px;
-  padding: 1.5rem;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-5px);
-  }
 `;
 
-const ResultHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+const ResultHeader = styled(FlexRow)`
   margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
 const TestTitle = styled.h3`
+  font-size: 1.3rem;
   margin: 0;
-  font-size: 1.1rem;
-  color: #ffd700;
 `;
 
-const ResultDate = styled.span`
-  color: rgba(255, 255, 255, 0.6);
+const ResultDate = styled.div`
   font-size: 0.9rem;
+  opacity: 0.7;
 `;
 
 const ResultContent = styled.div`
@@ -306,63 +222,40 @@ const ResultContent = styled.div`
 `;
 
 const ResultTitle = styled.h4`
+  font-size: 1.2rem;
   margin: 0 0 0.5rem 0;
-  font-size: 1.3rem;
-  color: #ff6b6b;
+  color: #ffa500;
 `;
 
 const ResultDescription = styled.p`
-  margin: 0 0 1rem 0;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+  margin-bottom: 1rem;
 `;
 
 const ResultImage = styled.img`
-  width: 100%;
-  max-width: 300px;
-  height: auto;
+  width: 150px;
+  height: 150px;
   border-radius: 10px;
-  margin-top: 1rem;
+  object-fit: cover;
 `;
 
 const ResultActions = styled.div`
   display: flex;
   gap: 1rem;
-  justify-content: flex-end;
 `;
 
-const RetakeButton = styled.button`
-  background: linear-gradient(45deg, #4CAF50, #45a049);
-  border: none;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  
-  &:hover {
-    background: linear-gradient(45deg, #45a049, #4CAF50);
-  }
-`;
+const RetakeButton = styled(PrimaryButton)``;
 
 const DeleteButton = styled.button`
   background: rgba(255, 0, 0, 0.3);
   border: none;
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
+  padding: 10px 20px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-weight: bold;
   
   &:hover {
     background: rgba(255, 0, 0, 0.4);
   }
-`;
-
-const Footer = styled.footer`
-  text-align: center;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
 `; 
