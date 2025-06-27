@@ -50,7 +50,7 @@ export default function History() {
   };
 
   const retakeTest = (testId) => {
-    router.push(`/psycho_page/tests/${testId}`);
+    router.push(`/tests/${testId}`);
   };
 
   if (loading) {
@@ -66,7 +66,7 @@ export default function History() {
     <MainWrap>
       {/* 헤더 */}
       <Header>
-        <BackButton onClick={() => router.push('/psycho_page')}>
+        <BackButton onClick={() => router.push('/')}>
           ← 메인으로
         </BackButton>
         <PageTitle>📋 테스트 기록</PageTitle>
@@ -81,7 +81,7 @@ export default function History() {
           <EmptyIcon>📝</EmptyIcon>
           <EmptyTitle>아직 완료한 테스트가 없습니다</EmptyTitle>
           <EmptyDesc>테스트를 완료하면 여기에 결과가 저장됩니다.</EmptyDesc>
-          <StartButton onClick={() => router.push('/psycho_page')}>
+          <StartButton onClick={() => router.push('/')}>
             테스트 시작하기
           </StartButton>
         </EmptyState>

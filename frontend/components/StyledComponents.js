@@ -272,4 +272,117 @@ export const ProgressText = styled.div`
   transform: translate(-50%, -50%);
   font-size: 0.9rem;
   font-weight: bold;
+`;
+
+// 메인 페이지 전용 스타일 컴포넌트들
+export const Logo = styled.h1`
+  font-size: 2rem;
+  margin: 0;
+  background: linear-gradient(45deg, #ff6b6b, #ffa500);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+`;
+
+export const Stats = styled.div`
+  display: flex;
+  gap: 20px;
+  align-items: center;
+`;
+
+export const StatItem = styled.span`
+  font-size: 0.9rem;
+  opacity: 0.9;
+`;
+
+export const HistoryButton = styled(SecondaryButton)`
+  font-size: 0.9rem;
+  padding: 10px 15px;
+`;
+
+export const SearchSection = styled.div`
+  max-width: 800px;
+  margin: 0 auto 30px;
+  padding: 0 20px;
+`;
+
+export const SearchBar = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 25px;
+  padding: 5px;
+  backdrop-filter: blur(10px);
+`;
+
+export const SearchInput = styled.input`
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  font-size: 1rem;
+  
+  &::placeholder {
+    color: rgba(255,255,255,0.6);
+  }
+  
+  &:focus {
+    outline: none;
+  }
+`;
+
+export const SearchButton = styled.button`
+  background: linear-gradient(45deg, #ff6b6b, #ffa500);
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
+export const FilterBar = styled.div`
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+export const CategorySelect = styled.select`
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  
+  option {
+    background: #333;
+    color: white;
+  }
+`;
+
+export const BannerStats = styled.div`
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0,0,0,0.7);
+  padding: 10px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+`;
+
+export const TestItemStats = styled.div`
+  display: flex;
+  gap: 15px;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-top: 10px;
 `; 

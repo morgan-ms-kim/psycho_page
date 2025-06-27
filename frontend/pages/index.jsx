@@ -15,7 +15,19 @@ import {
   Section,
   Title,
   SectionTitle,
-  Card
+  Card,
+  Logo,
+  Stats,
+  StatItem,
+  HistoryButton,
+  SearchSection,
+  SearchBar,
+  SearchInput,
+  SearchButton,
+  FilterBar,
+  CategorySelect,
+  BannerStats,
+  TestItemStats
 } from '../components/StyledComponents';
 
 // API 기본 URL - nginx 리버스 프록시 사용
@@ -71,6 +83,8 @@ export default function Home() {
       setVisitorStats(response.data);
     } catch (error) {
       console.error('방문자 통계 로드 실패:', error);
+      // 기본값 설정
+      setVisitorStats({ total: 0, today: 0, week: 0 });
     }
   };
 
@@ -81,6 +95,13 @@ export default function Home() {
       setCategories(response.data);
     } catch (error) {
       console.error('카테고리 로드 실패:', error);
+      // 기본 카테고리 설정
+      setCategories([
+        { id: 'personality', name: '성격' },
+        { id: 'love', name: '연애' },
+        { id: 'career', name: '직업' },
+        { id: 'hobby', name: '취미' }
+      ]);
     }
   };
 
@@ -116,9 +137,26 @@ export default function Home() {
       setLoadingMore(false);
     } catch (error) {
       console.error('테스트 데이터 로드 실패:', error);
-      setError('테스트를 불러오는데 실패했습니다.');
+      setError('테스트를 불러오는데 실패했습니다. 서버 연결을 확인해주세요.');
       setLoading(false);
       setLoadingMore(false);
+      
+      // API 연결 실패 시 기본 테스트 데이터 표시
+      if (reset && tests.length === 0) {
+        setTests([
+          {
+            id: 'test1',
+            title: '성격 유형 테스트',
+            description: '당신의 성격 유형을 알아보세요',
+            category: 'personality',
+            views: 1000,
+            likes: 50,
+            comments: 10,
+            createdAt: new Date().toISOString(),
+            thumbImage: '/default-thumb.png'
+          }
+        ]);
+      }
     }
   };
 
@@ -179,7 +217,7 @@ export default function Home() {
           <StatItem>📊 오늘 방문자: {visitorStats.today.toLocaleString()}</StatItem>
           <StatItem>📈 주간 방문자: {visitorStats.week.toLocaleString()}</StatItem>
         </Stats>
-        <HistoryButton onClick={() => window.location.href = '/psycho_page/history'}>
+        <HistoryButton onClick={() => window.location.href = '/history'}>
           📋 기록보기
         </HistoryButton>
       </Header>
@@ -210,7 +248,7 @@ export default function Home() {
           <SortSelect value={sort} onChange={e => setSort(e.target.value)}>
             <option value="latest">최신순</option>
             <option value="views">조회순</option>
-            <option value="likes">추천순</option>
+            <option value="likes">좋아요순</option>
             <option value="popular">인기순</option>
           </SortSelect>
         </FilterBar>
@@ -224,7 +262,7 @@ export default function Home() {
               <BannerSlide 
                 key={test.id} 
                 active={i === currentBanner}
-                onClick={() => window.location.href = `/psycho_page/tests/${test.id}`}
+                onClick={() => window.location.href = `/tests/${test.id}`}
               >
                 <BannerImg src={test.thumbnail || '/default-banner.png'} alt={test.title} onError={handleImageError} />
                 <BannerOverlay>
@@ -265,7 +303,7 @@ export default function Home() {
             <SectionTitle>🔥 인기 테스트</SectionTitle>
             <TestList>
               {sortedTests.slice(0, Math.ceil(sortedTests.length / 2)).map(test => (
-                <TestListItem key={test.id} onClick={() => window.location.href = `/psycho_page/tests/${test.id}`}>
+                <TestListItem key={test.id} onClick={() => window.location.href = `/tests/${test.id}`}>
                   <TestItemImage src={test.thumbnail || '/default-thumb.png'} alt={test.title} onError={handleImageError} />
                   <TestItemContent>
                     <TestItemTitle>{test.title}</TestItemTitle>
@@ -289,7 +327,7 @@ export default function Home() {
             <SectionTitle>⭐ 추천 테스트</SectionTitle>
             <TestList>
               {sortedTests.slice(Math.ceil(sortedTests.length / 2)).map(test => (
-                <TestListItem key={test.id} onClick={() => window.location.href = `/psycho_page/tests/${test.id}`}>
+                <TestListItem key={test.id} onClick={() => window.location.href = `/tests/${test.id}`}>
                   <TestItemImage src={test.thumbnail || '/default-thumb.png'} alt={test.title} onError={handleImageError} />
                   <TestItemContent>
                     <TestItemTitle>{test.title}</TestItemTitle>
@@ -515,12 +553,6 @@ const BannerDesc = styled.p`
   font-size: 1rem;
   margin: 0 0 1rem 0;
   opacity: 0.9;
-`;
-
-const BannerStats = styled.div`
-  display: flex;
-  gap: 1rem;
-  font-size: 0.9rem;
 `;
 
 const BannerDots = styled.div`

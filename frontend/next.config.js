@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: '/psycho_page',
-  trailingSlash: true,
+  trailingSlash: false,
+  compiler: {
+    styledComponents: true,
+  },
+  experimental: {
+    esmExternals: 'loose',
+  },
 };
 
 module.exports = nextConfig; 

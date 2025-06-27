@@ -82,6 +82,7 @@ export default function TestDetail() {
       });
     } catch (error) {
       console.error('방문 기록 실패:', error);
+      // 방문 기록 실패는 무시하고 계속 진행
     }
   };
 
@@ -94,8 +95,20 @@ export default function TestDetail() {
       setLoading(false);
     } catch (error) {
       console.error('테스트 데이터 로드 실패:', error);
-      setError('테스트를 불러오는데 실패했습니다.');
+      setError('테스트를 불러오는데 실패했습니다. 서버 연결을 확인해주세요.');
       setLoading(false);
+      
+      // API 연결 실패 시 기본 테스트 데이터 표시
+      setTest({
+        id: id,
+        title: '테스트 로드 중...',
+        description: '서버 연결을 확인해주세요.',
+        questions: [],
+        results: [],
+        views: 0,
+        likes: 0,
+        comments: 0
+      });
     }
   };
 
@@ -117,6 +130,10 @@ export default function TestDetail() {
     } catch (error) {
       console.error('댓글 로드 실패:', error);
       setLoadingComments(false);
+      // 댓글 로드 실패는 빈 배열로 설정
+      if (page === 1) {
+        setComments([]);
+      }
     }
   };
 
@@ -261,7 +278,7 @@ export default function TestDetail() {
     return (
       <ErrorWrap>
         <h2>테스트를 찾을 수 없습니다</h2>
-        <button onClick={() => router.push('/psycho_page')}>메인으로 돌아가기</button>
+        <button onClick={() => router.push('/')}>메인으로 돌아가기</button>
       </ErrorWrap>
     );
   }
@@ -269,7 +286,7 @@ export default function TestDetail() {
   return (
     <MainWrap>
       <Header>
-        <BackButton onClick={() => router.push('/psycho_page')}>
+        <BackButton onClick={() => router.push('/')}>
           ← 메인으로
         </BackButton>
         <TestTitle>{test.title}</TestTitle>
