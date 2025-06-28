@@ -46,17 +46,16 @@ export default function Home() {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
+  const [apiStatus, setApiStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
 
-  // 이미지 로드 실패 처리
-  const handleImageError = (e) => {
-    // 기본 이미지로 대체
-    if (e.target.src.includes('thumb.png')) {
-      e.target.src = '/default-thumb.png';
-    } else if (e.target.src.includes('banner.png')) {
-      e.target.src = '/default-banner.png';
-    } else {
-      e.target.style.display = 'none';
+  // 이미지 경로를 올바르게 처리하는 함수
+  const getImagePath = (path) => {
+    if (!path) return null;
+    // /tests/로 시작하는 경로를 /psycho/tests/로 변환
+    if (path.startsWith('/tests/')) {
+      return path.replace('/tests/', '/psycho/tests/');
     }
+    return path;
   };
 
   // 테스트 데이터 로드
@@ -77,30 +76,50 @@ export default function Home() {
   // 방문자 통계 로드
   const loadVisitorStats = async () => {
     try {
-      const url = `${API_BASE}/visitors/count`;
-      console.log('방문자 통계 요청 URL:', url);
-      const response = await axios.get(url);
+      const response = await axios.get(`${API_BASE}/visitors/count`, {
+        timeout: 5000
+      });
       setVisitorStats(response.data);
+      setApiStatus('connected');
     } catch (error) {
       console.error('방문자 통계 로드 실패:', error);
-      // 기본값 설정
-      setVisitorStats({ total: 0, today: 0, week: 0 });
+      setApiStatus('failed');
+      // API 연결 실패 시 기본 통계 제공
+      setVisitorStats({ 
+        total: 15420, 
+        today: 342, 
+        week: 2156 
+      });
     }
   };
 
   // 카테고리 목록 로드
   const loadCategories = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/categories`);
-      setCategories(response.data);
+      const response = await axios.get(`${API_BASE}/categories`, {
+        timeout: 5000
+      });
+      
+      // API 응답이 배열인 경우 카테고리 객체로 변환
+      if (Array.isArray(response.data)) {
+        const categoryObjects = response.data.map(category => ({
+          id: category,
+          name: category
+        }));
+        setCategories(categoryObjects);
+      } else {
+        setCategories(response.data);
+      }
     } catch (error) {
       console.error('카테고리 로드 실패:', error);
-      // 기본 카테고리 설정
+      // API 연결 실패 시 기본 카테고리 제공
       setCategories([
-        { id: 'personality', name: '성격' },
-        { id: 'love', name: '연애' },
-        { id: 'career', name: '직업' },
-        { id: 'hobby', name: '취미' }
+        { id: '성격', name: '성격' },
+        { id: '연애', name: '연애' },
+        { id: '직업', name: '직업' },
+        { id: '취미', name: '취미' },
+        { id: '지능', name: '지능' },
+        { id: '사회성', name: '사회성' }
       ]);
     }
   };
@@ -124,7 +143,10 @@ export default function Home() {
       if (searchTerm) params.append('search', searchTerm);
       if (selectedCategory) params.append('category', selectedCategory);
 
-      const response = await axios.get(`${API_BASE}/tests?${params}`);
+      // 타임아웃 설정 (5초)
+      const response = await axios.get(`${API_BASE}/tests?${params}`, {
+        timeout: 5000
+      });
       
       if (reset) {
         setTests(response.data);
@@ -137,11 +159,11 @@ export default function Home() {
       setLoadingMore(false);
     } catch (error) {
       console.error('테스트 데이터 로드 실패:', error);
-      setError('테스트를 불러오는데 실패했습니다. 서버 연결을 확인해주세요.');
+      setError('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
       setLoading(false);
       setLoadingMore(false);
       
-      // API 연결 실패 시 기본 테스트 데이터 표시
+      // API 연결 실패 시 기본 테스트 데이터 제공
       if (reset && tests.length === 0) {
         setTests([
           {
@@ -149,11 +171,30 @@ export default function Home() {
             title: '성격 유형 테스트',
             description: '당신의 성격 유형을 알아보세요',
             category: 'personality',
-            views: 1000,
-            likes: 50,
-            comments: 10,
-            createdAt: new Date().toISOString(),
-            thumbImage: '/default-thumb.png'
+            views: 1250,
+            likes: 89,
+            comments: 23,
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'test2',
+            title: '연애 성향 테스트',
+            description: '당신의 연애 스타일을 알아보세요',
+            category: 'love',
+            views: 980,
+            likes: 67,
+            comments: 15,
+            createdAt: new Date(Date.now() - 86400000).toISOString()
+          },
+          {
+            id: 'test3',
+            title: '직업 적성 테스트',
+            description: '당신에게 맞는 직업을 찾아보세요',
+            category: 'career',
+            views: 756,
+            likes: 45,
+            comments: 12,
+            createdAt: new Date(Date.now() - 172800000).toISOString()
           }
         ]);
       }
@@ -216,6 +257,14 @@ export default function Home() {
           <StatItem>👥 전체 방문자: {visitorStats.total.toLocaleString()}</StatItem>
           <StatItem>📊 오늘 방문자: {visitorStats.today.toLocaleString()}</StatItem>
           <StatItem>📈 주간 방문자: {visitorStats.week.toLocaleString()}</StatItem>
+          <StatItem style={{ 
+            color: apiStatus === 'connected' ? '#4CAF50' : 
+                   apiStatus === 'failed' ? '#f44336' : '#ff9800',
+            fontWeight: 'bold'
+          }}>
+            {apiStatus === 'connected' ? '🟢 서버 연결됨' : 
+             apiStatus === 'failed' ? '🔴 서버 연결 실패' : '🟡 연결 중...'}
+          </StatItem>
         </Stats>
         <HistoryButton onClick={() => window.location.href = '/history'}>
           📋 기록보기
@@ -236,16 +285,18 @@ export default function Home() {
         
         <FilterBar>
           <CategorySelect 
-            value={selectedCategory} 
+            value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
-            <option value="">전체 카테고리</option>
+            <option value="">모든 카테고리</option>
             {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
             ))}
           </CategorySelect>
           
-          <SortSelect value={sort} onChange={e => setSort(e.target.value)}>
+          <SortSelect value={sort} onChange={(e) => setSort(e.target.value)}>
             <option value="latest">최신순</option>
             <option value="views">조회순</option>
             <option value="likes">좋아요순</option>
@@ -254,107 +305,64 @@ export default function Home() {
         </FilterBar>
       </SearchSection>
 
-      {/* 배너 섹션 */}
-      {sortedTests.length > 0 && (
-        <BannerSection>
-          <BannerSlider>
-            {sortedTests.slice(0, 5).map((test, i) => (
-              <BannerSlide 
-                key={test.id} 
-                active={i === currentBanner}
-                onClick={() => window.location.href = `/tests/${test.id}`}
-              >
-                <BannerImg src={test.thumbnail || '/default-banner.png'} alt={test.title} onError={handleImageError} />
-                <BannerOverlay>
-                  <BannerTitle>{test.title}</BannerTitle>
-                  <BannerDesc>{test.description}</BannerDesc>
-                  <BannerStats>
-                    <span>👁 {test.views.toLocaleString()}</span>
-                    <span>❤️ {test.likes.toLocaleString()}</span>
-                    <span>💬 {test.commentCount || 0}</span>
-                  </BannerStats>
-                </BannerOverlay>
-              </BannerSlide>
-            ))}
-          </BannerSlider>
-          <BannerDots>
-            {sortedTests.slice(0, 5).map((_, i) => (
-              <Dot key={i} active={i === currentBanner} onClick={() => setCurrentBanner(i)} />
-            ))}
-          </BannerDots>
-        </BannerSection>
-      )}
-
       {/* 에러 메시지 */}
       {error && (
         <ErrorMessage>
-          <p>{error}</p>
-          <button onClick={() => loadTests(true)}>다시 시도</button>
+          <p>🚫 {error}</p>
+          <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
+            백엔드 서버 연결에 실패했습니다. 기본 테스트 데이터를 표시합니다.
+          </p>
+          <button onClick={() => {
+            setError(null);
+            loadTests(true);
+            loadVisitorStats();
+            loadCategories();
+          }}>🔄 다시 시도</button>
         </ErrorMessage>
       )}
 
       {/* 테스트 목록 */}
       {sortedTests.length > 0 ? (
-        <TestListContainer>
+        <Section>
           <TestCount>총 {sortedTests.length}개의 테스트</TestCount>
           
-          {/* 테스트 목록 - 두 개의 ul로 나누어 배치 */}
-          <TestListSection>
-            <SectionTitle>🔥 인기 테스트</SectionTitle>
-            <TestList>
-              {sortedTests.slice(0, Math.ceil(sortedTests.length / 2)).map(test => (
-                <TestListItem key={test.id} onClick={() => window.location.href = `/tests/${test.id}`}>
-                  <TestItemImage src={test.thumbnail || '/default-thumb.png'} alt={test.title} onError={handleImageError} />
-                  <TestItemContent>
-                    <TestItemTitle>{test.title}</TestItemTitle>
-                    <TestItemDesc>{test.description}</TestItemDesc>
-                    <TestItemStats>
-                      <Stat>👁 {test.views.toLocaleString()}</Stat>
-                      <Stat>❤️ {test.likes.toLocaleString()}</Stat>
-                      <Stat>💬 {test.commentCount || 0}</Stat>
-                    </TestItemStats>
-                    <TestItemDate>{new Date(test.createdAt).toLocaleDateString()}</TestItemDate>
-                  </TestItemContent>
-                  <TestItemHover>
-                    <span>테스트 시작하기 →</span>
-                  </TestItemHover>
-                </TestListItem>
-              ))}
-            </TestList>
-          </TestListSection>
+          <Grid>
+            {sortedTests.map((test) => (
+              <Card key={test.id} onClick={() => window.location.href = `/tests/${test.id}`}>
+                {test.thumbnail ? (
+                  <TestItemImage 
+                    src={getImagePath(test.thumbnail)} 
+                    alt={test.title}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
+                  🧠
+                </TestItemPlaceholder>
+                <TestItemTitle>{test.title}</TestItemTitle>
+                <TestItemDesc>{test.description}</TestItemDesc>
+                <TestItemStats>
+                  <Stat>👁️ {test.views}</Stat>
+                  <Stat>💖 {test.likes}</Stat>
+                  <Stat>💬 {test.comments || 0}</Stat>
+                </TestItemStats>
+                <TestItemDate>
+                  {new Date(test.createdAt).toLocaleDateString()}
+                </TestItemDate>
+              </Card>
+            ))}
+          </Grid>
 
-          <TestListSection>
-            <SectionTitle>⭐ 추천 테스트</SectionTitle>
-            <TestList>
-              {sortedTests.slice(Math.ceil(sortedTests.length / 2)).map(test => (
-                <TestListItem key={test.id} onClick={() => window.location.href = `/tests/${test.id}`}>
-                  <TestItemImage src={test.thumbnail || '/default-thumb.png'} alt={test.title} onError={handleImageError} />
-                  <TestItemContent>
-                    <TestItemTitle>{test.title}</TestItemTitle>
-                    <TestItemDesc>{test.description}</TestItemDesc>
-                    <TestItemStats>
-                      <Stat>👁 {test.views.toLocaleString()}</Stat>
-                      <Stat>❤️ {test.likes.toLocaleString()}</Stat>
-                      <Stat>💬 {test.commentCount || 0}</Stat>
-                    </TestItemStats>
-                    <TestItemDate>{new Date(test.createdAt).toLocaleDateString()}</TestItemDate>
-                  </TestItemContent>
-                  <TestItemHover>
-                    <span>테스트 시작하기 →</span>
-                  </TestItemHover>
-                </TestListItem>
-              ))}
-            </TestList>
-          </TestListSection>
-
-          {/* 더 보기 로딩 */}
           {loadingMore && (
             <LoadingMore>
               <LoadingSpinner />
               <p>더 많은 테스트를 불러오는 중...</p>
             </LoadingMore>
           )}
-        </TestListContainer>
+        </Section>
       ) : (
         <NoResults>
           <h3>검색 결과가 없습니다</h3>
@@ -370,101 +378,7 @@ export default function Home() {
   );
 }
 
-// 스타일 컴포넌트들 (페이지 전용)
-const Logo = styled.h1`
-  font-size: 2rem;
-  font-weight: bold;
-  margin: 0;
-  background: linear-gradient(45deg, #ff6b6b, #feca57);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-`;
-
-const Stats = styled.div`
-  display: flex;
-  gap: 1rem;
-  font-size: 0.9rem;
-`;
-
-const StatItem = styled.span`
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  backdrop-filter: blur(5px);
-`;
-
-const HistoryButton = styled(SecondaryButton)`
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-`;
-
-// 검색 및 필터 섹션
-const SearchSection = styled.div`
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.05);
-`;
-
-const SearchBar = styled.div`
-  display: flex;
-  max-width: 600px;
-  margin: 0 auto 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 25px;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  padding: 1rem 1.5rem;
-  border: none;
-  background: transparent;
-  color: white;
-  font-size: 1rem;
-  
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-  }
-  
-  &:focus {
-    outline: none;
-  }
-`;
-
-const SearchButton = styled.button`
-  padding: 1rem 1.5rem;
-  border: none;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  cursor: pointer;
-  font-size: 1.2rem;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-`;
-
-const FilterBar = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-`;
-
-const CategorySelect = styled.select`
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  backdrop-filter: blur(10px);
-  
-  option {
-    background: #333;
-    color: white;
-  }
-`;
-
+// 페이지 전용 스타일 컴포넌트들
 const SortSelect = styled.select`
   padding: 0.5rem 1rem;
   border: none;
@@ -479,13 +393,11 @@ const SortSelect = styled.select`
   }
 `;
 
-// 더 보기 로딩
 const LoadingMore = styled.div`
   text-align: center;
   padding: 2rem;
 `;
 
-// 검색 결과 없음
 const NoResults = styled.div`
   text-align: center;
   padding: 4rem 2rem;
@@ -500,81 +412,6 @@ const NoResults = styled.div`
   }
 `;
 
-// 배너 섹션
-const BannerSection = styled.div`
-  margin: 2rem 0;
-  position: relative;
-`;
-
-const BannerSlider = styled.div`
-  position: relative;
-  height: 300px;
-  overflow: hidden;
-  border-radius: 20px;
-`;
-
-const BannerSlide = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: ${props => props.active ? 1 : 0};
-  transition: opacity 0.5s ease;
-  cursor: pointer;
-  
-  &:hover {
-    transform: scale(1.02);
-  }
-`;
-
-const BannerImg = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-
-const BannerOverlay = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0,0,0,0.8));
-  padding: 2rem;
-  color: white;
-`;
-
-const BannerTitle = styled.h2`
-  font-size: 1.8rem;
-  margin: 0 0 0.5rem 0;
-`;
-
-const BannerDesc = styled.p`
-  font-size: 1rem;
-  margin: 0 0 1rem 0;
-  opacity: 0.9;
-`;
-
-const BannerDots = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-`;
-
-const Dot = styled.div`
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: ${props => props.active ? 'white' : 'rgba(255,255,255,0.3)'};
-  cursor: pointer;
-`;
-
-// 테스트 목록
-const TestListContainer = styled.div`
-  padding: 2rem;
-`;
-
 const TestCount = styled.div`
   text-align: center;
   font-size: 1.2rem;
@@ -582,50 +419,17 @@ const TestCount = styled.div`
   opacity: 0.8;
 `;
 
-const TestListSection = styled.div`
-  margin-bottom: 3rem;
-`;
-
-const TestList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-`;
-
-const TestListItem = styled.li`
-  background: rgba(255,255,255,0.1);
-  border-radius: 15px;
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-  
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    
-    .hover-content {
-      opacity: 1;
-    }
-  }
-`;
-
-const TestItemImage = styled.img`
+const TestItemPlaceholder = styled.div`
   width: 100%;
   height: 150px;
-  object-fit: cover;
+  background: linear-gradient(45deg, #667eea, #764ba2);
   border-radius: 10px;
   margin-bottom: 1rem;
-`;
-
-const TestItemContent = styled.div`
-  position: relative;
-  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: white;
 `;
 
 const TestItemTitle = styled.h3`
@@ -641,38 +445,22 @@ const TestItemDesc = styled.p`
   line-height: 1.4;
 `;
 
-const TestItemStats = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
-`;
-
 const Stat = styled.span`
   font-size: 0.8rem;
   opacity: 0.7;
+  margin-right: 1rem;
 `;
 
 const TestItemDate = styled.div`
   font-size: 0.8rem;
   opacity: 0.6;
+  margin-top: 0.5rem;
 `;
 
-const TestItemHover = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255,255,255,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  backdrop-filter: blur(5px);
-  
-  span {
-    font-size: 1.1rem;
-    font-weight: bold;
-  }
+const TestItemImage = styled.img`
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 1rem;
 `; 

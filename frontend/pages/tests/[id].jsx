@@ -56,13 +56,14 @@ export default function TestDetail() {
   const [error, setError] = useState(null);
   const [testCompleted, setTestCompleted] = useState(false);
 
-  // 이미지 로드 실패 처리
-  const handleImageError = (e) => {
-    if (e.target.src.includes('result.png')) {
-      e.target.src = '/default-result.png';
-    } else {
-      e.target.style.display = 'none';
+  // 이미지 경로를 올바르게 처리하는 함수
+  const getImagePath = (path) => {
+    if (!path) return null;
+    // /tests/로 시작하는 경로를 /psycho/tests/로 변환
+    if (path.startsWith('/tests/')) {
+      return path.replace('/tests/', '/psycho/tests/');
     }
+    return path;
   };
 
   // 테스트 데이터 로드
@@ -331,7 +332,9 @@ export default function TestDetail() {
         <ResultSection>
           <ResultCard>
             <ResultTitle>{result.title}</ResultTitle>
-            <ResultImage src={result.image || '/default-result.png'} alt={result.title} onError={handleImageError} />
+            <ResultPlaceholder>
+              🎯
+            </ResultPlaceholder>
             <ResultDescription>{result.description}</ResultDescription>
             
             <ShareSection>
@@ -521,7 +524,18 @@ const ResultTitle = styled.h2`
   color: #ffa500;
 `;
 
-const ResultImage = styled(Image)``;
+const ResultPlaceholder = styled.div`
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  border-radius: 20px;
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  color: white;
+`;
 
 const ResultDescription = styled.p`
   font-size: 1.2rem;

@@ -7,6 +7,15 @@ const nextConfig = {
   experimental: {
     esmExternals: 'loose',
   },
+  async redirects() {
+    return [
+      {
+        source: '/tests/:path*',
+        destination: '/psycho/tests/:path*',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig; 

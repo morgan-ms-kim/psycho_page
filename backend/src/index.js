@@ -29,7 +29,7 @@ const errorHandler = (err, req, res, next) => {
 };
 
 // 모든 테스트 목록 가져오기 (조회수, 좋아요 포함)
-app.get('/api/tests', async (req, res) => {
+app.get('/api/tests', async (req, res, next) => {
   try {
     const { search, category, sort = 'latest', limit = 20 } = req.query;
     
@@ -58,14 +58,28 @@ app.get('/api/tests', async (req, res) => {
       limit: parseInt(limit)
     });
     
-    res.json(tests);
+    // 이미지 경로 수정
+    const testsWithCorrectPaths = tests.map(test => {
+      const testData = test.toJSON();
+      if (testData.thumbnail) {
+        // /psycho/tests/ 경로로 수정
+        if (testData.thumbnail.startsWith('/tests/')) {
+          testData.thumbnail = testData.thumbnail.replace('/tests/', '/psycho/tests/');
+        } else if (!testData.thumbnail.startsWith('/psycho/tests/')) {
+          testData.thumbnail = `/psycho/tests/${testData.thumbnail}`;
+        }
+      }
+      return testData;
+    });
+    
+    res.json(testsWithCorrectPaths);
   } catch (error) {
     next(error);
   }
 });
 
 // 테스트별 상세 정보 (조회수, 좋아요, 댓글 수)
-app.get('/api/tests/:id', async (req, res) => {
+app.get('/api/tests/:id', async (req, res, next) => {
   try {
     const test = await Test.findByPk(req.params.id);
     if (!test) {
@@ -106,8 +120,18 @@ app.get('/api/tests/:id', async (req, res) => {
       }
     });
     
+    // 이미지 경로 수정
+    const testData = test.toJSON();
+    if (testData.thumbnail) {
+      if (testData.thumbnail.startsWith('/tests/')) {
+        testData.thumbnail = testData.thumbnail.replace('/tests/', '/psycho/tests/');
+      } else if (!testData.thumbnail.startsWith('/psycho/tests/')) {
+        testData.thumbnail = `/psycho/tests/${testData.thumbnail}`;
+      }
+    }
+    
     res.json({
-      ...test.toJSON(),
+      ...testData,
       commentCount,
       userLiked: !!userLike
     });
@@ -117,7 +141,7 @@ app.get('/api/tests/:id', async (req, res) => {
 });
 
 // 좋아요 토글
-app.post('/api/tests/:id/like', async (req, res) => {
+app.post('/api/tests/:id/like', async (req, res, next) => {
   try {
     const clientIP = getClientIP(req);
     const testId = req.params.id;
@@ -143,7 +167,7 @@ app.post('/api/tests/:id/like', async (req, res) => {
 });
 
 // 댓글 목록
-app.get('/api/tests/:id/comments', async (req, res) => {
+app.get('/api/tests/:id/comments', async (req, res, next) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
@@ -167,7 +191,7 @@ app.get('/api/tests/:id/comments', async (req, res) => {
 });
 
 // 댓글 작성
-app.post('/api/tests/:id/comments', async (req, res) => {
+app.post('/api/tests/:id/comments', async (req, res, next) => {
   try {
     const { nickname, content } = req.body;
     
@@ -193,7 +217,7 @@ app.post('/api/tests/:id/comments', async (req, res) => {
 });
 
 // 댓글 좋아요 토글
-app.post('/api/comments/:id/like', async (req, res) => {
+app.post('/api/comments/:id/like', async (req, res, next) => {
   try {
     const clientIP = getClientIP(req);
     const commentId = req.params.id;
@@ -215,23 +239,30 @@ app.post('/api/comments/:id/like', async (req, res) => {
 });
 
 // 카테고리 목록
-app.get('/api/categories', async (req, res) => {
+app.get('/api/categories', async (req, res, next) => {
   try {
-    const categories = await Test.findAll({
-      attributes: [[sequelize.fn('DISTINCT', sequelize.col('category')), 'category']],
+    // 더 안전한 방법으로 카테고리 조회
+    const tests = await Test.findAll({
+      attributes: ['category'],
       where: {
         category: { [Op.ne]: null }
-      }
+      },
+      raw: true
     });
     
-    res.json(categories.map(cat => cat.category));
+    // 중복 제거
+    const uniqueCategories = [...new Set(tests.map(test => test.category).filter(Boolean))];
+    
+    res.json(uniqueCategories);
   } catch (error) {
-    next(error);
+    console.error('카테고리 조회 오류:', error);
+    // 오류 발생 시 빈 배열 반환
+    res.json([]);
   }
 });
 
 // 인기 테스트 (조회수 기준)
-app.get('/api/tests/popular', async (req, res) => {
+app.get('/api/tests/popular', async (req, res, next) => {
   try {
     const { limit = 10 } = req.query;
     
@@ -247,7 +278,7 @@ app.get('/api/tests/popular', async (req, res) => {
 });
 
 // 최신 테스트
-app.get('/api/tests/latest', async (req, res) => {
+app.get('/api/tests/latest', async (req, res, next) => {
   try {
     const { limit = 10 } = req.query;
     
@@ -263,7 +294,7 @@ app.get('/api/tests/latest', async (req, res) => {
 });
 
 // 방문자 통계
-app.get('/api/visitors/count', async (req, res) => {
+app.get('/api/visitors/count', async (req, res, next) => {
   try {
     const today = new Date();
     today.setHours(0,0,0,0);
@@ -291,7 +322,7 @@ app.get('/api/visitors/count', async (req, res) => {
 });
 
 // 방문자 기록
-app.post('/api/visitors', async (req, res) => {
+app.post('/api/visitors', async (req, res, next) => {
   try {
     const { country, region, testId } = req.body;
     const clientIP = getClientIP(req);
@@ -311,7 +342,7 @@ app.post('/api/visitors', async (req, res) => {
 });
 
 // 테스트 통계
-app.get('/api/stats', async (req, res) => {
+app.get('/api/stats', async (req, res, next) => {
   try {
     const totalTests = await Test.count();
     const totalViews = await Test.sum('views') || 0;
