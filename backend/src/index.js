@@ -50,7 +50,7 @@ app.get('/api/health', (req, res) => {
     adminToken: process.env.ADMIN_TOKEN ? '설정됨' : '설정되지 않음',
     nodeVersion: process.version,
     platform: process.platform,
-    arch: process.arch(),
+    arch: process.arch,
     memoryUsage: process.memoryUsage(),
     uptime: process.uptime()
   });
@@ -82,11 +82,11 @@ app.get('/api/db-status', async (req, res) => {
         updatedAt: test.updatedAt
       })),
       systemInfo: {
-        platform: os.platform(),
-        arch: os.arch(),
-        totalMemory: os.totalmem(),
-        freeMemory: os.freemem(),
-        cpus: os.cpus().length
+        platform: os.default.platform(),
+        arch: os.default.arch(),
+        totalMemory: os.default.totalmem(),
+        freeMemory: os.default.freemem(),
+        cpus: os.default.cpus().length
       }
     });
   } catch (error) {
