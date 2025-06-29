@@ -113,9 +113,7 @@ export default function Analytics() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    if (validateAndFixPath('/', router)) {
-      router.push('/');
-    }
+    router.push('/');
   };
 
   const chartData = {

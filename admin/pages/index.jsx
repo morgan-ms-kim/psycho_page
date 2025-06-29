@@ -11,6 +11,37 @@ const apiClient = axios.create({
   }
 });
 
+// 경로 확인 및 수정 유틸리티 함수
+const validateAndFixPath = (path, router) => {
+  // 현재 경로 확인
+  const currentPath = router.asPath;
+  const basePath = '/psycho_page/admin';
+  
+  console.log('현재 경로:', currentPath);
+  
+  // 중복 경로 확인 (더 정확한 패턴 매칭)
+  if (currentPath.includes('/psycho_page/admin/psycho_page/admin')) {
+    console.warn('중복 경로 감지:', currentPath);
+    // 중복 제거하고 올바른 경로로 리다이렉트
+    const cleanPath = currentPath.replace('/psycho_page/admin/psycho_page/admin', basePath);
+    console.log('수정된 경로:', cleanPath);
+    router.replace(cleanPath);
+    return false;
+  }
+  
+  // 올바른 경로인지 확인
+  if (!currentPath.startsWith(basePath) && currentPath !== '/') {
+    console.warn('잘못된 경로 감지:', currentPath);
+    // 올바른 경로로 리다이렉트
+    const correctPath = `${basePath}${path}`;
+    console.log('올바른 경로로 리다이렉트:', correctPath);
+    router.replace(correctPath);
+    return false;
+  }
+  
+  return true;
+};
+
 export default function AdminLogin() {
   const router = useRouter();
   const [credentials, setCredentials] = useState({ username: '', password: '' });
@@ -18,10 +49,15 @@ export default function AdminLogin() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // 경로 검증 및 수정
+    validateAndFixPath('/', router);
+    
     // 이미 로그인된 경우 대시보드로 이동
     const token = localStorage.getItem('adminToken');
     if (token) {
-      router.push('/dashboard');
+      if (validateAndFixPath('/dashboard', router)) {
+        router.push('/dashboard');
+      }
     }
   }, [router]);
 
@@ -33,7 +69,9 @@ export default function AdminLogin() {
     try {
       const response = await apiClient.post('/admin/login', credentials);
       localStorage.setItem('adminToken', response.data.token);
-      router.push('/dashboard');
+      if (validateAndFixPath('/dashboard', router)) {
+        router.push('/dashboard');
+      }
     } catch (error) {
       console.error('로그인 실패:', error);
       setError('아이디 또는 비밀번호가 올바르지 않습니다.');
@@ -114,67 +152,3 @@ const Logo = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 1rem;
-`;
-
-const LoginForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const Label = styled.label`
-  font-weight: 600;
-  color: #333;
-`;
-
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 2px solid #e1e5e9;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #667eea;
-  }
-`;
-
-const LoginButton = styled.button`
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  padding: 0.75rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-`;
-
-const ErrorMessage = styled.div`
-  color: #e74c3c;
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 0.5rem;
-  background: #fdf2f2;
-  border-radius: 5px;
-`; 

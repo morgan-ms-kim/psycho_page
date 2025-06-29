@@ -116,9 +116,7 @@ export default function TestManagement() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    if (validateAndFixPath('/', router)) {
-      router.push('/');
-    }
+    router.push('/');
   };
 
   const showMessage = (message, type = 'info') => {

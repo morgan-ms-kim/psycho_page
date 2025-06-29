@@ -103,9 +103,7 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    if (validateAndFixPath('/', router)) {
-      router.push('/');
-    }
+    router.push('/');
   };
 
   if (loading) {
