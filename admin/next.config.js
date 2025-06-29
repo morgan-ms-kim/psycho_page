@@ -8,10 +8,6 @@ module.exports = {
   experimental: {
     esmExternals: 'loose',
   },
-  // 캐시 무효화를 위한 빌드 ID 추가
-  generateBuildId: async () => {
-    return `build-${Date.now()}`;
-  },
   // Fast Refresh 문제 해결
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
