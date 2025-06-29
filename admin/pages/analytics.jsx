@@ -54,6 +54,32 @@ apiClient.interceptors.response.use(
   }
 );
 
+// 경로 확인 및 수정 유틸리티 함수
+const validateAndFixPath = (path, router) => {
+  // 현재 경로 확인
+  const currentPath = router.asPath;
+  const basePath = '/psycho_page/admin';
+  
+  // 중복 경로 확인
+  if (currentPath.includes(`${basePath}${basePath}`)) {
+    console.warn('중복 경로 감지:', currentPath);
+    // 중복 제거
+    const cleanPath = currentPath.replace(`${basePath}${basePath}`, basePath);
+    router.replace(cleanPath);
+    return false;
+  }
+  
+  // 올바른 경로인지 확인
+  if (!currentPath.startsWith(basePath) && currentPath !== '/') {
+    console.warn('잘못된 경로 감지:', currentPath);
+    // 올바른 경로로 리다이렉트
+    router.replace(`${basePath}${path}`);
+    return false;
+  }
+  
+  return true;
+};
+
 export default function Analytics() {
   const router = useRouter();
   const [period, setPeriod] = useState('day');
@@ -64,7 +90,9 @@ export default function Analytics() {
     // 로그인 확인
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      router.push('/');
+      if (validateAndFixPath('/', router)) {
+        router.push('/');
+      }
       return;
     }
 
@@ -85,7 +113,9 @@ export default function Analytics() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    router.push('/');
+    if (validateAndFixPath('/', router)) {
+      router.push('/');
+    }
   };
 
   const chartData = {
@@ -137,7 +167,9 @@ export default function Analytics() {
         <HeaderContent>
           <Logo onClick={() => {
             if (router.pathname !== '/dashboard') {
-              router.push('/dashboard');
+              if (validateAndFixPath('/dashboard', router)) {
+                router.push('/dashboard');
+              }
             }
           }} style={{ cursor: 'pointer' }}>�� PSYCHO 관리자</Logo>
           <Nav>
