@@ -59,10 +59,13 @@ export default function TestManagement() {
 
   const loadTests = async () => {
     try {
+      console.log('🔄 테스트 목록 로드 시작');
       const response = await apiClient.get('/admin/tests');
+      console.log('✅ 테스트 목록 로드 성공:', response.data);
       setTests(response.data);
     } catch (error) {
-      console.error('테스트 로드 실패:', error);
+      console.error('❌ 테스트 로드 실패:', error);
+      console.error('응답 데이터:', error.response?.data);
     } finally {
       setLoading(false);
     }

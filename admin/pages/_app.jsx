@@ -1,4 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
+import { useEffect } from 'react';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -31,6 +32,14 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 function MyApp({ Component, pageProps }) {
+  useEffect(() => {
+    // Fast Refresh 비활성화
+    if (typeof window !== 'undefined') {
+      window.__NEXT_DATA__ = window.__NEXT_DATA__ || {};
+      window.__NEXT_DATA__.dev = false;
+    }
+  }, []);
+
   return (
     <>
       <GlobalStyle />

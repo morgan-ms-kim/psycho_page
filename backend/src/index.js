@@ -544,12 +544,19 @@ app.post('/api/admin/login', async (req, res, next) => {
 // 테스트 목록 (관리자용)
 app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
   try {
+    console.log('=== 관리자 테스트 목록 요청 ===');
+    console.log('요청 헤더:', JSON.stringify(req.headers, null, 2));
+    
     const tests = await Test.findAll({
       order: [['createdAt', 'DESC']]
     });
     
+    console.log('✅ 테스트 목록 조회 성공:', tests.length, '개');
+    console.log('테스트 목록:', tests.map(t => ({ id: t.id, title: t.title })));
+    
     res.json(tests);
   } catch (error) {
+    console.error('❌ 테스트 목록 조회 실패:', error);
     next(error);
   }
 });
