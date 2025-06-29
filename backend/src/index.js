@@ -3,12 +3,30 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { Op } from 'sequelize';
 import sequelize, { Test, Comment, Like, Visitor } from './models/index.js';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import fs from 'fs';
+import path from 'path';
+
+const execAsync = promisify(exec);
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// 관리자 인증 미들웨어
+const authenticateAdmin = (req, res, next) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  
+  // 간단한 토큰 검증 (실제로는 JWT 사용 권장)
+  if (token === process.env.ADMIN_TOKEN) {
+    next();
+  } else {
+    res.status(401).json({ error: '인증이 필요합니다.' });
+  }
+};
 
 // IP 주소 추출 미들웨어
 const getClientIP = (req) => {
@@ -427,18 +445,26 @@ app.delete('/api/comments/:id', async (req, res, next) => {
     const { password } = req.body;
     const commentId = req.params.id;
     
-    if (!password) {
-      return res.status(400).json({ error: '비밀번호를 입력해주세요.' });
-    }
-    
     const comment = await Comment.findByPk(commentId);
     if (!comment) {
       return res.status(404).json({ error: '댓글을 찾을 수 없습니다.' });
     }
     
-    // 비밀번호 확인
-    if (comment.password !== password) {
-      return res.status(403).json({ error: '비밀번호가 일치하지 않습니다.' });
+    // 기존 댓글(비밀번호가 없는 경우)은 IP 기반으로 확인
+    if (!comment.password) {
+      const clientIP = getClientIP(req);
+      if (comment.ip !== clientIP) {
+        return res.status(403).json({ error: '댓글을 삭제할 권한이 없습니다.' });
+      }
+    } else {
+      // 새 댓글(비밀번호가 있는 경우)은 비밀번호로 확인
+      if (!password) {
+        return res.status(400).json({ error: '비밀번호를 입력해주세요.' });
+      }
+      
+      if (comment.password !== password) {
+        return res.status(403).json({ error: '비밀번호가 일치하지 않습니다.' });
+      }
     }
     
     // 댓글과 관련된 좋아요도 함께 삭제
@@ -446,6 +472,184 @@ app.delete('/api/comments/:id', async (req, res, next) => {
     await comment.destroy();
     
     res.json({ success: true, message: '댓글이 삭제되었습니다.' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 관리자 로그인
+app.post('/api/admin/login', async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    
+    // 환경변수에서 관리자 정보 확인
+    if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+      res.json({ 
+        token: process.env.ADMIN_TOKEN,
+        message: '로그인 성공'
+      });
+    } else {
+      res.status(401).json({ error: '아이디 또는 비밀번호가 올바르지 않습니다.' });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 테스트 목록 (관리자용)
+app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
+  try {
+    const tests = await Test.findAll({
+      order: [['createdAt', 'DESC']]
+    });
+    
+    res.json(tests);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 새 테스트 추가 (Git에서 클론)
+app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
+  try {
+    const { gitUrl, title, description, category } = req.body;
+    
+    if (!gitUrl || !title) {
+      return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.' });
+    }
+    
+    // 테스트 디렉토리 경로
+    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
+    
+    // Git에서 클론
+    const repoName = gitUrl.split('/').pop().replace('.git', '');
+    const clonePath = path.join(testsDir, repoName);
+    
+    try {
+      await execAsync(`git clone ${gitUrl} ${clonePath}`);
+    } catch (error) {
+      return res.status(400).json({ error: 'Git 저장소 클론에 실패했습니다.' });
+    }
+    
+    // package.json 수정
+    const packageJsonPath = path.join(clonePath, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+      packageJson.homepage = `/psycho/tests/${repoName}/`;
+      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+      
+      // npm install 및 build
+      try {
+        await execAsync('npm install', { cwd: clonePath });
+        await execAsync('npm run build', { cwd: clonePath });
+      } catch (error) {
+        console.error('빌드 실패:', error);
+        return res.status(400).json({ error: '테스트 빌드에 실패했습니다.' });
+      }
+    }
+    
+    // 데이터베이스에 테스트 정보 저장
+    const test = await Test.create({
+      title,
+      description: description || '',
+      category: category || '기타',
+      thumbnail: `/tests/${repoName}/thumbnail.png` // 기본 썸네일 경로
+    });
+    
+    res.json({ 
+      success: true, 
+      message: '테스트가 성공적으로 추가되었습니다.',
+      test 
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 테스트 썸네일 업로드
+app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, async (req, res, next) => {
+  try {
+    const testId = req.params.id;
+    const { thumbnailPath } = req.body;
+    
+    const test = await Test.findByPk(testId);
+    if (!test) {
+      return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
+    }
+    
+    test.thumbnail = thumbnailPath;
+    await test.save();
+    
+    res.json({ success: true, message: '썸네일이 업데이트되었습니다.' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 방문자 통계 (상세)
+app.get('/api/admin/analytics', authenticateAdmin, async (req, res, next) => {
+  try {
+    const { period = 'day', limit = 30 } = req.query;
+    
+    let startDate = new Date();
+    let groupBy = 'DATE(visitedAt)';
+    
+    switch (period) {
+      case 'week':
+        startDate.setDate(startDate.getDate() - 7);
+        groupBy = 'YEARWEEK(visitedAt)';
+        break;
+      case 'month':
+        startDate.setMonth(startDate.getMonth() - 1);
+        groupBy = 'DATE_FORMAT(visitedAt, "%Y-%m")';
+        break;
+      default:
+        startDate.setDate(startDate.getDate() - limit);
+        break;
+    }
+    
+    const visitors = await sequelize.query(`
+      SELECT 
+        ${groupBy} as date,
+        COUNT(*) as count
+      FROM Visitors 
+      WHERE visitedAt >= ?
+      GROUP BY ${groupBy}
+      ORDER BY date DESC
+      LIMIT ?
+    `, {
+      replacements: [startDate, parseInt(limit)],
+      type: sequelize.QueryTypes.SELECT
+    });
+    
+    res.json(visitors);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 방문자 상세 로그
+app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
+  try {
+    const { page = 1, limit = 50 } = req.query;
+    const offset = (page - 1) * limit;
+    
+    const visitors = await Visitor.findAndCountAll({
+      include: [{
+        model: Test,
+        attributes: ['title']
+      }],
+      order: [['visitedAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
+    
+    res.json({
+      visitors: visitors.rows,
+      total: visitors.count,
+      pages: Math.ceil(visitors.count / limit),
+      currentPage: parseInt(page)
+    });
   } catch (error) {
     next(error);
   }

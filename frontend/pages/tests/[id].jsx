@@ -225,15 +225,11 @@ export default function TestDetail() {
   // 댓글 삭제
   const deleteComment = async (commentId) => {
     if (deletingCommentId === commentId) {
-      // 이미 삭제 모드인 경우, 비밀번호로 삭제 시도
-      if (!deletePassword) {
-        alert('비밀번호를 입력해주세요.');
-        return;
-      }
-      
+      // 이미 삭제 모드인 경우, 삭제 시도
       try {
+        const requestData = deletePassword ? { password: deletePassword } : {};
         await apiClient.delete(`/comments/${commentId}`, {
-          data: { password: deletePassword }
+          data: requestData
         });
         loadComments(1);
         setCommentCount(prev => prev - 1);
@@ -242,7 +238,9 @@ export default function TestDetail() {
       } catch (error) {
         console.error('댓글 삭제 실패:', error);
         if (error.response?.status === 403) {
-          alert('비밀번호가 일치하지 않습니다.');
+          alert('삭제 권한이 없습니다.');
+        } else if (error.response?.status === 400) {
+          alert('비밀번호를 입력해주세요.');
         } else {
           alert('댓글 삭제에 실패했습니다.');
         }
