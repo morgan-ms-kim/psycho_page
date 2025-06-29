@@ -47,6 +47,8 @@ app.use(cors({
 
 // 정적 파일 서빙 (업로드된 썸네일)
 app.use('/psycho_page/uploads', express.static(path.join(process.cwd(), '..', 'frontend', 'public', 'uploads')));
+// 빌드된 테스트 앱 정적 서빙
+app.use('/psycho_page/tests', express.static(path.join(process.cwd(), '..', 'frontend', 'public', 'tests')));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));

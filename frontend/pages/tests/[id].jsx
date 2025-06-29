@@ -179,6 +179,20 @@ export default function TestPage() {
     );
   }
 
+  // 중복 렌더링 방지: test 데이터가 없거나 title이 비정상(예: github url)일 때 렌더링 X
+  if (!test || !test.title || test.title.startsWith('http')) {
+    return (
+      <MainWrap>
+        <Header>
+          <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
+        </Header>
+        <ErrorMessage>
+          <p>🚫 올바른 테스트 정보가 없습니다.</p>
+        </ErrorMessage>
+      </MainWrap>
+    );
+  }
+
   const testUrl = `/psycho_page/tests/${id}/`;
   const commentCount = comments.length;
 
@@ -204,7 +218,7 @@ export default function TestPage() {
           onError={handleIframeError}
           title={test?.title || '테스트'}
           allow="fullscreen"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          sandbox="allow-scripts allow-forms allow-popups"
         />
       </TestContainer>
 
