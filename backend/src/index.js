@@ -716,6 +716,33 @@ app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
   }
 });
 
+// 테스트 삭제
+app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => {
+  try {
+    const testId = req.params.id;
+    console.log('테스트 삭제 요청:', testId);
+    
+    const test = await Test.findByPk(testId);
+    if (!test) {
+      return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
+    }
+    
+    // 관련 데이터 삭제 (댓글, 좋아요, 방문자 기록)
+    await Comment.destroy({ where: { testId } });
+    await Like.destroy({ where: { testId } });
+    await Visitor.destroy({ where: { testId } });
+    
+    // 테스트 삭제
+    await test.destroy();
+    
+    console.log('테스트 삭제 완료:', testId);
+    res.json({ success: true, message: '테스트가 삭제되었습니다.' });
+  } catch (error) {
+    console.error('테스트 삭제 오류:', error);
+    next(error);
+  }
+});
+
 // 에러 핸들링 미들웨어 적용
 app.use(errorHandler);
 

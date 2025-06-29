@@ -44,6 +44,16 @@ export default function AddTest() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState('info');
+
+  const showMessage = (message, type = 'info') => {
+    setModalMessage(message);
+    setModalType(type);
+    setShowModal(true);
+    setTimeout(() => setShowModal(false), 3000);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,11 +75,12 @@ export default function AddTest() {
         });
       }
       
-      alert('테스트가 성공적으로 추가되었습니다!');
+      showMessage('테스트가 성공적으로 추가되었습니다!');
       router.push('/psycho_page/admin/tests');
     } catch (error) {
       console.error('테스트 추가 실패:', error);
       setError(error.response?.data?.error || '테스트 추가에 실패했습니다.');
+      showMessage(error.response?.data?.error || '테스트 추가에 실패했습니다.', 'error');
     } finally {
       setLoading(false);
     }
@@ -189,6 +200,20 @@ export default function AddTest() {
           </InfoList>
         </InfoCard>
       </Main>
+      
+      {/* 팝업 모달 */}
+      {showModal && (
+        <Modal type={modalType}>
+          <ModalContent>
+            <ModalIcon>
+              {modalType === 'success' && '✅'}
+              {modalType === 'error' && '❌'}
+              {modalType === 'info' && 'ℹ️'}
+            </ModalIcon>
+            <ModalMessage>{modalMessage}</ModalMessage>
+          </ModalContent>
+        </Modal>
+      )}
     </Container>
   );
 }
@@ -429,4 +454,36 @@ const InfoItem = styled.li`
   &:last-child {
     border-bottom: none;
   }
+`;
+
+const Modal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  text-align: center;
+`;
+
+const ModalIcon = styled.div`
+  font-size: 2rem;
+  margin-bottom: 1rem;
+`;
+
+const ModalMessage = styled.p`
+  font-size: 1rem;
+  color: #333;
 `; 

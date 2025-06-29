@@ -37,6 +37,9 @@ export default function TestManagement() {
   const router = useRouter();
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState('info');
 
   useEffect(() => {
     // 로그인 확인
@@ -60,9 +63,31 @@ export default function TestManagement() {
     }
   };
 
+  const handleDeleteTest = async (testId) => {
+    if (!confirm('정말로 이 테스트를 삭제하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await apiClient.delete(`/admin/tests/${testId}`);
+      showMessage('테스트가 삭제되었습니다.', 'success');
+      loadTests(); // 목록 새로고침
+    } catch (error) {
+      console.error('테스트 삭제 실패:', error);
+      showMessage('테스트 삭제에 실패했습니다: ' + (error.response?.data?.error || error.message), 'error');
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     router.push('/');
+  };
+
+  const showMessage = (message, type = 'info') => {
+    setModalMessage(message);
+    setModalType(type);
+    setShowModal(true);
+    setTimeout(() => setShowModal(false), 3000);
   };
 
   if (loading) {
@@ -77,11 +102,11 @@ export default function TestManagement() {
     <Container>
       <Header>
         <HeaderContent>
-          <Logo>🧠 PSYCHO 관리자</Logo>
+          <Logo onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
           <Nav>
-            <NavLink href="/dashboard">대시보드</NavLink>
-            <NavLink href="/tests">테스트 관리</NavLink>
-            <NavLink href="/analytics">방문자 분석</NavLink>
+            <NavLink href="/psycho_page/admin/dashboard">대시보드</NavLink>
+            <NavLink href="/psycho_page/admin/tests">테스트 관리</NavLink>
+            <NavLink href="/psycho_page/admin/analytics">방문자 분석</NavLink>
             <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
           </Nav>
         </HeaderContent>
@@ -141,6 +166,20 @@ export default function TestManagement() {
           </EmptyState>
         )}
       </Main>
+      
+      {/* 팝업 모달 */}
+      {showModal && (
+        <Modal type={modalType}>
+          <ModalContent>
+            <ModalIcon>
+              {modalType === 'success' && '✅'}
+              {modalType === 'error' && '❌'}
+              {modalType === 'info' && 'ℹ️'}
+            </ModalIcon>
+            <ModalMessage>{modalMessage}</ModalMessage>
+          </ModalContent>
+        </Modal>
+      )}
     </Container>
   );
 }
@@ -378,4 +417,35 @@ const LoadingMessage = styled.div`
   height: 100vh;
   font-size: 1.2rem;
   color: #666;
+`;
+
+const Modal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ModalContent = styled.div`
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+`;
+
+const ModalIcon = styled.div`
+  font-size: 2rem;
+  margin-bottom: 1rem;
+`;
+
+const ModalMessage = styled.p`
+  font-size: 1rem;
+  color: #333;
 `; 
