@@ -964,6 +964,38 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
   }
 });
 
+// 테스트 수정
+app.put('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => {
+  try {
+    const testId = req.params.id;
+    const { title, description, category } = req.body;
+    
+    console.log('테스트 수정 요청:', testId, req.body);
+    
+    const test = await Test.findByPk(testId);
+    if (!test) {
+      return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
+    }
+    
+    // 필수 필드 검증
+    if (!title || !description) {
+      return res.status(400).json({ error: '제목과 설명은 필수입니다.' });
+    }
+    
+    // 테스트 정보 업데이트
+    test.title = title;
+    test.description = description;
+    test.category = category || '기타';
+    await test.save();
+    
+    console.log('✅ 테스트 수정 완료:', testId);
+    res.json({ success: true, message: '테스트가 수정되었습니다.', test });
+  } catch (error) {
+    console.error('❌ 테스트 수정 오류:', error);
+    next(error);
+  }
+});
+
 // 에러 핸들링 미들웨어
 const errorHandler = (err, req, res, next) => {
   console.error('Error:', err);

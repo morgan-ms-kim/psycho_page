@@ -196,10 +196,20 @@ export default function TestManagement() {
               </TestInfo>
               
               <TestActions>
-                <ActionButton onClick={() => router.push(`/tests/${test.id}/edit`)}>
+                <ActionButton onClick={() => {
+                  console.log('수정 버튼 클릭:', test.id);
+                  if (validateAndFixPath(`/tests/${test.id}/edit`, router)) {
+                    router.push(`/tests/${test.id}/edit`);
+                  }
+                }}>
                   ✏️ 수정
                 </ActionButton>
-                <ActionButton onClick={() => router.push(`/tests/${test.id}/thumbnail`)}>
+                <ActionButton onClick={() => {
+                  console.log('썸네일 버튼 클릭:', test.id);
+                  if (validateAndFixPath(`/tests/${test.id}/thumbnail`, router)) {
+                    router.push(`/tests/${test.id}/thumbnail`);
+                  }
+                }}>
                   🖼️ 썸네일
                 </ActionButton>
                 <DeleteButton onClick={() => handleDeleteTest(test.id)}>
