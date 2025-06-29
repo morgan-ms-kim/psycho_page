@@ -58,6 +58,11 @@ export default function Home() {
     return path;
   };
 
+  // 테스트 ID를 폴더명으로 변환하는 함수
+  const getTestFolderName = (testId) => {
+    return `test${testId}`;
+  };
+
   // 테스트 데이터 로드
   useEffect(() => {
     loadTests();
@@ -328,7 +333,7 @@ export default function Home() {
           
           <Grid>
             {sortedTests.map((test) => (
-              <Card key={test.id} onClick={() => window.location.href = `/psycho_page/tests/${test.id}`}>
+              <Card key={test.id} onClick={() => window.location.href = `/psycho_page/tests/${getTestFolderName(test.id)}`}>
                 {test.thumbnail ? (
                   <TestItemImage 
                     src={getImagePath(test.thumbnail)} 

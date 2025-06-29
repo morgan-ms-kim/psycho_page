@@ -66,6 +66,12 @@ export default function TestDetail() {
     return path;
   };
 
+  // 폴더명에서 숫자 ID를 추출하는 함수
+  const getTestIdFromFolder = (folderName) => {
+    // test5 -> 5, test1 -> 1
+    return folderName.replace('test', '');
+  };
+
   // 테스트 데이터 로드
   useEffect(() => {
     if (id) {
@@ -78,8 +84,9 @@ export default function TestDetail() {
   // 방문 기록
   const recordVisit = async () => {
     try {
+      const testId = getTestIdFromFolder(id);
       await axios.post(`${API_BASE}/visitors`, {
-        testId: id
+        testId: testId
       });
     } catch (error) {
       console.error('방문 기록 실패:', error);
@@ -90,7 +97,8 @@ export default function TestDetail() {
   // 테스트 데이터 로드
   const loadTestData = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/tests/${id}`);
+      const testId = getTestIdFromFolder(id);
+      const response = await axios.get(`${API_BASE}/tests/${testId}`);
       setTest(response.data);
       setLiked(response.data.userLiked || false);
       setLoading(false);
@@ -101,7 +109,7 @@ export default function TestDetail() {
       
       // API 연결 실패 시 기본 테스트 데이터 표시
       setTest({
-        id: id,
+        id: getTestIdFromFolder(id),
         title: '테스트 로드 중...',
         description: '서버 연결을 확인해주세요.',
         questions: [],
@@ -117,7 +125,8 @@ export default function TestDetail() {
   const loadComments = async (page = 1) => {
     try {
       setLoadingComments(true);
-      const response = await axios.get(`${API_BASE}/tests/${id}/comments?page=${page}&limit=10`);
+      const testId = getTestIdFromFolder(id);
+      const response = await axios.get(`${API_BASE}/tests/${testId}/comments?page=${page}&limit=10`);
       
       if (page === 1) {
         setComments(response.data.comments);
@@ -148,7 +157,8 @@ export default function TestDetail() {
   // 좋아요 토글
   const toggleLike = async () => {
     try {
-      const response = await axios.post(`${API_BASE}/tests/${id}/like`);
+      const testId = getTestIdFromFolder(id);
+      const response = await axios.post(`${API_BASE}/tests/${testId}/like`);
       setLiked(response.data.liked);
       loadTestData();
     } catch (error) {
@@ -171,7 +181,8 @@ export default function TestDetail() {
     if (!newComment.nickname || !newComment.content) return;
     
     try {
-      await axios.post(`${API_BASE}/tests/${id}/comments`, newComment);
+      const testId = getTestIdFromFolder(id);
+      await axios.post(`${API_BASE}/tests/${testId}/comments`, newComment);
       setNewComment({ nickname: '', content: '' });
       setShowCommentForm(false);
       loadComments(1);
@@ -201,7 +212,7 @@ export default function TestDetail() {
     setTestCompleted(true);
     
     const testResult = {
-      testId: id,
+      testId: getTestIdFromFolder(id),
       testTitle: test.title,
       result: test.results[resultIndex],
       completedAt: new Date().toISOString()
