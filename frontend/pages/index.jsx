@@ -83,6 +83,13 @@ export default function Home() {
     loadTests();
     loadVisitorStats();
     loadCategories();
+    
+    // 30초마다 테스트 목록 갱신 (새 테스트 등록 시 바로 보이도록)
+    const interval = setInterval(() => {
+      loadTests(true);
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   // 검색어나 카테고리 변경 시 테스트 다시 로드

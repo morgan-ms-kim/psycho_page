@@ -37,6 +37,29 @@ fi
 echo "[INFO] package.json 내용:"
 cat package.json
 
+# package.json의 homepage 필드 확인 및 수정
+echo "[INFO] package.json의 homepage 필드 확인 중..."
+if ! grep -q '"homepage"' package.json; then
+  echo "[INFO] homepage 필드가 없습니다. 추가합니다..."
+  # 임시 파일 생성
+  cp package.json package.json.tmp
+  
+  # homepage 필드 추가 (마지막 } 앞에 추가)
+  sed -i 's/}$/  "homepage": "\/psycho_page\/tests\/'$(basename $(pwd))'\/",\n}/' package.json.tmp
+  
+  # 수정된 내용 확인
+  echo "[INFO] 수정된 package.json:"
+  cat package.json.tmp
+  
+  # 원본 파일 교체
+  mv package.json.tmp package.json
+  echo "[INFO] homepage 필드 추가 완료"
+else
+  echo "[INFO] homepage 필드가 이미 존재합니다."
+  # homepage 필드 값 확인
+  grep '"homepage"' package.json
+fi
+
 # Node.js 버전 확인
 echo "[INFO] Node.js 버전:"
 node --version

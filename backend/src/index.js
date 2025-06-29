@@ -31,13 +31,16 @@ dotenv.config();
 
 const app = express();
 
-// CORS 설정을 더 구체적으로 설정
+// CORS 설정
 app.use(cors({
   origin: ['https://smartpick.website', 'http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
+// 정적 파일 서빙 (업로드된 썸네일)
+app.use('/uploads', express.static(path.join(process.cwd(), '..', 'frontend', 'public', 'uploads')));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -59,15 +62,11 @@ app.get('/api/health', (req, res) => {
 // 데이터베이스 상태 확인 라우트
 app.get('/api/db-status', async (req, res) => {
   try {
-    // 데이터베이스 연결 확인
     await sequelize.authenticate();
-    
-    // 테스트 테이블의 모든 데이터 조회
     const tests = await Test.findAll({
       order: [['createdAt', 'DESC']]
     });
     
-    // 시스템 정보 추가
     const os = await import('os');
     
     res.json({
@@ -98,59 +97,16 @@ app.get('/api/db-status', async (req, res) => {
   }
 });
 
-// 요청 로깅 미들웨어
-app.use((req, res, next) => {
-  const timestamp = new Date().toISOString();
-  const logMessage = `${timestamp} - ${req.method} ${req.path} - IP: ${getClientIP(req)}`;
-  
-  // 콘솔에 출력
-  console.log('='.repeat(80));
-  console.log(logMessage);
-  console.log('Headers:', JSON.stringify(req.headers, null, 2));
-  
-  if (req.body && Object.keys(req.body).length > 0) {
-    console.log('Body:', JSON.stringify(req.body, null, 2));
-  }
-  
-  // 라우트 매칭 확인을 위한 추가 로그
-  if (req.path === '/api/admin/tests') {
-    console.log('🔍 라우트 매칭 확인:', req.method, req.path);
-    console.log('Content-Type:', req.headers['content-type']);
-    console.log('Authorization:', req.headers.authorization ? '있음' : '없음');
-  }
-  
-  // 파일에 로그 저장
-  const logDir = path.join(process.cwd(), 'logs');
-  if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir, { recursive: true });
-  }
-  
-  const logFile = path.join(logDir, `server-${new Date().toISOString().split('T')[0]}.log`);
-  const fullLogMessage = `${logMessage}\nHeaders: ${JSON.stringify(req.headers)}\nBody: ${JSON.stringify(req.body)}\n${'='.repeat(80)}\n`;
-  
-  fs.appendFileSync(logFile, fullLogMessage);
-  
-  console.log('='.repeat(80));
-  next();
-});
-
 // 관리자 인증 미들웨어
 const authenticateAdmin = (req, res, next) => {
   console.log('🔐 관리자 인증 시도');
-  console.log('요청 경로:', req.path);
-  console.log('요청 메서드:', req.method);
-  
   const token = req.headers.authorization?.replace('Bearer ', '');
-  console.log('제공된 토큰:', token ? '있음' : '없음');
-  console.log('환경 변수 ADMIN_TOKEN:', process.env.ADMIN_TOKEN ? '설정됨' : '설정되지 않음');
   
-  // 간단한 토큰 검증 (실제로는 JWT 사용 권장)
   if (token === process.env.ADMIN_TOKEN) {
     console.log('✅ 관리자 인증 성공');
     next();
   } else {
     console.log('❌ 관리자 인증 실패');
-    console.log('토큰 일치 여부:', token === process.env.ADMIN_TOKEN);
     res.status(401).json({ error: '인증이 필요합니다.' });
   }
 };
@@ -164,16 +120,24 @@ const getClientIP = (req) => {
          req.ip;
 };
 
-// 에러 핸들링 미들웨어
-const errorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ 
-    error: '서버 오류가 발생했습니다.',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-};
+// test_deploy.sh 실행 함수
+async function runTestDeployScript(clonePath) {
+  const scriptPath = path.join(process.cwd(), '..', 'test_deploy.sh');
+  try {
+    const { stdout, stderr } = await execAsync(`bash ${scriptPath} ${clonePath}`, {
+      timeout: 300000, // 5분
+      maxBuffer: 1024 * 1024
+    });
+    console.log('✅ test_deploy.sh 실행 결과:', stdout);
+    if (stderr) console.error('test_deploy.sh stderr:', stderr);
+    return { success: true, stdout, stderr };
+  } catch (error) {
+    console.error('❌ test_deploy.sh 실행 실패:', error.message);
+    return { success: false, error: error.message };
+  }
+}
 
-// 모든 테스트 목록 가져오기 (조회수, 좋아요 포함)
+// 모든 테스트 목록 가져오기
 app.get('/api/tests', async (req, res, next) => {
   try {
     const { search, category, sort = 'latest', limit = 20 } = req.query;
@@ -207,11 +171,10 @@ app.get('/api/tests', async (req, res, next) => {
     const testsWithCorrectPaths = tests.map(test => {
       const testData = test.toJSON();
       if (testData.thumbnail) {
-        // /psycho/tests/ 경로로 수정
-        if (testData.thumbnail.startsWith('/tests/')) {
-          testData.thumbnail = testData.thumbnail.replace('/tests/', '/psycho/tests/');
-        } else if (!testData.thumbnail.startsWith('/psycho/tests/')) {
-          testData.thumbnail = `/psycho/tests/${testData.thumbnail}`;
+        if (testData.thumbnail.startsWith('/uploads/')) {
+          testData.thumbnail = testData.thumbnail.replace('/uploads/', '/psycho_page/uploads/');
+        } else if (!testData.thumbnail.startsWith('/psycho_page/')) {
+          testData.thumbnail = `/psycho_page${testData.thumbnail}`;
         }
       }
       return testData;
@@ -223,7 +186,7 @@ app.get('/api/tests', async (req, res, next) => {
   }
 });
 
-// 테스트별 상세 정보 (조회수, 좋아요, 댓글 수)
+// 테스트별 상세 정보
 app.get('/api/tests/:id', async (req, res, next) => {
   try {
     const test = await Test.findByPk(req.params.id);
@@ -268,10 +231,10 @@ app.get('/api/tests/:id', async (req, res, next) => {
     // 이미지 경로 수정
     const testData = test.toJSON();
     if (testData.thumbnail) {
-      if (testData.thumbnail.startsWith('/tests/')) {
-        testData.thumbnail = testData.thumbnail.replace('/tests/', '/psycho/tests/');
-      } else if (!testData.thumbnail.startsWith('/psycho/tests/')) {
-        testData.thumbnail = `/psycho/tests/${testData.thumbnail}`;
+      if (testData.thumbnail.startsWith('/uploads/')) {
+        testData.thumbnail = testData.thumbnail.replace('/uploads/', '/psycho_page/uploads/');
+      } else if (!testData.thumbnail.startsWith('/psycho_page/')) {
+        testData.thumbnail = `/psycho_page${testData.thumbnail}`;
       }
     }
     
@@ -296,12 +259,10 @@ app.post('/api/tests/:id/like', async (req, res, next) => {
     });
     
     if (existingLike) {
-      // 좋아요 취소
       await existingLike.destroy();
       await Test.decrement('likes', { where: { id: testId } });
       res.json({ liked: false, message: '좋아요가 취소되었습니다.' });
     } else {
-      // 좋아요 추가
       await Like.create({ testId, ip: clientIP });
       await Test.increment('likes', { where: { id: testId } });
       res.json({ liked: true, message: '좋아요가 추가되었습니다.' });
@@ -325,15 +286,11 @@ app.get('/api/tests/:id/comments', async (req, res, next) => {
       offset: parseInt(offset)
     });
     
-    // 각 댓글에 대해 좋아요 상태와 작성자 여부 추가
     const commentsWithStatus = await Promise.all(
       comments.rows.map(async (comment) => {
         const commentData = comment.toJSON();
-        
-        // 비밀번호 제거
         delete commentData.password;
         
-        // 현재 사용자의 좋아요 상태 확인
         const userLike = await Like.findOne({
           where: { commentId: comment.id, ip: clientIP }
         });
@@ -393,7 +350,6 @@ app.post('/api/comments/:id/like', async (req, res, next) => {
     const clientIP = getClientIP(req);
     const commentId = req.params.id;
     
-    // 댓글 존재 여부 확인
     const comment = await Comment.findByPk(commentId);
     if (!comment) {
       return res.status(404).json({ error: '댓글을 찾을 수 없습니다.' });
@@ -410,7 +366,7 @@ app.post('/api/comments/:id/like', async (req, res, next) => {
       await Like.create({ 
         commentId, 
         ip: clientIP,
-        testId: comment.testId  // 댓글의 testId 사용
+        testId: comment.testId
       });
       res.json({ liked: true });
     }
@@ -423,7 +379,6 @@ app.post('/api/comments/:id/like', async (req, res, next) => {
 // 카테고리 목록
 app.get('/api/categories', async (req, res, next) => {
   try {
-    // 더 안전한 방법으로 카테고리 조회
     const tests = await Test.findAll({
       attributes: ['category'],
       where: {
@@ -432,69 +387,11 @@ app.get('/api/categories', async (req, res, next) => {
       raw: true
     });
     
-    // 중복 제거
     const uniqueCategories = [...new Set(tests.map(test => test.category).filter(Boolean))];
-    
     res.json(uniqueCategories);
   } catch (error) {
     console.error('카테고리 조회 오류:', error);
-    // 오류 발생 시 빈 배열 반환
     res.json([]);
-  }
-});
-
-// 인기 테스트 (조회수 기준)
-app.get('/api/tests/popular', async (req, res, next) => {
-  try {
-    const { limit = 10 } = req.query;
-    
-    const tests = await Test.findAll({
-      order: [['views', 'DESC']],
-      limit: parseInt(limit)
-    });
-    
-    res.json(tests);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// 최신 테스트
-app.get('/api/tests/latest', async (req, res, next) => {
-  try {
-    const { limit = 10 } = req.query;
-    
-    const tests = await Test.findAll({
-      order: [['createdAt', 'DESC']],
-      limit: parseInt(limit)
-    });
-    
-    res.json(tests);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// 방문자 목록 조회
-app.get('/api/visitors', async (req, res, next) => {
-  try {
-    const { page = 1, limit = 10 } = req.query;
-    const offset = (page - 1) * limit;
-    
-    const visitors = await Visitor.findAndCountAll({
-      order: [['visitedAt', 'DESC']],
-      limit: parseInt(limit),
-      offset: parseInt(offset)
-    });
-    
-    res.json({
-      visitors: visitors.rows,
-      total: visitors.count,
-      pages: Math.ceil(visitors.count / limit),
-      currentPage: parseInt(page)
-    });
-  } catch (error) {
-    next(error);
   }
 });
 
@@ -509,7 +406,6 @@ app.get('/api/visitors/count', async (req, res, next) => {
       where: { visitedAt: { [Op.gte]: today } } 
     });
     
-    // 주간 통계
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
     const weekCount = await Visitor.count({
@@ -577,14 +473,12 @@ app.delete('/api/comments/:id', async (req, res, next) => {
       return res.status(404).json({ error: '댓글을 찾을 수 없습니다.' });
     }
     
-    // 기존 댓글(비밀번호가 없는 경우)은 IP 기반으로 확인
     if (!comment.password) {
       const clientIP = getClientIP(req);
       if (comment.ip !== clientIP) {
         return res.status(403).json({ error: '댓글을 삭제할 권한이 없습니다.' });
       }
     } else {
-      // 새 댓글(비밀번호가 있는 경우)은 비밀번호로 확인
       if (!password) {
         return res.status(400).json({ error: '비밀번호를 입력해주세요.' });
       }
@@ -594,7 +488,6 @@ app.delete('/api/comments/:id', async (req, res, next) => {
       }
     }
     
-    // 댓글과 관련된 좋아요도 함께 삭제
     await Like.destroy({ where: { commentId } });
     await comment.destroy();
     
@@ -608,16 +501,8 @@ app.delete('/api/comments/:id', async (req, res, next) => {
 app.post('/api/admin/login', async (req, res, next) => {
   try {
     console.log('🔐 관리자 로그인 시도');
-    console.log('요청 데이터:', JSON.stringify(req.body, null, 2));
-    
     const { username, password } = req.body;
     
-    console.log('환경 변수 확인:');
-    console.log('ADMIN_USERNAME:', process.env.ADMIN_USERNAME ? '설정됨' : '설정되지 않음');
-    console.log('ADMIN_PASSWORD:', process.env.ADMIN_PASSWORD ? '설정됨' : '설정되지 않음');
-    console.log('ADMIN_TOKEN:', process.env.ADMIN_TOKEN ? '설정됨' : '설정되지 않음');
-    
-    // 환경변수에서 관리자 정보 확인
     if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
       console.log('✅ 로그인 성공');
       res.json({ 
@@ -626,8 +511,6 @@ app.post('/api/admin/login', async (req, res, next) => {
       });
     } else {
       console.log('❌ 로그인 실패');
-      console.log('사용자명 일치:', username === process.env.ADMIN_USERNAME);
-      console.log('비밀번호 일치:', password === process.env.ADMIN_PASSWORD);
       res.status(401).json({ error: '아이디 또는 비밀번호가 올바르지 않습니다.' });
     }
   } catch (error) {
@@ -636,24 +519,7 @@ app.post('/api/admin/login', async (req, res, next) => {
   }
 });
 
-// test_deploy.sh 실행 함수 (timeout 5분)
-async function runTestDeployScript(clonePath) {
-  const scriptPath = path.join(process.cwd(), '..', 'test_deploy.sh');
-  try {
-    const { stdout, stderr } = await execAsync(`bash ${scriptPath} ${clonePath}`, {
-      timeout: 300000, // 5분
-      maxBuffer: 1024 * 1024
-    });
-    console.log('✅ test_deploy.sh 실행 결과:', stdout);
-    if (stderr) console.error('test_deploy.sh stderr:', stderr);
-    return { success: true, stdout, stderr };
-  } catch (error) {
-    console.error('❌ test_deploy.sh 실행 실패:', error.message);
-    return { success: false, error: error.message };
-  }
-}
-
-// 새 테스트 추가 (Git에서 클론) - POST 라우트를 먼저 정의
+// 새 테스트 추가 (Git에서 클론)
 app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
   console.log('🎯 POST /api/admin/tests/add 핸들러 실행됨');
   
@@ -677,7 +543,6 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
       return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.', steps });
     }
 
-    // Git URL 유효성 검사
     if (!gitUrl.includes('github.com') && !gitUrl.includes('gitlab.com')) {
       console.error('❌ 지원하지 않는 Git 저장소:', gitUrl);
       return res.status(400).json({ error: 'GitHub 또는 GitLab 저장소만 지원합니다.', steps });
@@ -706,41 +571,24 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     if (fs.existsSync(clonePath)) {
       try {
         fs.rmSync(clonePath, { recursive: true, force: true });
-        console.log('⚠️ 기존 디렉토리 삭제:', clonePath);
+        console.log('🗑️ 기존 디렉토리 삭제:', clonePath);
       } catch (error) {
         console.error('❌ 기존 디렉토리 삭제 실패:', error.message);
         return res.status(500).json({ error: '기존 디렉토리 삭제 실패', steps, detail: error.message });
       }
     }
-
+    
     try {
-      console.log('🔄 git clone 시작:', gitUrl);
-      console.log('명령어:', `git clone ${gitUrl} ${clonePath}`);
-      
-      const { stdout, stderr } = await execAsync(`git clone ${gitUrl} ${clonePath}`, {
-        timeout: 60000, // 60초 타임아웃
-        maxBuffer: 1024 * 1024 // 1MB 버퍼
-      });
-      
-      if (stderr) {
-        console.warn('⚠️ git clone stderr:', stderr);
-      }
-      
-      console.log('✅ git clone 성공:', stdout);
+      console.log('🔗 Git 클론 시작:', gitUrl);
+      await execAsync(`git clone ${gitUrl} "${clonePath}"`, { timeout: 300000 });
+      console.log('✅ Git 클론 완료');
       steps.gitCloned = true;
     } catch (error) {
-      console.error('❌ git clone 실패:', error.message);
-      console.error('Error details:', error);
-      return res.status(400).json({ 
-        error: 'Git 저장소 클론 실패', 
-        steps, 
-        detail: error.message, 
-        command: `git clone ${gitUrl} ${clonePath}`,
-        stderr: error.stderr
-      });
+      console.error('❌ Git 클론 실패:', error.message);
+      return res.status(400).json({ error: 'Git 클론 실패', steps, detail: error.message, stderr: error.stderr });
     }
 
-    // 3. package.json 수정
+    // 3. package.json 수정 (homepage 필드 추가)
     const packageJsonPath = path.join(clonePath, 'package.json');
     console.log('📄 package.json 경로:', packageJsonPath);
     
@@ -749,14 +597,28 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
         const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
         console.log('📦 원본 package.json:', JSON.stringify(packageJson, null, 2));
         
-        packageJson.homepage = `/psycho/tests/${repoName}/`;
-        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+        // homepage 필드 확인
+        if (!packageJson.homepage) {
+          console.log('➕ homepage 필드가 없습니다. 새로 추가합니다.');
+          packageJson.homepage = `/psycho/tests/${repoName}/`;
+        } else {
+          console.log('🔄 homepage 필드가 있습니다. 업데이트합니다.');
+          console.log('📝 기존 homepage:', packageJson.homepage);
+          packageJson.homepage = `/psycho/tests/${repoName}/`;
+        }
+        
+        console.log('📝 새로운 homepage:', packageJson.homepage);
+        
+        // JSON 형식 유지하면서 저장
+        const updatedPackageJson = JSON.stringify(packageJson, null, 2);
+        fs.writeFileSync(packageJsonPath, updatedPackageJson);
         
         console.log('✅ package.json 수정 완료');
-        console.log('📦 수정된 package.json:', JSON.stringify(packageJson, null, 2));
+        console.log('📦 수정된 package.json:', updatedPackageJson);
         steps.packageJsonModified = true;
       } catch (error) {
         console.error('❌ package.json 수정 실패:', error.message);
+        console.error('❌ package.json 내용:', fs.readFileSync(packageJsonPath, 'utf8'));
         return res.status(500).json({ error: 'package.json 수정 실패', steps, detail: error.message });
       }
     } else {
@@ -783,8 +645,8 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     const thumbPath = path.join(clonePath, 'thumb.png');
     console.log('🖼️ 썸네일 경로:', thumbPath);
     
-    let thumbnailPath = `/uploads/thumbnails/${repoName}_${Date.now()}_thumb.png`;
-    const destThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', thumbnailPath);
+    let thumbnailPath = `/psycho_page/uploads/thumbnails/${repoName}_${Date.now()}_thumb.png`;
+    const destThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', 'uploads', 'thumbnails', `${repoName}_${Date.now()}_thumb.png`);
     
     if (fs.existsSync(thumbPath)) {
       try {
@@ -799,11 +661,11 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
         console.log('✅ 썸네일 복사 성공:', destThumbPath);
       } catch (error) {
         console.error('❌ 썸네일 복사 실패:', error.message);
-        thumbnailPath = '/default-thumb.png';
+        thumbnailPath = '/psycho_page/default-thumb.png';
         steps.thumbnailReady = false;
       }
     } else {
-      thumbnailPath = '/default-thumb.png';
+      thumbnailPath = '/psycho_page/default-thumb.png';
       steps.thumbnailReady = false;
       console.log('⚠️ thumb.png 없음, 기본 썸네일 사용');
     }
@@ -819,13 +681,55 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
       steps.databaseSaved = true;
       console.log('✅ DB 저장 성공:', test.id);
       
+      // 7. 폴더명을 test{id} 형식으로 변경
+      const newFolderName = `test${test.id}`;
+      const newClonePath = path.join(testsDir, newFolderName);
+      
+      try {
+        if (fs.existsSync(newClonePath)) {
+          fs.rmSync(newClonePath, { recursive: true, force: true });
+          console.log('🗑️ 기존 test{id} 폴더 삭제:', newClonePath);
+        }
+        
+        fs.renameSync(clonePath, newClonePath);
+        console.log('📁 폴더명 변경 완료:', `${repoName} → ${newFolderName}`);
+        
+        // package.json의 homepage도 업데이트
+        const newPackageJsonPath = path.join(newClonePath, 'package.json');
+        if (fs.existsSync(newPackageJsonPath)) {
+          try {
+            const packageJson = JSON.parse(fs.readFileSync(newPackageJsonPath, 'utf8'));
+            
+            // homepage 필드가 없으면 추가, 있으면 업데이트
+            if (!packageJson.homepage) {
+              console.log('➕ homepage 필드 추가:', `/psycho_page/tests/${newFolderName}/`);
+              packageJson.homepage = `/psycho_page/tests/${newFolderName}/`;
+            } else {
+              console.log('🔄 homepage 필드 업데이트:', `/psycho_page/tests/${newFolderName}/`);
+              packageJson.homepage = `/psycho_page/tests/${newFolderName}/`;
+            }
+            
+            const updatedPackageJson = JSON.stringify(packageJson, null, 2);
+            fs.writeFileSync(newPackageJsonPath, updatedPackageJson);
+            console.log('📦 package.json homepage 업데이트 완료');
+            console.log('📦 최종 package.json:', updatedPackageJson);
+          } catch (error) {
+            console.error('❌ package.json 업데이트 실패:', error.message);
+          }
+        }
+        
+      } catch (error) {
+        console.error('❌ 폴더명 변경 실패:', error.message);
+      }
+      
       const response = {
         success: true,
         message: '테스트가 성공적으로 추가되었습니다.',
         test,
         steps,
         thumbnailUrl: thumbnailPath,
-        clonePath: clonePath
+        clonePath: newClonePath,
+        folderName: newFolderName
       };
       
       console.log('🎉 최종 응답:', JSON.stringify(response, null, 2));
@@ -841,13 +745,12 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
   }
 });
 
-// 테스트 목록 (관리자용) - GET 라우트를 나중에 정의
+// 테스트 목록 (관리자용)
 app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
   console.log('🎯 GET /api/admin/tests 핸들러 실행됨');
   
   try {
     console.log('=== 관리자 테스트 목록 요청 ===');
-    console.log('요청 헤더:', JSON.stringify(req.headers, null, 2));
     
     const tests = await Test.findAll({
       order: [['createdAt', 'DESC']]
@@ -863,44 +766,75 @@ app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
   }
 });
 
-// 썸네일 업로드 라우트 (디렉토리 자동 생성, 권한, 에러 반환 강화)
+// 썸네일 업로드 라우트
 app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thumbnail'), async (req, res, next) => {
   try {
+    console.log('🎯 썸네일 업로드 요청 시작');
+    console.log('요청 파일:', req.file);
+    console.log('요청 파라미터:', req.params);
+    
     const testId = req.params.id;
     if (!req.file) {
+      console.error('❌ 썸네일 파일이 없음');
       return res.status(400).json({ error: '썸네일 파일이 필요합니다.' });
     }
+    
+    console.log('📁 업로드된 파일 정보:', {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      path: req.file.path
+    });
+    
     const test = await Test.findByPk(testId);
     if (!test) {
+      console.error('❌ 테스트를 찾을 수 없음:', testId);
       return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
     }
-    const thumbnailPath = `/uploads/thumbnails/${testId}_${Date.now()}_${req.file.originalname}`;
-    const fullPath = path.join(process.cwd(), '..', 'frontend', 'public', thumbnailPath);
+    
+    const thumbnailPath = `/psycho_page/uploads/thumbnails/${testId}_${Date.now()}_${req.file.originalname}`;
+    const fullPath = path.join(process.cwd(), '..', 'frontend', 'public', 'uploads', 'thumbnails', `${testId}_${Date.now()}_${req.file.originalname}`);
+    
+    console.log('📂 썸네일 저장 경로:', fullPath);
+    
     // 디렉토리 자동 생성
     const uploadDir = path.dirname(fullPath);
     if (!fs.existsSync(uploadDir)) {
+      console.log('📁 업로드 디렉토리 생성:', uploadDir);
       fs.mkdirSync(uploadDir, { recursive: true });
     }
+    
     // 파일 이동
     try {
+      console.log('📋 파일 이동 시작');
       fs.renameSync(req.file.path, fullPath);
       fs.chmodSync(fullPath, 0o644);
+      console.log('✅ 파일 이동 완료');
     } catch (error) {
+      console.error('❌ 파일 이동 실패:', error.message);
       return res.status(500).json({ error: '파일 이동 실패', detail: error.message });
     }
+    
     // 기존 썸네일 삭제
-    if (test.thumbnail && test.thumbnail !== '/default-thumb.png') {
+    if (test.thumbnail && test.thumbnail !== '/psycho_page/default-thumb.png') {
       try {
-        const oldThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail);
+        const oldThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail.replace('/psycho_page/', ''));
         if (fs.existsSync(oldThumbPath)) {
           fs.unlinkSync(oldThumbPath);
+          console.log('🗑️ 기존 썸네일 삭제:', oldThumbPath);
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error('⚠️ 기존 썸네일 삭제 실패:', error.message);
+      }
     }
+    
     test.thumbnail = thumbnailPath;
     await test.save();
+    
+    console.log('✅ 썸네일 업데이트 완료:', thumbnailPath);
     res.json({ success: true, message: '썸네일이 업데이트되었습니다.', thumbnail: thumbnailPath });
   } catch (error) {
+    console.error('❌ 썸네일 업로드 전체 오류:', error.message);
     next(error);
   }
 });
@@ -1013,7 +947,15 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
   }
 });
 
-// 에러 핸들링 미들웨어 적용
+// 에러 핸들링 미들웨어
+const errorHandler = (err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ 
+    error: '서버 오류가 발생했습니다.',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+};
+
 app.use(errorHandler);
 
 // 서버 시작 및 DB 동기화

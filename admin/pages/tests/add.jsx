@@ -171,6 +171,7 @@ export default function AddTest() {
         if (response.data.steps.packageJsonModified) {
           updateProgressStep('package.json 수정', 'completed');
           addLog('✅ package.json 수정 완료');
+          addLog('📦 homepage 필드 추가/업데이트 완료');
         }
         if (response.data.steps.npmInstalled) {
           updateProgressStep('의존성 설치', 'completed');
@@ -202,15 +203,18 @@ export default function AddTest() {
           const thumbnailResponse = await apiClient.post(`/admin/tests/${response.data.test.id}/thumbnail`, formDataThumbnail, {
             headers: {
               'Content-Type': 'multipart/form-data',
-            }
+            },
+            timeout: 60000 // 60초 타임아웃
           });
           
           updateProgressStep('썸네일 업로드', 'completed');
           addLog('✅ 썸네일 업로드 성공');
           addLog('썸네일 경로: ' + thumbnailResponse.data.thumbnail);
+          addLog('썸네일 URL: https://smartpick.website/psycho_page' + thumbnailResponse.data.thumbnail);
         } catch (thumbnailError) {
           updateProgressStep('썸네일 업로드', 'failed');
           addLog('❌ 썸네일 업로드 실패: ' + (thumbnailError.response?.data?.error || thumbnailError.message));
+          addLog('❌ 에러 상세: ' + JSON.stringify(thumbnailError.response?.data || thumbnailError.message));
           console.error('썸네일 업로드 실패:', thumbnailError);
         }
       }
@@ -219,9 +223,15 @@ export default function AddTest() {
       addLog('🎉 테스트 추가 완료!');
       showMessage('테스트가 성공적으로 추가되었습니다!', 'success');
       
-      // 3초 후 목록 페이지로 이동
+      // 테스트 등록 완료 후 해당 테스트 페이지로 이동
+      const folderName = response.data.folderName || `test${response.data.test.id}`;
+      const testUrl = `/psycho_page/tests/${folderName}/`;
+      addLog('🔗 테스트 페이지: ' + testUrl);
+      
+      // 3초 후 테스트 페이지로 이동
       setTimeout(() => {
-        router.push('/tests');
+        window.open(testUrl, '_blank'); // 새 탭에서 테스트 페이지 열기
+        router.push('/tests'); // 관리자 목록 페이지로 이동
       }, 3000);
       
     } catch (error) {
