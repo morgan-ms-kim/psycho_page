@@ -609,127 +609,87 @@ async function runTestDeployScript(clonePath) {
 
 // 새 테스트 추가 (Git에서 클론)
 app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
+  const steps = {
+    directoryCreated: false,
+    gitCloned: false,
+    packageJsonModified: false,
+    npmInstalled: false,
+    buildCompleted: false,
+    databaseSaved: false,
+    thumbnailReady: false
+  };
   try {
     console.log('=== 테스트 추가 요청 시작 ===');
-    console.log('요청 바디:', JSON.stringify(req.body, null, 2));
-    console.log('요청 헤더:', JSON.stringify(req.headers, null, 2));
-    
     const { gitUrl, title, description, category } = req.body;
-    
-    console.log('파싱된 데이터:', { gitUrl, title, description, category });
-    
     if (!gitUrl || !title) {
-      console.log('❌ 필수 필드 누락:', { gitUrl: !!gitUrl, title: !!title });
-      return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.' });
+      return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.', steps });
     }
-    
-    console.log('✅ 필수 필드 검증 통과');
-    
-    // 1단계: 테스트 디렉토리 경로 설정
+    // 1. 테스트 디렉토리 생성
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
-    console.log('📁 1단계 - 테스트 디렉토리 설정:', testsDir);
-    
-    // 2단계: 디렉토리가 없으면 생성
     if (!fs.existsSync(testsDir)) {
-      console.log('📁 2단계 - 테스트 디렉토리 생성 중...');
       fs.mkdirSync(testsDir, { recursive: true });
-      console.log('✅ 테스트 디렉토리 생성 완료');
-    } else {
-      console.log('✅ 테스트 디렉토리 이미 존재');
     }
-    
-    // 3단계: Git에서 클론
+    steps.directoryCreated = true;
+    // 2. git clone
     const repoName = gitUrl.split('/').pop().replace('.git', '');
     const clonePath = path.join(testsDir, repoName);
-    console.log('📁 3단계 - Git 클론 준비:', { gitUrl, repoName, clonePath });
-    
-    // 기존 디렉토리가 있으면 삭제
     if (fs.existsSync(clonePath)) {
-      console.log('⚠️ 기존 디렉토리 삭제 중:', clonePath);
       fs.rmSync(clonePath, { recursive: true, force: true });
     }
-    
     try {
-      console.log('🔄 4단계 - Git 클론 시작:', gitUrl);
-      const cloneResult = await execAsync(`git clone ${gitUrl} ${clonePath}`);
-      console.log('✅ Git 클론 성공:', cloneResult.stdout);
+      await execAsync(`git clone ${gitUrl} ${clonePath}`);
+      steps.gitCloned = true;
     } catch (error) {
-      console.error('❌ Git 클론 실패:', error.message);
-      return res.status(400).json({ error: 'Git 저장소 클론에 실패했습니다: ' + error.message });
+      return res.status(400).json({ error: 'Git 저장소 클론 실패', steps, detail: error.message });
     }
-    
-    // 5단계: package.json 확인 및 수정
+    // 3. package.json 수정
     const packageJsonPath = path.join(clonePath, 'package.json');
-    console.log('📦 5단계 - package.json 확인:', packageJsonPath);
-    
     if (fs.existsSync(packageJsonPath)) {
-      console.log('📦 package.json 발견, 수정 중...');
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-      console.log('📦 기존 package.json:', packageJson);
-      
       packageJson.homepage = `/psycho/tests/${repoName}/`;
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-      console.log('✅ package.json 수정 완료:', packageJson.homepage);
-      
-      // 6단계: npm install
-      const deployResult = await runTestDeployScript(clonePath);
-      if (!deployResult.success) {
-        return res.status(400).json({ error: '테스트 배포 스크립트 실패', detail: deployResult.error });
-      }
-      
-      // 7단계: npm run build
-      try {
-        console.log('🔨 7단계 - npm run build 시작');
-        const buildResult = await execAsync('npm run build', { cwd: clonePath });
-        console.log('✅ npm run build 완료:', buildResult.stdout);
-      } catch (error) {
-        console.error('❌ npm run build 실패:', error.message);
-        return res.status(400).json({ error: '테스트 빌드에 실패했습니다: ' + error.message });
-      }
+      steps.packageJsonModified = true;
     } else {
-      console.log('⚠️ package.json이 없습니다. 빌드 단계를 건너뜁니다.');
+      return res.status(400).json({ error: 'package.json 없음', steps });
     }
-    
-    // 8단계: 데이터베이스에 테스트 정보 저장
-    console.log('💾 8단계 - 데이터베이스에 테스트 정보 저장 중...');
+    // 4. npm install & build (test_deploy.sh)
+    const deployResult = await runTestDeployScript(clonePath);
+    if (!deployResult.success) {
+      return res.status(400).json({ error: '테스트 배포 스크립트 실패', steps, detail: deployResult.error });
+    }
+    steps.npmInstalled = true;
+    steps.buildCompleted = true;
+    // 5. 썸네일 파일 확인
+    const thumbPath = path.join(clonePath, 'thumb.png');
+    let thumbnailPath = `/uploads/thumbnails/${repoName}_${Date.now()}_thumb.png`;
+    const destThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', thumbnailPath);
+    if (fs.existsSync(thumbPath)) {
+      // uploads/thumbnails로 복사
+      fs.mkdirSync(path.dirname(destThumbPath), { recursive: true });
+      fs.copyFileSync(thumbPath, destThumbPath);
+      steps.thumbnailReady = true;
+    } else {
+      // 기본 썸네일로 대체
+      thumbnailPath = '/default-thumb.png';
+      steps.thumbnailReady = false;
+    }
+    // 6. DB 저장
     const test = await Test.create({
       title,
       description: description || '',
       category: category || '기타',
-      thumbnail: `/tests/${repoName}/thumbnail.png` // 기본 썸네일 경로
+      thumbnail: thumbnailPath
     });
-    
-    console.log('✅ 테스트 생성 완료:', {
-      id: test.id,
-      title: test.title,
-      description: test.description,
-      category: test.category,
-      thumbnail: test.thumbnail,
-      createdAt: test.createdAt
-    });
-    
-    // 9단계: 최종 확인
-    const savedTest = await Test.findByPk(test.id);
-    console.log('✅ 9단계 - 데이터베이스 저장 확인:', savedTest ? '성공' : '실패');
-    
-    console.log('=== 테스트 추가 요청 완료 ===');
-    
-    res.json({ 
-      success: true, 
+    steps.databaseSaved = true;
+    return res.json({
+      success: true,
       message: '테스트가 성공적으로 추가되었습니다.',
       test,
-      steps: {
-        directoryCreated: true,
-        gitCloned: true,
-        packageJsonModified: fs.existsSync(packageJsonPath),
-        npmInstalled: deployResult.success,
-        buildCompleted: fs.existsSync(packageJsonPath),
-        databaseSaved: !!savedTest
-      }
+      steps,
+      thumbnailUrl: thumbnailPath
     });
   } catch (error) {
-    console.error('❌ 테스트 추가 오류:', error);
-    next(error);
+    return res.status(500).json({ error: '서버 오류', steps, detail: error.message });
   }
 });
 
