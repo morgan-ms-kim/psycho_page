@@ -151,10 +151,10 @@ export default function TestManagement() {
               </TestInfo>
               
               <TestActions>
-                <ActionButton onClick={() => router.push(`/tests/${test.id}/edit`)}>
+                <ActionButton onClick={() => router.push(`/psycho_page/admin/tests/${test.id}/edit`)}>
                   ✏️ 수정
                 </ActionButton>
-                <ActionButton onClick={() => router.push(`/tests/${test.id}/thumbnail`)}>
+                <ActionButton onClick={() => router.push(`/psycho_page/admin/tests/${test.id}/thumbnail`)}>
                   🖼️ 썸네일
                 </ActionButton>
                 <DeleteButton onClick={() => handleDeleteTest(test.id)}>
