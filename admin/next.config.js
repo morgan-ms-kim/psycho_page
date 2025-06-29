@@ -12,8 +12,8 @@ const nextConfig = {
   generateBuildId: async () => {
     return `admin-build-${Date.now()}`;
   },
-  // 정적 파일 경로를 항상 /psycho_page/admin으로 설정
-  assetPrefix: '/psycho_page/admin',
+  // 정적 파일 캐시 무효화 (프론트엔드와 동일한 방식)
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/psycho_page/admin' : '',
   // 서버 설정 추가
   poweredByHeader: false,
   compress: true,

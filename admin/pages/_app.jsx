@@ -1,5 +1,4 @@
 import { createGlobalStyle } from 'styled-components';
-import Head from 'next/head';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -26,16 +25,6 @@ const GlobalStyle = createGlobalStyle`
 function MyApp({ Component, pageProps }) {
   return (
     <>
-      <Head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.__NEXT_DATA__ = window.__NEXT_DATA__ || {};
-              window.__NEXT_DATA__.assetPrefix = '/psycho_page/admin';
-            `,
-          }}
-        />
-      </Head>
       <GlobalStyle />
       <Component {...pageProps} />
     </>
