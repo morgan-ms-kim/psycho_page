@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -52,6 +52,24 @@ export default function AddTest() {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalType, setModalType] = useState('info');
+  const [serverStatus, setServerStatus] = useState('checking');
+
+  // 서버 상태 확인
+  useEffect(() => {
+    const checkServerStatus = async () => {
+      try {
+        const response = await apiClient.get('/health');
+        console.log('서버 상태:', response.data);
+        setServerStatus('ok');
+      } catch (error) {
+        console.error('서버 상태 확인 실패:', error);
+        setServerStatus('error');
+        setError('서버에 연결할 수 없습니다. 관리자에게 문의하세요.');
+      }
+    };
+    
+    checkServerStatus();
+  }, []);
 
   const showMessage = (message, type = 'info') => {
     setModalMessage(message);
@@ -117,6 +135,16 @@ export default function AddTest() {
         </PageHeader>
 
         <FormCard>
+          {serverStatus === 'checking' && (
+            <div style={{ textAlign: 'center', padding: '1rem', color: '#666' }}>
+              서버 상태 확인 중...
+            </div>
+          )}
+          {serverStatus === 'error' && (
+            <ErrorMessage>
+              ⚠️ 서버에 연결할 수 없습니다. 관리자에게 문의하세요.
+            </ErrorMessage>
+          )}
           <Form onSubmit={handleSubmit}>
             <FormGroup>
               <Label>Git 저장소 URL *</Label>

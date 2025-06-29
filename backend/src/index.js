@@ -42,6 +42,15 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// 서버 상태 확인 라우트
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    adminToken: process.env.ADMIN_TOKEN ? '설정됨' : '설정되지 않음'
+  });
+});
+
 // 요청 로깅 미들웨어
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - IP: ${getClientIP(req)}`);
