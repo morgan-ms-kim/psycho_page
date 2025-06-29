@@ -21,6 +21,7 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
+    // 파일명: testID_타임스탬프_원본이름
     const testId = req.params.id || 'temp';
     cb(null, `${testId}_${Date.now()}_${file.originalname}`);
   }

@@ -49,6 +49,11 @@ const getTestIdFromFolder = (folderName) => {
   return folderName;
 };
 
+// 실제로 빌드된 index.html이 있는지 체크하는 함수(간단히 경로 패턴으로)
+const isValidTestUrl = (id) => {
+  return /^test\d+$/.test(id);
+};
+
 export default function TestPage() {
   const router = useRouter();
   const { id } = router.query;
@@ -60,12 +65,31 @@ export default function TestPage() {
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [newComment, setNewComment] = useState({ nickname: '', content: '', password: '' });
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [buildExists, setBuildExists] = useState(false);
+  const [checkedBuild, setCheckedBuild] = useState(false);
 
   // 테스트 데이터 로드
   useEffect(() => {
     if (id) {
       loadTestData();
       recordVisit();
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (/^test\d+$/.test(id)) {
+      fetch(`/psycho_page/tests/${id}/index.html`, { method: 'HEAD' })
+        .then(res => {
+          setBuildExists(res.ok);
+          setCheckedBuild(true);
+        })
+        .catch(() => {
+          setBuildExists(false);
+          setCheckedBuild(true);
+        });
+    } else {
+      setBuildExists(false);
+      setCheckedBuild(true);
     }
   }, [id]);
 
@@ -196,6 +220,20 @@ export default function TestPage() {
   const testUrl = `/psycho_page/tests/${id}/`;
   const commentCount = comments.length;
 
+  if (!checkedBuild && /^test\d+$/.test(id)) {
+    return (
+      <MainWrap>
+        <Header>
+          <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
+        </Header>
+        <LoadingWrap>
+          <LoadingSpinner />
+          <p>테스트 앱 상태를 확인 중...</p>
+        </LoadingWrap>
+      </MainWrap>
+    );
+  }
+
   return (
     <MainWrap>
       <Header>
@@ -203,24 +241,29 @@ export default function TestPage() {
         <TestTitle>{test?.title || '테스트'}</TestTitle>
       </Header>
 
-      {/* 테스트 앱 iframe */}
-      <TestContainer>
-        {!iframeLoaded && (
-          <LoadingOverlay>
-            <LoadingSpinner />
-            <p>테스트 앱을 로드하는 중...</p>
-          </LoadingOverlay>
-        )}
-        
-        <TestIframe
-          src={testUrl}
-          onLoad={handleIframeLoad}
-          onError={handleIframeError}
-          title={test?.title || '테스트'}
-          allow="fullscreen"
-          sandbox="allow-scripts allow-forms allow-popups"
-        />
-      </TestContainer>
+      {/* 빌드된 테스트만 iframe으로 띄움 */}
+      {buildExists ? (
+        <TestContainer>
+          {!iframeLoaded && (
+            <LoadingOverlay>
+              <LoadingSpinner />
+              <p>테스트 앱을 로드하는 중...</p>
+            </LoadingOverlay>
+          )}
+          <TestIframe
+            src={testUrl}
+            onLoad={handleIframeLoad}
+            onError={handleIframeError}
+            title={test?.title || '테스트'}
+            allow="fullscreen"
+            sandbox="allow-scripts allow-forms allow-popups"
+          />
+        </TestContainer>
+      ) : (
+        <ErrorMessage>
+          <p>아직 빌드된 테스트 앱이 없습니다.</p>
+        </ErrorMessage>
+      )}
 
       {/* 테스트 정보 및 소셜 기능 */}
       <Section>
