@@ -205,13 +205,13 @@ export default function AddTest() {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
-            timeout: 60000 // 60초 타임아웃
+            timeout: 120000 // 120초 타임아웃
           });
           
           updateProgressStep('썸네일 업로드', 'completed');
           addLog('✅ 썸네일 업로드 성공');
           addLog('썸네일 경로: ' + thumbnailResponse.data.thumbnail);
-          addLog('썸네일 URL: https://smartpick.website/psycho_page' + thumbnailResponse.data.thumbnail);
+          addLog('썸네일 URL: https://smartpick.website' + thumbnailResponse.data.thumbnail);
         } catch (thumbnailError) {
           updateProgressStep('썸네일 업로드', 'failed');
           addLog('❌ 썸네일 업로드 실패: ' + (thumbnailError.response?.data?.error || thumbnailError.message));

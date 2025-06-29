@@ -14,18 +14,24 @@ const execAsync = promisify(exec);
 // multer 설정
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(process.cwd(), 'uploads');
+    const uploadDir = path.join(process.cwd(), '..', 'frontend', 'public', 'uploads', 'thumbnails');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '_' + file.originalname);
+    const testId = req.params.id || 'temp';
+    cb(null, `${testId}_${Date.now()}_${file.originalname}`);
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB
+  }
+});
 
 dotenv.config();
 
@@ -40,7 +46,7 @@ app.use(cors({
 }));
 
 // 정적 파일 서빙 (업로드된 썸네일)
-app.use('/uploads', express.static(path.join(process.cwd(), '..', 'frontend', 'public', 'uploads')));
+app.use('/psycho_page/uploads', express.static(path.join(process.cwd(), '..', 'frontend', 'public', 'uploads')));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -783,7 +789,8 @@ app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thu
       originalname: req.file.originalname,
       mimetype: req.file.mimetype,
       size: req.file.size,
-      path: req.file.path
+      path: req.file.path,
+      filename: req.file.filename
     });
     
     const test = await Test.findByPk(testId);
@@ -792,30 +799,12 @@ app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thu
       return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
     }
     
-    const thumbnailPath = `/psycho_page/uploads/thumbnails/${testId}_${Date.now()}_${req.file.originalname}`;
-    const fullPath = path.join(process.cwd(), '..', 'frontend', 'public', 'uploads', 'thumbnails', `${testId}_${Date.now()}_${req.file.originalname}`);
+    // 파일이 이미 올바른 위치에 있으므로 경로만 설정
+    const thumbnailPath = `/psycho_page/uploads/thumbnails/${req.file.filename}`;
     
-    console.log('📂 썸네일 저장 경로:', fullPath);
+    console.log('📂 썸네일 경로:', thumbnailPath);
     
-    // 디렉토리 자동 생성
-    const uploadDir = path.dirname(fullPath);
-    if (!fs.existsSync(uploadDir)) {
-      console.log('📁 업로드 디렉토리 생성:', uploadDir);
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    
-    // 파일 이동
-    try {
-      console.log('📋 파일 이동 시작');
-      fs.renameSync(req.file.path, fullPath);
-      fs.chmodSync(fullPath, 0o644);
-      console.log('✅ 파일 이동 완료');
-    } catch (error) {
-      console.error('❌ 파일 이동 실패:', error.message);
-      return res.status(500).json({ error: '파일 이동 실패', detail: error.message });
-    }
-    
-    // 기존 썸네일 삭제
+    // 기존 썸네일 삭제 (기본 썸네일 제외)
     if (test.thumbnail && test.thumbnail !== '/psycho_page/default-thumb.png') {
       try {
         const oldThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail.replace('/psycho_page/', ''));

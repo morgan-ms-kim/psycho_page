@@ -142,6 +142,7 @@ export default function TestPage() {
 
   const handleIframeError = () => {
     setError('테스트 앱을 로드하는데 실패했습니다.');
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -203,6 +204,7 @@ export default function TestPage() {
           onError={handleIframeError}
           title={test?.title || '테스트'}
           allow="fullscreen"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         />
       </TestContainer>
 
@@ -311,18 +313,20 @@ const TestTitle = styled.h1`
 const TestContainer = styled.div`
   position: relative;
   width: 100%;
-  height: 70vh;
-  min-height: 500px;
+  height: 80vh;
+  min-height: 600px;
   margin-bottom: 2rem;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 `;
 
 const TestIframe = styled.iframe`
   width: 100%;
   height: 100%;
   border: none;
-  border-radius: 10px;
   background: white;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 `;
 
 const LoadingOverlay = styled.div`
@@ -331,13 +335,12 @@ const LoadingOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 10;
-  border-radius: 10px;
   
   p {
     margin-top: 1rem;
