@@ -68,7 +68,7 @@ app.get('/api/db-status', async (req, res) => {
     });
     
     // 시스템 정보 추가
-    const os = require('os');
+    const os = await import('os');
     
     res.json({
       dbConnection: 'ok',
@@ -120,7 +120,6 @@ app.use((req, res, next) => {
   }
   
   // 파일에 로그 저장
-  const fs = require('fs');
   const logDir = path.join(process.cwd(), 'logs');
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
@@ -137,12 +136,21 @@ app.use((req, res, next) => {
 
 // 관리자 인증 미들웨어
 const authenticateAdmin = (req, res, next) => {
+  console.log('🔐 관리자 인증 시도');
+  console.log('요청 경로:', req.path);
+  console.log('요청 메서드:', req.method);
+  
   const token = req.headers.authorization?.replace('Bearer ', '');
+  console.log('제공된 토큰:', token ? '있음' : '없음');
+  console.log('환경 변수 ADMIN_TOKEN:', process.env.ADMIN_TOKEN ? '설정됨' : '설정되지 않음');
   
   // 간단한 토큰 검증 (실제로는 JWT 사용 권장)
   if (token === process.env.ADMIN_TOKEN) {
+    console.log('✅ 관리자 인증 성공');
     next();
   } else {
+    console.log('❌ 관리자 인증 실패');
+    console.log('토큰 일치 여부:', token === process.env.ADMIN_TOKEN);
     res.status(401).json({ error: '인증이 필요합니다.' });
   }
 };
@@ -599,18 +607,31 @@ app.delete('/api/comments/:id', async (req, res, next) => {
 // 관리자 로그인
 app.post('/api/admin/login', async (req, res, next) => {
   try {
+    console.log('🔐 관리자 로그인 시도');
+    console.log('요청 데이터:', JSON.stringify(req.body, null, 2));
+    
     const { username, password } = req.body;
+    
+    console.log('환경 변수 확인:');
+    console.log('ADMIN_USERNAME:', process.env.ADMIN_USERNAME ? '설정됨' : '설정되지 않음');
+    console.log('ADMIN_PASSWORD:', process.env.ADMIN_PASSWORD ? '설정됨' : '설정되지 않음');
+    console.log('ADMIN_TOKEN:', process.env.ADMIN_TOKEN ? '설정됨' : '설정되지 않음');
     
     // 환경변수에서 관리자 정보 확인
     if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+      console.log('✅ 로그인 성공');
       res.json({ 
         token: process.env.ADMIN_TOKEN,
         message: '로그인 성공'
       });
     } else {
+      console.log('❌ 로그인 실패');
+      console.log('사용자명 일치:', username === process.env.ADMIN_USERNAME);
+      console.log('비밀번호 일치:', password === process.env.ADMIN_PASSWORD);
       res.status(401).json({ error: '아이디 또는 비밀번호가 올바르지 않습니다.' });
     }
   } catch (error) {
+    console.error('❌ 로그인 오류:', error);
     next(error);
   }
 });
