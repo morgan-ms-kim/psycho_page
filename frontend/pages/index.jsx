@@ -32,7 +32,7 @@ import {
 } from '../components/StyledComponents';
 
 // API 기본 URL - nginx 리버스 프록시 사용
-const API_BASE = 'https://smartpick.website/api';
+const getApiBase = () => 'https://smartpick.website/api';
 
 export default function Home() {
   const [tests, setTests] = useState([]);
@@ -83,7 +83,7 @@ export default function Home() {
   // 방문자 통계 로드
   const loadVisitorStats = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/visitors/count`, {
+      const response = await axios.get(`${getApiBase()}/visitors/count`, {
         timeout: 5000
       });
       setVisitorStats(response.data);
@@ -103,7 +103,7 @@ export default function Home() {
   // 카테고리 목록 로드
   const loadCategories = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/categories`, {
+      const response = await axios.get(`${getApiBase()}/categories`, {
         timeout: 5000
       });
       
@@ -151,7 +151,7 @@ export default function Home() {
       if (selectedCategory) params.append('category', selectedCategory);
 
       // 타임아웃 설정 (5초)
-      const response = await axios.get(`${API_BASE}/tests?${params}`, {
+      const response = await axios.get(`${getApiBase()}/tests?${params}`, {
         timeout: 5000
       });
       

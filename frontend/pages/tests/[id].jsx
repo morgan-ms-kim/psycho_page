@@ -34,7 +34,7 @@ import {
 } from '../../components/StyledComponents';
 
 // API 기본 URL - nginx 리버스 프록시 사용
-const API_BASE = 'https://smartpick.website/api';
+const getApiBase = () => 'https://smartpick.website/api';
 
 export default function TestDetail() {
   const router = useRouter();
@@ -85,7 +85,7 @@ export default function TestDetail() {
   const recordVisit = async () => {
     try {
       const testId = getTestIdFromFolder(id);
-      await axios.post(`${API_BASE}/visitors`, {
+      await axios.post(`${getApiBase()}/visitors`, {
         testId: testId
       });
     } catch (error) {
@@ -98,7 +98,7 @@ export default function TestDetail() {
   const loadTestData = async () => {
     try {
       const testId = getTestIdFromFolder(id);
-      const response = await axios.get(`${API_BASE}/tests/${testId}`);
+      const response = await axios.get(`${getApiBase()}/tests/${testId}`);
       setTest(response.data);
       setLiked(response.data.userLiked || false);
       setLoading(false);
@@ -126,7 +126,7 @@ export default function TestDetail() {
     try {
       setLoadingComments(true);
       const testId = getTestIdFromFolder(id);
-      const response = await axios.get(`${API_BASE}/tests/${testId}/comments?page=${page}&limit=10`);
+      const response = await axios.get(`${getApiBase()}/tests/${testId}/comments?page=${page}&limit=10`);
       
       if (page === 1) {
         setComments(response.data.comments);
@@ -158,7 +158,7 @@ export default function TestDetail() {
   const toggleLike = async () => {
     try {
       const testId = getTestIdFromFolder(id);
-      const response = await axios.post(`${API_BASE}/tests/${testId}/like`);
+      const response = await axios.post(`${getApiBase()}/tests/${testId}/like`);
       setLiked(response.data.liked);
       loadTestData();
     } catch (error) {
@@ -169,7 +169,7 @@ export default function TestDetail() {
   // 댓글 좋아요 토글
   const toggleCommentLike = async (commentId) => {
     try {
-      await axios.post(`${API_BASE}/comments/${commentId}/like`);
+      await axios.post(`${getApiBase()}/comments/${commentId}/like`);
       loadComments(1);
     } catch (error) {
       console.error('댓글 좋아요 처리 실패:', error);
@@ -182,7 +182,7 @@ export default function TestDetail() {
     
     try {
       const testId = getTestIdFromFolder(id);
-      await axios.post(`${API_BASE}/tests/${testId}/comments`, newComment);
+      await axios.post(`${getApiBase()}/tests/${testId}/comments`, newComment);
       setNewComment({ nickname: '', content: '' });
       setShowCommentForm(false);
       loadComments(1);
@@ -393,7 +393,7 @@ export default function TestDetail() {
             </InfoItem>
             <InfoItem>
               <InfoLabel>댓글</InfoLabel>
-              <InfoValue>{test.commentCount || 0}</InfoValue>
+              <InfoValue>{test.comments || 0}</InfoValue>
             </InfoItem>
             <InfoItem>
               <InfoLabel>생성일</InfoLabel>
@@ -405,7 +405,7 @@ export default function TestDetail() {
 
       <CommentSection>
         <CommentHeader>
-          <CommentTitle>💬 댓글 ({test.commentCount || 0})</CommentTitle>
+          <CommentTitle>💬 댓글 ({test.comments || 0})</CommentTitle>
           <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>
             {showCommentForm ? '취소' : '댓글 작성'}
           </CommentButton>
