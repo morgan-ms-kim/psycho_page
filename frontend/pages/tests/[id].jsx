@@ -16,7 +16,6 @@ import {
   QuestionCard,
   ResultCard,
   InfoCard,
-  CommentForm,
   CommentItem,
   Input,
   Textarea,
@@ -249,7 +248,7 @@ export default function TestPage() {
         </CommentHeader>
 
         {showCommentForm && (
-          <CommentForm>
+          <CommentFormContainer>
             <CommentInput
               type="text"
               placeholder="닉네임"
@@ -273,15 +272,15 @@ export default function TestPage() {
             <CommentSubmitButton onClick={submitComment}>
               댓글 작성
             </CommentSubmitButton>
-          </CommentForm>
+          </CommentFormContainer>
         )}
 
         {comments.map((comment) => (
           <CommentItem key={comment.id}>
-            <CommentHeader>
+            <CommentItemHeader>
               <CommentAuthor>{comment.nickname}</CommentAuthor>
               <CommentDate>{new Date(comment.createdAt).toLocaleDateString()}</CommentDate>
-            </CommentHeader>
+            </CommentItemHeader>
             <CommentContent>{comment.content}</CommentContent>
           </CommentItem>
         ))}
@@ -392,7 +391,7 @@ const CommentButton = styled.button`
   }
 `;
 
-const CommentForm = styled.div`
+const CommentFormContainer = styled.div`
   background: rgba(255, 255, 255, 0.1);
   padding: 1.5rem;
   border-radius: 10px;
@@ -420,6 +419,13 @@ const CommentSubmitButton = styled.button`
   &:hover {
     background: #5a6fd8;
   }
+`;
+
+const CommentItemHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
 `;
 
 const CommentAuthor = styled.div`
