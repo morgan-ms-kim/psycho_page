@@ -29,6 +29,10 @@ const Test = sequelize.define('Test', {
     type: Sequelize.TEXT,
     allowNull: false,
   },
+  category: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
   thumbnail: {
     type: Sequelize.STRING,
     allowNull: true,
@@ -107,7 +111,7 @@ const Like = sequelize.define('Like', {
   },
 });
 
-const Visitor = sequelize.define('Visitor', {
+const  = sequelize.define('Visitor', {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
