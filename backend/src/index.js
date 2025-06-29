@@ -593,6 +593,20 @@ app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
   }
 });
 
+// 테스트 등록 전용 deploy 스크립트 실행 함수
+async function runTestDeployScript(clonePath) {
+  const scriptPath = path.join(process.cwd(), '..', 'test_deploy.sh');
+  try {
+    const { stdout, stderr } = await execAsync(`bash ${scriptPath} ${clonePath}`);
+    console.log('✅ test_deploy.sh 실행 결과:', stdout);
+    if (stderr) console.error('test_deploy.sh stderr:', stderr);
+    return { success: true, stdout, stderr };
+  } catch (error) {
+    console.error('❌ test_deploy.sh 실행 실패:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
 // 새 테스트 추가 (Git에서 클론)
 app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
   try {
@@ -658,13 +672,9 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
       console.log('✅ package.json 수정 완료:', packageJson.homepage);
       
       // 6단계: npm install
-      try {
-        console.log('📦 6단계 - npm install 시작');
-        const installResult = await execAsync('npm install', { cwd: clonePath });
-        console.log('✅ npm install 완료:', installResult.stdout);
-      } catch (error) {
-        console.error('❌ npm install 실패:', error.message);
-        return res.status(400).json({ error: '의존성 설치에 실패했습니다: ' + error.message });
+      const deployResult = await runTestDeployScript(clonePath);
+      if (!deployResult.success) {
+        return res.status(400).json({ error: '테스트 배포 스크립트 실패', detail: deployResult.error });
       }
       
       // 7단계: npm run build
@@ -712,7 +722,7 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
         directoryCreated: true,
         gitCloned: true,
         packageJsonModified: fs.existsSync(packageJsonPath),
-        npmInstalled: fs.existsSync(packageJsonPath),
+        npmInstalled: deployResult.success,
         buildCompleted: fs.existsSync(packageJsonPath),
         databaseSaved: !!savedTest
       }
