@@ -244,6 +244,12 @@ app.post('/api/comments/:id/like', async (req, res, next) => {
     const clientIP = getClientIP(req);
     const commentId = req.params.id;
     
+    // 댓글 존재 여부 확인
+    const comment = await Comment.findByPk(commentId);
+    if (!comment) {
+      return res.status(404).json({ error: '댓글을 찾을 수 없습니다.' });
+    }
+    
     const existingLike = await Like.findOne({
       where: { commentId, ip: clientIP }
     });
@@ -255,13 +261,13 @@ app.post('/api/comments/:id/like', async (req, res, next) => {
       await Like.create({ 
         commentId, 
         ip: clientIP,
-        testId: null  // 댓글 좋아요는 testId를 null로 설정
+        testId: comment.testId  // 댓글의 testId 사용
       });
       res.json({ liked: true });
     }
   } catch (error) {
     console.error('댓글 좋아요 오류:', error);
-    next(error);
+    res.status(500).json({ error: '댓글 좋아요 처리 중 오류가 발생했습니다.' });
   }
 });
 

@@ -141,6 +141,8 @@ export default function TestDetail() {
       const testId = getTestIdFromFolder(id);
       const response = await apiClient.get(`/tests/${testId}/comments?page=${page}&limit=10`);
       
+      console.log('댓글 데이터:', response.data); // 디버깅용
+      
       if (page === 1) {
         setComments(response.data.comments);
       } else {
@@ -459,25 +461,28 @@ export default function TestDetail() {
         )}
 
         <CommentList>
-          {(comments || []).map(comment => (
-            <CommentItem key={comment.id}>
-              <CommentHeader>
-                <CommentAuthor>{comment.nickname}</CommentAuthor>
-                <CommentDate>{new Date(comment.createdAt).toLocaleDateString()}</CommentDate>
-              </CommentHeader>
-              <CommentContent>{comment.content}</CommentContent>
-              <CommentActions>
-                <CommentLikeButton onClick={() => toggleCommentLike(comment.id)}>
-                  {comment.userLiked ? '❤️' : '🤍'} 좋아요
-                </CommentLikeButton>
-                {comment.isAuthor && (
-                  <CommentDeleteButton onClick={() => deleteComment(comment.id)}>
-                    ❌ 삭제
-                  </CommentDeleteButton>
-                )}
-              </CommentActions>
-            </CommentItem>
-          ))}
+          {(comments || []).map(comment => {
+            console.log('댓글 정보:', comment); // 디버깅용
+            return (
+              <CommentItem key={comment.id}>
+                <CommentHeader>
+                  <CommentAuthor>{comment.nickname}</CommentAuthor>
+                  <CommentDate>{new Date(comment.createdAt).toLocaleDateString()}</CommentDate>
+                </CommentHeader>
+                <CommentContent>{comment.content}</CommentContent>
+                <CommentActions>
+                  <CommentLikeButton onClick={() => toggleCommentLike(comment.id)}>
+                    {comment.userLiked ? '❤️' : '🤍'} 좋아요
+                  </CommentLikeButton>
+                  {comment.isAuthor && (
+                    <CommentDeleteButton onClick={() => deleteComment(comment.id)}>
+                      ❌ 삭제
+                    </CommentDeleteButton>
+                  )}
+                </CommentActions>
+              </CommentItem>
+            );
+          })}
           
           {hasMoreComments && (
             <LoadMoreButton onClick={loadMoreComments} disabled={loadingComments}>
