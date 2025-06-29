@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   basePath: '/psycho_page',
+  assetPrefix: '/psycho_page',
   trailingSlash: false,
   compiler: {
     styledComponents: true,
@@ -8,15 +9,18 @@ const nextConfig = {
   experimental: {
     esmExternals: 'loose',
   },
-  async redirects() {
+  async rewrites() {
     return [
       {
-        source: '/tests/:path*',
-        destination: '/psycho_page/tests/:path*',
-        permanent: false,
+        source: '/api/:path*',
+        destination: '/psycho_page/api/:path*',
       },
     ];
   },
+  // 서버 설정 추가
+  poweredByHeader: false,
+  compress: true,
+  generateEtags: false,
 };
 
 module.exports = nextConfig; 
