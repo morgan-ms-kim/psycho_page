@@ -53,6 +53,8 @@ export default function AddTest() {
   const [modalMessage, setModalMessage] = useState('');
   const [modalType, setModalType] = useState('info');
   const [serverStatus, setServerStatus] = useState('checking');
+  const [progressSteps, setProgressSteps] = useState([]);
+  const [currentStep, setCurrentStep] = useState('');
 
   // 서버 상태 확인
   useEffect(() => {
@@ -82,16 +84,56 @@ export default function AddTest() {
     setTimeout(() => setShowModal(false), 3000);
   };
 
+  const addProgressStep = (step, status = 'pending') => {
+    setProgressSteps(prev => [...prev, { step, status, timestamp: new Date() }]);
+  };
+
+  const updateProgressStep = (step, status) => {
+    setProgressSteps(prev => 
+      prev.map(p => p.step === step ? { ...p, status } : p)
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setProgressSteps([]);
+
+    // 진행 단계 초기화
+    const steps = [
+      'Git 저장소 클론',
+      'package.json 수정',
+      '의존성 설치',
+      '테스트 빌드',
+      '데이터베이스 저장'
+    ];
+
+    steps.forEach(step => addProgressStep(step));
 
     try {
+      console.log('🔄 테스트 추가 시작:', formData);
+      setCurrentStep('테스트 추가 중...');
+      
       const response = await apiClient.post('/admin/tests', formData);
+      
+      console.log('✅ 테스트 추가 성공:', response.data);
+      
+      // 진행 단계 업데이트
+      if (response.data.steps) {
+        if (response.data.steps.directoryCreated) updateProgressStep('Git 저장소 클론', 'completed');
+        if (response.data.steps.gitCloned) updateProgressStep('Git 저장소 클론', 'completed');
+        if (response.data.steps.packageJsonModified) updateProgressStep('package.json 수정', 'completed');
+        if (response.data.steps.npmInstalled) updateProgressStep('의존성 설치', 'completed');
+        if (response.data.steps.buildCompleted) updateProgressStep('테스트 빌드', 'completed');
+        if (response.data.steps.databaseSaved) updateProgressStep('데이터베이스 저장', 'completed');
+      }
       
       // 썸네일 업로드
       if (thumbnailFile && response.data.test) {
+        setCurrentStep('썸네일 업로드 중...');
+        addProgressStep('썸네일 업로드');
+        
         const formDataThumbnail = new FormData();
         formDataThumbnail.append('thumbnail', thumbnailFile);
         
@@ -100,12 +142,28 @@ export default function AddTest() {
             'Content-Type': 'multipart/form-data',
           }
         });
+        
+        updateProgressStep('썸네일 업로드', 'completed');
       }
       
-      showMessage('테스트가 성공적으로 추가되었습니다!');
-      router.push('/psycho_page/admin/tests');
+      setCurrentStep('완료!');
+      showMessage('테스트가 성공적으로 추가되었습니다!', 'success');
+      
+      // 3초 후 목록 페이지로 이동
+      setTimeout(() => {
+        router.push('/psycho_page/admin/tests');
+      }, 3000);
+      
     } catch (error) {
       console.error('테스트 추가 실패:', error);
+      setCurrentStep('오류 발생');
+      
+      // 진행 중인 단계를 실패로 표시
+      const currentStepIndex = progressSteps.findIndex(p => p.status === 'pending');
+      if (currentStepIndex !== -1) {
+        updateProgressStep(progressSteps[currentStepIndex].step, 'failed');
+      }
+      
       setError(error.response?.data?.error || '테스트 추가에 실패했습니다.');
       showMessage(error.response?.data?.error || '테스트 추가에 실패했습니다.', 'error');
     } finally {
@@ -149,6 +207,26 @@ export default function AddTest() {
               ⚠️ 서버에 연결할 수 없습니다. 관리자에게 문의하세요.
             </ErrorMessage>
           )}
+          
+          {/* 진행 상황 표시 */}
+          {loading && progressSteps.length > 0 && (
+            <ProgressContainer>
+              <ProgressTitle>{currentStep}</ProgressTitle>
+              <ProgressSteps>
+                {progressSteps.map((step, index) => (
+                  <ProgressStep key={index} status={step.status}>
+                    <StepIcon>
+                      {step.status === 'completed' && '✅'}
+                      {step.status === 'failed' && '❌'}
+                      {step.status === 'pending' && '⏳'}
+                    </StepIcon>
+                    <StepText>{step.step}</StepText>
+                  </ProgressStep>
+                ))}
+              </ProgressSteps>
+            </ProgressContainer>
+          )}
+          
           <Form onSubmit={handleSubmit}>
             <FormGroup>
               <Label>Git 저장소 URL *</Label>
@@ -523,4 +601,42 @@ const ModalIcon = styled.div`
 const ModalMessage = styled.p`
   font-size: 1rem;
   color: #333;
+`;
+
+const ProgressContainer = styled.div`
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+`;
+
+const ProgressTitle = styled.h3`
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 1rem;
+`;
+
+const ProgressSteps = styled.ul`
+  list-style: none;
+  padding: 0;
+`;
+
+const ProgressStep = styled.li`
+  color: ${props => props.status === 'completed' ? '#28a745' : props.status === 'failed' ? '#e74c3c' : '#666'};
+  padding: 0.5rem 0;
+  border-bottom: ${props => props.status === 'completed' ? '1px solid #28a745' : props.status === 'failed' ? '1px solid #e74c3c' : 'none'};
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const StepIcon = styled.div`
+  font-size: 1rem;
+  margin-right: 0.5rem;
+`;
+
+const StepText = styled.span`
+  font-size: 1rem;
 `; 
