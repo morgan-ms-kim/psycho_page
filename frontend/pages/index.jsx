@@ -32,7 +32,7 @@ import {
 } from '../components/StyledComponents';
 
 // API 기본 URL - nginx 리버스 프록시 사용
-const API_BASE = 'https://smartpick.website/api';
+const API_BASE = '/api';
 
 export default function Home() {
   const [tests, setTests] = useState([]);
