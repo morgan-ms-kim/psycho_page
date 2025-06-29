@@ -193,6 +193,8 @@ export default function TestDetail() {
 
   // 답변 선택
   const selectAnswer = (answerIndex) => {
+    if (!test || !test.questions) return;
+    
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = answerIndex;
     setAnswers(newAnswers);
@@ -206,6 +208,8 @@ export default function TestDetail() {
 
   // 결과 계산
   const calculateResult = (finalAnswers) => {
+    if (!test || !test.results || test.results.length === 0) return;
+    
     const resultIndex = Math.floor(Math.random() * test.results.length);
     setResult(test.results[resultIndex]);
     setShowResult(true);
@@ -234,6 +238,8 @@ export default function TestDetail() {
 
   // 결과 공유
   const shareResult = async () => {
+    if (!test || !result) return;
+    
     const shareData = {
       title: `${test.title} - ${result.title}`,
       text: `${test.title} 테스트 결과: ${result.title}\n${result.description}`,
@@ -256,6 +262,8 @@ export default function TestDetail() {
 
   // 소셜 미디어 공유
   const shareToSocial = (platform) => {
+    if (!test || !result) return;
+    
     const url = encodeURIComponent(window.location.href);
     const text = encodeURIComponent(`${test.title} - ${result.title}`);
     
@@ -314,7 +322,7 @@ export default function TestDetail() {
         </ErrorMessage>
       )}
 
-      {!showResult && (
+      {!showResult && test && test.questions && test.questions.length > 0 && (
         <TestSection>
           <ProgressBar>
             <ProgressFill progress={(currentQuestion / test.questions.length) * 100} />
@@ -323,17 +331,17 @@ export default function TestDetail() {
 
           <QuestionCard>
             <QuestionNumber>Q{currentQuestion + 1}</QuestionNumber>
-            <QuestionText>{test.questions[currentQuestion].question}</QuestionText>
+            <QuestionText>{test.questions[currentQuestion]?.question || '질문을 불러올 수 없습니다.'}</QuestionText>
             
             <AnswerGrid>
-              {test.questions[currentQuestion].answers.map((answer, index) => (
+              {test.questions[currentQuestion]?.answers?.map((answer, index) => (
                 <AnswerButton
                   key={index}
                   onClick={() => selectAnswer(index)}
                 >
                   {answer}
                 </AnswerButton>
-              ))}
+              )) || []}
             </AnswerGrid>
           </QuestionCard>
         </TestSection>
@@ -377,11 +385,11 @@ export default function TestDetail() {
           <InfoGrid>
             <InfoItem>
               <InfoLabel>조회수</InfoLabel>
-              <InfoValue>{test.views.toLocaleString()}</InfoValue>
+              <InfoValue>{(test.views || 0).toLocaleString()}</InfoValue>
             </InfoItem>
             <InfoItem>
               <InfoLabel>좋아요</InfoLabel>
-              <InfoValue>{test.likes.toLocaleString()}</InfoValue>
+              <InfoValue>{(test.likes || 0).toLocaleString()}</InfoValue>
             </InfoItem>
             <InfoItem>
               <InfoLabel>댓글</InfoLabel>
@@ -389,7 +397,7 @@ export default function TestDetail() {
             </InfoItem>
             <InfoItem>
               <InfoLabel>생성일</InfoLabel>
-              <InfoValue>{new Date(test.createdAt).toLocaleDateString()}</InfoValue>
+              <InfoValue>{test.createdAt ? new Date(test.createdAt).toLocaleDateString() : '알 수 없음'}</InfoValue>
             </InfoItem>
           </InfoGrid>
         </InfoCard>
@@ -425,7 +433,7 @@ export default function TestDetail() {
         )}
 
         <CommentList>
-          {comments.map(comment => (
+          {(comments || []).map(comment => (
             <CommentItem key={comment.id}>
               <CommentHeader>
                 <CommentAuthor>{comment.nickname}</CommentAuthor>

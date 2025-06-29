@@ -111,7 +111,7 @@ const Like = sequelize.define('Like', {
   },
 });
 
-const  = sequelize.define('Visitor', {
+const Visitor = sequelize.define('Visitor', {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
