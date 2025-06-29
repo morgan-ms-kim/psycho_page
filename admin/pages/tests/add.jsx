@@ -61,6 +61,10 @@ export default function AddTest() {
         const response = await apiClient.get('/health');
         console.log('서버 상태:', response.data);
         setServerStatus('ok');
+        
+        // 데이터베이스 상태도 확인
+        const dbResponse = await apiClient.get('/db-status');
+        console.log('데이터베이스 상태:', dbResponse.data);
       } catch (error) {
         console.error('서버 상태 확인 실패:', error);
         setServerStatus('error');

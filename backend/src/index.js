@@ -51,6 +51,38 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// 데이터베이스 상태 확인 라우트
+app.get('/api/db-status', async (req, res) => {
+  try {
+    // 데이터베이스 연결 확인
+    await sequelize.authenticate();
+    
+    // 테스트 테이블의 모든 데이터 조회
+    const tests = await Test.findAll({
+      order: [['createdAt', 'DESC']]
+    });
+    
+    res.json({
+      dbConnection: 'ok',
+      testCount: tests.length,
+      tests: tests.map(test => ({
+        id: test.id,
+        title: test.title,
+        description: test.description,
+        category: test.category,
+        createdAt: test.createdAt,
+        updatedAt: test.updatedAt
+      }))
+    });
+  } catch (error) {
+    console.error('데이터베이스 상태 확인 실패:', error);
+    res.status(500).json({
+      dbConnection: 'error',
+      error: error.message
+    });
+  }
+});
+
 // 요청 로깅 미들웨어
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - IP: ${getClientIP(req)}`);
