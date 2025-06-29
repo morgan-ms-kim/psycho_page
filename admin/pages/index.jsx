@@ -152,3 +152,63 @@ const Logo = styled.div`
 `;
 
 const Title = styled.h1`
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0;
+`;
+
+const LoginForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const Label = styled.label`
+  font-weight: 500;
+  color: #333;
+`;
+
+const Input = styled.input`
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  
+  &:focus {
+    outline: none;
+    border-color: #667eea;
+  }
+`;
+
+const ErrorMessage = styled.div`
+  color: #e74c3c;
+  font-size: 0.875rem;
+  text-align: center;
+`;
+
+const LoginButton = styled.button`
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: #5a6fd8;
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+`;
