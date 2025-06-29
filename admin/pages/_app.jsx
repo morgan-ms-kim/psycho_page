@@ -7,7 +7,10 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
   }
 
+  html,
   body {
+    padding: 0;
+    margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
       sans-serif;
@@ -19,6 +22,11 @@ const GlobalStyle = createGlobalStyle`
   a {
     color: inherit;
     text-decoration: none;
+  }
+
+  /* styled-components hydration 오류 방지 */
+  .styled-components-hydration-fix {
+    display: none;
   }
 `;
 
