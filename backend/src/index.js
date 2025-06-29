@@ -622,12 +622,14 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
     console.log('=== 테스트 추가 요청 시작 ===');
     const { gitUrl, title, description, category } = req.body;
     if (!gitUrl || !title) {
+      console.error('❌ 필수 입력값 누락');
       return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.', steps });
     }
     // 1. 테스트 디렉토리 생성
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
     if (!fs.existsSync(testsDir)) {
       fs.mkdirSync(testsDir, { recursive: true });
+      console.log('✅ 테스트 디렉토리 생성:', testsDir);
     }
     steps.directoryCreated = true;
     // 2. git clone
@@ -635,12 +637,16 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
     const clonePath = path.join(testsDir, repoName);
     if (fs.existsSync(clonePath)) {
       fs.rmSync(clonePath, { recursive: true, force: true });
+      console.log('⚠️ 기존 디렉토리 삭제:', clonePath);
     }
     try {
+      console.log('🔄 git clone 시작:', gitUrl);
       await execAsync(`git clone ${gitUrl} ${clonePath}`);
       steps.gitCloned = true;
+      console.log('✅ git clone 성공:', clonePath);
     } catch (error) {
-      return res.status(400).json({ error: 'Git 저장소 클론 실패', steps, detail: error.message });
+      console.error('❌ git clone 실패:', error.message);
+      return res.status(400).json({ error: 'Git 저장소 클론 실패', steps, detail: error.message, stack: error.stack });
     }
     // 3. package.json 수정
     const packageJsonPath = path.join(clonePath, 'package.json');
@@ -649,13 +655,17 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
       packageJson.homepage = `/psycho/tests/${repoName}/`;
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
       steps.packageJsonModified = true;
+      console.log('✅ package.json 수정 완료');
     } else {
+      console.error('❌ package.json 없음');
       return res.status(400).json({ error: 'package.json 없음', steps });
     }
     // 4. npm install & build (test_deploy.sh)
+    console.log('🔨 test_deploy.sh 실행');
     const deployResult = await runTestDeployScript(clonePath);
     if (!deployResult.success) {
-      return res.status(400).json({ error: '테스트 배포 스크립트 실패', steps, detail: deployResult.error });
+      console.error('❌ test_deploy.sh 실패:', deployResult.error);
+      return res.status(400).json({ error: '테스트 배포 스크립트 실패', steps, detail: deployResult.error, stack: deployResult.stderr } );
     }
     steps.npmInstalled = true;
     steps.buildCompleted = true;
@@ -664,32 +674,39 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
     let thumbnailPath = `/uploads/thumbnails/${repoName}_${Date.now()}_thumb.png`;
     const destThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', thumbnailPath);
     if (fs.existsSync(thumbPath)) {
-      // uploads/thumbnails로 복사
       fs.mkdirSync(path.dirname(destThumbPath), { recursive: true });
       fs.copyFileSync(thumbPath, destThumbPath);
       steps.thumbnailReady = true;
+      console.log('✅ 썸네일 복사 성공:', destThumbPath);
     } else {
-      // 기본 썸네일로 대체
       thumbnailPath = '/default-thumb.png';
       steps.thumbnailReady = false;
+      console.log('⚠️ thumb.png 없음, 기본 썸네일 사용');
     }
     // 6. DB 저장
-    const test = await Test.create({
-      title,
-      description: description || '',
-      category: category || '기타',
-      thumbnail: thumbnailPath
-    });
-    steps.databaseSaved = true;
-    return res.json({
-      success: true,
-      message: '테스트가 성공적으로 추가되었습니다.',
-      test,
-      steps,
-      thumbnailUrl: thumbnailPath
-    });
+    try {
+      const test = await Test.create({
+        title,
+        description: description || '',
+        category: category || '기타',
+        thumbnail: thumbnailPath
+      });
+      steps.databaseSaved = true;
+      console.log('✅ DB 저장 성공:', test.id);
+      return res.json({
+        success: true,
+        message: '테스트가 성공적으로 추가되었습니다.',
+        test,
+        steps,
+        thumbnailUrl: thumbnailPath
+      });
+    } catch (error) {
+      console.error('❌ DB 저장 실패:', error.message);
+      return res.status(500).json({ error: 'DB 저장 실패', steps, detail: error.message, stack: error.stack });
+    }
   } catch (error) {
-    return res.status(500).json({ error: '서버 오류', steps, detail: error.message });
+    console.error('❌ 테스트 추가 전체 오류:', error.message);
+    return res.status(500).json({ error: '서버 오류', steps, detail: error.message, stack: error.stack });
   }
 });
 
