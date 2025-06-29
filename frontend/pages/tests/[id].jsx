@@ -35,7 +35,7 @@ import {
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
-  baseURL: 'https://smartpick.website/api',
+  baseURL: 'https://smartpick.website/psycho_page/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ const apiClient = axios.create({
 const getApiBase = () => {
   // 타임스탬프를 추가하여 캐시 무효화
   const timestamp = Date.now();
-  return `https://smartpick.website/api?t=${timestamp}`.replace('?t=', '');
+  return `https://smartpick.website/psycho_page/api?t=${timestamp}`.replace('?t=', '');
 };
 
 export default function TestDetail() {
