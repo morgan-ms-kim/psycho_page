@@ -775,6 +775,31 @@ app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
   }
 });
 
+// 관리자용 개별 테스트 조회
+app.get('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => {
+  try {
+    const test = await Test.findByPk(req.params.id);
+    if (!test) {
+      return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
+    }
+    
+    // 이미지 경로 수정
+    const testData = test.toJSON();
+    if (testData.thumbnail) {
+      if (testData.thumbnail.startsWith('/uploads/')) {
+        testData.thumbnail = testData.thumbnail.replace('/uploads/', '/psycho_page/uploads/');
+      } else if (!testData.thumbnail.startsWith('/psycho_page/')) {
+        testData.thumbnail = `/psycho_page${testData.thumbnail}`;
+      }
+    }
+    
+    res.json(testData);
+  } catch (error) {
+    console.error('❌ 관리자 테스트 조회 실패:', error);
+    next(error);
+  }
+});
+
 // 썸네일 업로드 라우트
 app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thumbnail'), async (req, res, next) => {
   try {
