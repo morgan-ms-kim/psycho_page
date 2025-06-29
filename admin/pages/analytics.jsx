@@ -48,7 +48,8 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('adminToken');
-      window.location.href = '/';
+      // 히스토리를 완전히 초기화하고 로그인 페이지로 강제 이동
+      window.location.href = '/psycho_page/admin';
     }
     return Promise.reject(error);
   }
@@ -113,7 +114,8 @@ export default function Analytics() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    router.push('/');
+    // 히스토리를 완전히 초기화하고 로그인 페이지로 강제 이동
+    window.location.href = '/psycho_page/admin';
   };
 
   const chartData = {
