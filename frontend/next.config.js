@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: '/psycho_page',
   trailingSlash: false,
   compiler: {
     styledComponents: true,
