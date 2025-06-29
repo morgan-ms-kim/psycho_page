@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -55,6 +55,8 @@ export default function AddTest() {
   const [serverStatus, setServerStatus] = useState('checking');
   const [progressSteps, setProgressSteps] = useState([]);
   const [currentStep, setCurrentStep] = useState('');
+  const [logMessages, setLogMessages] = useState([]);
+  const logPanelRef = useRef(null);
 
   // 서버 상태 확인
   useEffect(() => {
@@ -94,11 +96,23 @@ export default function AddTest() {
     );
   };
 
+  // 로그 추가 함수
+  const addLog = (msg) => {
+    setLogMessages(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
+    setTimeout(() => {
+      if (logPanelRef.current) {
+        logPanelRef.current.scrollTop = logPanelRef.current.scrollHeight;
+      }
+    }, 100);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setProgressSteps([]);
+    setLogMessages([]);
+    addLog('테스트 추가 시작');
 
     // 진행 단계 초기화
     const steps = [
@@ -112,10 +126,12 @@ export default function AddTest() {
     steps.forEach(step => addProgressStep(step));
 
     try {
+      addLog('API 요청: 테스트 등록');
       console.log('🔄 테스트 추가 시작:', formData);
       setCurrentStep('테스트 추가 중...');
       
       const response = await apiClient.post('/admin/tests', formData);
+      addLog('API 응답: ' + JSON.stringify(response.data));
       
       console.log('✅ 테스트 추가 성공:', response.data);
       
@@ -134,6 +150,7 @@ export default function AddTest() {
         setCurrentStep('썸네일 업로드 중...');
         addProgressStep('썸네일 업로드');
         
+        addLog('API 요청: 썸네일 업로드');
         const formDataThumbnail = new FormData();
         formDataThumbnail.append('thumbnail', thumbnailFile);
         
@@ -144,6 +161,7 @@ export default function AddTest() {
         });
         
         updateProgressStep('썸네일 업로드', 'completed');
+        addLog('썸네일 업로드 성공');
       }
       
       setCurrentStep('완료!');
@@ -224,6 +242,11 @@ export default function AddTest() {
                   </ProgressStep>
                 ))}
               </ProgressSteps>
+              <LogPanel ref={logPanelRef}>
+                {logMessages.map((msg, idx) => (
+                  <div key={idx} style={{ fontSize: '0.95em', color: '#444' }}>{msg}</div>
+                ))}
+              </LogPanel>
             </ProgressContainer>
           )}
           
@@ -639,4 +662,15 @@ const StepIcon = styled.div`
 
 const StepText = styled.span`
   font-size: 1rem;
+`;
+
+const LogPanel = styled.div`
+  background: #f8f8f8;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  max-height: 180px;
+  overflow-y: auto;
+  font-family: 'Fira Mono', 'Consolas', monospace;
 `; 
