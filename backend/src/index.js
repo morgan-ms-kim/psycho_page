@@ -512,9 +512,13 @@ app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
 // 새 테스트 추가 (Git에서 클론)
 app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
   try {
+    console.log('테스트 추가 요청 받음:', req.body);
+    console.log('요청 헤더:', req.headers);
+    
     const { gitUrl, title, description, category } = req.body;
     
     if (!gitUrl || !title) {
+      console.log('필수 필드 누락:', { gitUrl, title });
       return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.' });
     }
     
