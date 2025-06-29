@@ -123,7 +123,7 @@ export default function TestManagement() {
       <Main>
         <PageHeader>
           <PageTitle>테스트 관리</PageTitle>
-          <AddButton href="/tests/add">➕ 새 테스트 추가</AddButton>
+          <AddButton href="/psycho_page/admin/tests/add">➕ 새 테스트 추가</AddButton>
         </PageHeader>
 
         <TestsGrid>
@@ -170,7 +170,7 @@ export default function TestManagement() {
             <EmptyIcon>📝</EmptyIcon>
             <EmptyTitle>등록된 테스트가 없습니다</EmptyTitle>
             <EmptyDesc>새 테스트를 추가해보세요!</EmptyDesc>
-            <AddButton href="/tests/add">첫 번째 테스트 추가</AddButton>
+            <AddButton href="/psycho_page/admin/tests/add">첫 번째 테스트 추가</AddButton>
           </EmptyState>
         )}
       </Main>

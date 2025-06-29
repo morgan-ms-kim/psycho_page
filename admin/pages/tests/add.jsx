@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 const apiClient = axios.create({
   baseURL: 'https://smartpick.website/psycho_page/api',
-  timeout: 30000,
+  timeout: 300000,
   headers: {
     'Content-Type': 'application/json',
   }
@@ -235,7 +235,7 @@ export default function AddTest() {
       // 3초 후 테스트 페이지로 이동
       setTimeout(() => {
         window.open(testUrl, '_blank'); // 새 탭에서 테스트 페이지 열기
-        router.push('/tests'); // 관리자 목록 페이지로 이동
+        router.push('/psycho_page/admin/tests'); // 관리자 목록 페이지로 이동
       }, 3000);
       
     } catch (error) {
@@ -288,7 +288,7 @@ export default function AddTest() {
       <Main>
         <PageHeader>
           <PageTitle>새 테스트 추가</PageTitle>
-          <BackButton href="/tests">← 목록으로</BackButton>
+          <BackButton href="/psycho_page/admin/tests">← 목록으로</BackButton>
         </PageHeader>
 
         <FormCard>
@@ -394,7 +394,7 @@ export default function AddTest() {
             {error && <ErrorMessage>{error}</ErrorMessage>}
 
             <ButtonGroup>
-              <CancelButton type="button" onClick={() => router.push('/tests')}>
+              <CancelButton type="button" onClick={() => router.push('/psycho_page/admin/tests')}>
                 취소
               </CancelButton>
               <SubmitButton type="submit" disabled={loading}>
