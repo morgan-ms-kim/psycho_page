@@ -229,13 +229,13 @@ export default function AddTest() {
       
       // 테스트 등록 완료 후 해당 테스트 페이지로 이동
       const folderName = response.data.folderName || `test${response.data.test.id}`;
-      const testUrl = `/psycho_page/tests/${folderName}/`;
+      const testUrl = `/tests/${folderName}/`;
       addLog('🔗 테스트 페이지: ' + testUrl);
       
       // 3초 후 테스트 페이지로 이동
       setTimeout(() => {
         window.open(testUrl, '_blank'); // 새 탭에서 테스트 페이지 열기
-        router.push('/psycho_page/admin/tests'); // 관리자 목록 페이지로 이동
+        router.push('/tests'); // 관리자 목록 페이지로 이동
       }, 3000);
       
     } catch (error) {
@@ -268,18 +268,18 @@ export default function AddTest() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    router.push('/psycho_page/admin');
+    router.push('/');
   };
 
   return (
     <Container>
       <Header>
         <HeaderContent>
-          <Logo onClick={() => router.push('/psycho_page/admin/dashboard')} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
+          <Logo onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
           <Nav>
-            <NavLink href="/psycho_page/admin/dashboard">대시보드</NavLink>
-            <NavLink href="/psycho_page/admin/tests">테스트 관리</NavLink>
-            <NavLink href="/psycho_page/admin/analytics">방문자 분석</NavLink>
+            <NavLink href="/dashboard">대시보드</NavLink>
+            <NavLink href="/tests">테스트 관리</NavLink>
+            <NavLink href="/analytics">방문자 분석</NavLink>
             <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
           </Nav>
         </HeaderContent>
@@ -288,7 +288,7 @@ export default function AddTest() {
       <Main>
         <PageHeader>
           <PageTitle>새 테스트 추가</PageTitle>
-          <BackButton href="/psycho_page/admin/tests">← 목록으로</BackButton>
+          <BackButton href="/tests">← 목록으로</BackButton>
         </PageHeader>
 
         <FormCard>
@@ -394,7 +394,7 @@ export default function AddTest() {
             {error && <ErrorMessage>{error}</ErrorMessage>}
 
             <ButtonGroup>
-              <CancelButton type="button" onClick={() => router.push('/psycho_page/admin/tests')}>
+              <CancelButton type="button" onClick={() => router.push('/tests')}>
                 취소
               </CancelButton>
               <SubmitButton type="submit" disabled={loading}>

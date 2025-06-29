@@ -50,7 +50,7 @@ export default function TestManagement() {
     // 로그인 확인
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      router.push('/psycho_page/admin');
+      router.push('/');
       return;
     }
 
@@ -88,7 +88,7 @@ export default function TestManagement() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    router.push('/psycho_page/admin');
+    router.push('/');
   };
 
   const showMessage = (message, type = 'info') => {
@@ -110,11 +110,11 @@ export default function TestManagement() {
     <Container>
       <Header>
         <HeaderContent>
-          <Logo onClick={() => router.push('/psycho_page/admin/dashboard')} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
+          <Logo onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
           <Nav>
-            <NavLink href="/psycho_page/admin/dashboard">대시보드</NavLink>
-            <NavLink href="/psycho_page/admin/tests">테스트 관리</NavLink>
-            <NavLink href="/psycho_page/admin/analytics">방문자 분석</NavLink>
+            <NavLink href="/dashboard">대시보드</NavLink>
+            <NavLink href="/tests">테스트 관리</NavLink>
+            <NavLink href="/analytics">방문자 분석</NavLink>
             <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
           </Nav>
         </HeaderContent>
@@ -123,7 +123,7 @@ export default function TestManagement() {
       <Main>
         <PageHeader>
           <PageTitle>테스트 관리</PageTitle>
-          <AddButton href="/psycho_page/admin/tests/add">➕ 새 테스트 추가</AddButton>
+          <AddButton href="/tests/add">➕ 새 테스트 추가</AddButton>
         </PageHeader>
 
         <TestsGrid>
@@ -151,10 +151,10 @@ export default function TestManagement() {
               </TestInfo>
               
               <TestActions>
-                <ActionButton onClick={() => router.push(`/psycho_page/admin/tests/${test.id}/edit`)}>
+                <ActionButton onClick={() => router.push(`/tests/${test.id}/edit`)}>
                   ✏️ 수정
                 </ActionButton>
-                <ActionButton onClick={() => router.push(`/psycho_page/admin/tests/${test.id}/thumbnail`)}>
+                <ActionButton onClick={() => router.push(`/tests/${test.id}/thumbnail`)}>
                   🖼️ 썸네일
                 </ActionButton>
                 <DeleteButton onClick={() => handleDeleteTest(test.id)}>
@@ -170,7 +170,7 @@ export default function TestManagement() {
             <EmptyIcon>📝</EmptyIcon>
             <EmptyTitle>등록된 테스트가 없습니다</EmptyTitle>
             <EmptyDesc>새 테스트를 추가해보세요!</EmptyDesc>
-            <AddButton href="/psycho_page/admin/tests/add">첫 번째 테스트 추가</AddButton>
+            <AddButton href="/tests/add">첫 번째 테스트 추가</AddButton>
           </EmptyState>
         )}
       </Main>

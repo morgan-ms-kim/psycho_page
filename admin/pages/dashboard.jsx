@@ -27,7 +27,7 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('adminToken');
-      window.location.href = '/psycho_page/admin';
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }
@@ -49,7 +49,7 @@ export default function Dashboard() {
     // 로그인 확인
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      router.push('/psycho_page/admin');
+      router.push('/');
       return;
     }
 
@@ -77,7 +77,7 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    router.push('/psycho_page/admin');
+    router.push('/');
   };
 
   if (loading) {
@@ -94,9 +94,9 @@ export default function Dashboard() {
         <HeaderContent>
           <Logo>🧠 PSYCHO 관리자</Logo>
           <Nav>
-            <NavLink href="/psycho_page/admin/dashboard">대시보드</NavLink>
-            <NavLink href="/psycho_page/admin/tests">테스트 관리</NavLink>
-            <NavLink href="/psycho_page/admin/analytics">방문자 분석</NavLink>
+            <NavLink href="/dashboard">대시보드</NavLink>
+            <NavLink href="/tests">테스트 관리</NavLink>
+            <NavLink href="/analytics">방문자 분석</NavLink>
             <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
           </Nav>
         </HeaderContent>
@@ -158,19 +158,19 @@ export default function Dashboard() {
         <QuickActions>
           <SectionTitle>빠른 작업</SectionTitle>
           <ActionGrid>
-            <ActionCard href="/psycho_page/admin/tests/add">
+            <ActionCard href="/tests/add">
               <ActionIcon>➕</ActionIcon>
               <ActionTitle>새 테스트 추가</ActionTitle>
               <ActionDesc>Git 저장소에서 테스트를 가져와 등록합니다</ActionDesc>
             </ActionCard>
 
-            <ActionCard href="/psycho_page/admin/tests">
+            <ActionCard href="/tests">
               <ActionIcon>📝</ActionIcon>
               <ActionTitle>테스트 관리</ActionTitle>
               <ActionDesc>등록된 테스트들을 확인하고 관리합니다</ActionDesc>
             </ActionCard>
 
-            <ActionCard href="/psycho_page/admin/analytics">
+            <ActionCard href="/analytics">
               <ActionIcon>📊</ActionIcon>
               <ActionTitle>방문자 분석</ActionTitle>
               <ActionDesc>상세한 방문자 통계를 확인합니다</ActionDesc>

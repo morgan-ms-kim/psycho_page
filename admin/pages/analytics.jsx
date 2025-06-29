@@ -48,7 +48,7 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('adminToken');
-      window.location.href = '/psycho_page/admin';
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }
@@ -64,7 +64,7 @@ export default function Analytics() {
     // 로그인 확인
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      router.push('/psycho_page/admin');
+      router.push('/');
       return;
     }
 
@@ -85,7 +85,7 @@ export default function Analytics() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    router.push('/psycho_page/admin');
+    router.push('/');
   };
 
   const chartData = {
@@ -137,9 +137,9 @@ export default function Analytics() {
         <HeaderContent>
           <Logo>🧠 PSYCHO 관리자</Logo>
           <Nav>
-            <NavLink href="/psycho_page/admin/dashboard">대시보드</NavLink>
-            <NavLink href="/psycho_page/admin/tests">테스트 관리</NavLink>
-            <NavLink href="/psycho_page/admin/analytics">방문자 분석</NavLink>
+            <NavLink href="/dashboard">대시보드</NavLink>
+            <NavLink href="/tests">테스트 관리</NavLink>
+            <NavLink href="/analytics">방문자 분석</NavLink>
             <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
           </Nav>
         </HeaderContent>
