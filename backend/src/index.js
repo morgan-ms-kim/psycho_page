@@ -293,6 +293,29 @@ app.get('/api/tests/latest', async (req, res, next) => {
   }
 });
 
+// 방문자 목록 조회
+app.get('/api/visitors', async (req, res, next) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+    
+    const visitors = await Visitor.findAndCountAll({
+      order: [['visitedAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
+    
+    res.json({
+      visitors: visitors.rows,
+      total: visitors.count,
+      pages: Math.ceil(visitors.count / limit),
+      currentPage: parseInt(page)
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // 방문자 통계
 app.get('/api/visitors/count', async (req, res, next) => {
   try {
