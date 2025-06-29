@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: '/psycho_page/admin',
+  // basePath 제거 - nginx에서 경로 처리
   trailingSlash: false,
   compiler: {
     styledComponents: true,
@@ -12,8 +12,8 @@ const nextConfig = {
   generateBuildId: async () => {
     return `admin-build-${Date.now()}`;
   },
-  // 정적 파일 경로를 항상 /psycho_page/admin으로 설정
-  assetPrefix: '/psycho_page/admin',
+  // 정적 파일 경로를 절대 URL로 설정
+  assetPrefix: 'https://smartpick.website/psycho_page/admin',
   // 서버 설정 추가
   poweredByHeader: false,
   compress: true,
