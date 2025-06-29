@@ -43,6 +43,7 @@ export default function AddTest() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [thumbnailFile, setThumbnailFile] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,8 +52,21 @@ export default function AddTest() {
 
     try {
       const response = await apiClient.post('/admin/tests', formData);
+      
+      // 썸네일 업로드
+      if (thumbnailFile && response.data.test) {
+        const formDataThumbnail = new FormData();
+        formDataThumbnail.append('thumbnail', thumbnailFile);
+        
+        await apiClient.post(`/admin/tests/${response.data.test.id}/thumbnail`, formDataThumbnail, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        });
+      }
+      
       alert('테스트가 성공적으로 추가되었습니다!');
-      router.push('/tests');
+      router.push('/psycho_page/admin/tests');
     } catch (error) {
       console.error('테스트 추가 실패:', error);
       setError(error.response?.data?.error || '테스트 추가에 실패했습니다.');
@@ -70,11 +84,11 @@ export default function AddTest() {
     <Container>
       <Header>
         <HeaderContent>
-          <Logo>🧠 PSYCHO 관리자</Logo>
+          <Logo onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
           <Nav>
-            <NavLink href="/dashboard">대시보드</NavLink>
-            <NavLink href="/tests">테스트 관리</NavLink>
-            <NavLink href="/analytics">방문자 분석</NavLink>
+            <NavLink href="/psycho_page/admin/dashboard">대시보드</NavLink>
+            <NavLink href="/psycho_page/admin/tests">테스트 관리</NavLink>
+            <NavLink href="/psycho_page/admin/analytics">방문자 분석</NavLink>
             <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
           </Nav>
         </HeaderContent>
@@ -137,6 +151,18 @@ export default function AddTest() {
                 <option value="사회성">사회성</option>
                 <option value="기타">기타</option>
               </Select>
+            </FormGroup>
+
+            <FormGroup>
+              <Label>썸네일 이미지</Label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setThumbnailFile(e.target.files[0])}
+              />
+              <HelpText>
+                테스트를 대표할 썸네일 이미지를 선택하세요. (선택사항)
+              </HelpText>
             </FormGroup>
 
             {error && <ErrorMessage>{error}</ErrorMessage>}

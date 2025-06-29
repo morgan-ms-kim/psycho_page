@@ -7,8 +7,25 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
+import multer from 'multer';
 
 const execAsync = promisify(exec);
+
+// multer 설정
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(process.cwd(), 'uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '_' + file.originalname);
+  }
+});
+
+const upload = multer({ storage: storage });
 
 dotenv.config();
 
@@ -512,47 +529,72 @@ app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
 // 새 테스트 추가 (Git에서 클론)
 app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
   try {
-    console.log('테스트 추가 요청 받음:', req.body);
-    console.log('요청 헤더:', req.headers);
+    console.log('=== 테스트 추가 요청 시작 ===');
+    console.log('요청 바디:', JSON.stringify(req.body, null, 2));
+    console.log('요청 헤더:', JSON.stringify(req.headers, null, 2));
     
     const { gitUrl, title, description, category } = req.body;
     
+    console.log('파싱된 데이터:', { gitUrl, title, description, category });
+    
     if (!gitUrl || !title) {
-      console.log('필수 필드 누락:', { gitUrl, title });
+      console.log('❌ 필수 필드 누락:', { gitUrl: !!gitUrl, title: !!title });
       return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.' });
     }
     
+    console.log('✅ 필수 필드 검증 통과');
+    
     // 테스트 디렉토리 경로
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
+    console.log('테스트 디렉토리:', testsDir);
+    
+    // 디렉토리가 없으면 생성
+    if (!fs.existsSync(testsDir)) {
+      fs.mkdirSync(testsDir, { recursive: true });
+      console.log('✅ 테스트 디렉토리 생성됨');
+    }
     
     // Git에서 클론
     const repoName = gitUrl.split('/').pop().replace('.git', '');
     const clonePath = path.join(testsDir, repoName);
+    console.log('클론 경로:', clonePath);
     
     try {
+      console.log('🔄 Git 클론 시작:', gitUrl);
       await execAsync(`git clone ${gitUrl} ${clonePath}`);
+      console.log('✅ Git 클론 성공');
     } catch (error) {
-      return res.status(400).json({ error: 'Git 저장소 클론에 실패했습니다.' });
+      console.error('❌ Git 클론 실패:', error.message);
+      return res.status(400).json({ error: 'Git 저장소 클론에 실패했습니다: ' + error.message });
     }
     
     // package.json 수정
     const packageJsonPath = path.join(clonePath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
+      console.log('📦 package.json 발견, 수정 중...');
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
       packageJson.homepage = `/psycho/tests/${repoName}/`;
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
       
       // npm install 및 build
       try {
+        console.log('📦 npm install 시작');
         await execAsync('npm install', { cwd: clonePath });
+        console.log('✅ npm install 완료');
+        
+        console.log('🔨 npm run build 시작');
         await execAsync('npm run build', { cwd: clonePath });
+        console.log('✅ npm run build 완료');
       } catch (error) {
-        console.error('빌드 실패:', error);
-        return res.status(400).json({ error: '테스트 빌드에 실패했습니다.' });
+        console.error('❌ 빌드 실패:', error.message);
+        return res.status(400).json({ error: '테스트 빌드에 실패했습니다: ' + error.message });
       }
+    } else {
+      console.log('⚠️ package.json이 없습니다. 빌드 단계를 건너뜁니다.');
     }
     
     // 데이터베이스에 테스트 정보 저장
+    console.log('💾 데이터베이스에 테스트 정보 저장 중...');
     const test = await Test.create({
       title,
       description: description || '',
@@ -560,32 +602,47 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
       thumbnail: `/tests/${repoName}/thumbnail.png` // 기본 썸네일 경로
     });
     
+    console.log('✅ 테스트 생성 완료:', test.id);
+    console.log('=== 테스트 추가 요청 완료 ===');
+    
     res.json({ 
       success: true, 
       message: '테스트가 성공적으로 추가되었습니다.',
       test 
     });
   } catch (error) {
+    console.error('❌ 테스트 추가 오류:', error);
     next(error);
   }
 });
 
 // 테스트 썸네일 업로드
-app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, async (req, res, next) => {
+app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thumbnail'), async (req, res, next) => {
   try {
     const testId = req.params.id;
-    const { thumbnailPath } = req.body;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: '썸네일 파일이 필요합니다.' });
+    }
     
     const test = await Test.findByPk(testId);
     if (!test) {
       return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
     }
     
+    // 파일 경로 설정
+    const thumbnailPath = `/uploads/thumbnails/${testId}_${Date.now()}_${req.file.originalname}`;
+    const fullPath = path.join(process.cwd(), '..', 'frontend', 'public', thumbnailPath);
+    
+    // 파일 이동
+    fs.renameSync(req.file.path, fullPath);
+    
     test.thumbnail = thumbnailPath;
     await test.save();
     
-    res.json({ success: true, message: '썸네일이 업데이트되었습니다.' });
+    res.json({ success: true, message: '썸네일이 업데이트되었습니다.', thumbnail: thumbnailPath });
   } catch (error) {
+    console.error('썸네일 업로드 오류:', error);
     next(error);
   }
 });

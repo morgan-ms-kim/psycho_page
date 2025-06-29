@@ -344,7 +344,11 @@ export default function Home() {
           
           <Grid>
             {sortedTests.map((test) => (
-              <Card key={test.id} onClick={() => router.push(`/tests/${getTestFolderName(test.id)}`)}>
+              <Card 
+                key={test.id} 
+                onClick={() => router.push(`/tests/${getTestFolderName(test.id)}`)}
+                style={{ cursor: 'pointer' }}
+              >
                 {test.thumbnail ? (
                   <TestItemImage 
                     src={getImagePath(test.thumbnail)} 
