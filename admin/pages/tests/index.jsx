@@ -5,8 +5,8 @@ import axios from 'axios';
 import Link from 'next/link';
 
 const apiClient = axios.create({
-  baseURL: 'https://smartpick.website/psycho_page/api',
-  timeout: 10000,
+  baseURL: 'https://smartpick.website/api',
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   }
@@ -18,16 +18,21 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  console.log('API 요청:', config.method?.toUpperCase(), config.url);
   return config;
 });
 
 // 응답 인터셉터로 인증 오류 처리
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API 응답 성공:', response.status);
+    return response;
+  },
   (error) => {
+    console.error('API 응답 오류:', error.response?.status, error.response?.data);
     if (error.response?.status === 401) {
       localStorage.removeItem('adminToken');
-      window.location.href = '/admin';
+      window.location.href = '/psycho_page/admin';
     }
     return Promise.reject(error);
   }

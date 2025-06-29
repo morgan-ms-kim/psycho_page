@@ -26,8 +26,8 @@ ChartJS.register(
 );
 
 const apiClient = axios.create({
-  baseURL: 'https://smartpick.website/psycho_page/api',
-  timeout: 10000,
+  baseURL: 'https://smartpick.website/api',
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   }
