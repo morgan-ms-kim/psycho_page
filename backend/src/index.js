@@ -47,7 +47,12 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
-    adminToken: process.env.ADMIN_TOKEN ? '설정됨' : '설정되지 않음'
+    adminToken: process.env.ADMIN_TOKEN ? '설정됨' : '설정되지 않음',
+    nodeVersion: process.version,
+    platform: process.platform,
+    arch: process.arch,
+    memoryUsage: process.memoryUsage(),
+    uptime: process.uptime()
   });
 });
 
@@ -62,6 +67,9 @@ app.get('/api/db-status', async (req, res) => {
       order: [['createdAt', 'DESC']]
     });
     
+    // 시스템 정보 추가
+    const os = require('os');
+    
     res.json({
       dbConnection: 'ok',
       testCount: tests.length,
@@ -72,7 +80,14 @@ app.get('/api/db-status', async (req, res) => {
         category: test.category,
         createdAt: test.createdAt,
         updatedAt: test.updatedAt
-      }))
+      })),
+      systemInfo: {
+        platform: os.platform(),
+        arch: os.arch(),
+        totalMemory: os.totalmem(),
+        freeMemory: os.freemem(),
+        cpus: os.cpus().length
+      }
     });
   } catch (error) {
     console.error('데이터베이스 상태 확인 실패:', error);
@@ -618,71 +633,148 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
     databaseSaved: false,
     thumbnailReady: false
   };
+  
   try {
     console.log('=== 테스트 추가 요청 시작 ===');
+    console.log('요청 데이터:', JSON.stringify(req.body, null, 2));
+    
     const { gitUrl, title, description, category } = req.body;
     if (!gitUrl || !title) {
       console.error('❌ 필수 입력값 누락');
       return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.', steps });
     }
+
+    // Git URL 유효성 검사
+    if (!gitUrl.includes('github.com') && !gitUrl.includes('gitlab.com')) {
+      console.error('❌ 지원하지 않는 Git 저장소:', gitUrl);
+      return res.status(400).json({ error: 'GitHub 또는 GitLab 저장소만 지원합니다.', steps });
+    }
+
     // 1. 테스트 디렉토리 생성
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
+    console.log('📁 테스트 디렉토리 경로:', testsDir);
+    
     if (!fs.existsSync(testsDir)) {
-      fs.mkdirSync(testsDir, { recursive: true });
-      console.log('✅ 테스트 디렉토리 생성:', testsDir);
+      try {
+        fs.mkdirSync(testsDir, { recursive: true });
+        console.log('✅ 테스트 디렉토리 생성:', testsDir);
+      } catch (error) {
+        console.error('❌ 디렉토리 생성 실패:', error.message);
+        return res.status(500).json({ error: '디렉토리 생성 실패', steps, detail: error.message });
+      }
     }
     steps.directoryCreated = true;
+
     // 2. git clone
     const repoName = gitUrl.split('/').pop().replace('.git', '');
     const clonePath = path.join(testsDir, repoName);
+    console.log('📂 클론 경로:', clonePath);
+    
     if (fs.existsSync(clonePath)) {
-      fs.rmSync(clonePath, { recursive: true, force: true });
-      console.log('⚠️ 기존 디렉토리 삭제:', clonePath);
+      try {
+        fs.rmSync(clonePath, { recursive: true, force: true });
+        console.log('⚠️ 기존 디렉토리 삭제:', clonePath);
+      } catch (error) {
+        console.error('❌ 기존 디렉토리 삭제 실패:', error.message);
+        return res.status(500).json({ error: '기존 디렉토리 삭제 실패', steps, detail: error.message });
+      }
     }
+
     try {
       console.log('🔄 git clone 시작:', gitUrl);
-      await execAsync(`git clone ${gitUrl} ${clonePath}`);
+      console.log('명령어:', `git clone ${gitUrl} ${clonePath}`);
+      
+      const { stdout, stderr } = await execAsync(`git clone ${gitUrl} ${clonePath}`, {
+        timeout: 60000, // 60초 타임아웃
+        maxBuffer: 1024 * 1024 // 1MB 버퍼
+      });
+      
+      if (stderr) {
+        console.warn('⚠️ git clone stderr:', stderr);
+      }
+      
+      console.log('✅ git clone 성공:', stdout);
       steps.gitCloned = true;
-      console.log('✅ git clone 성공:', clonePath);
     } catch (error) {
       console.error('❌ git clone 실패:', error.message);
-      return res.status(400).json({ error: 'Git 저장소 클론 실패', steps, detail: error.message, stack: error.stack });
+      console.error('Error details:', error);
+      return res.status(400).json({ 
+        error: 'Git 저장소 클론 실패', 
+        steps, 
+        detail: error.message, 
+        command: `git clone ${gitUrl} ${clonePath}`,
+        stderr: error.stderr
+      });
     }
+
     // 3. package.json 수정
     const packageJsonPath = path.join(clonePath, 'package.json');
+    console.log('📄 package.json 경로:', packageJsonPath);
+    
     if (fs.existsSync(packageJsonPath)) {
-      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-      packageJson.homepage = `/psycho/tests/${repoName}/`;
-      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-      steps.packageJsonModified = true;
-      console.log('✅ package.json 수정 완료');
+      try {
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+        console.log('📦 원본 package.json:', JSON.stringify(packageJson, null, 2));
+        
+        packageJson.homepage = `/psycho/tests/${repoName}/`;
+        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+        
+        console.log('✅ package.json 수정 완료');
+        console.log('📦 수정된 package.json:', JSON.stringify(packageJson, null, 2));
+        steps.packageJsonModified = true;
+      } catch (error) {
+        console.error('❌ package.json 수정 실패:', error.message);
+        return res.status(500).json({ error: 'package.json 수정 실패', steps, detail: error.message });
+      }
     } else {
-      console.error('❌ package.json 없음');
-      return res.status(400).json({ error: 'package.json 없음', steps });
+      console.error('❌ package.json 없음:', packageJsonPath);
+      return res.status(400).json({ error: 'package.json 없음', steps, path: packageJsonPath });
     }
+
     // 4. npm install & build (test_deploy.sh)
     console.log('🔨 test_deploy.sh 실행');
     const deployResult = await runTestDeployScript(clonePath);
     if (!deployResult.success) {
       console.error('❌ test_deploy.sh 실패:', deployResult.error);
-      return res.status(400).json({ error: '테스트 배포 스크립트 실패', steps, detail: deployResult.error, stack: deployResult.stderr } );
+      return res.status(400).json({ 
+        error: '테스트 배포 스크립트 실패', 
+        steps, 
+        detail: deployResult.error, 
+        stderr: deployResult.stderr 
+      });
     }
     steps.npmInstalled = true;
     steps.buildCompleted = true;
+
     // 5. 썸네일 파일 확인
     const thumbPath = path.join(clonePath, 'thumb.png');
+    console.log('🖼️ 썸네일 경로:', thumbPath);
+    
     let thumbnailPath = `/uploads/thumbnails/${repoName}_${Date.now()}_thumb.png`;
     const destThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', thumbnailPath);
+    
     if (fs.existsSync(thumbPath)) {
-      fs.mkdirSync(path.dirname(destThumbPath), { recursive: true });
-      fs.copyFileSync(thumbPath, destThumbPath);
-      steps.thumbnailReady = true;
-      console.log('✅ 썸네일 복사 성공:', destThumbPath);
+      try {
+        const uploadDir = path.dirname(destThumbPath);
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+          console.log('✅ 업로드 디렉토리 생성:', uploadDir);
+        }
+        
+        fs.copyFileSync(thumbPath, destThumbPath);
+        steps.thumbnailReady = true;
+        console.log('✅ 썸네일 복사 성공:', destThumbPath);
+      } catch (error) {
+        console.error('❌ 썸네일 복사 실패:', error.message);
+        thumbnailPath = '/default-thumb.png';
+        steps.thumbnailReady = false;
+      }
     } else {
       thumbnailPath = '/default-thumb.png';
       steps.thumbnailReady = false;
       console.log('⚠️ thumb.png 없음, 기본 썸네일 사용');
     }
+
     // 6. DB 저장
     try {
       const test = await Test.create({
@@ -693,12 +785,14 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
       });
       steps.databaseSaved = true;
       console.log('✅ DB 저장 성공:', test.id);
+      
       return res.json({
         success: true,
         message: '테스트가 성공적으로 추가되었습니다.',
         test,
         steps,
-        thumbnailUrl: thumbnailPath
+        thumbnailUrl: thumbnailPath,
+        clonePath: clonePath
       });
     } catch (error) {
       console.error('❌ DB 저장 실패:', error.message);
@@ -706,6 +800,7 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
     }
   } catch (error) {
     console.error('❌ 테스트 추가 전체 오류:', error.message);
+    console.error('Error stack:', error.stack);
     return res.status(500).json({ error: '서버 오류', steps, detail: error.message, stack: error.stack });
   }
 });
@@ -714,29 +809,107 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
 app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thumbnail'), async (req, res, next) => {
   try {
     const testId = req.params.id;
+    console.log('=== 썸네일 업로드 요청 ===');
+    console.log('테스트 ID:', testId);
+    console.log('업로드된 파일:', req.file);
     
     if (!req.file) {
+      console.error('❌ 업로드된 파일이 없습니다.');
       return res.status(400).json({ error: '썸네일 파일이 필요합니다.' });
     }
     
     const test = await Test.findByPk(testId);
     if (!test) {
+      console.error('❌ 테스트를 찾을 수 없습니다:', testId);
       return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
+    }
+    
+    console.log('✅ 테스트 찾음:', test.title);
+    
+    // 파일 확장자 검사
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    const fileExtension = path.extname(req.file.originalname).toLowerCase();
+    
+    if (!allowedExtensions.includes(fileExtension)) {
+      console.error('❌ 지원하지 않는 파일 형식:', fileExtension);
+      return res.status(400).json({ 
+        error: '지원하지 않는 파일 형식입니다. JPG, PNG, GIF, WebP만 허용됩니다.' 
+      });
+    }
+    
+    // 파일 크기 검사 (5MB 제한)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (req.file.size > maxSize) {
+      console.error('❌ 파일 크기가 너무 큽니다:', req.file.size);
+      return res.status(400).json({ 
+        error: '파일 크기가 너무 큽니다. 5MB 이하의 파일만 업로드 가능합니다.' 
+      });
     }
     
     // 파일 경로 설정
     const thumbnailPath = `/uploads/thumbnails/${testId}_${Date.now()}_${req.file.originalname}`;
     const fullPath = path.join(process.cwd(), '..', 'frontend', 'public', thumbnailPath);
     
-    // 파일 이동
-    fs.renameSync(req.file.path, fullPath);
+    console.log('📁 썸네일 저장 경로:', fullPath);
     
+    // 업로드 디렉토리 생성
+    const uploadDir = path.dirname(fullPath);
+    if (!fs.existsSync(uploadDir)) {
+      try {
+        fs.mkdirSync(uploadDir, { recursive: true });
+        console.log('✅ 업로드 디렉토리 생성:', uploadDir);
+      } catch (error) {
+        console.error('❌ 업로드 디렉토리 생성 실패:', error.message);
+        return res.status(500).json({ error: '업로드 디렉토리 생성 실패', detail: error.message });
+      }
+    }
+    
+    // 파일 이동
+    try {
+      fs.renameSync(req.file.path, fullPath);
+      console.log('✅ 파일 이동 완료:', req.file.path, '->', fullPath);
+    } catch (error) {
+      console.error('❌ 파일 이동 실패:', error.message);
+      return res.status(500).json({ error: '파일 이동 실패', detail: error.message });
+    }
+    
+    // 파일 권한 설정
+    try {
+      fs.chmodSync(fullPath, 0o644);
+      console.log('✅ 파일 권한 설정 완료');
+    } catch (error) {
+      console.warn('⚠️ 파일 권한 설정 실패:', error.message);
+    }
+    
+    // 기존 썸네일 파일 삭제 (기본 썸네일이 아닌 경우)
+    if (test.thumbnail && test.thumbnail !== '/default-thumb.png') {
+      try {
+        const oldThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail);
+        if (fs.existsSync(oldThumbPath)) {
+          fs.unlinkSync(oldThumbPath);
+          console.log('✅ 기존 썸네일 삭제:', oldThumbPath);
+        }
+      } catch (error) {
+        console.warn('⚠️ 기존 썸네일 삭제 실패:', error.message);
+      }
+    }
+    
+    // 데이터베이스 업데이트
     test.thumbnail = thumbnailPath;
     await test.save();
     
-    res.json({ success: true, message: '썸네일이 업데이트되었습니다.', thumbnail: thumbnailPath });
+    console.log('✅ 데이터베이스 업데이트 완료');
+    
+    res.json({ 
+      success: true, 
+      message: '썸네일이 업데이트되었습니다.', 
+      thumbnail: thumbnailPath,
+      fileSize: req.file.size,
+      originalName: req.file.originalname
+    });
   } catch (error) {
-    console.error('썸네일 업로드 오류:', error);
+    console.error('❌ 썸네일 업로드 오류:', error.message);
+    console.error('Error stack:', error.stack);
     next(error);
   }
 });

@@ -114,6 +114,27 @@ export default function AddTest() {
     setLogMessages([]);
     addLog('테스트 추가 시작');
 
+    // 입력값 검증
+    if (!formData.gitUrl.trim()) {
+      setError('Git 저장소 URL을 입력해주세요.');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.title.trim()) {
+      setError('테스트 제목을 입력해주세요.');
+      setLoading(false);
+      return;
+    }
+
+    // Git URL 형식 검증
+    const gitUrlPattern = /^https:\/\/(github\.com|gitlab\.com)\/[^\/]+\/[^\/]+\.git$/;
+    if (!gitUrlPattern.test(formData.gitUrl)) {
+      setError('올바른 GitHub 또는 GitLab 저장소 URL을 입력해주세요. (예: https://github.com/username/repository.git)');
+      setLoading(false);
+      return;
+    }
+
     // 진행 단계 초기화
     const steps = [
       'Git 저장소 클론',
@@ -127,6 +148,8 @@ export default function AddTest() {
 
     try {
       addLog('API 요청: 테스트 등록');
+      addLog('Git URL: ' + formData.gitUrl);
+      addLog('제목: ' + formData.title);
       console.log('🔄 테스트 추가 시작:', formData);
       setCurrentStep('테스트 추가 중...');
       
@@ -137,12 +160,30 @@ export default function AddTest() {
       
       // 진행 단계 업데이트
       if (response.data.steps) {
-        if (response.data.steps.directoryCreated) updateProgressStep('Git 저장소 클론', 'completed');
-        if (response.data.steps.gitCloned) updateProgressStep('Git 저장소 클론', 'completed');
-        if (response.data.steps.packageJsonModified) updateProgressStep('package.json 수정', 'completed');
-        if (response.data.steps.npmInstalled) updateProgressStep('의존성 설치', 'completed');
-        if (response.data.steps.buildCompleted) updateProgressStep('테스트 빌드', 'completed');
-        if (response.data.steps.databaseSaved) updateProgressStep('데이터베이스 저장', 'completed');
+        if (response.data.steps.directoryCreated) {
+          updateProgressStep('Git 저장소 클론', 'completed');
+          addLog('✅ 디렉토리 생성 완료');
+        }
+        if (response.data.steps.gitCloned) {
+          updateProgressStep('Git 저장소 클론', 'completed');
+          addLog('✅ Git 클론 완료');
+        }
+        if (response.data.steps.packageJsonModified) {
+          updateProgressStep('package.json 수정', 'completed');
+          addLog('✅ package.json 수정 완료');
+        }
+        if (response.data.steps.npmInstalled) {
+          updateProgressStep('의존성 설치', 'completed');
+          addLog('✅ 의존성 설치 완료');
+        }
+        if (response.data.steps.buildCompleted) {
+          updateProgressStep('테스트 빌드', 'completed');
+          addLog('✅ 빌드 완료');
+        }
+        if (response.data.steps.databaseSaved) {
+          updateProgressStep('데이터베이스 저장', 'completed');
+          addLog('✅ 데이터베이스 저장 완료');
+        }
       }
       
       // 썸네일 업로드
@@ -151,20 +192,31 @@ export default function AddTest() {
         addProgressStep('썸네일 업로드');
         
         addLog('API 요청: 썸네일 업로드');
+        addLog('파일명: ' + thumbnailFile.name);
+        addLog('파일 크기: ' + (thumbnailFile.size / 1024).toFixed(2) + 'KB');
+        
         const formDataThumbnail = new FormData();
         formDataThumbnail.append('thumbnail', thumbnailFile);
         
-        await apiClient.post(`/admin/tests/${response.data.test.id}/thumbnail`, formDataThumbnail, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          }
-        });
-        
-        updateProgressStep('썸네일 업로드', 'completed');
-        addLog('썸네일 업로드 성공');
+        try {
+          const thumbnailResponse = await apiClient.post(`/admin/tests/${response.data.test.id}/thumbnail`, formDataThumbnail, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            }
+          });
+          
+          updateProgressStep('썸네일 업로드', 'completed');
+          addLog('✅ 썸네일 업로드 성공');
+          addLog('썸네일 경로: ' + thumbnailResponse.data.thumbnail);
+        } catch (thumbnailError) {
+          updateProgressStep('썸네일 업로드', 'failed');
+          addLog('❌ 썸네일 업로드 실패: ' + (thumbnailError.response?.data?.error || thumbnailError.message));
+          console.error('썸네일 업로드 실패:', thumbnailError);
+        }
       }
       
       setCurrentStep('완료!');
+      addLog('🎉 테스트 추가 완료!');
       showMessage('테스트가 성공적으로 추가되었습니다!', 'success');
       
       // 3초 후 목록 페이지로 이동
@@ -176,14 +228,25 @@ export default function AddTest() {
       console.error('테스트 추가 실패:', error);
       setCurrentStep('오류 발생');
       
+      // 에러 상세 정보 로깅
+      addLog('❌ 테스트 추가 실패');
+      addLog('에러 메시지: ' + (error.response?.data?.error || error.message));
+      if (error.response?.data?.detail) {
+        addLog('상세 정보: ' + error.response.data.detail);
+      }
+      if (error.response?.data?.command) {
+        addLog('실행 명령어: ' + error.response.data.command);
+      }
+      
       // 진행 중인 단계를 실패로 표시
       const currentStepIndex = progressSteps.findIndex(p => p.status === 'pending');
       if (currentStepIndex !== -1) {
         updateProgressStep(progressSteps[currentStepIndex].step, 'failed');
       }
       
-      setError(error.response?.data?.error || '테스트 추가에 실패했습니다.');
-      showMessage(error.response?.data?.error || '테스트 추가에 실패했습니다.', 'error');
+      const errorMessage = error.response?.data?.error || '테스트 추가에 실패했습니다.';
+      setError(errorMessage);
+      showMessage(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
