@@ -198,16 +198,18 @@ export default function TestManagement() {
               <TestActions>
                 <ActionButton onClick={() => {
                   console.log('수정 버튼 클릭:', test.id);
-                  if (validateAndFixPath(`/tests/${test.id}/edit`, router)) {
-                    router.push(`/tests/${test.id}/edit`);
+                  const targetPath = `/tests/${test.id}/edit`;
+                  if (validateAndFixPath(targetPath, router)) {
+                    router.push(targetPath);
                   }
                 }}>
                   ✏️ 수정
                 </ActionButton>
                 <ActionButton onClick={() => {
                   console.log('썸네일 버튼 클릭:', test.id);
-                  if (validateAndFixPath(`/tests/${test.id}/thumbnail`, router)) {
-                    router.push(`/tests/${test.id}/thumbnail`);
+                  const targetPath = `/tests/${test.id}/thumbnail`;
+                  if (validateAndFixPath(targetPath, router)) {
+                    router.push(targetPath);
                   }
                 }}>
                   🖼️ 썸네일
