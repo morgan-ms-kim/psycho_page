@@ -69,6 +69,8 @@ export default function TestDetail() {
   const [error, setError] = useState(null);
   const [testCompleted, setTestCompleted] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
+  const [deletePassword, setDeletePassword] = useState('');
 
   // 이미지 경로를 올바르게 처리하는 함수
   const getImagePath = (path) => {
@@ -222,23 +224,41 @@ export default function TestDetail() {
 
   // 댓글 삭제
   const deleteComment = async (commentId) => {
-    const password = prompt('댓글 삭제를 위한 비밀번호를 입력하세요:');
-    if (!password) return;
-    
-    try {
-      await apiClient.delete(`/comments/${commentId}`, {
-        data: { password }
-      });
-      loadComments(1);
-      setCommentCount(prev => prev - 1);
-    } catch (error) {
-      console.error('댓글 삭제 실패:', error);
-      if (error.response?.status === 403) {
-        alert('비밀번호가 일치하지 않습니다.');
-      } else {
-        alert('댓글 삭제에 실패했습니다.');
+    if (deletingCommentId === commentId) {
+      // 이미 삭제 모드인 경우, 비밀번호로 삭제 시도
+      if (!deletePassword) {
+        alert('비밀번호를 입력해주세요.');
+        return;
       }
+      
+      try {
+        await apiClient.delete(`/comments/${commentId}`, {
+          data: { password: deletePassword }
+        });
+        loadComments(1);
+        setCommentCount(prev => prev - 1);
+        setDeletingCommentId(null);
+        setDeletePassword('');
+      } catch (error) {
+        console.error('댓글 삭제 실패:', error);
+        if (error.response?.status === 403) {
+          alert('비밀번호가 일치하지 않습니다.');
+        } else {
+          alert('댓글 삭제에 실패했습니다.');
+        }
+        setDeletePassword('');
+      }
+    } else {
+      // 삭제 모드 활성화
+      setDeletingCommentId(commentId);
+      setDeletePassword('');
     }
+  };
+
+  // 삭제 취소
+  const cancelDelete = () => {
+    setDeletingCommentId(null);
+    setDeletePassword('');
   };
 
   // 답변 선택
@@ -503,9 +523,27 @@ export default function TestDetail() {
                   <CommentLikeButton onClick={() => toggleCommentLike(comment.id)}>
                     {comment.userLiked ? '❤️' : '🤍'} 좋아요
                   </CommentLikeButton>
-                  <CommentDeleteButton onClick={() => deleteComment(comment.id)}>
-                    ❌ 삭제
-                  </CommentDeleteButton>
+                  {deletingCommentId === comment.id ? (
+                    <DeleteModeContainer>
+                      <DeletePasswordInput
+                        type="password"
+                        placeholder="비밀번호"
+                        value={deletePassword}
+                        onChange={(e) => setDeletePassword(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && deleteComment(comment.id)}
+                      />
+                      <DeleteConfirmButton onClick={() => deleteComment(comment.id)}>
+                        ✅ 확인
+                      </DeleteConfirmButton>
+                      <DeleteCancelButton onClick={cancelDelete}>
+                        ❌ 취소
+                      </DeleteCancelButton>
+                    </DeleteModeContainer>
+                  ) : (
+                    <CommentDeleteButton onClick={() => deleteComment(comment.id)}>
+                      ❌ 삭제
+                    </CommentDeleteButton>
+                  )}
                 </CommentActions>
               </CommentItem>
             );
@@ -739,4 +777,56 @@ const LoadMoreButton = styled.button`
     opacity: 0.5;
     cursor: not-allowed;
   `}
+`;
+
+const DeleteModeContainer = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const DeletePasswordInput = styled.input`
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  width: 120px;
+  
+  &::placeholder {
+    color: rgba(255,255,255,0.6);
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: rgba(255,255,255,0.5);
+  }
+`;
+
+const DeleteConfirmButton = styled.button`
+  background: rgba(0, 255, 0, 0.3);
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  
+  &:hover {
+    background: rgba(0, 255, 0, 0.4);
+  }
+`;
+
+const DeleteCancelButton = styled.button`
+  background: rgba(255, 0, 0, 0.3);
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  
+  &:hover {
+    background: rgba(255, 0, 0, 0.4);
+  }
 `; 
