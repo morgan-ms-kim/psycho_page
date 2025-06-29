@@ -636,11 +636,14 @@ app.post('/api/admin/login', async (req, res, next) => {
   }
 });
 
-// 테스트 등록 전용 deploy 스크립트 실행 함수
+// test_deploy.sh 실행 함수 (timeout 5분)
 async function runTestDeployScript(clonePath) {
   const scriptPath = path.join(process.cwd(), '..', 'test_deploy.sh');
   try {
-    const { stdout, stderr } = await execAsync(`bash ${scriptPath} ${clonePath}`);
+    const { stdout, stderr } = await execAsync(`bash ${scriptPath} ${clonePath}`, {
+      timeout: 300000, // 5분
+      maxBuffer: 1024 * 1024
+    });
     console.log('✅ test_deploy.sh 실행 결과:', stdout);
     if (stderr) console.error('test_deploy.sh stderr:', stderr);
     return { success: true, stdout, stderr };
@@ -860,112 +863,57 @@ app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
   }
 });
 
-// 테스트 썸네일 업로드
+// 썸네일 업로드 라우트 (디렉토리 자동 생성, 권한, 에러 반환 강화)
 app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thumbnail'), async (req, res, next) => {
   try {
     const testId = req.params.id;
-    console.log('=== 썸네일 업로드 요청 ===');
-    console.log('테스트 ID:', testId);
-    console.log('업로드된 파일:', req.file);
-    
     if (!req.file) {
-      console.error('❌ 업로드된 파일이 없습니다.');
       return res.status(400).json({ error: '썸네일 파일이 필요합니다.' });
     }
-    
     const test = await Test.findByPk(testId);
     if (!test) {
-      console.error('❌ 테스트를 찾을 수 없습니다:', testId);
       return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
     }
-    
-    console.log('✅ 테스트 찾음:', test.title);
-    
-    // 파일 확장자 검사
-    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-    const fileExtension = path.extname(req.file.originalname).toLowerCase();
-    
-    if (!allowedExtensions.includes(fileExtension)) {
-      console.error('❌ 지원하지 않는 파일 형식:', fileExtension);
-      return res.status(400).json({ 
-        error: '지원하지 않는 파일 형식입니다. JPG, PNG, GIF, WebP만 허용됩니다.' 
-      });
-    }
-    
-    // 파일 크기 검사 (5MB 제한)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (req.file.size > maxSize) {
-      console.error('❌ 파일 크기가 너무 큽니다:', req.file.size);
-      return res.status(400).json({ 
-        error: '파일 크기가 너무 큽니다. 5MB 이하의 파일만 업로드 가능합니다.' 
-      });
-    }
-    
-    // 파일 경로 설정
     const thumbnailPath = `/uploads/thumbnails/${testId}_${Date.now()}_${req.file.originalname}`;
     const fullPath = path.join(process.cwd(), '..', 'frontend', 'public', thumbnailPath);
-    
-    console.log('📁 썸네일 저장 경로:', fullPath);
-    
-    // 업로드 디렉토리 생성
+    // 디렉토리 자동 생성
     const uploadDir = path.dirname(fullPath);
     if (!fs.existsSync(uploadDir)) {
-      try {
-        fs.mkdirSync(uploadDir, { recursive: true });
-        console.log('✅ 업로드 디렉토리 생성:', uploadDir);
-      } catch (error) {
-        console.error('❌ 업로드 디렉토리 생성 실패:', error.message);
-        return res.status(500).json({ error: '업로드 디렉토리 생성 실패', detail: error.message });
-      }
+      fs.mkdirSync(uploadDir, { recursive: true });
     }
-    
     // 파일 이동
     try {
       fs.renameSync(req.file.path, fullPath);
-      console.log('✅ 파일 이동 완료:', req.file.path, '->', fullPath);
+      fs.chmodSync(fullPath, 0o644);
     } catch (error) {
-      console.error('❌ 파일 이동 실패:', error.message);
       return res.status(500).json({ error: '파일 이동 실패', detail: error.message });
     }
-    
-    // 파일 권한 설정
-    try {
-      fs.chmodSync(fullPath, 0o644);
-      console.log('✅ 파일 권한 설정 완료');
-    } catch (error) {
-      console.warn('⚠️ 파일 권한 설정 실패:', error.message);
-    }
-    
-    // 기존 썸네일 파일 삭제 (기본 썸네일이 아닌 경우)
+    // 기존 썸네일 삭제
     if (test.thumbnail && test.thumbnail !== '/default-thumb.png') {
       try {
         const oldThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail);
         if (fs.existsSync(oldThumbPath)) {
           fs.unlinkSync(oldThumbPath);
-          console.log('✅ 기존 썸네일 삭제:', oldThumbPath);
         }
-      } catch (error) {
-        console.warn('⚠️ 기존 썸네일 삭제 실패:', error.message);
-      }
+      } catch (error) {}
     }
-    
-    // 데이터베이스 업데이트
     test.thumbnail = thumbnailPath;
     await test.save();
-    
-    console.log('✅ 데이터베이스 업데이트 완료');
-    
-    res.json({ 
-      success: true, 
-      message: '썸네일이 업데이트되었습니다.', 
-      thumbnail: thumbnailPath,
-      fileSize: req.file.size,
-      originalName: req.file.originalname
-    });
+    res.json({ success: true, message: '썸네일이 업데이트되었습니다.', thumbnail: thumbnailPath });
   } catch (error) {
-    console.error('❌ 썸네일 업로드 오류:', error.message);
-    console.error('Error stack:', error.stack);
     next(error);
+  }
+});
+
+// 실시간 로그 API
+app.get('/api/admin/tests/:repo/log', authenticateAdmin, (req, res) => {
+  const repo = req.params.repo;
+  const logPath = path.join(process.cwd(), '..', 'frontend', 'public', 'tests', repo, 'deploy.log');
+  if (fs.existsSync(logPath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    fs.createReadStream(logPath).pipe(res);
+  } else {
+    res.status(404).send('로그 파일이 없습니다.');
   }
 });
 

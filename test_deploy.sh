@@ -1,5 +1,8 @@
 #!/bin/bash
 
+LOGFILE="deploy.log"
+exec > >(tee -a "$LOGFILE") 2>&1
+
 # 인자로 받은 경로로 이동
 CLONE_PATH="$1"
 
@@ -62,7 +65,10 @@ echo "[INFO] npm run build 완료"
 echo "[INFO] build 결과 확인:"
 ls -la build/ 2>/dev/null || ls -la dist/ 2>/dev/null || echo "build/dist 디렉토리를 찾을 수 없습니다"
 
-echo "[INFO] 파일 권한 설정"
+echo "[INFO] build 결과물을 상위로 복사"
+cp -r build/* .
+
+echo "[INFO] chmod 755"
 chmod -R 755 "$CLONE_PATH"
 
 echo "[INFO] 최종 디렉토리 구조:"
