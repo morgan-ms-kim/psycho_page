@@ -50,7 +50,7 @@ app.get('/api/health', (req, res) => {
     adminToken: process.env.ADMIN_TOKEN ? '설정됨' : '설정되지 않음',
     nodeVersion: process.version,
     platform: process.platform,
-    arch: process.arch,
+    arch: process.arch(),
     memoryUsage: process.memoryUsage(),
     uptime: process.uptime()
   });
@@ -630,7 +630,9 @@ async function runTestDeployScript(clonePath) {
 }
 
 // 새 테스트 추가 (Git에서 클론) - POST 라우트를 먼저 정의
-app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
+app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
+  console.log('🎯 POST /api/admin/tests/add 핸들러 실행됨');
+  
   const steps = {
     directoryCreated: false,
     gitCloned: false,
@@ -793,14 +795,17 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
       steps.databaseSaved = true;
       console.log('✅ DB 저장 성공:', test.id);
       
-      return res.json({
+      const response = {
         success: true,
         message: '테스트가 성공적으로 추가되었습니다.',
         test,
         steps,
         thumbnailUrl: thumbnailPath,
         clonePath: clonePath
-      });
+      };
+      
+      console.log('🎉 최종 응답:', JSON.stringify(response, null, 2));
+      return res.json(response);
     } catch (error) {
       console.error('❌ DB 저장 실패:', error.message);
       return res.status(500).json({ error: 'DB 저장 실패', steps, detail: error.message, stack: error.stack });
@@ -814,6 +819,8 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
 
 // 테스트 목록 (관리자용) - GET 라우트를 나중에 정의
 app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
+  console.log('🎯 GET /api/admin/tests 핸들러 실행됨');
+  
   try {
     console.log('=== 관리자 테스트 목록 요청 ===');
     console.log('요청 헤더:', JSON.stringify(req.headers, null, 2));
