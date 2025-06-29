@@ -211,7 +211,7 @@ export default function AddTest() {
       <Main>
         <PageHeader>
           <PageTitle>새 테스트 추가</PageTitle>
-          <BackButton href="/tests">← 목록으로</BackButton>
+          <BackButton href="/psycho_page/admin/tests">← 목록으로</BackButton>
         </PageHeader>
 
         <FormCard>
@@ -317,7 +317,7 @@ export default function AddTest() {
             {error && <ErrorMessage>{error}</ErrorMessage>}
 
             <ButtonGroup>
-              <CancelButton type="button" onClick={() => router.push('/tests')}>
+              <CancelButton type="button" onClick={() => router.push('/psycho_page/admin/tests')}>
                 취소
               </CancelButton>
               <SubmitButton type="submit" disabled={loading}>

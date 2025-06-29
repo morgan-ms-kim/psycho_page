@@ -21,7 +21,7 @@ export default function AdminLogin() {
     // 이미 로그인된 경우 대시보드로 이동
     const token = localStorage.getItem('adminToken');
     if (token) {
-      router.push('/dashboard');
+      router.push('/psycho_page/admin/dashboard');
     }
   }, [router]);
 
@@ -33,7 +33,7 @@ export default function AdminLogin() {
     try {
       const response = await apiClient.post('/admin/login', credentials);
       localStorage.setItem('adminToken', response.data.token);
-      router.push('/dashboard');
+      router.push('/psycho_page/admin/dashboard');
     } catch (error) {
       console.error('로그인 실패:', error);
       setError('아이디 또는 비밀번호가 올바르지 않습니다.');
