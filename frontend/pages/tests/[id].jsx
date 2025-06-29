@@ -42,62 +42,34 @@ const apiClient = axios.create({
   }
 });
 
-// API 기본 URL - nginx 리버스 프록시 사용
-const getApiBase = () => {
-  // 타임스탬프를 추가하여 캐시 무효화
-  const timestamp = Date.now();
-  return `https://smartpick.website/psycho_page/api?t=${timestamp}`.replace('?t=', '');
+// 테스트 ID를 폴더명으로 변환하는 함수
+const getTestIdFromFolder = (folderName) => {
+  if (folderName.startsWith('test')) {
+    return folderName.replace('test', '');
+  }
+  return folderName;
 };
 
-export default function TestDetail() {
+export default function TestPage() {
   const router = useRouter();
   const { id } = router.query;
-  
-  const [test, setTest] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState([]);
-  const [showResult, setShowResult] = useState(false);
-  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+  const [test, setTest] = useState(null);
   const [liked, setLiked] = useState(false);
   const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState({ nickname: '', content: '', password: '' });
   const [showCommentForm, setShowCommentForm] = useState(false);
-  const [commentPage, setCommentPage] = useState(1);
-  const [hasMoreComments, setHasMoreComments] = useState(true);
-  const [loadingComments, setLoadingComments] = useState(false);
-  const [error, setError] = useState(null);
-  const [testCompleted, setTestCompleted] = useState(false);
-  const [commentCount, setCommentCount] = useState(0);
-  const [deletingCommentId, setDeletingCommentId] = useState(null);
-  const [deletePassword, setDeletePassword] = useState('');
-
-  // 이미지 경로를 올바르게 처리하는 함수
-  const getImagePath = (path) => {
-    if (!path) return null;
-    // /tests/로 시작하는 경로를 /psycho_page/tests/로 변환
-    if (path.startsWith('/tests/')) {
-      return path.replace('/tests/', '/psycho_page/tests/');
-    }
-    return path;
-  };
-
-  // 폴더명에서 숫자 ID를 추출하는 함수
-  const getTestIdFromFolder = (folderName) => {
-    // test5 -> 5, test1 -> 1
-    return folderName.replace('test', '');
-  };
+  const [newComment, setNewComment] = useState({ nickname: '', content: '', password: '' });
+  const [iframeLoaded, setIframeLoaded] = useState(false);
 
   // 테스트 데이터 로드
   useEffect(() => {
     if (id) {
       loadTestData();
-      loadComments();
       recordVisit();
     }
   }, [id]);
 
-  // 방문 기록
   const recordVisit = async () => {
     try {
       const testId = getTestIdFromFolder(id);
@@ -106,11 +78,9 @@ export default function TestDetail() {
       });
     } catch (error) {
       console.error('방문 기록 실패:', error);
-      // 방문 기록 실패는 무시하고 계속 진행
     }
   };
 
-  // 테스트 데이터 로드
   const loadTestData = async () => {
     try {
       const testId = getTestIdFromFolder(id);
@@ -122,355 +92,154 @@ export default function TestDetail() {
       console.error('테스트 데이터 로드 실패:', error);
       setError('테스트를 불러오는데 실패했습니다. 서버 연결을 확인해주세요.');
       setLoading(false);
-      
-      // API 연결 실패 시 기본 테스트 데이터 표시
-      setTest({
-        id: getTestIdFromFolder(id),
-        title: '테스트 로드 중...',
-        description: '서버 연결을 확인해주세요.',
-        questions: [],
-        results: [],
-        views: 0,
-        likes: 0,
-        comments: 0
-      });
     }
   };
 
-  // 댓글 로드
-  const loadComments = async (page = 1) => {
-    try {
-      setLoadingComments(true);
-      const testId = getTestIdFromFolder(id);
-      const response = await apiClient.get(`/tests/${testId}/comments?page=${page}&limit=10`);
-      
-      console.log('댓글 데이터:', response.data); // 디버깅용
-      
-      if (page === 1) {
-        setComments(response.data.comments);
-        setCommentCount(response.data.total);
-      } else {
-        setComments(prev => [...prev, ...response.data.comments]);
-      }
-      
-      setHasMoreComments(response.data.currentPage < response.data.pages);
-      setCommentPage(response.data.currentPage);
-      setLoadingComments(false);
-    } catch (error) {
-      console.error('댓글 로드 실패:', error);
-      setLoadingComments(false);
-      // 댓글 로드 실패는 빈 배열로 설정
-      if (page === 1) {
-        setComments([]);
-        setCommentCount(0);
-      }
-    }
-  };
-
-  // 더 많은 댓글 로드
-  const loadMoreComments = () => {
-    if (!loadingComments && hasMoreComments) {
-      loadComments(commentPage + 1);
-    }
-  };
-
-  // 좋아요 토글
-  const toggleLike = async () => {
+  const handleLike = async () => {
     try {
       const testId = getTestIdFromFolder(id);
       const response = await apiClient.post(`/tests/${testId}/like`);
       setLiked(response.data.liked);
-      loadTestData();
+      setTest(prev => ({
+        ...prev,
+        likes: response.data.liked ? prev.likes + 1 : prev.likes - 1
+      }));
     } catch (error) {
       console.error('좋아요 처리 실패:', error);
     }
   };
 
-  // 댓글 좋아요 토글
-  const toggleCommentLike = async (commentId) => {
+  const loadComments = async () => {
     try {
-      await apiClient.post(`/comments/${commentId}/like`);
-      loadComments(1);
+      const testId = getTestIdFromFolder(id);
+      const response = await apiClient.get(`/tests/${testId}/comments`);
+      setComments(response.data.comments);
     } catch (error) {
-      console.error('댓글 좋아요 처리 실패:', error);
+      console.error('댓글 로드 실패:', error);
     }
   };
 
-  // 댓글 작성
   const submitComment = async () => {
-    if (!newComment.nickname || !newComment.content || !newComment.password) return;
-    
-    if (newComment.password.length < 4) {
-      alert('비밀번호는 4자 이상 입력해주세요.');
+    if (!newComment.nickname || !newComment.content || !newComment.password) {
+      alert('모든 필드를 입력해주세요.');
       return;
     }
-    
+
     try {
       const testId = getTestIdFromFolder(id);
       await apiClient.post(`/tests/${testId}/comments`, newComment);
       setNewComment({ nickname: '', content: '', password: '' });
       setShowCommentForm(false);
-      loadComments(1);
-      setCommentCount(prev => prev + 1);
+      loadComments();
     } catch (error) {
       console.error('댓글 작성 실패:', error);
-      if (error.response?.data?.error) {
-        alert(error.response.data.error);
-      } else {
-        alert('댓글 작성에 실패했습니다.');
-      }
+      alert('댓글 작성에 실패했습니다.');
     }
   };
 
-  // 댓글 삭제
-  const deleteComment = async (commentId) => {
-    if (deletingCommentId === commentId) {
-      // 이미 삭제 모드인 경우, 삭제 시도
-      try {
-        const requestData = deletePassword ? { password: deletePassword } : {};
-        await apiClient.delete(`/comments/${commentId}`, {
-          data: requestData
-        });
-        loadComments(1);
-        setCommentCount(prev => prev - 1);
-        setDeletingCommentId(null);
-        setDeletePassword('');
-      } catch (error) {
-        console.error('댓글 삭제 실패:', error);
-        if (error.response?.status === 403) {
-          alert('삭제 권한이 없습니다.');
-        } else if (error.response?.status === 400) {
-          alert('비밀번호를 입력해주세요.');
-        } else {
-          alert('댓글 삭제에 실패했습니다.');
-        }
-        setDeletePassword('');
-      }
-    } else {
-      // 삭제 모드 활성화
-      setDeletingCommentId(commentId);
-      setDeletePassword('');
+  const handleIframeLoad = () => {
+    setIframeLoaded(true);
+  };
+
+  const handleIframeError = () => {
+    setError('테스트 앱을 로드하는데 실패했습니다.');
+  };
+
+  useEffect(() => {
+    if (test) {
+      loadComments();
     }
-  };
-
-  // 삭제 취소
-  const cancelDelete = () => {
-    setDeletingCommentId(null);
-    setDeletePassword('');
-  };
-
-  // 답변 선택
-  const selectAnswer = (answerIndex) => {
-    if (!test || !test.questions) return;
-    
-    const newAnswers = [...answers];
-    newAnswers[currentQuestion] = answerIndex;
-    setAnswers(newAnswers);
-
-    if (currentQuestion < test.questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      calculateResult(newAnswers);
-    }
-  };
-
-  // 결과 계산
-  const calculateResult = (finalAnswers) => {
-    if (!test || !test.results || test.results.length === 0) return;
-    
-    const resultIndex = Math.floor(Math.random() * test.results.length);
-    setResult(test.results[resultIndex]);
-    setShowResult(true);
-    setTestCompleted(true);
-    
-    const testResult = {
-      testId: getTestIdFromFolder(id),
-      testTitle: test.title,
-      result: test.results[resultIndex],
-      completedAt: new Date().toISOString()
-    };
-    
-    const savedResults = JSON.parse(localStorage.getItem('testResults') || '[]');
-    savedResults.push(testResult);
-    localStorage.setItem('testResults', JSON.stringify(savedResults));
-  };
-
-  // 테스트 다시 시작
-  const restartTest = () => {
-    setCurrentQuestion(0);
-    setAnswers([]);
-    setShowResult(false);
-    setResult(null);
-    setTestCompleted(false);
-  };
-
-  // 결과 공유
-  const shareResult = async () => {
-    if (!test || !result) return;
-    
-    const shareData = {
-      title: `${test.title} - ${result.title}`,
-      text: `${test.title} 테스트 결과: ${result.title}\n${result.description}`,
-      url: window.location.href
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(
-          `${shareData.title}\n${shareData.text}\n${shareData.url}`
-        );
-        alert('결과가 클립보드에 복사되었습니다!');
-      }
-    } catch (error) {
-      console.error('공유 실패:', error);
-    }
-  };
-
-  // 소셜 미디어 공유
-  const shareToSocial = (platform) => {
-    if (!test || !result) return;
-    
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent(`${test.title} - ${result.title}`);
-    
-    let shareUrl = '';
-    switch (platform) {
-      case 'twitter':
-        shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-        break;
-      case 'facebook':
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-        break;
-      case 'kakao':
-        shareUrl = `https://story.kakao.com/share?url=${url}`;
-        break;
-      default:
-        return;
-    }
-    
-    window.open(shareUrl, '_blank', 'width=600,height=400');
-  };
+  }, [test]);
 
   if (loading) {
     return (
-      <LoadingWrap>
-        <LoadingSpinner />
-        <p>테스트를 불러오는 중...</p>
-      </LoadingWrap>
+      <MainWrap>
+        <Header>
+          <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
+        </Header>
+        <LoadingWrap>
+          <LoadingSpinner />
+          <p>테스트를 불러오는 중...</p>
+        </LoadingWrap>
+      </MainWrap>
     );
   }
 
-  if (!test) {
+  if (error) {
     return (
-      <ErrorWrap>
-        <h2>테스트를 찾을 수 없습니다</h2>
-        <button onClick={() => router.push('/')}>메인으로 돌아가기</button>
-      </ErrorWrap>
+      <MainWrap>
+        <Header>
+          <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
+        </Header>
+        <ErrorMessage>
+          <p>🚫 {error}</p>
+          <button onClick={() => router.push('/')}>홈으로 돌아가기</button>
+        </ErrorMessage>
+      </MainWrap>
     );
   }
+
+  const testUrl = `/psycho_page/tests/${id}/`;
+  const commentCount = comments.length;
 
   return (
     <MainWrap>
       <Header>
-        <BackButton onClick={() => router.push('/')}>
-          ← 메인으로
-        </BackButton>
-        <TestTitle>{test.title}</TestTitle>
-        <LikeButton onClick={toggleLike} liked={liked}>
-          {liked ? '❤️' : '🤍'} {test.likes}
-        </LikeButton>
+        <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
+        <TestTitle>{test?.title || '테스트'}</TestTitle>
       </Header>
 
-      {error && (
-        <ErrorMessage>
-          <p>{error}</p>
-          <button onClick={loadTestData}>다시 시도</button>
-        </ErrorMessage>
-      )}
+      {/* 테스트 앱 iframe */}
+      <TestContainer>
+        {!iframeLoaded && (
+          <LoadingOverlay>
+            <LoadingSpinner />
+            <p>테스트 앱을 로드하는 중...</p>
+          </LoadingOverlay>
+        )}
+        
+        <TestIframe
+          src={testUrl}
+          onLoad={handleIframeLoad}
+          onError={handleIframeError}
+          title={test?.title || '테스트'}
+          allow="fullscreen"
+        />
+      </TestContainer>
 
-      {!showResult && test && test.questions && test.questions.length > 0 && (
-        <TestSection>
-          <ProgressBar>
-            <ProgressFill progress={(currentQuestion / test.questions.length) * 100} />
-            <ProgressText>{currentQuestion + 1} / {test.questions.length}</ProgressText>
-          </ProgressBar>
-
-          <QuestionCard>
-            <QuestionNumber>Q{currentQuestion + 1}</QuestionNumber>
-            <QuestionText>{test.questions[currentQuestion]?.question || '질문을 불러올 수 없습니다.'}</QuestionText>
-            
-            <AnswerGrid>
-              {test.questions[currentQuestion]?.answers?.map((answer, index) => (
-                <AnswerButton
-                  key={index}
-                  onClick={() => selectAnswer(index)}
-                >
-                  {answer}
-                </AnswerButton>
-              )) || []}
-            </AnswerGrid>
-          </QuestionCard>
-        </TestSection>
-      )}
-
-      {showResult && result && (
-        <ResultSection>
-          <ResultCard>
-            <ResultTitle>{result.title}</ResultTitle>
-            <ResultPlaceholder>
-              🎯
-            </ResultPlaceholder>
-            <ResultDescription>{result.description}</ResultDescription>
-            
-            <ShareSection>
-              <ShareButton onClick={shareResult}>
-                📤 결과 공유하기
-              </ShareButton>
-              <SocialShareButtons>
-                <SocialButton onClick={() => shareToSocial('twitter')}>
-                  🐦 트위터
-                </SocialButton>
-                <SocialButton onClick={() => shareToSocial('facebook')}>
-                  📘 페이스북
-                </SocialButton>
-                <SocialButton onClick={() => shareToSocial('kakao')}>
-                  💬 카카오톡
-                </SocialButton>
-              </SocialShareButtons>
-              <RestartButton onClick={restartTest}>
-                🔄 다시 테스트하기
-              </RestartButton>
-            </ShareSection>
-          </ResultCard>
-        </ResultSection>
-      )}
-
-      <InfoSection>
+      {/* 테스트 정보 및 소셜 기능 */}
+      <Section>
         <InfoCard>
-          <InfoTitle>📊 테스트 정보</InfoTitle>
-          <InfoGrid>
-            <InfoItem>
-              <InfoLabel>조회수</InfoLabel>
-              <InfoValue>{(test.views || 0).toLocaleString()}</InfoValue>
-            </InfoItem>
-            <InfoItem>
-              <InfoLabel>좋아요</InfoLabel>
-              <InfoValue>{(test.likes || 0).toLocaleString()}</InfoValue>
-            </InfoItem>
-            <InfoItem>
-              <InfoLabel>댓글</InfoLabel>
-              <InfoValue>{test.comments || 0}</InfoValue>
-            </InfoItem>
-            <InfoItem>
-              <InfoLabel>생성일</InfoLabel>
-              <InfoValue>{test.createdAt ? new Date(test.createdAt).toLocaleDateString() : '알 수 없음'}</InfoValue>
-            </InfoItem>
-          </InfoGrid>
+          <Title>{test?.title}</Title>
+          <SubTitle>{test?.description}</SubTitle>
+          
+          <FlexRow>
+            <SocialButton onClick={handleLike} liked={liked}>
+              {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
+            </SocialButton>
+            <SocialButton onClick={() => setShowCommentForm(!showCommentForm)}>
+              💬 댓글 작성
+            </SocialButton>
+          </FlexRow>
+          
+          <Grid>
+            <StatItem>
+              <StatLabel>조회수</StatLabel>
+              <StatValue>{test?.views || 0}</StatValue>
+            </StatItem>
+            <StatItem>
+              <StatLabel>좋아요</StatLabel>
+              <StatValue>{test?.likes || 0}</StatValue>
+            </StatItem>
+            <StatItem>
+              <StatLabel>댓글</StatLabel>
+              <StatValue>{commentCount}</StatValue>
+            </StatItem>
+          </Grid>
         </InfoCard>
-      </InfoSection>
+      </Section>
 
+      {/* 댓글 섹션 */}
       <CommentSection>
         <CommentHeader>
           <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
@@ -507,52 +276,21 @@ export default function TestDetail() {
           </CommentForm>
         )}
 
-        <CommentList>
-          {(comments || []).map(comment => {
-            console.log('댓글 정보:', comment); // 디버깅용
-            return (
-              <CommentItem key={comment.id}>
-                <CommentHeader>
-                  <CommentAuthor>{comment.nickname}</CommentAuthor>
-                  <CommentDate>{new Date(comment.createdAt).toLocaleDateString()}</CommentDate>
-                </CommentHeader>
-                <CommentContent>{comment.content}</CommentContent>
-                <CommentActions>
-                  <CommentLikeButton onClick={() => toggleCommentLike(comment.id)}>
-                    {comment.userLiked ? '❤️' : '🤍'} 좋아요
-                  </CommentLikeButton>
-                  {deletingCommentId === comment.id ? (
-                    <DeleteModeContainer>
-                      <DeletePasswordInput
-                        type="password"
-                        placeholder="비밀번호"
-                        value={deletePassword}
-                        onChange={(e) => setDeletePassword(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && deleteComment(comment.id)}
-                      />
-                      <DeleteConfirmButton onClick={() => deleteComment(comment.id)}>
-                        ✅ 확인
-                      </DeleteConfirmButton>
-                      <DeleteCancelButton onClick={cancelDelete}>
-                        ❌ 취소
-                      </DeleteCancelButton>
-                    </DeleteModeContainer>
-                  ) : (
-                    <CommentDeleteButton onClick={() => deleteComment(comment.id)}>
-                      ❌ 삭제
-                    </CommentDeleteButton>
-                  )}
-                </CommentActions>
-              </CommentItem>
-            );
-          })}
-          
-          {hasMoreComments && (
-            <LoadMoreButton onClick={loadMoreComments} disabled={loadingComments}>
-              {loadingComments ? '로딩 중...' : '더 많은 댓글 보기'}
-            </LoadMoreButton>
-          )}
-        </CommentList>
+        {comments.map((comment) => (
+          <CommentItem key={comment.id}>
+            <CommentHeader>
+              <CommentAuthor>{comment.nickname}</CommentAuthor>
+              <CommentDate>{new Date(comment.createdAt).toLocaleDateString()}</CommentDate>
+            </CommentHeader>
+            <CommentContent>{comment.content}</CommentContent>
+          </CommentItem>
+        ))}
+
+        {comments.length === 0 && (
+          <EmptyComment>
+            <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!</p>
+          </EmptyComment>
+        )}
       </CommentSection>
 
       <Footer>
@@ -562,269 +300,149 @@ export default function TestDetail() {
   );
 }
 
-// 스타일 컴포넌트들
-const TestTitle = styled(Title)``;
+// 페이지 전용 스타일 컴포넌트들
+const TestTitle = styled.h1`
+  font-size: 1.5rem;
+  color: white;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+`;
 
-const ErrorWrap = styled.div`
+const TestContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  min-height: 500px;
+  margin-bottom: 2rem;
+`;
+
+const TestIframe = styled.iframe`
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+`;
+
+const LoadingOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  text-align: center;
+  z-index: 10;
+  border-radius: 10px;
   
-  h2 {
-    margin-bottom: 1rem;
-  }
-  
-  button {
-    background: linear-gradient(45deg, #ff6b6b, #ffa500);
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
+  p {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    color: #333;
   }
 `;
 
-const LikeButton = styled.button`
-  background: ${props => props.liked ? 'rgba(255, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.2)'};
-  border: none;
+const StatItem = styled.div`
+  text-align: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+`;
+
+const StatLabel = styled.div`
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+`;
+
+const StatValue = styled.div`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #667eea;
+`;
+
+const CommentHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
+
+const CommentTitle = styled.h3`
+  font-size: 1.3rem;
+  margin: 0;
+`;
+
+const CommentButton = styled.button`
+  background: #667eea;
   color: white;
+  border: none;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   cursor: pointer;
-  font-size: 1rem;
-  
-  &:hover {
-    background: ${props => props.liked ? 'rgba(255, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.3)'};
-  }
-`;
-
-const TestSection = styled(Section)``;
-
-const QuestionNumber = styled.div`
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #ffa500;
-  margin-bottom: 20px;
-`;
-
-const QuestionText = styled(SubTitle)``;
-
-const AnswerGrid = styled(Grid)``;
-
-const AnswerButton = styled.button`
-  background: rgba(255,255,255,0.1);
-  border: 2px solid rgba(255,255,255,0.3);
-  color: white;
-  padding: 20px;
-  border-radius: 15px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: rgba(255,255,255,0.2);
-    border-color: rgba(255,255,255,0.5);
-    transform: translateY(-2px);
-  }
-`;
-
-const ResultSection = styled(Section)``;
-
-const ResultTitle = styled.h2`
-  font-size: 2rem;
-  margin: 0 0 20px 0;
-  color: #ffa500;
-`;
-
-const ResultPlaceholder = styled.div`
-  width: 200px;
-  height: 200px;
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  border-radius: 20px;
-  margin: 20px auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 4rem;
-  color: white;
-`;
-
-const ResultDescription = styled.p`
-  font-size: 1.2rem;
-  line-height: 1.6;
-  margin: 20px 0;
-`;
-
-const ShareSection = styled.div`
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  margin-top: 30px;
-`;
-
-const ShareButton = styled(PrimaryButton)``;
-
-const SocialShareButtons = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const RestartButton = styled(SecondaryButton)``;
-
-const InfoSection = styled(Section)``;
-
-const InfoTitle = styled(SectionTitle)``;
-
-const InfoGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-`;
-
-const InfoItem = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const InfoLabel = styled.span`
   font-size: 0.9rem;
-  opacity: 0.6;
+  
+  &:hover {
+    background: #5a6fd8;
+  }
 `;
 
-const InfoValue = styled.span`
-  font-size: 1rem;
+const CommentForm = styled.div`
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
 `;
 
-const CommentHeader = styled(FlexRow)`
-  margin-bottom: 20px;
+const CommentInput = styled(Input)`
+  margin-bottom: 1rem;
 `;
 
-const CommentTitle = styled(SectionTitle)``;
-
-const CommentButton = styled(SecondaryButton)`
-  padding: 10px 20px;
+const CommentTextarea = styled(Textarea)`
+  margin-bottom: 1rem;
+  min-height: 100px;
 `;
 
-const CommentInput = styled(Input)``;
-
-const CommentTextarea = styled(Textarea)``;
-
-const CommentSubmitButton = styled(PrimaryButton)`
-  padding: 10px 20px;
-`;
-
-const CommentList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+const CommentSubmitButton = styled.button`
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  
+  &:hover {
+    background: #5a6fd8;
+  }
 `;
 
 const CommentAuthor = styled.div`
   font-weight: bold;
-  margin-bottom: 5px;
+  color: #667eea;
 `;
 
 const CommentDate = styled.div`
   font-size: 0.8rem;
-  opacity: 0.6;
-  margin-bottom: 10px;
+  opacity: 0.7;
 `;
 
 const CommentContent = styled.div`
+  margin-top: 0.5rem;
   line-height: 1.5;
 `;
 
-const CommentActions = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const CommentLikeButton = styled.button`
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-`;
-
-const CommentDeleteButton = styled.button`
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-`;
-
-const LoadMoreButton = styled.button`
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-  ${props => props.disabled && `
-    opacity: 0.5;
-    cursor: not-allowed;
-  `}
-`;
-
-const DeleteModeContainer = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const DeletePasswordInput = styled.input`
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 0.9rem;
-  width: 120px;
+const EmptyComment = styled.div`
+  text-align: center;
+  padding: 2rem;
+  opacity: 0.7;
   
-  &::placeholder {
-    color: rgba(255,255,255,0.6);
-  }
-  
-  &:focus {
-    outline: none;
-    border-color: rgba(255,255,255,0.5);
-  }
-`;
-
-const DeleteConfirmButton = styled.button`
-  background: rgba(0, 255, 0, 0.3);
-  border: none;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  
-  &:hover {
-    background: rgba(0, 255, 0, 0.4);
-  }
-`;
-
-const DeleteCancelButton = styled.button`
-  background: rgba(255, 0, 0, 0.3);
-  border: none;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  
-  &:hover {
-    background: rgba(255, 0, 0, 0.4);
+  p {
+    margin: 0;
   }
 `; 

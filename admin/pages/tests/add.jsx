@@ -195,6 +195,7 @@ export default function AddTest() {
         addLog('API 요청: 썸네일 업로드');
         addLog('파일명: ' + thumbnailFile.name);
         addLog('파일 크기: ' + (thumbnailFile.size / 1024).toFixed(2) + 'KB');
+        addLog('파일 타입: ' + thumbnailFile.type);
         
         const formDataThumbnail = new FormData();
         formDataThumbnail.append('thumbnail', thumbnailFile);
@@ -215,8 +216,11 @@ export default function AddTest() {
           updateProgressStep('썸네일 업로드', 'failed');
           addLog('❌ 썸네일 업로드 실패: ' + (thumbnailError.response?.data?.error || thumbnailError.message));
           addLog('❌ 에러 상세: ' + JSON.stringify(thumbnailError.response?.data || thumbnailError.message));
+          addLog('⚠️ 썸네일 업로드 실패했지만 테스트 등록은 완료되었습니다.');
           console.error('썸네일 업로드 실패:', thumbnailError);
         }
+      } else {
+        addLog('ℹ️ 썸네일 파일이 선택되지 않았습니다.');
       }
       
       setCurrentStep('완료!');
