@@ -135,11 +135,24 @@ export default function Analytics() {
     <Container>
       <Header>
         <HeaderContent>
-          <Logo>🧠 PSYCHO 관리자</Logo>
+          <Logo onClick={() => {
+            if (router.pathname !== '/dashboard') {
+              router.push('/dashboard');
+            }
+          }} style={{ cursor: 'pointer' }}>�� PSYCHO 관리자</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
             <NavLink href="/tests">테스트 관리</NavLink>
-            <NavLink href="/analytics">방문자 분석</NavLink>
+            <NavLink 
+              href="/analytics" 
+              onClick={(e) => {
+                if (router.pathname === '/analytics') {
+                  e.preventDefault();
+                }
+              }}
+            >
+              방문자 분석
+            </NavLink>
             <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
           </Nav>
         </HeaderContent>

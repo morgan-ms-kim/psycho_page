@@ -275,7 +275,11 @@ export default function AddTest() {
     <Container>
       <Header>
         <HeaderContent>
-          <Logo onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
+          <Logo onClick={() => {
+            if (router.pathname !== '/dashboard') {
+              router.push('/dashboard');
+            }
+          }} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
             <NavLink href="/tests">테스트 관리</NavLink>

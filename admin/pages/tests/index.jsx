@@ -110,10 +110,23 @@ export default function TestManagement() {
     <Container>
       <Header>
         <HeaderContent>
-          <Logo onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
+          <Logo onClick={() => {
+            if (router.pathname !== '/dashboard') {
+              router.push('/dashboard');
+            }
+          }} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
-            <NavLink href="/tests">테스트 관리</NavLink>
+            <NavLink 
+              href="/tests" 
+              onClick={(e) => {
+                if (router.pathname === '/tests') {
+                  e.preventDefault();
+                }
+              }}
+            >
+              테스트 관리
+            </NavLink>
             <NavLink href="/analytics">방문자 분석</NavLink>
             <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
           </Nav>
