@@ -33,8 +33,21 @@ import {
   ProgressText
 } from '../../components/StyledComponents';
 
+// axios 인스턴스 생성
+const apiClient = axios.create({
+  baseURL: 'https://smartpick.website/api',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
+
 // API 기본 URL - nginx 리버스 프록시 사용
-const getApiBase = () => 'https://smartpick.website/api';
+const getApiBase = () => {
+  // 타임스탬프를 추가하여 캐시 무효화
+  const timestamp = Date.now();
+  return `https://smartpick.website/api?t=${timestamp}`.replace('?t=', '');
+};
 
 export default function TestDetail() {
   const router = useRouter();
@@ -85,7 +98,7 @@ export default function TestDetail() {
   const recordVisit = async () => {
     try {
       const testId = getTestIdFromFolder(id);
-      await axios.post(`${getApiBase()}/visitors`, {
+      await apiClient.post(`/visitors`, {
         testId: testId
       });
     } catch (error) {
@@ -98,7 +111,7 @@ export default function TestDetail() {
   const loadTestData = async () => {
     try {
       const testId = getTestIdFromFolder(id);
-      const response = await axios.get(`${getApiBase()}/tests/${testId}`);
+      const response = await apiClient.get(`/tests/${testId}`);
       setTest(response.data);
       setLiked(response.data.userLiked || false);
       setLoading(false);
@@ -126,7 +139,7 @@ export default function TestDetail() {
     try {
       setLoadingComments(true);
       const testId = getTestIdFromFolder(id);
-      const response = await axios.get(`${getApiBase()}/tests/${testId}/comments?page=${page}&limit=10`);
+      const response = await apiClient.get(`/tests/${testId}/comments?page=${page}&limit=10`);
       
       if (page === 1) {
         setComments(response.data.comments);
@@ -158,7 +171,7 @@ export default function TestDetail() {
   const toggleLike = async () => {
     try {
       const testId = getTestIdFromFolder(id);
-      const response = await axios.post(`${getApiBase()}/tests/${testId}/like`);
+      const response = await apiClient.post(`/tests/${testId}/like`);
       setLiked(response.data.liked);
       loadTestData();
     } catch (error) {
@@ -169,7 +182,7 @@ export default function TestDetail() {
   // 댓글 좋아요 토글
   const toggleCommentLike = async (commentId) => {
     try {
-      await axios.post(`${getApiBase()}/comments/${commentId}/like`);
+      await apiClient.post(`/comments/${commentId}/like`);
       loadComments(1);
     } catch (error) {
       console.error('댓글 좋아요 처리 실패:', error);
@@ -182,7 +195,7 @@ export default function TestDetail() {
     
     try {
       const testId = getTestIdFromFolder(id);
-      await axios.post(`${getApiBase()}/tests/${testId}/comments`, newComment);
+      await apiClient.post(`/tests/${testId}/comments`, newComment);
       setNewComment({ nickname: '', content: '' });
       setShowCommentForm(false);
       loadComments(1);

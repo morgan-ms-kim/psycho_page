@@ -31,8 +31,21 @@ import {
   TestItemStats
 } from '../components/StyledComponents';
 
+// axios 인스턴스 생성
+const apiClient = axios.create({
+  baseURL: 'https://smartpick.website/api',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
+
 // API 기본 URL - nginx 리버스 프록시 사용
-const getApiBase = () => 'https://smartpick.website/api';
+const getApiBase = () => {
+  // 타임스탬프를 추가하여 캐시 무효화
+  const timestamp = Date.now();
+  return `https://smartpick.website/api?t=${timestamp}`.replace('?t=', '');
+};
 
 export default function Home() {
   const [tests, setTests] = useState([]);
@@ -83,9 +96,7 @@ export default function Home() {
   // 방문자 통계 로드
   const loadVisitorStats = async () => {
     try {
-      const response = await axios.get(`${getApiBase()}/visitors/count`, {
-        timeout: 5000
-      });
+      const response = await apiClient.get('/visitors/count');
       setVisitorStats(response.data);
       setApiStatus('connected');
     } catch (error) {
@@ -103,9 +114,7 @@ export default function Home() {
   // 카테고리 목록 로드
   const loadCategories = async () => {
     try {
-      const response = await axios.get(`${getApiBase()}/categories`, {
-        timeout: 5000
-      });
+      const response = await apiClient.get('/categories');
       
       // API 응답이 배열인 경우 카테고리 객체로 변환
       if (Array.isArray(response.data)) {
@@ -151,8 +160,8 @@ export default function Home() {
       if (selectedCategory) params.append('category', selectedCategory);
 
       // 타임아웃 설정 (5초)
-      const response = await axios.get(`${getApiBase()}/tests?${params}`, {
-        timeout: 5000
+      const response = await apiClient.get('/tests', {
+        params: params
       });
       
       if (reset) {
