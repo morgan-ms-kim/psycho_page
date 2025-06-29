@@ -27,7 +27,7 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('adminToken');
-      window.location.href = '/admin';
+      window.location.href = '/psycho_page/admin';
     }
     return Promise.reject(error);
   }
@@ -49,7 +49,7 @@ export default function Dashboard() {
     // 로그인 확인
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      router.push('/');
+      router.push('/psycho_page/admin');
       return;
     }
 
@@ -77,7 +77,7 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    router.push('/');
+    router.push('/psycho_page/admin');
   };
 
   if (loading) {

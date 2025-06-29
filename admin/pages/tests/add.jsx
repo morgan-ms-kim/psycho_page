@@ -268,7 +268,7 @@ export default function AddTest() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    router.push('/');
+    router.push('/psycho_page/admin');
   };
 
   return (

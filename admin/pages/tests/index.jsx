@@ -50,7 +50,7 @@ export default function TestManagement() {
     // 로그인 확인
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      router.push('/');
+      router.push('/psycho_page/admin');
       return;
     }
 
@@ -88,7 +88,7 @@ export default function TestManagement() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    router.push('/');
+    router.push('/psycho_page/admin');
   };
 
   const showMessage = (message, type = 'info') => {
@@ -110,7 +110,7 @@ export default function TestManagement() {
     <Container>
       <Header>
         <HeaderContent>
-          <Logo onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
+          <Logo onClick={() => router.push('/psycho_page/admin/dashboard')} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
           <Nav>
             <NavLink href="/psycho_page/admin/dashboard">대시보드</NavLink>
             <NavLink href="/psycho_page/admin/tests">테스트 관리</NavLink>
