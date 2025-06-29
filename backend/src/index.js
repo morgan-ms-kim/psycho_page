@@ -100,11 +100,38 @@ app.get('/api/db-status', async (req, res) => {
 
 // 요청 로깅 미들웨어
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - IP: ${getClientIP(req)}`);
-  console.log('Headers:', req.headers);
+  const timestamp = new Date().toISOString();
+  const logMessage = `${timestamp} - ${req.method} ${req.path} - IP: ${getClientIP(req)}`;
+  
+  // 콘솔에 출력
+  console.log('='.repeat(80));
+  console.log(logMessage);
+  console.log('Headers:', JSON.stringify(req.headers, null, 2));
+  
   if (req.body && Object.keys(req.body).length > 0) {
     console.log('Body:', JSON.stringify(req.body, null, 2));
   }
+  
+  // 라우트 매칭 확인을 위한 추가 로그
+  if (req.path === '/api/admin/tests') {
+    console.log('🔍 라우트 매칭 확인:', req.method, req.path);
+    console.log('Content-Type:', req.headers['content-type']);
+    console.log('Authorization:', req.headers.authorization ? '있음' : '없음');
+  }
+  
+  // 파일에 로그 저장
+  const fs = require('fs');
+  const logDir = path.join(process.cwd(), 'logs');
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
+  
+  const logFile = path.join(logDir, `server-${new Date().toISOString().split('T')[0]}.log`);
+  const fullLogMessage = `${logMessage}\nHeaders: ${JSON.stringify(req.headers)}\nBody: ${JSON.stringify(req.body)}\n${'='.repeat(80)}\n`;
+  
+  fs.appendFileSync(logFile, fullLogMessage);
+  
+  console.log('='.repeat(80));
   next();
 });
 
@@ -588,26 +615,6 @@ app.post('/api/admin/login', async (req, res, next) => {
   }
 });
 
-// 테스트 목록 (관리자용)
-app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
-  try {
-    console.log('=== 관리자 테스트 목록 요청 ===');
-    console.log('요청 헤더:', JSON.stringify(req.headers, null, 2));
-    
-    const tests = await Test.findAll({
-      order: [['createdAt', 'DESC']]
-    });
-    
-    console.log('✅ 테스트 목록 조회 성공:', tests.length, '개');
-    console.log('테스트 목록:', tests.map(t => ({ id: t.id, title: t.title })));
-    
-    res.json(tests);
-  } catch (error) {
-    console.error('❌ 테스트 목록 조회 실패:', error);
-    next(error);
-  }
-});
-
 // 테스트 등록 전용 deploy 스크립트 실행 함수
 async function runTestDeployScript(clonePath) {
   const scriptPath = path.join(process.cwd(), '..', 'test_deploy.sh');
@@ -622,7 +629,7 @@ async function runTestDeployScript(clonePath) {
   }
 }
 
-// 새 테스트 추가 (Git에서 클론)
+// 새 테스트 추가 (Git에서 클론) - POST 라우트를 먼저 정의
 app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
   const steps = {
     directoryCreated: false,
@@ -802,6 +809,26 @@ app.post('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
     console.error('❌ 테스트 추가 전체 오류:', error.message);
     console.error('Error stack:', error.stack);
     return res.status(500).json({ error: '서버 오류', steps, detail: error.message, stack: error.stack });
+  }
+});
+
+// 테스트 목록 (관리자용) - GET 라우트를 나중에 정의
+app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
+  try {
+    console.log('=== 관리자 테스트 목록 요청 ===');
+    console.log('요청 헤더:', JSON.stringify(req.headers, null, 2));
+    
+    const tests = await Test.findAll({
+      order: [['createdAt', 'DESC']]
+    });
+    
+    console.log('✅ 테스트 목록 조회 성공:', tests.length, '개');
+    console.log('테스트 목록:', tests.map(t => ({ id: t.id, title: t.title })));
+    
+    res.json(tests);
+  } catch (error) {
+    console.error('❌ 테스트 목록 조회 실패:', error);
+    next(error);
   }
 });
 
