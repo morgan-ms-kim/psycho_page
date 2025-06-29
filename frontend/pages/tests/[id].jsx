@@ -61,13 +61,14 @@ export default function TestDetail() {
   const [result, setResult] = useState(null);
   const [liked, setLiked] = useState(false);
   const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState({ nickname: '', content: '' });
+  const [newComment, setNewComment] = useState({ nickname: '', content: '', password: '' });
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [commentPage, setCommentPage] = useState(1);
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const [loadingComments, setLoadingComments] = useState(false);
   const [error, setError] = useState(null);
   const [testCompleted, setTestCompleted] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
 
   // 이미지 경로를 올바르게 처리하는 함수
   const getImagePath = (path) => {
@@ -145,6 +146,7 @@ export default function TestDetail() {
       
       if (page === 1) {
         setComments(response.data.comments);
+        setCommentCount(response.data.total);
       } else {
         setComments(prev => [...prev, ...response.data.comments]);
       }
@@ -158,6 +160,7 @@ export default function TestDetail() {
       // 댓글 로드 실패는 빈 배열로 설정
       if (page === 1) {
         setComments([]);
+        setCommentCount(0);
       }
     }
   };
@@ -193,29 +196,48 @@ export default function TestDetail() {
 
   // 댓글 작성
   const submitComment = async () => {
-    if (!newComment.nickname || !newComment.content) return;
+    if (!newComment.nickname || !newComment.content || !newComment.password) return;
+    
+    if (newComment.password.length < 4) {
+      alert('비밀번호는 4자 이상 입력해주세요.');
+      return;
+    }
     
     try {
       const testId = getTestIdFromFolder(id);
       await apiClient.post(`/tests/${testId}/comments`, newComment);
-      setNewComment({ nickname: '', content: '' });
+      setNewComment({ nickname: '', content: '', password: '' });
       setShowCommentForm(false);
       loadComments(1);
+      setCommentCount(prev => prev + 1);
     } catch (error) {
       console.error('댓글 작성 실패:', error);
+      if (error.response?.data?.error) {
+        alert(error.response.data.error);
+      } else {
+        alert('댓글 작성에 실패했습니다.');
+      }
     }
   };
 
   // 댓글 삭제
   const deleteComment = async (commentId) => {
-    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+    const password = prompt('댓글 삭제를 위한 비밀번호를 입력하세요:');
+    if (!password) return;
     
     try {
-      await apiClient.delete(`/comments/${commentId}`);
+      await apiClient.delete(`/comments/${commentId}`, {
+        data: { password }
+      });
       loadComments(1);
+      setCommentCount(prev => prev - 1);
     } catch (error) {
       console.error('댓글 삭제 실패:', error);
-      alert('댓글 삭제에 실패했습니다.');
+      if (error.response?.status === 403) {
+        alert('비밀번호가 일치하지 않습니다.');
+      } else {
+        alert('댓글 삭제에 실패했습니다.');
+      }
     }
   };
 
@@ -433,7 +455,7 @@ export default function TestDetail() {
 
       <CommentSection>
         <CommentHeader>
-          <CommentTitle>💬 댓글 ({test.comments || 0})</CommentTitle>
+          <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
           <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>
             {showCommentForm ? '취소' : '댓글 작성'}
           </CommentButton>
@@ -447,6 +469,13 @@ export default function TestDetail() {
               value={newComment.nickname}
               onChange={(e) => setNewComment({...newComment, nickname: e.target.value})}
               maxLength={20}
+            />
+            <CommentInput
+              type="password"
+              placeholder="비밀번호 (4자 이상)"
+              value={newComment.password}
+              onChange={(e) => setNewComment({...newComment, password: e.target.value})}
+              minLength={4}
             />
             <CommentTextarea
               placeholder="댓글을 작성해주세요..."
@@ -474,11 +503,9 @@ export default function TestDetail() {
                   <CommentLikeButton onClick={() => toggleCommentLike(comment.id)}>
                     {comment.userLiked ? '❤️' : '🤍'} 좋아요
                   </CommentLikeButton>
-                  {comment.isAuthor && (
-                    <CommentDeleteButton onClick={() => deleteComment(comment.id)}>
-                      ❌ 삭제
-                    </CommentDeleteButton>
-                  )}
+                  <CommentDeleteButton onClick={() => deleteComment(comment.id)}>
+                    ❌ 삭제
+                  </CommentDeleteButton>
                 </CommentActions>
               </CommentItem>
             );

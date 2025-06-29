@@ -185,18 +185,17 @@ app.get('/api/tests/:id/comments', async (req, res, next) => {
       comments.rows.map(async (comment) => {
         const commentData = comment.toJSON();
         
+        // 비밀번호 제거
+        delete commentData.password;
+        
         // 현재 사용자의 좋아요 상태 확인
         const userLike = await Like.findOne({
           where: { commentId: comment.id, ip: clientIP }
         });
         
-        // 작성자 여부 확인 (IP 기반)
-        const isAuthor = comment.ip === clientIP;
-        
         return {
           ...commentData,
-          userLiked: !!userLike,
-          isAuthor: isAuthor
+          userLiked: !!userLike
         };
       })
     );
@@ -215,20 +214,25 @@ app.get('/api/tests/:id/comments', async (req, res, next) => {
 // 댓글 작성
 app.post('/api/tests/:id/comments', async (req, res, next) => {
   try {
-    const { nickname, content } = req.body;
+    const { nickname, content, password } = req.body;
     
-    if (!nickname || !content) {
-      return res.status(400).json({ error: '닉네임과 내용을 모두 입력해주세요.' });
+    if (!nickname || !content || !password) {
+      return res.status(400).json({ error: '닉네임, 내용, 비밀번호를 모두 입력해주세요.' });
     }
     
     if (content.length > 500) {
       return res.status(400).json({ error: '댓글은 500자 이내로 작성해주세요.' });
     }
     
+    if (password.length < 4) {
+      return res.status(400).json({ error: '비밀번호는 4자 이상 입력해주세요.' });
+    }
+    
     const comment = await Comment.create({
       testId: req.params.id,
       nickname: nickname.trim(),
       content: content.trim(),
+      password: password,
       ip: getClientIP(req)
     });
     
@@ -420,17 +424,21 @@ app.get('/api/stats', async (req, res, next) => {
 // 댓글 삭제
 app.delete('/api/comments/:id', async (req, res, next) => {
   try {
-    const clientIP = getClientIP(req);
+    const { password } = req.body;
     const commentId = req.params.id;
+    
+    if (!password) {
+      return res.status(400).json({ error: '비밀번호를 입력해주세요.' });
+    }
     
     const comment = await Comment.findByPk(commentId);
     if (!comment) {
       return res.status(404).json({ error: '댓글을 찾을 수 없습니다.' });
     }
     
-    // 작성자만 삭제 가능 (IP 기반)
-    if (comment.ip !== clientIP) {
-      return res.status(403).json({ error: '댓글을 삭제할 권한이 없습니다.' });
+    // 비밀번호 확인
+    if (comment.password !== password) {
+      return res.status(403).json({ error: '비밀번호가 일치하지 않습니다.' });
     }
     
     // 댓글과 관련된 좋아요도 함께 삭제

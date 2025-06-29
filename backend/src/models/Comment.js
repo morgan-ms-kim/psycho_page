@@ -19,6 +19,14 @@ const Comment = sequelize.define('Comment', {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  ip: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   likes: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
