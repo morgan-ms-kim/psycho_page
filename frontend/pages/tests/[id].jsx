@@ -204,6 +204,19 @@ export default function TestDetail() {
     }
   };
 
+  // 댓글 삭제
+  const deleteComment = async (commentId) => {
+    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+    
+    try {
+      await apiClient.delete(`/comments/${commentId}`);
+      loadComments(1);
+    } catch (error) {
+      console.error('댓글 삭제 실패:', error);
+      alert('댓글 삭제에 실패했습니다.');
+    }
+  };
+
   // 답변 선택
   const selectAnswer = (answerIndex) => {
     if (!test || !test.questions) return;
@@ -455,8 +468,13 @@ export default function TestDetail() {
               <CommentContent>{comment.content}</CommentContent>
               <CommentActions>
                 <CommentLikeButton onClick={() => toggleCommentLike(comment.id)}>
-                  👍 좋아요
+                  {comment.userLiked ? '❤️' : '🤍'} 좋아요
                 </CommentLikeButton>
+                {comment.isAuthor && (
+                  <CommentDeleteButton onClick={() => deleteComment(comment.id)}>
+                    ❌ 삭제
+                  </CommentDeleteButton>
+                )}
               </CommentActions>
             </CommentItem>
           ))}
@@ -660,6 +678,15 @@ const CommentActions = styled.div`
 `;
 
 const CommentLikeButton = styled.button`
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
+const CommentDeleteButton = styled.button`
   background: rgba(255,255,255,0.2);
   border: none;
   color: white;

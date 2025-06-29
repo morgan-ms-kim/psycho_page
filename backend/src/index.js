@@ -171,6 +171,7 @@ app.get('/api/tests/:id/comments', async (req, res, next) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
+    const clientIP = getClientIP(req);
     
     const comments = await Comment.findAndCountAll({
       where: { testId: req.params.id },
@@ -179,8 +180,29 @@ app.get('/api/tests/:id/comments', async (req, res, next) => {
       offset: parseInt(offset)
     });
     
+    // 각 댓글에 대해 좋아요 상태와 작성자 여부 추가
+    const commentsWithStatus = await Promise.all(
+      comments.rows.map(async (comment) => {
+        const commentData = comment.toJSON();
+        
+        // 현재 사용자의 좋아요 상태 확인
+        const userLike = await Like.findOne({
+          where: { commentId: comment.id, ip: clientIP }
+        });
+        
+        // 작성자 여부 확인 (IP 기반)
+        const isAuthor = comment.ip === clientIP;
+        
+        return {
+          ...commentData,
+          userLiked: !!userLike,
+          isAuthor: isAuthor
+        };
+      })
+    );
+    
     res.json({
-      comments: comments.rows,
+      comments: commentsWithStatus,
       total: comments.count,
       pages: Math.ceil(comments.count / limit),
       currentPage: parseInt(page)
@@ -230,10 +252,15 @@ app.post('/api/comments/:id/like', async (req, res, next) => {
       await existingLike.destroy();
       res.json({ liked: false });
     } else {
-      await Like.create({ commentId, ip: clientIP });
+      await Like.create({ 
+        commentId, 
+        ip: clientIP,
+        testId: null  // 댓글 좋아요는 testId를 null로 설정
+      });
       res.json({ liked: true });
     }
   } catch (error) {
+    console.error('댓글 좋아요 오류:', error);
     next(error);
   }
 });
@@ -379,6 +406,32 @@ app.get('/api/stats', async (req, res, next) => {
       totalComments,
       averageViews: Math.round(totalViews / totalTests) || 0
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 댓글 삭제
+app.delete('/api/comments/:id', async (req, res, next) => {
+  try {
+    const clientIP = getClientIP(req);
+    const commentId = req.params.id;
+    
+    const comment = await Comment.findByPk(commentId);
+    if (!comment) {
+      return res.status(404).json({ error: '댓글을 찾을 수 없습니다.' });
+    }
+    
+    // 작성자만 삭제 가능 (IP 기반)
+    if (comment.ip !== clientIP) {
+      return res.status(403).json({ error: '댓글을 삭제할 권한이 없습니다.' });
+    }
+    
+    // 댓글과 관련된 좋아요도 함께 삭제
+    await Like.destroy({ where: { commentId } });
+    await comment.destroy();
+    
+    res.json({ success: true, message: '댓글이 삭제되었습니다.' });
   } catch (error) {
     next(error);
   }

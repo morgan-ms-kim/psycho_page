@@ -9,7 +9,7 @@ const Like = sequelize.define('Like', {
   },
   testId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
   },
   commentId: {
     type: DataTypes.INTEGER,
