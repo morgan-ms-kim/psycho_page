@@ -59,9 +59,9 @@ export default function TestDetail() {
   // 이미지 경로를 올바르게 처리하는 함수
   const getImagePath = (path) => {
     if (!path) return null;
-    // /tests/로 시작하는 경로를 /psycho/tests/로 변환
+    // /tests/로 시작하는 경로를 /psycho_page/tests/로 변환
     if (path.startsWith('/tests/')) {
-      return path.replace('/tests/', '/psycho/tests/');
+      return path.replace('/tests/', '/psycho_page/tests/');
     }
     return path;
   };

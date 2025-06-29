@@ -31,7 +31,7 @@ import {
 } from '../components/StyledComponents';
 
 // API 기본 URL - nginx 리버스 프록시 사용
-const API_BASE = '/api';
+const API_BASE = '/psycho_page-api';
 
 export default function Home() {
   const [tests, setTests] = useState([]);
@@ -51,9 +51,9 @@ export default function Home() {
   // 이미지 경로를 올바르게 처리하는 함수
   const getImagePath = (path) => {
     if (!path) return null;
-    // /tests/로 시작하는 경로를 /psycho/tests/로 변환
+    // /tests/로 시작하는 경로를 /psycho_page/tests/로 변환
     if (path.startsWith('/tests/')) {
-      return path.replace('/tests/', '/psycho/tests/');
+      return path.replace('/tests/', '/psycho_page/tests/');
     }
     return path;
   };
@@ -328,7 +328,7 @@ export default function Home() {
           
           <Grid>
             {sortedTests.map((test) => (
-              <Card key={test.id} onClick={() => window.location.href = `/tests/${test.id}`}>
+              <Card key={test.id} onClick={() => window.location.href = `/psycho_page/tests/${test.id}`}>
                 {test.thumbnail ? (
                   <TestItemImage 
                     src={getImagePath(test.thumbnail)} 
