@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
 import {
@@ -31,7 +32,7 @@ import {
 } from '../components/StyledComponents';
 
 // API 기본 URL - nginx 리버스 프록시 사용
-const API_BASE = '/api';
+const API_BASE = '/psycho_page-api';
 
 export default function Home() {
   const [tests, setTests] = useState([]);
@@ -47,6 +48,7 @@ export default function Home() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [apiStatus, setApiStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
+  const router = useRouter();
 
   // 이미지 경로를 올바르게 처리하는 함수
   const getImagePath = (path) => {
@@ -271,7 +273,7 @@ export default function Home() {
              apiStatus === 'failed' ? '🔴 서버 연결 실패' : '🟡 연결 중...'}
           </StatItem>
         </Stats>
-        <HistoryButton onClick={() => window.location.href = '/history'}>
+        <HistoryButton onClick={() => router.push('/history')}>
           📋 기록보기
         </HistoryButton>
       </Header>
@@ -333,7 +335,7 @@ export default function Home() {
           
           <Grid>
             {sortedTests.map((test) => (
-              <Card key={test.id} onClick={() => window.location.href = `/psycho_page/tests/${getTestFolderName(test.id)}`}>
+              <Card key={test.id} onClick={() => router.push(`/tests/${getTestFolderName(test.id)}`)}>
                 {test.thumbnail ? (
                   <TestItemImage 
                     src={getImagePath(test.thumbnail)} 

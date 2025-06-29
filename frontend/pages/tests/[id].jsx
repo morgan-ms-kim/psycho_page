@@ -34,7 +34,7 @@ import {
 } from '../../components/StyledComponents';
 
 // API 기본 URL - nginx 리버스 프록시 사용
-const API_BASE = '/api';
+const API_BASE = '/psycho_page-api';
 
 export default function TestDetail() {
   const router = useRouter();
