@@ -198,19 +198,15 @@ export default function TestManagement() {
               <TestActions>
                 <ActionButton onClick={() => {
                   console.log('수정 버튼 클릭:', test.id);
-                  const targetPath = `/tests/${test.id}/edit`;
-                  validateAndFixPath(targetPath, router);
-                  // 경로가 수정되었든 안되었든 목표 경로로 이동
-                  router.push(targetPath);
+                  // 히스토리를 완전히 초기화하고 수정 페이지로 강제 이동
+                  window.location.href = `/psycho_page/admin/tests/${test.id}/edit`;
                 }}>
                   ✏️ 수정
                 </ActionButton>
                 <ActionButton onClick={() => {
                   console.log('썸네일 버튼 클릭:', test.id);
-                  const targetPath = `/tests/${test.id}/thumbnail`;
-                  validateAndFixPath(targetPath, router);
-                  // 경로가 수정되었든 안되었든 목표 경로로 이동
-                  router.push(targetPath);
+                  // 히스토리를 완전히 초기화하고 썸네일 페이지로 강제 이동
+                  window.location.href = `/psycho_page/admin/tests/${test.id}/thumbnail`;
                 }}>
                   🖼️ 썸네일
                 </ActionButton>
