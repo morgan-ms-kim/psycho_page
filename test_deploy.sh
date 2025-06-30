@@ -54,7 +54,7 @@ fi
 echo "[INFO] vite.config.js 파일 확인 중..."
 if [ -f "vite.config.js" ]; then
   echo "[INFO] vite.config.js 파일이 발견되었습니다."
-  TEST_PATH="/psycho_page/frontend/public/tests/$FOLDER_NAME/"
+  TEST_PATH="/psycho_page/public/tests/$FOLDER_NAME/"
   echo "[INFO] 현재 vite.config.js 내용:"
   cat vite.config.js
   if ! grep -q "base:" vite.config.js; then
