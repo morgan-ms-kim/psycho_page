@@ -127,7 +127,19 @@ echo "[INFO] build 결과 확인:"
 ls -la build/ 2>/dev/null || ls -la dist/ 2>/dev/null || echo "build/dist 디렉토리를 찾을 수 없습니다"
 
 echo "[INFO] build 결과물을 상위로 복사"
-cp -r build/* .
+# build 폴더가 있으면 복사
+if [ -d "build" ]; then
+  echo "[INFO] build 폴더 내용을 상위로 복사"
+  cp -r build/* .
+  echo "[INFO] build 폴더 복사 완료"
+# dist 폴더가 있으면 복사 (Vite 프로젝트)
+elif [ -d "dist" ]; then
+  echo "[INFO] dist 폴더 내용을 상위로 복사"
+  cp -r dist/* .
+  echo "[INFO] dist 폴더 복사 완료"
+else
+  echo "[WARNING] build 또는 dist 폴더를 찾을 수 없습니다"
+fi
 
 echo "[INFO] chmod 755"
 chmod -R 755 "$CLONE_PATH"
