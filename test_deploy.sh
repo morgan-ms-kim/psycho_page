@@ -54,7 +54,9 @@ fi
 echo "[INFO] vite.config.js 파일 확인 중..."
 if [ -f "vite.config.js" ]; then
   echo "[INFO] vite.config.js 파일이 발견되었습니다."
-  TEST_PATH="/psycho_page/tests/$FOLDER_NAME/"
+  TEST_PATH="/psycho_page/frontend/public/tests/$FOLDER_NAME/"
+  # 실제 서비스 경로(슬래시 없이)도 계산
+  SERVICE_PATH="/psycho_page/frontend/public/tests/$FOLDER_NAME"
   echo "[INFO] 현재 vite.config.js 내용:"
   cat vite.config.js
   if ! grep -q "base:" vite.config.js; then
@@ -73,12 +75,12 @@ else
   echo "[INFO] vite.config.js 파일이 없습니다."
 fi
 
-# src/App.jsx의 <Router> 또는 <BrowserRouter>를 <Router basename="TEST_PATH">로 자동 치환
+# src/App.jsx의 <Router> 또는 <BrowserRouter>를 <BrowserRouter basename="SERVICE_PATH">로 자동 치환
 APP_FILE="src/App.jsx"
 if [ -f "$APP_FILE" ]; then
   echo "[INFO] $APP_FILE 파일에서 Router basename 자동 치환"
-  sed -i "s#<Router>#<Router basename=\"$TEST_PATH\">#" "$APP_FILE"
-  sed -i "s#<BrowserRouter>#<BrowserRouter basename=\"$TEST_PATH\">#" "$APP_FILE"
+  sed -i "s#<Router>#<BrowserRouter basename=\"$SERVICE_PATH\">#" "$APP_FILE"
+  sed -i "s#<BrowserRouter>#<BrowserRouter basename=\"$SERVICE_PATH\">#" "$APP_FILE"
   echo "[INFO] 수정된 src/App.jsx Router 부분:"
   grep "Router basename=" "$APP_FILE"
 else
