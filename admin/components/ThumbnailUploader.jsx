@@ -104,12 +104,44 @@ export default function ThumbnailUploader({ testId, testTitle, onUploadSuccess, 
     }
   };
 
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        if (file.size <= 5 * 1024 * 1024) {
+          setSelectedFile(file);
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            setPreviewUrl(e.target.result);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          alert('파일 크기는 5MB 이하여야 합니다.');
+        }
+      } else {
+        alert('이미지 파일만 업로드 가능합니다.');
+      }
+    }
+  };
+
   return (
     <Container>
       <Title>썸네일 업로드</Title>
       <Subtitle>테스트: {testTitle}</Subtitle>
 
-      <UploadArea>
+      <UploadArea
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
         <FileInput
           ref={fileInputRef}
           type="file"
@@ -119,9 +151,9 @@ export default function ThumbnailUploader({ testId, testTitle, onUploadSuccess, 
         />
         
         {!selectedFile && (
-          <UploadPrompt>
+          <UploadPrompt onClick={() => fileInputRef.current?.click()}>
             <UploadIcon>📁</UploadIcon>
-            <UploadText>클릭하여 이미지 파일을 선택하세요</UploadText>
+            <UploadText>클릭하거나 파일을 드래그하여 이미지를 선택하세요</UploadText>
             <UploadHint>지원 형식: JPG, PNG, GIF, WebP (최대 5MB)</UploadHint>
           </UploadPrompt>
         )}
