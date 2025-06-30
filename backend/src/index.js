@@ -743,6 +743,42 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
           }
         }
         
+        // vite.config.js 파일 확인 및 base 설정 업데이트
+        const newViteConfigPath = path.join(newClonePath, 'vite.config.js');
+        if (fs.existsSync(newViteConfigPath)) {
+          try {
+            console.log('⚡ vite.config.js 파일 발견, base 설정 업데이트 중...');
+            let viteConfigContent = fs.readFileSync(newViteConfigPath, 'utf8');
+            
+            // 현재 테스트 경로
+            const testPath = `/psycho_page/tests/${newFolderName}/`;
+            
+            // base 설정이 있는지 확인
+            if (viteConfigContent.includes('base:')) {
+              // 기존 base 설정 업데이트
+              viteConfigContent = viteConfigContent.replace(
+                /base:\s*['"`][^'"`]*['"`]/g,
+                `base: '${testPath}'`
+              );
+              console.log('🔄 vite.config.js base 설정 업데이트:', testPath);
+            } else {
+              // base 설정 추가
+              viteConfigContent = viteConfigContent.replace(
+                /defineConfig\({/g,
+                `defineConfig({\n  base: '${testPath}',`
+              );
+              console.log('➕ vite.config.js base 설정 추가:', testPath);
+            }
+            
+            fs.writeFileSync(newViteConfigPath, viteConfigContent);
+            console.log('✅ vite.config.js 업데이트 완료');
+          } catch (error) {
+            console.error('❌ vite.config.js 업데이트 실패:', error.message);
+          }
+        } else {
+          console.log('ℹ️ vite.config.js 파일이 없습니다.');
+        }
+        
       } catch (error) {
         console.error('❌ 폴더명 변경 실패:', error.message);
       }

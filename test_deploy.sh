@@ -60,6 +60,44 @@ else
   grep '"homepage"' package.json
 fi
 
+# vite.config.js 파일 확인 및 base 설정 추가
+echo "[INFO] vite.config.js 파일 확인 중..."
+if [ -f "vite.config.js" ]; then
+  echo "[INFO] vite.config.js 파일이 발견되었습니다."
+  
+  # 현재 테스트 경로 생성
+  TEST_PATH="/psycho_page/frontend/public/tests/$(basename $(pwd))/"
+  
+  # vite.config.js 내용 확인
+  echo "[INFO] 현재 vite.config.js 내용:"
+  cat vite.config.js
+  
+  # defineConfig 내부에 base 설정이 있는지 확인
+  if ! grep -q "base:" vite.config.js; then
+    echo "[INFO] base 설정이 없습니다. 추가합니다..."
+    
+    # 임시 파일 생성
+    cp vite.config.js vite.config.js.tmp
+    
+    # defineConfig({ 다음에 base 설정 추가
+    sed -i 's/defineConfig({/defineConfig({\n  base: "'$TEST_PATH'",/' vite.config.js.tmp
+    
+    # 수정된 내용 확인
+    echo "[INFO] 수정된 vite.config.js:"
+    cat vite.config.js.tmp
+    
+    # 원본 파일 교체
+    mv vite.config.js.tmp vite.config.js
+    echo "[INFO] vite.config.js base 설정 추가 완료"
+  else
+    echo "[INFO] base 설정이 이미 존재합니다."
+    # base 설정 값 확인
+    grep "base:" vite.config.js
+  fi
+else
+  echo "[INFO] vite.config.js 파일이 없습니다."
+fi
+
 # Node.js 버전 확인
 echo "[INFO] Node.js 버전:"
 node --version
