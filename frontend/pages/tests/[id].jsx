@@ -147,7 +147,7 @@ export default function TestPage() {
       alert('모든 필드를 입력해주세요.');
       return;
     }
-
+    
     try {
       const testId = getTestIdFromFolder(id);
       await apiClient.post(`/tests/${testId}/comments`, newComment);
@@ -162,8 +162,8 @@ export default function TestPage() {
 
   const handleIframeLoad = () => {
     setIframeLoaded(true);
-  };
-
+    };
+    
   const handleIframeError = () => {
     setError('테스트 앱을 로드하는데 실패했습니다.');
     setLoading(false);
@@ -181,10 +181,10 @@ export default function TestPage() {
         <Header>
           <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
         </Header>
-        <LoadingWrap>
-          <LoadingSpinner />
-          <p>테스트를 불러오는 중...</p>
-        </LoadingWrap>
+      <LoadingWrap>
+        <LoadingSpinner />
+        <p>테스트를 불러오는 중...</p>
+      </LoadingWrap>
       </MainWrap>
     );
   }
@@ -270,14 +270,14 @@ export default function TestPage() {
         <InfoCard>
           <Title>{test?.title}</Title>
           <SubTitle>{test?.description}</SubTitle>
-          
+            
           <FlexRow>
             <SocialButton onClick={handleLike} liked={liked}>
               {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
-            </SocialButton>
+                </SocialButton>
             <SocialButton onClick={() => setShowCommentForm(!showCommentForm)}>
               💬 댓글 작성
-            </SocialButton>
+                </SocialButton>
           </FlexRow>
           
           <Grid>
@@ -335,15 +335,15 @@ export default function TestPage() {
         )}
 
         {comments.map((comment) => (
-          <CommentItem key={comment.id}>
+            <CommentItem key={comment.id}>
             <CommentItemHeader>
-              <CommentAuthor>{comment.nickname}</CommentAuthor>
-              <CommentDate>{new Date(comment.createdAt).toLocaleDateString()}</CommentDate>
+                <CommentAuthor>{comment.nickname}</CommentAuthor>
+                <CommentDate>{new Date(comment.createdAt).toLocaleDateString()}</CommentDate>
             </CommentItemHeader>
-            <CommentContent>{comment.content}</CommentContent>
-          </CommentItem>
-        ))}
-
+              <CommentContent>{comment.content}</CommentContent>
+            </CommentItem>
+          ))}
+          
         {comments.length === 0 && (
           <EmptyComment>
             <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!</p>
@@ -410,7 +410,7 @@ const StatItem = styled.div`
   text-align: center;
   padding: 1rem;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+    border-radius: 10px;
 `;
 
 const StatLabel = styled.div`
@@ -421,7 +421,7 @@ const StatLabel = styled.div`
 
 const StatValue = styled.div`
   font-size: 1.5rem;
-  font-weight: bold;
+    font-weight: bold;
   color: #667eea;
 `;
 
