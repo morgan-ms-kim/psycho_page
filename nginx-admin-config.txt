@@ -26,4 +26,11 @@ location /psycho_page/admin/_next {
 
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection 'upgrade';
+}
+
+# 업로드된 썸네일 이미지용 설정
+location /psycho_page/uploads {
+    alias /var/www/psycho2/frontend/public/uploads;
+    expires 1y;
+    add_header Cache-Control "public, immutable";
 } 

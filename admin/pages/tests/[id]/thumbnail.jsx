@@ -41,6 +41,8 @@ export default function ThumbnailTest() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -51,7 +53,14 @@ export default function ThumbnailTest() {
   const loadTest = async () => {
     try {
       const response = await apiClient.get(`/admin/tests/${id}`);
+      console.log('✅ 테스트 로드 성공:', response.data);
+      console.log('📁 썸네일 경로:', response.data.thumbnail);
       setTest(response.data);
+      // 이미지 상태 초기화
+      if (response.data.thumbnail) {
+        setImageLoading(true);
+        setImageError(false);
+      }
     } catch (error) {
       console.error('테스트 로드 실패:', error);
       setError('테스트를 불러올 수 없습니다.');
@@ -150,8 +159,34 @@ export default function ThumbnailTest() {
         {test?.thumbnail && (
           <CurrentThumbnail>
             <h3>현재 썸네일</h3>
-            <ThumbnailImage src={test.thumbnail} alt="현재 썸네일" />
+            {imageLoading && <ThumbnailLoading>🔄 이미지 로딩 중...</ThumbnailLoading>}
+            <ThumbnailImage 
+              src={test.thumbnail} 
+              alt="현재 썸네일"
+              style={{ display: imageLoading ? 'none' : 'block' }}
+              onLoad={() => {
+                console.log('✅ 썸네일 이미지 로딩 성공:', test.thumbnail);
+                setImageLoading(false);
+                setImageError(false);
+              }}
+              onError={(e) => {
+                console.error('❌ 썸네일 이미지 로딩 실패:', test.thumbnail);
+                setImageLoading(false);
+                setImageError(true);
+                e.target.style.display = 'none';
+              }}
+            />
+            {imageError && (
+              <ThumbnailError>
+                ❌ 이미지를 불러올 수 없습니다
+                <br />
+                <small>경로: {test.thumbnail}</small>
+              </ThumbnailError>
+            )}
             <ThumbnailPath>{test.thumbnail}</ThumbnailPath>
+            <ThumbnailUrl>
+              <strong>전체 URL:</strong> https://smartpick.website{test.thumbnail}
+            </ThumbnailUrl>
           </CurrentThumbnail>
         )}
       </Main>
@@ -326,8 +361,26 @@ const ThumbnailImage = styled.img`
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 `;
 
+const ThumbnailLoading = styled.div`
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+`;
+
+const ThumbnailError = styled.div`
+  color: #721c24;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+`;
+
 const ThumbnailPath = styled.p`
   color: #666;
   font-size: 0.9rem;
   word-break: break-all;
+`;
+
+const ThumbnailUrl = styled.div`
+  margin-top: 1rem;
+  color: #666;
+  font-size: 0.9rem;
 `; 
