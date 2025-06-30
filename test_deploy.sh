@@ -40,7 +40,7 @@ echo "[INFO] package.json의 homepage 필드 확인 중..."
 if ! grep -q '"homepage"' package.json; then
   echo "[INFO] homepage 필드가 없습니다. 추가합니다..."
   cp package.json package.json.tmp
-  sed -i 's/}$/  "homepage": "\/psycho_page\/frontend\/public\/tests\/'"$FOLDER_NAME"'\/",\n}/' package.json.tmp
+  sed -i 's/}$/  "homepage": "\/psycho_page\/public\/tests\/'"$FOLDER_NAME"'\/",\n}/' package.json.tmp
   echo "[INFO] 수정된 package.json:"
   cat package.json.tmp
   mv package.json.tmp package.json

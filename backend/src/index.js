@@ -813,20 +813,49 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
   try {
     const testId = req.params.id;
     console.log('테스트 삭제 요청:', testId);
-    
     const test = await Test.findByPk(testId);
     if (!test) {
       return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
     }
-    
     // 관련 데이터 삭제 (댓글, 좋아요, 방문자 기록)
     await Comment.destroy({ where: { testId } });
     await Like.destroy({ where: { testId } });
     await Visitor.destroy({ where: { testId } });
-    
+    // 테스트 폴더 삭제
+    if (test.folder) {
+      const testFolderPath = path.join(process.cwd(), '..', 'frontend', 'public', 'tests', test.folder);
+      if (fs.existsSync(testFolderPath)) {
+        fs.rmSync(testFolderPath, { recursive: true, force: true });
+        console.log('🗑️ 테스트 폴더 삭제:', testFolderPath);
+      }
+    }
+    // 썸네일 파일 삭제 (기본 썸네일 제외)
+    if (test.thumbnail && test.thumbnail !== '/psycho_page/uploads/thumbnails/default-thumb.png') {
+      const thumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail.replace('/psycho_page/', ''));
+      if (fs.existsSync(thumbPath)) {
+        fs.unlinkSync(thumbPath);
+        console.log('🗑️ 썸네일 파일 삭제:', thumbPath);
+      }
+    }
     // 테스트 삭제
     await test.destroy();
-    
+    // 필요 없는 썸네일 파일 정리 (어떤 테스트와도 연결되지 않은 파일)
+    const usedThumbnails = new Set((await Test.findAll({ attributes: ['thumbnail'], raw: true })).map(t => t.thumbnail));
+    const thumbsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'uploads', 'thumbnails');
+    if (fs.existsSync(thumbsDir)) {
+      const files = fs.readdirSync(thumbsDir);
+      for (const file of files) {
+        const relPath = `/psycho_page/uploads/thumbnails/${file}`;
+        if (!usedThumbnails.has(relPath) && file !== 'default-thumb.png') {
+          try {
+            fs.unlinkSync(path.join(thumbsDir, file));
+            console.log('🗑️ 불필요한 썸네일 파일 삭제:', file);
+          } catch (e) {
+            console.error('⚠️ 불필요한 썸네일 삭제 실패:', file, e.message);
+          }
+        }
+      }
+    }
     console.log('테스트 삭제 완료:', testId);
     res.json({ success: true, message: '테스트가 삭제되었습니다.' });
   } catch (error) {
