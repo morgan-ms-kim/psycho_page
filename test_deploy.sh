@@ -80,7 +80,7 @@ if [ -f "vite.config.js" ]; then
     cp vite.config.js vite.config.js.tmp
     
     # defineConfig({ 다음에 base 설정 추가
-    sed -i 's/defineConfig({/defineConfig({\n  base: "'$TEST_PATH'",/' vite.config.js.tmp
+    sed -i "s#defineConfig({#defineConfig({\n  base: '$TEST_PATH',#" vite.config.js.tmp
     
     # 수정된 내용 확인
     echo "[INFO] 수정된 vite.config.js:"
@@ -126,13 +126,19 @@ TEST_PATH="/psycho_page/frontend/public/tests/$(basename $(pwd))/"
 APP_FILE="src/App.jsx"
 if [ -f "$APP_FILE" ]; then
   echo "[INFO] $APP_FILE 파일에서 Router basename 자동 치환"
-  sed -i 's#<Router>#<Router basename="'$TEST_PATH'">#' "$APP_FILE"
-  sed -i 's#<BrowserRouter>#<BrowserRouter basename="'$TEST_PATH'">#' "$APP_FILE"
-  echo "[INFO] 치환 결과:"
+  sed -i "s#<Router>#<Router basename=\"$TEST_PATH\">#" "$APP_FILE"
+  sed -i "s#<BrowserRouter>#<BrowserRouter basename=\"$TEST_PATH\">#" "$APP_FILE"
+  echo "[INFO] 수정된 src/App.jsx Router 부분:"
   grep "Router basename=" "$APP_FILE"
 else
   echo "[WARNING] $APP_FILE 파일이 없습니다."
 fi
+
+# 빌드 전 주요 파일 상태 로그
+echo "[INFO] 빌드 전 vite.config.js:"
+cat vite.config.js
+echo "[INFO] 빌드 전 src/App.jsx Router 부분:"
+grep "Router" src/App.jsx
 
 echo "[INFO] npm run build 시작"
 npm run build
