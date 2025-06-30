@@ -100,18 +100,7 @@ fi
 
 # TEST_PATH는 이미 위에서 계산됨: /psycho_page/frontend/public/tests/$(basename $(pwd))/
 
-# src/App.jsx의 <Router basename="..."> 또는 <BrowserRouter basename="..."> 부분을 TEST_PATH로 치환
-APP_FILE="src/App.jsx"
-if [ -f "$APP_FILE" ]; then
-  echo "[INFO] $APP_FILE 파일에서 Router basename 자동 치환"
-  # Router 또는 BrowserRouter의 basename 속성 값을 TEST_PATH로 치환
-  sed -i 's#<Router basename=.*>#<Router basename="'"$TEST_PATH"'">#' "$APP_FILE"
-  sed -i 's#<BrowserRouter basename=.*>#<BrowserRouter basename="'"$TEST_PATH"'">#' "$APP_FILE"
-  echo "[INFO] 치환 결과:"
-  grep "Router basename=" "$APP_FILE"
-else
-  echo "[WARNING] $APP_FILE 파일이 없습니다."
-fi
+
 
 # Node.js 버전 확인
 echo "[INFO] Node.js 버전:"
@@ -129,6 +118,21 @@ fi
 echo "[INFO] npm install 완료"
 echo "[INFO] node_modules 확인:"
 ls -la node_modules | head -10
+
+# Vite 프로젝트의 TEST_PATH 계산 (이미 위에서 계산됨)
+TEST_PATH="/psycho_page/frontend/public/tests/$(basename $(pwd))/"
+
+# src/App.jsx의 <Router> 또는 <BrowserRouter>를 <Router basename="TEST_PATH">로 자동 치환
+APP_FILE="src/App.jsx"
+if [ -f "$APP_FILE" ]; then
+  echo "[INFO] $APP_FILE 파일에서 Router basename 자동 치환"
+  sed -i 's#<Router>#<Router basename="'$TEST_PATH'">#' "$APP_FILE"
+  sed -i 's#<BrowserRouter>#<BrowserRouter basename="'$TEST_PATH'">#' "$APP_FILE"
+  echo "[INFO] 치환 결과:"
+  grep "Router basename=" "$APP_FILE"
+else
+  echo "[WARNING] $APP_FILE 파일이 없습니다."
+fi
 
 echo "[INFO] npm run build 시작"
 npm run build
