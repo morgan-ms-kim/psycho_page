@@ -543,10 +543,9 @@ app.post('/api/admin/login', async (req, res, next) => {
   }
 });
 
-// 새 테스트 추가 (Git에서 클론)
+// 새 테스트 추가 (폴더명/경로 싱크 구조)
 app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
-  console.log('🎯 POST /api/admin/tests/add 핸들러 실행됨');
-  
+  console.log('🎯 POST /api/admin/tests/add (폴더명 싱크 구조)');
   const steps = {
     directoryCreated: false,
     gitCloned: false,
@@ -556,253 +555,73 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     databaseSaved: false,
     thumbnailReady: false
   };
-  
   try {
-    console.log('=== 테스트 추가 요청 시작 ===');
-    console.log('요청 데이터:', JSON.stringify(req.body, null, 2));
-    
+    // 1. nextId로 폴더명 미리 결정
+    const maxId = await Test.max('id');
+    const nextId = (maxId || 0) + 1;
+    const folderName = `test${nextId}`;
     const { gitUrl, title, description, category } = req.body;
     if (!gitUrl || !title) {
-      console.error('❌ 필수 입력값 누락');
       return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.', steps });
     }
-
     if (!gitUrl.includes('github.com') && !gitUrl.includes('gitlab.com')) {
-      console.error('❌ 지원하지 않는 Git 저장소:', gitUrl);
       return res.status(400).json({ error: 'GitHub 또는 GitLab 저장소만 지원합니다.', steps });
     }
-
-    // 1. 테스트 디렉토리 생성
+    // 2. 폴더 생성 및 git clone
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
-    console.log('📁 테스트 디렉토리 경로:', testsDir);
-    
-    if (!fs.existsSync(testsDir)) {
-      try {
-        fs.mkdirSync(testsDir, { recursive: true });
-        console.log('✅ 테스트 디렉토리 생성:', testsDir);
-      } catch (error) {
-        console.error('❌ 디렉토리 생성 실패:', error.message);
-        return res.status(500).json({ error: '디렉토리 생성 실패', steps, detail: error.message });
-      }
+    const testPath = path.join(testsDir, folderName);
+    if (!fs.existsSync(testPath)) {
+      fs.mkdirSync(testPath, { recursive: true });
+      steps.directoryCreated = true;
     }
-    steps.directoryCreated = true;
-
-    // 2. git clone
-    const repoName = gitUrl.split('/').pop().replace('.git', '');
-    const clonePath = path.join(testsDir, repoName);
-    console.log('📂 클론 경로:', clonePath);
-    
-    if (fs.existsSync(clonePath)) {
-      try {
-        fs.rmSync(clonePath, { recursive: true, force: true });
-        console.log('🗑️ 기존 디렉토리 삭제:', clonePath);
-      } catch (error) {
-        console.error('❌ 기존 디렉토리 삭제 실패:', error.message);
-        return res.status(500).json({ error: '기존 디렉토리 삭제 실패', steps, detail: error.message });
-      }
-    }
-    
+    // git clone
     try {
-      console.log('🔗 Git 클론 시작:', gitUrl);
-      await execAsync(`git clone ${gitUrl} "${clonePath}"`, { timeout: 300000 });
-      console.log('✅ Git 클론 완료');
+      await execAsync(`git clone ${gitUrl} ${testPath}`, { timeout: 300000 });
       steps.gitCloned = true;
     } catch (error) {
-      console.error('❌ Git 클론 실패:', error.message);
-      return res.status(400).json({ error: 'Git 클론 실패', steps, detail: error.message, stderr: error.stderr });
+      return res.status(400).json({ error: 'Git 클론 실패', steps, detail: error.message });
     }
-
     // 3. package.json 수정 (homepage 필드 추가)
-    const packageJsonPath = path.join(clonePath, 'package.json');
-    console.log('📄 package.json 경로:', packageJsonPath);
-    
+    const packageJsonPath = path.join(testPath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
       try {
         const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-        console.log('📦 원본 package.json:', JSON.stringify(packageJson, null, 2));
-        
-        // homepage 필드 확인
-        if (!packageJson.homepage) {
-          console.log('➕ homepage 필드가 없습니다. 새로 추가합니다.');
-          packageJson.homepage = `/psycho_page/tests/${repoName}/`;
-        } else {
-          console.log('🔄 homepage 필드가 있습니다. 업데이트합니다.');
-          console.log('📝 기존 homepage:', packageJson.homepage);
-          packageJson.homepage = `/psycho_page/tests/${repoName}/`;
-        }
-        
-        console.log('📝 새로운 homepage:', packageJson.homepage);
-        
-        // JSON 형식 유지하면서 저장
-        const updatedPackageJson = JSON.stringify(packageJson, null, 2);
-        fs.writeFileSync(packageJsonPath, updatedPackageJson);
-        
-        console.log('✅ package.json 수정 완료');
-        console.log('📦 수정된 package.json:', updatedPackageJson);
+        packageJson.homepage = `/psycho_page/tests/${folderName}/`;
+        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
         steps.packageJsonModified = true;
       } catch (error) {
-        console.error('❌ package.json 수정 실패:', error.message);
-        console.error('❌ package.json 내용:', fs.readFileSync(packageJsonPath, 'utf8'));
         return res.status(500).json({ error: 'package.json 수정 실패', steps, detail: error.message });
       }
     } else {
-      console.error('❌ package.json 없음:', packageJsonPath);
       return res.status(400).json({ error: 'package.json 없음', steps, path: packageJsonPath });
     }
-
-    // 4. npm install & build (test_deploy.sh)
-    console.log('🔨 test_deploy.sh 실행');
-    const deployResult = await runTestDeployScript(clonePath);
-    if (!deployResult.success) {
-      console.error('❌ test_deploy.sh 실패:', deployResult.error);
-      return res.status(400).json({ 
-        error: '테스트 배포 스크립트 실패', 
-        steps, 
-        detail: deployResult.error, 
-        stderr: deployResult.stderr 
-      });
+    // 4. test_deploy.sh 실행 (폴더명 인자로)
+    try {
+      const scriptPath = path.join(process.cwd(), '..', 'test_deploy.sh');
+      const deployResult = await execAsync(`bash ${scriptPath} ${folderName}`, { cwd: testsDir });
+      steps.npmInstalled = true;
+      steps.buildCompleted = true;
+    } catch (error) {
+      return res.status(400).json({ error: '테스트 배포 스크립트 실패', steps, detail: error.message });
     }
-    steps.npmInstalled = true;
-    steps.buildCompleted = true;
-
-    // 5. 썸네일 파일 확인
-    const thumbPath = path.join(clonePath, 'thumb.png');
-    console.log('🖼️ 썸네일 경로:', thumbPath);
-    
-    let thumbnailPath = `/psycho_page/uploads/thumbnails/${repoName}_${Date.now()}_thumb.png`;
-    const destThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', 'uploads', 'thumbnails', `${repoName}_${Date.now()}_thumb.png`);
-    
-    if (fs.existsSync(thumbPath)) {
-      try {
-        const uploadDir = path.dirname(destThumbPath);
-        if (!fs.existsSync(uploadDir)) {
-          fs.mkdirSync(uploadDir, { recursive: true });
-          console.log('✅ 업로드 디렉토리 생성:', uploadDir);
-        }
-        
-        fs.copyFileSync(thumbPath, destThumbPath);
-        steps.thumbnailReady = true;
-        console.log('✅ 썸네일 복사 성공:', destThumbPath);
-      } catch (error) {
-        console.error('❌ 썸네일 복사 실패:', error.message);
-        thumbnailPath = '/psycho_page/uploads/thumbnails/default-thumb.png';
-        steps.thumbnailReady = false;
-        console.log('⚠️ thumb.png 없음, 기본 썸네일 사용');
-      }
-    } else {
-      thumbnailPath = '/psycho_page/uploads/thumbnails/default-thumb.png';
-      steps.thumbnailReady = false;
-      console.log('⚠️ thumb.png 없음, 기본 썸네일 사용');
-    }
-
-    // 6. DB 저장
+    // 5. 썸네일 등 기타 파일 작업 (필요시, 기본값 사용)
+    let thumbnailPath = '/psycho_page/uploads/thumbnails/default-thumb.png';
+    // 6. DB에 insert (모든 작업 성공 시)
     try {
       const test = await Test.create({
         title,
         description: description || '',
         category: category || '기타',
-        thumbnail: thumbnailPath
+        thumbnail: thumbnailPath,
+        folder: folderName
       });
       steps.databaseSaved = true;
-      console.log('✅ DB 저장 성공:', test.id);
-      
-      // 7. 폴더명을 test{id} 형식으로 변경
-      const newFolderName = `test${test.id}`;
-      const newClonePath = path.join(testsDir, newFolderName);
-      
-      try {
-        if (fs.existsSync(newClonePath)) {
-          fs.rmSync(newClonePath, { recursive: true, force: true });
-          console.log('🗑️ 기존 test{id} 폴더 삭제:', newClonePath);
-        }
-        
-        fs.renameSync(clonePath, newClonePath);
-        console.log('📁 폴더명 변경 완료:', `${repoName} → ${newFolderName}`);
-        
-        // package.json의 homepage도 업데이트
-        const newPackageJsonPath = path.join(newClonePath, 'package.json');
-        if (fs.existsSync(newPackageJsonPath)) {
-          try {
-            const packageJson = JSON.parse(fs.readFileSync(newPackageJsonPath, 'utf8'));
-            
-            // homepage 필드가 없으면 추가, 있으면 업데이트
-            if (!packageJson.homepage) {
-              console.log('➕ homepage 필드 추가:', `/psycho_page/tests/${newFolderName}/`);
-              packageJson.homepage = `/psycho_page/tests/${newFolderName}/`;
-            } else {
-              console.log('🔄 homepage 필드 업데이트:', `/psycho_page/tests/${newFolderName}/`);
-              packageJson.homepage = `/psycho_page/tests/${newFolderName}/`;
-            }
-            
-            const updatedPackageJson = JSON.stringify(packageJson, null, 2);
-            fs.writeFileSync(newPackageJsonPath, updatedPackageJson);
-            console.log('📦 package.json homepage 업데이트 완료');
-            console.log('📦 최종 package.json:', updatedPackageJson);
-          } catch (error) {
-            console.error('❌ package.json 업데이트 실패:', error.message);
-          }
-        }
-        
-        // vite.config.js 파일 확인 및 base 설정 업데이트
-        const newViteConfigPath = path.join(newClonePath, 'vite.config.js');
-        if (fs.existsSync(newViteConfigPath)) {
-          try {
-            console.log('⚡ vite.config.js 파일 발견, base 설정 업데이트 중...');
-            let viteConfigContent = fs.readFileSync(newViteConfigPath, 'utf8');
-            
-            // 현재 테스트 경로
-            const testPath = `/psycho_page/tests/${newFolderName}/`;
-            
-            // base 설정이 있는지 확인
-            if (viteConfigContent.includes('base:')) {
-              // 기존 base 설정 업데이트
-              viteConfigContent = viteConfigContent.replace(
-                /base:\s*['"`][^'"`]*['"`]/g,
-                `base: '${testPath}'`
-              );
-              console.log('🔄 vite.config.js base 설정 업데이트:', testPath);
-            } else {
-              // base 설정 추가
-              viteConfigContent = viteConfigContent.replace(
-                /defineConfig\({/g,
-                `defineConfig({\n  base: '${testPath}',`
-              );
-              console.log('➕ vite.config.js base 설정 추가:', testPath);
-            }
-            
-            fs.writeFileSync(newViteConfigPath, viteConfigContent);
-            console.log('✅ vite.config.js 업데이트 완료');
-          } catch (error) {
-            console.error('❌ vite.config.js 업데이트 실패:', error.message);
-          }
-        } else {
-          console.log('ℹ️ vite.config.js 파일이 없습니다.');
-        }
-        
-      } catch (error) {
-        console.error('❌ 폴더명 변경 실패:', error.message);
-      }
-      
-      const response = {
-        success: true,
-        message: '테스트가 성공적으로 추가되었습니다.',
-        test,
-        steps,
-        thumbnailUrl: thumbnailPath,
-        clonePath: newClonePath,
-        folderName: newFolderName
-      };
-      
-      console.log('🎉 최종 응답:', JSON.stringify(response, null, 2));
-      return res.json(response);
+      return res.json({ success: true, test, steps, folderName });
     } catch (error) {
-      console.error('❌ DB 저장 실패:', error.message);
-      return res.status(500).json({ error: 'DB 저장 실패', steps, detail: error.message, stack: error.stack });
+      return res.status(500).json({ error: 'DB 저장 실패', steps, detail: error.message });
     }
   } catch (error) {
-    console.error('❌ 테스트 추가 전체 오류:', error.message);
-    console.error('Error stack:', error.stack);
-    return res.status(500).json({ error: '서버 오류', steps, detail: error.message, stack: error.stack });
+    return res.status(500).json({ error: '서버 오류', steps, detail: error.message });
   }
 });
 
@@ -1088,6 +907,20 @@ app.post('/api/admin/update-thumbnail-paths', authenticateAdmin, async (req, res
   } catch (error) {
     console.error('❌ 썸네일 경로 업데이트 실패:', error);
     next(error);
+  }
+});
+
+// 다음 테스트 폴더명을 반환하는 엔드포인트
+app.get('/api/admin/tests/next-id', authenticateAdmin, async (req, res, next) => {
+  try {
+    // 다음 id 구하기 (id가 AUTO_INCREMENT라면)
+    const maxId = await Test.max('id');
+    const nextId = (maxId || 0) + 1;
+    const folderName = `test${nextId}`;
+    res.json({ nextId, folderName });
+  } catch (error) {
+    console.error('다음 테스트 id 조회 실패:', error);
+    res.status(500).json({ error: '다음 테스트 id 조회 실패', detail: error.message });
   }
 });
 
