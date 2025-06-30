@@ -45,7 +45,7 @@ if ! grep -q '"homepage"' package.json; then
   cp package.json package.json.tmp
   
   # homepage 필드 추가 (마지막 } 앞에 추가)
-  sed -i 's/}$/  "homepage": "\/psycho_page\/tests\/'$(basename $(pwd))'\/",\n}/' package.json.tmp
+  sed -i 's/}$/  "homepage": "\/psycho_page\/frontend\/public\/tests\/'$(basename $(pwd))'\/",\n}/' package.json.tmp
   
   # 수정된 내용 확인
   echo "[INFO] 수정된 package.json:"
