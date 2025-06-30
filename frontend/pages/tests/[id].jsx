@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -67,6 +67,7 @@ export default function TestPage() {
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [buildExists, setBuildExists] = useState(false);
   const [checkedBuild, setCheckedBuild] = useState(false);
+  const iframeRef = useRef(); // iframe 제어용 ref 추가
 
   // 테스트 데이터 로드
   useEffect(() => {
@@ -175,6 +176,13 @@ export default function TestPage() {
     }
   }, [test]);
 
+  // 새로고침 버튼 핸들러
+  const reloadIframe = () => {
+    if (iframeRef.current) {
+      iframeRef.current.contentWindow.location.reload();
+    }
+  };
+
   if (loading) {
     return (
       <MainWrap>
@@ -244,6 +252,11 @@ export default function TestPage() {
       {/* 빌드된 테스트만 iframe으로 띄움 */}
       {buildExists ? (
         <TestContainer>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 12px 0 0' }}>
+            <button onClick={reloadIframe} style={{ padding: '6px 16px', borderRadius: 5, background: '#eee', border: 'none', cursor: 'pointer' }}>
+              새로고침
+            </button>
+          </div>
           {!iframeLoaded && (
             <LoadingOverlay>
               <LoadingSpinner />
@@ -251,6 +264,7 @@ export default function TestPage() {
             </LoadingOverlay>
           )}
           <TestIframe
+            ref={iframeRef}
             src={testUrl}
             onLoad={handleIframeLoad}
             onError={handleIframeError}

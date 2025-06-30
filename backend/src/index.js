@@ -188,10 +188,11 @@ app.get('/api/tests', async (req, res, next) => {
     const tests = await Test.findAll({
       where: whereClause,
       order: orderClause,
-      limit: parseInt(limit)
+      limit: parseInt(limit),
+      distinct: true // 중복 제거
     });
     
-    // 이미지 경로 수정
+    // 이미지 경로 수정 및 중복 제거
     const testsWithCorrectPaths = tests.map(test => {
       const testData = test.toJSON();
       if (testData.thumbnail) {
@@ -204,7 +205,13 @@ app.get('/api/tests', async (req, res, next) => {
       return testData;
     });
     
-    res.json(testsWithCorrectPaths);
+    // 중복 제거 (id 기준)
+    const uniqueTests = testsWithCorrectPaths.filter((test, index, self) => 
+      index === self.findIndex(t => t.id === test.id)
+    );
+    
+    console.log(`📊 테스트 목록 조회: ${uniqueTests.length}개 (중복 제거 후)`);
+    res.json(uniqueTests);
   } catch (error) {
     next(error);
   }
@@ -950,6 +957,88 @@ app.get('/api/admin/tests/next-id', authenticateAdmin, async (req, res, next) =>
   } catch (error) {
     console.error('다음 테스트 id 조회 실패:', error);
     res.status(500).json({ error: '다음 테스트 id 조회 실패', detail: error.message });
+  }
+});
+
+// 등록되지 않은 테스트 폴더 정리 API
+app.post('/api/admin/cleanup-orphan-folders', authenticateAdmin, async (req, res, next) => {
+  try {
+    console.log('🧹 등록되지 않은 테스트 폴더 정리 시작');
+    
+    // DB에 등록된 테스트 폴더 목록
+    const registeredFolders = new Set(
+      (await Test.findAll({ attributes: ['folder'], raw: true }))
+        .map(t => t.folder)
+        .filter(Boolean)
+    );
+    
+    // 파일시스템의 테스트 폴더 목록
+    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
+    const filesystemFolders = fs.existsSync(testsDir) 
+      ? fs.readdirSync(testsDir, { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name)
+      : [];
+    
+    // 등록되지 않은 폴더 찾기
+    const orphanFolders = filesystemFolders.filter(folder => !registeredFolders.has(folder));
+    
+    console.log('📁 등록된 폴더:', Array.from(registeredFolders));
+    console.log('📁 파일시스템 폴더:', filesystemFolders);
+    console.log('🗑️ 정리 대상 폴더:', orphanFolders);
+    
+    // 등록되지 않은 폴더 삭제
+    let deletedCount = 0;
+    for (const folder of orphanFolders) {
+      try {
+        const folderPath = path.join(testsDir, folder);
+        fs.rmSync(folderPath, { recursive: true, force: true });
+        console.log('🗑️ 등록되지 않은 폴더 삭제:', folder);
+        deletedCount++;
+      } catch (error) {
+        console.error('⚠️ 폴더 삭제 실패:', folder, error.message);
+      }
+    }
+    
+    console.log(`✅ ${deletedCount}개 등록되지 않은 폴더 정리 완료`);
+    res.json({ 
+      success: true, 
+      message: `${deletedCount}개 등록되지 않은 폴더가 정리되었습니다.`,
+      deletedCount,
+      orphanFolders
+    });
+  } catch (error) {
+    console.error('❌ 등록되지 않은 폴더 정리 실패:', error);
+    next(error);
+  }
+});
+
+// 등록되지 않은 폴더 목록 조회 API
+app.get('/api/admin/orphan-folders', authenticateAdmin, async (req, res, next) => {
+  try {
+    const registeredFolders = new Set(
+      (await Test.findAll({ attributes: ['folder'], raw: true }))
+        .map(t => t.folder)
+        .filter(Boolean)
+    );
+    
+    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
+    const filesystemFolders = fs.existsSync(testsDir) 
+      ? fs.readdirSync(testsDir, { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name)
+      : [];
+    
+    const orphanFolders = filesystemFolders.filter(folder => !registeredFolders.has(folder));
+    
+    res.json({ 
+      orphanFolders,
+      totalOrphans: orphanFolders.length,
+      registeredFolders: Array.from(registeredFolders),
+      filesystemFolders
+    });
+  } catch (error) {
+    next(error);
   }
 });
 

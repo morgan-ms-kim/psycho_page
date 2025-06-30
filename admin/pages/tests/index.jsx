@@ -72,6 +72,8 @@ export default function TestManagement() {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalType, setModalType] = useState('info');
+  const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [cleanupResult, setCleanupResult] = useState(null);
 
   useEffect(() => {
     // 로그인 확인
@@ -128,6 +130,18 @@ export default function TestManagement() {
     setTimeout(() => setShowModal(false), 3000);
   };
 
+  const handleCleanupOrphanFolders = async () => {
+    setCleanupLoading(true);
+    setCleanupResult(null);
+    try {
+      const res = await apiClient.post('/admin/cleanup-orphan-folders');
+      setCleanupResult(res.data);
+    } catch (e) {
+      setCleanupResult({ success: false, message: '정리 실패', error: e.message });
+    }
+    setCleanupLoading(false);
+  };
+
   if (loading) {
     return (
       <Container>
@@ -169,6 +183,16 @@ export default function TestManagement() {
         <PageHeader>
           <PageTitle>테스트 관리</PageTitle>
           <AddButton href="/tests/add">➕ 새 테스트 추가</AddButton>
+          <button onClick={handleCleanupOrphanFolders} disabled={cleanupLoading} style={{marginLeft: 16}}>
+            {cleanupLoading ? '정리 중...' : '등록되지 않은 폴더 정리'}
+          </button>
+          {cleanupResult && (
+            <div style={{marginTop: 8, color: cleanupResult.success ? 'green' : 'red'}}>
+              {cleanupResult.success
+                ? `정리 완료: ${cleanupResult.deletedCount}개 폴더 삭제`
+                : `오류: ${cleanupResult.message || cleanupResult.error}`}
+            </div>
+          )}
         </PageHeader>
 
         <TestsGrid>
