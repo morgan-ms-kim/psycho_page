@@ -624,11 +624,11 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
         // homepage 필드 확인
         if (!packageJson.homepage) {
           console.log('➕ homepage 필드가 없습니다. 새로 추가합니다.');
-          packageJson.homepage = `/psycho/tests/${repoName}/`;
+          packageJson.homepage = `/psycho_page/tests/${repoName}/`;
         } else {
           console.log('🔄 homepage 필드가 있습니다. 업데이트합니다.');
           console.log('📝 기존 homepage:', packageJson.homepage);
-          packageJson.homepage = `/psycho/tests/${repoName}/`;
+          packageJson.homepage = `/psycho_page/tests/${repoName}/`;
         }
         
         console.log('📝 새로운 homepage:', packageJson.homepage);
@@ -685,11 +685,12 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
         console.log('✅ 썸네일 복사 성공:', destThumbPath);
       } catch (error) {
         console.error('❌ 썸네일 복사 실패:', error.message);
-        thumbnailPath = '/psycho_page/default-thumb.png';
+        thumbnailPath = '/psycho_page/uploads/thumbnails/default-thumb.png';
         steps.thumbnailReady = false;
+        console.log('⚠️ thumb.png 없음, 기본 썸네일 사용');
       }
     } else {
-      thumbnailPath = '/psycho_page/default-thumb.png';
+      thumbnailPath = '/psycho_page/uploads/thumbnails/default-thumb.png';
       steps.thumbnailReady = false;
       console.log('⚠️ thumb.png 없음, 기본 썸네일 사용');
     }
@@ -848,7 +849,7 @@ app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thu
     console.log('📂 썸네일 경로:', thumbnailPath);
     
     // 기존 썸네일 삭제 (기본 썸네일 제외)
-    if (test.thumbnail && test.thumbnail !== '/psycho_page/default-thumb.png') {
+    if (test.thumbnail && test.thumbnail !== '/psycho_page/uploads/thumbnails/default-thumb.png') {
       try {
         const oldThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail.replace('/psycho_page/', ''));
         if (fs.existsSync(oldThumbPath)) {
@@ -1007,6 +1008,49 @@ app.put('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => {
     res.json({ success: true, message: '테스트가 수정되었습니다.', test });
   } catch (error) {
     console.error('❌ 테스트 수정 오류:', error);
+    next(error);
+  }
+});
+
+// 기존 테스트 썸네일 경로 업데이트 (일회성)
+app.post('/api/admin/update-thumbnail-paths', authenticateAdmin, async (req, res, next) => {
+  try {
+    console.log('🔄 기존 테스트 썸네일 경로 업데이트 시작');
+    
+    const tests = await Test.findAll();
+    let updatedCount = 0;
+    
+    for (const test of tests) {
+      let needsUpdate = false;
+      
+      // 기본 썸네일 경로 수정
+      if (test.thumbnail === '/psycho_page/default-thumb.png') {
+        test.thumbnail = '/psycho_page/uploads/thumbnails/default-thumb.png';
+        needsUpdate = true;
+        console.log(`📝 테스트 ${test.id} 기본 썸네일 경로 업데이트`);
+      }
+      
+      // uploads 경로가 없는 경우 추가
+      if (test.thumbnail && test.thumbnail.startsWith('/uploads/')) {
+        test.thumbnail = test.thumbnail.replace('/uploads/', '/psycho_page/uploads/');
+        needsUpdate = true;
+        console.log(`📝 테스트 ${test.id} uploads 경로 업데이트`);
+      }
+      
+      if (needsUpdate) {
+        await test.save();
+        updatedCount++;
+      }
+    }
+    
+    console.log(`✅ ${updatedCount}개 테스트 썸네일 경로 업데이트 완료`);
+    res.json({ 
+      success: true, 
+      message: `${updatedCount}개 테스트의 썸네일 경로가 업데이트되었습니다.`,
+      updatedCount 
+    });
+  } catch (error) {
+    console.error('❌ 썸네일 경로 업데이트 실패:', error);
     next(error);
   }
 });
