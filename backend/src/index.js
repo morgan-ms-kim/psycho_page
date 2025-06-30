@@ -21,9 +21,24 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    // 파일명: testID_타임스탬프_원본이름
+    // 파일명: testID_타임스탬프_안전한파일명
     const testId = req.params.id || 'temp';
-    cb(null, `${testId}_${Date.now()}_${file.originalname}`);
+    const timestamp = Date.now();
+    
+    // 원본 파일명에서 확장자 추출
+    const ext = path.extname(file.originalname).toLowerCase();
+    
+    // 안전한 파일명 생성 (한글, 특수문자 제거)
+    const safeName = `test${testId}_${timestamp}${ext}`;
+    
+    console.log('📁 파일명 생성:', {
+      original: file.originalname,
+      safe: safeName,
+      testId,
+      timestamp
+    });
+    
+    cb(null, safeName);
   }
 });
 

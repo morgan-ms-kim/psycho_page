@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
 import Link from 'next/link';
+import ThumbnailUploader from '../../components/ThumbnailUploader';
 
 const apiClient = axios.create({
   baseURL: 'https://smartpick.website/psycho_page/api',
@@ -417,10 +418,10 @@ export default function AddTest() {
 
             <FormGroup>
               <Label>썸네일 이미지</Label>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setThumbnailFile(e.target.files[0])}
+              <ThumbnailUploader
+                testId="new"
+                testTitle="새 테스트"
+                onImageChange={(file) => setThumbnailFile(file)}
               />
               <HelpText>
                 테스트를 대표할 썸네일 이미지를 선택하세요. (선택사항)

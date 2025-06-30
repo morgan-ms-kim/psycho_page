@@ -19,7 +19,7 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-export default function ThumbnailUploader({ testId, testTitle, onUploadSuccess, onUploadError }) {
+export default function ThumbnailUploader({ testId, testTitle, onUploadSuccess, onUploadError, onImageChange }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -42,6 +42,9 @@ export default function ThumbnailUploader({ testId, testTitle, onUploadSuccess, 
       }
 
       setSelectedFile(file);
+      
+      // 부모 컴포넌트에 파일 전달
+      onImageChange?.(file);
       
       // 미리보기 생성
       const reader = new FileReader();
@@ -119,6 +122,10 @@ export default function ThumbnailUploader({ testId, testTitle, onUploadSuccess, 
       if (file.type.startsWith('image/')) {
         if (file.size <= 5 * 1024 * 1024) {
           setSelectedFile(file);
+          
+          // 부모 컴포넌트에 파일 전달
+          onImageChange?.(file);
+          
           const reader = new FileReader();
           reader.onload = (e) => {
             setPreviewUrl(e.target.result);
