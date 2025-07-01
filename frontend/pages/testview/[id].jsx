@@ -154,28 +154,29 @@ function RenderedCommentItem({ comment }) {
   if (!comment) return null;
   return (
     <CommentItem style={{
-      marginBottom: 16,
+      marginBottom: 12,
       background: '#fff',
       color: '#222',
       boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
       display: 'flex',
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
+      gap: 8,
       minWidth: 200,
       maxWidth: 300,
-      padding: '8px 12px',
+      padding: '6px 10px',
       justifyContent: 'center',
       flex: '0 1 280px',
       textAlign: 'left',
+      minHeight: 40,
     }}>
-      <span style={{ fontWeight: 600, color: '#6c63ff', fontSize: '1rem', marginRight: 8, minWidth: 40 }}>
+      <span style={{ fontWeight: 600, color: '#6c63ff', fontSize: '0.9rem', marginRight: 6, minWidth: 35 }}>
         {comment.nickname || '익명'}
       </span>
-      <span style={{ fontSize: '1.08rem', whiteSpace: 'pre-line', wordBreak: 'break-all', flex: 1 }}>
+      <span style={{ fontSize: '1rem', whiteSpace: 'pre-line', wordBreak: 'break-all', flex: 1 }}>
         {comment.content}
       </span>
-      <span style={{ color: '#aaa', fontSize: '0.9rem', marginLeft: 8, minWidth: 70, textAlign: 'right' }}>
+      <span style={{ color: '#aaa', fontSize: '0.8rem', marginLeft: 6, minWidth: 60, textAlign: 'right' }}>
         {comment.createdAt ? new Date(comment.createdAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) : ''}
       </span>
     </CommentItem>
@@ -457,11 +458,9 @@ export default function TestPage() {
         <title>{test?.title ? `${test.title} - PSYCHO` : '테스트 상세 - PSYCHO'}</title>
       </Head>
       <MainWrap style={{ paddingTop: 0, background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
-        {/* 카카오 광고 컨테이너 - 상단 */}
+        {/* 카카오 광고 컨테이너 - iframe 방식 */}
         <div
-          id="kakao-ad-container"
           style={{
-            position: 'relative',
             width: '100%',
             minWidth: 320,
             maxWidth: 728,
@@ -475,16 +474,23 @@ export default function TestPage() {
             zIndex: 10,
             display: 'block',
           }}
-          dangerouslySetInnerHTML={{
-            __html: `
-              <ins class="kakao_ad_area"
-                style="display:block !important;width:100%;min-width:320px;max-width:728px;height:90px;margin:0 auto;text-align:center;"
-                data-ad-unit="DAN-NOAbzxQGMUQ8Mke7"
-                data-ad-width="728"
-                data-ad-height="90"></ins>
-            `
-          }}
-        />
+        >
+          <iframe
+            src="/kakao-ad.html"
+            style={{
+              width: '100%',
+              minWidth: 320,
+              maxWidth: 728,
+              height: 90,
+              border: 'none',
+              margin: '0 auto',
+              display: 'block',
+              background: 'transparent',
+            }}
+            scrolling="no"
+            title="카카오광고"
+          />
+        </div>
         <Section style={{
           maxWidth: 1400,
           margin: '40px auto 0 auto',
