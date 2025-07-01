@@ -162,20 +162,20 @@ function RenderedCommentItem({ comment }) {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 12,
-      minWidth: 220,
-      maxWidth: 350,
-      padding: '8px 16px',
+      minWidth: 200,
+      maxWidth: 300,
+      padding: '8px 12px',
       justifyContent: 'center',
-      flex: '0 1 320px',
+      flex: '0 1 280px',
       textAlign: 'left',
     }}>
-      <span style={{ fontWeight: 600, color: '#6c63ff', fontSize: '1rem', marginRight: 8, minWidth: 48 }}>
+      <span style={{ fontWeight: 600, color: '#6c63ff', fontSize: '1rem', marginRight: 8, minWidth: 40 }}>
         {comment.nickname || '익명'}
       </span>
       <span style={{ fontSize: '1.08rem', whiteSpace: 'pre-line', wordBreak: 'break-all', flex: 1 }}>
         {comment.content}
       </span>
-      <span style={{ color: '#aaa', fontSize: '0.9rem', marginLeft: 8, minWidth: 80, textAlign: 'right' }}>
+      <span style={{ color: '#aaa', fontSize: '0.9rem', marginLeft: 8, minWidth: 70, textAlign: 'right' }}>
         {comment.createdAt ? new Date(comment.createdAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) : ''}
       </span>
     </CommentItem>
@@ -457,6 +457,34 @@ export default function TestPage() {
         <title>{test?.title ? `${test.title} - PSYCHO` : '테스트 상세 - PSYCHO'}</title>
       </Head>
       <MainWrap style={{ paddingTop: 0, background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
+        {/* 카카오 광고 컨테이너 - 상단 */}
+        <div
+          id="kakao-ad-container"
+          style={{
+            position: 'relative',
+            width: '100%',
+            minWidth: 320,
+            maxWidth: 728,
+            margin: '0 auto 24px auto',
+            textAlign: 'center',
+            minHeight: 90,
+            background: '#fff',
+            borderRadius: 12,
+            padding: 16,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            zIndex: 10,
+            display: 'block',
+          }}
+          dangerouslySetInnerHTML={{
+            __html: `
+              <ins class="kakao_ad_area"
+                style="display:block !important;width:100%;min-width:320px;max-width:728px;height:90px;margin:0 auto;text-align:center;"
+                data-ad-unit="DAN-NOAbzxQGMUQ8Mke7"
+                data-ad-width="728"
+                data-ad-height="90"></ins>
+            `
+          }}
+        />
         <Section style={{
           maxWidth: 1400,
           margin: '40px auto 0 auto',
@@ -467,34 +495,6 @@ export default function TestPage() {
           minHeight: 120,
           position: 'relative',
         }}>
-          {/* 카카오 광고 컨테이너 - SSR-safe, 스타일 강제 */}
-          <div
-            id="kakao-ad-container"
-            style={{
-              position: 'relative',
-              width: '100%',
-              minWidth: 320,
-              maxWidth: 728,
-              margin: '0 auto 24px auto',
-              textAlign: 'center',
-              minHeight: 90,
-              background: '#fff',
-              borderRadius: 12,
-              padding: 16,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-              zIndex: 10,
-              display: 'block',
-            }}
-            dangerouslySetInnerHTML={{
-              __html: `
-                <ins class="kakao_ad_area"
-                  style="display:block !important;width:100%;min-width:320px;max-width:728px;height:90px;margin:0 auto;text-align:center;"
-                  data-ad-unit="DAN-NOAbzxQGMUQ8Mke7"
-                  data-ad-width="728"
-                  data-ad-height="90"></ins>
-              `
-            }}
-          />
           <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
             <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
           </Header>
@@ -574,7 +574,7 @@ export default function TestPage() {
             alignItems: 'center',
             width: '100%'
           }}>
-            <CommentHeader style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, display: 'flex' }}>
+            <CommentHeader style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, display: 'flex', padding: '0 24px' }}>
               <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
               <CommentButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ marginLeft: 'auto' }}>
                 {showCommentForm ? '취소' : '댓글 작성'}
