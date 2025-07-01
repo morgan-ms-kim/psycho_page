@@ -797,11 +797,16 @@ app.get('/api/admin/tests/:repo/log', authenticateAdmin, (req, res) => {
 // 방문자 통계 (상세)
 app.get('/api/admin/analytics', authenticateAdmin, async (req, res, next) => {
   try {
-    const { period = 'day', limit = 30 } = req.query;
-    
+    const { period = 'day', limit = 30, start, end } = req.query;
     let startDate = new Date();
     let groupBy = 'DATE(visitedAt)';
-    
+    let endDate = null;
+    if (end) {
+      endDate = new Date(end);
+      if (end.length === 10) {
+        endDate.setHours(23, 59, 59, 999);
+      }
+    }
     switch (period) {
       case 'week':
         startDate.setDate(startDate.getDate() - 7);
@@ -815,18 +820,23 @@ app.get('/api/admin/analytics', authenticateAdmin, async (req, res, next) => {
         startDate.setDate(startDate.getDate() - limit);
         break;
     }
-    
+    let whereClause = 'visitedAt >= ?';
+    let params = [startDate];
+    if (endDate) {
+      whereClause += ' AND visitedAt <= ?';
+      params.push(endDate);
+    }
     const visitors = await sequelize.query(`
       SELECT 
         ${groupBy} as date,
         COUNT(*) as count
       FROM Visitors 
-      WHERE visitedAt >= ?
+      WHERE ${whereClause}
       GROUP BY ${groupBy}
       ORDER BY date DESC
       LIMIT ?
     `, {
-      replacements: [startDate, parseInt(limit)],
+      replacements: [...params, parseInt(limit)],
       type: sequelize.QueryTypes.SELECT
     });
     // 오늘 날짜가 결과에 없으면 count 0으로 추가
@@ -876,8 +886,12 @@ app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
     let where = {};
     if (start) where.visitedAt = { [Op.gte]: new Date(start) };
     if (end) {
+      let endDate = new Date(end);
+      if (end.length === 10) {
+        endDate.setHours(23, 59, 59, 999);
+      }
       where.visitedAt = where.visitedAt || {};
-      where.visitedAt[Op.lte] = new Date(end);
+      where.visitedAt[Op.lte] = endDate;
     }
     const visitors = await Visitor.findAndCountAll({
       attributes: ['id', 'country', 'region', 'ip', 'userAgent', 'visitedAt', 'testId'],
