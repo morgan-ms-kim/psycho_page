@@ -62,9 +62,9 @@ app.use(cors({
 }));
 
 // 정적 파일 서빙 (업로드된 썸네일)
-app.use('/psycho_page/uploads', express.static(path.join(process.cwd(), '..', 'frontend', 'public', 'uploads')));
+app.use('/uploads', express.static(path.join(process.cwd(), '..', 'frontend', 'public', 'uploads')));
 // 빌드된 테스트 앱 정적 서빙
-app.use('/psycho_page/tests', express.static(path.join(process.cwd(), '..', 'frontend', 'public', 'tests')));
+app.use('/tests', express.static(path.join(process.cwd(), '..', 'frontend', 'public', 'tests')));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -607,7 +607,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     if (fs.existsSync(packageJsonPath)) {
       try {
         const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-        packageJson.homepage = `/psycho_page/tests/${folderName}/`;
+        packageJson.homepage = `/tests/${folderName}/`;
         fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
         steps.packageJsonModified = true;
       } catch (error) {
@@ -626,7 +626,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
       return res.status(400).json({ error: '테스트 배포 스크립트 실패', steps, detail: error.message });
     }
     // 5. 썸네일 등 기타 파일 작업 (필요시, 기본값 사용)
-    let thumbnailPath = '/psycho_page/uploads/thumbnails/default-thumb.png';
+    let thumbnailPath = '/uploads/thumbnails/default-thumb.png';
     // 6. DB에 insert (모든 작업 성공 시)
     try {
       const test = await Test.create({
@@ -712,14 +712,14 @@ app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thu
     }
     
     // 파일이 이미 올바른 위치에 있으므로 경로만 설정
-    const thumbnailPath = `/psycho_page/uploads/thumbnails/${req.file.filename}`;
+    const thumbnailPath = `/uploads/thumbnails/${req.file.filename}`;
     
     console.log('📂 썸네일 경로:', thumbnailPath);
     
     // 기존 썸네일 삭제 (기본 썸네일 제외)
-    if (test.thumbnail && test.thumbnail !== '/psycho_page/uploads/thumbnails/default-thumb.png') {
+    if (test.thumbnail && test.thumbnail !== '/uploads/thumbnails/default-thumb.png') {
       try {
-        const oldThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail.replace('/psycho_page/', ''));
+        const oldThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail.replace('/', ''));
         if (fs.existsSync(oldThumbPath)) {
           fs.unlinkSync(oldThumbPath);
           console.log('🗑️ 기존 썸네일 삭제:', oldThumbPath);
@@ -843,8 +843,8 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
       }
     }
     // 썸네일 파일 삭제 (기본 썸네일 제외)
-    if (test.thumbnail && test.thumbnail !== '/psycho_page/uploads/thumbnails/default-thumb.png') {
-      const thumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail.replace('/psycho_page/', ''));
+    if (test.thumbnail && test.thumbnail !== '/uploads/thumbnails/default-thumb.png') {
+      const thumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail.replace('/', ''));
       if (fs.existsSync(thumbPath)) {
         fs.unlinkSync(thumbPath);
         console.log('🗑️ 썸네일 파일 삭제:', thumbPath);
@@ -858,7 +858,7 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
     if (fs.existsSync(thumbsDir)) {
       const files = fs.readdirSync(thumbsDir);
       for (const file of files) {
-        const relPath = `/psycho_page/uploads/thumbnails/${file}`;
+        const relPath = `/uploads/thumbnails/${file}`;
         if (!usedThumbnails.has(relPath) && file !== 'default-thumb.png') {
           try {
             fs.unlinkSync(path.join(thumbsDir, file));
@@ -921,15 +921,15 @@ app.post('/api/admin/update-thumbnail-paths', authenticateAdmin, async (req, res
       let needsUpdate = false;
       
       // 기본 썸네일 경로 수정
-      if (test.thumbnail === '/psycho_page/default-thumb.png') {
-        test.thumbnail = '/psycho_page/uploads/thumbnails/default-thumb.png';
+      if (test.thumbnail === '/default-thumb.png') {
+        test.thumbnail = '/uploads/thumbnails/default-thumb.png';
         needsUpdate = true;
         console.log(`📝 테스트 ${test.id} 기본 썸네일 경로 업데이트`);
       }
       
       // uploads 경로가 없는 경우 추가
       if (test.thumbnail && test.thumbnail.startsWith('/uploads/')) {
-        test.thumbnail = test.thumbnail.replace('/uploads/', '/psycho_page/uploads/');
+        test.thumbnail = test.thumbnail.replace('/uploads/', '/uploads/');
         needsUpdate = true;
         console.log(`📝 테스트 ${test.id} uploads 경로 업데이트`);
       }

@@ -5,7 +5,7 @@ echo "🔍 서버 로그 확인 도구"
 echo "========================"
 
 # 백엔드 디렉토리로 이동
-cd /var/www/html/wordpress/psycho_page/backend
+cd /var/www/html/psycho_page/backend
 
 # 로그 디렉토리 확인
 if [ ! -d "logs" ]; then

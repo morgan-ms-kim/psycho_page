@@ -35,6 +35,6 @@ pm2 restart all
 #start npm --name "psycho-frontend" -- start
 
 echo "✅ 강력한 배포 완료!"
-echo "🌐 https://smartpick.website/psycho_page/admin 에서 확인하세요."
+echo "🌐 https://smartpick.website/admin 에서 확인하세요."
 echo "💡 브라우저에서 Ctrl+F5로 강력 새로고침을 해주세요!" 
-curl https://smartpick.website/psycho_page/admin 
+curl https://smartpick.website/admin 

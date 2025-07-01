@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: '/psycho_page/admin',
-  assetPrefix: '/psycho_page/admin',
+  basePath: '/admin',
+  assetPrefix: '/admin',
   compiler: {
     styledComponents: true,
   },

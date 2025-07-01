@@ -1,5 +1,5 @@
 # 관리자 페이지용 nginx 설정
-location /psycho_page/admin {
+location /admin {
     proxy_pass http://localhost:3001/;
     proxy_http_version 1.1;
     proxy_set_header Host              $host;
@@ -14,7 +14,7 @@ location /psycho_page/admin {
 }
 
 # 관리자 페이지 정적 파일용 설정 (_next/static)
-location /psycho_page/admin/_next {
+location /admin/_next {
     proxy_pass http://localhost:3001/_next;
     proxy_http_version 1.1;
     proxy_set_header Host              $host;
@@ -29,7 +29,7 @@ location /psycho_page/admin/_next {
 }
 
 # 업로드된 썸네일 이미지용 설정
-location /psycho_page/uploads {
+location /uploads {
     alias /var/www/psycho2/frontend/public/uploads;
     expires 1y;
     add_header Cache-Control "public, immutable";

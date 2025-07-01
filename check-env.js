@@ -8,7 +8,7 @@ console.log('======================');
 const envPaths = [
   path.join(__dirname, 'backend', '.env'),
   path.join(__dirname, '.env'),
-  '/var/www/html/wordpress/psycho_page/backend/.env'
+  '/var/www/html/wordpress/backend/.env'
 ];
 
 console.log('📁 .env 파일 검색 중...');

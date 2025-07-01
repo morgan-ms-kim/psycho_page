@@ -4,7 +4,7 @@
 echo "🚀 강력한 배포 시작..."
 
 # 프로젝트 디렉토리로 이동
-cd /var/www/html/wordpress/psycho_page
+cd /var/www/html/psycho_page
 
 # Git pull
 echo "📥 Git pull 중..."
@@ -31,7 +31,7 @@ npm run build
 
 # 관리자 디렉토리로 이동
 echo "📁 관리자 디렉토리로 이동..."
-cd /var/www/html/wordpress/psycho_page/admin
+cd /var/www/html/wordpress/admin
 
 # 완전한 캐시 삭제
 echo "🗑️ 캐시 삭제 중..."
@@ -53,8 +53,8 @@ pm2 restart all
 #start npm --name "psycho-frontend" -- start
 
 echo "✅ 강력한 배포 완료!"
-echo "🌐 https://smartpick.website/psycho_page 에서 확인하세요."
+echo "🌐 https://smartpick.website/ 에서 확인하세요."
 echo "💡 브라우저에서 Ctrl+F5로 강력 새로고침을 해주세요!" 
 
-curl https://smartpick.website/psycho_page/admin
-curl https://smartpick.website/psycho_page/
+curl https://smartpick.website/admin
+curl https://smartpick.website/

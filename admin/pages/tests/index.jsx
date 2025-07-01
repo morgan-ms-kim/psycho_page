@@ -33,7 +33,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('adminToken');
       // 히스토리를 완전히 초기화하고 로그인 페이지로 강제 이동
-      window.location.href = '/psycho_page/admin';
+      window.location.href = '/admin';
     }
     return Promise.reject(error);
   }

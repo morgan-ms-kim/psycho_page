@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://smartpick.website/psycho_page/api',
+  baseURL: 'https://smartpick.website/api',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',

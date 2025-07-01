@@ -40,7 +40,7 @@ echo "[INFO] package.json의 homepage 필드 확인 중..."
 if ! grep -q '"homepage"' package.json; then
   echo "[INFO] homepage 필드가 없습니다. 추가합니다..."
   cp package.json package.json.tmp
-  sed -i 's/}$/  "homepage": "\/psycho_page\/tests\/'"$FOLDER_NAME"'\/",\n}/' package.json.tmp
+  sed -i 's/}$/  "homepage": "\/tests\/'"$FOLDER_NAME"'\/",\n}/' package.json.tmp
   echo "[INFO] 수정된 package.json:"
   cat package.json.tmp
   mv package.json.tmp package.json
@@ -54,9 +54,9 @@ fi
 echo "[INFO] vite.config.js 파일 확인 중..."
 if [ -f "vite.config.js" ]; then
   echo "[INFO] vite.config.js 파일이 발견되었습니다."
-  TEST_PATH="/psycho_page/frontend/public/tests/$FOLDER_NAME/"
+  TEST_PATH="/frontend/public/tests/$FOLDER_NAME/"
   # 실제 서비스 경로(슬래시 없이)도 계산
-  SERVICE_PATH="/psycho_page/frontend/public/tests/$FOLDER_NAME"
+  SERVICE_PATH="/frontend/public/tests/$FOLDER_NAME"
   echo "[INFO] 현재 vite.config.js 내용:"
   cat vite.config.js
   if ! grep -q "base:" vite.config.js; then
