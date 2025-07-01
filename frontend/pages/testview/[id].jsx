@@ -69,10 +69,10 @@ const isValidTestUrl = (id) => {
 const TestContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: 90vx;
-  min-width: 80vx;
-  max-height: 70vx;
-  min-height: 60vx;
+  max-width: 90vw;
+  min-width: 80vw;
+  max-height: 70vw;
+  min-height: 60vw;
   margin: 2rem auto;
   background: white;
   border-radius: 24px;
