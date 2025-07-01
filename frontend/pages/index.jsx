@@ -128,9 +128,6 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                       <Stat>💖 {test.likes}</Stat>
                       <Stat>💬 {test.comments || 0}</Stat>
                     </TestItemStats>
-                    <TestItemDate>
-                      {new Date(test.createdAt).toLocaleDateString()}
-                    </TestItemDate>
                   </TestContent>
                 </TestCardContent>
               </Card>
@@ -723,12 +720,6 @@ const TestItemStats = styled.div`
 `;
 
 const Stat = styled.span``;
-
-const TestItemDate = styled.div`
-  font-size: 0.8rem;
-  opacity: 0.6;
-  margin-top: auto;
-`;
 
 const TestItemImage = styled.img`
   width: 100%;
