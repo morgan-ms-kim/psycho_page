@@ -396,31 +396,67 @@ export default function TestPage() {
       <script
         dangerouslySetInnerHTML={{
           __html: `
-            (function() {
-              function loadKakaoAd() {
+            // 카카오 광고 로드 함수
+            function loadKakaoAd() {
+              try {
                 var isPC = window.matchMedia('(min-width: 728px)').matches;
                 var adUnit = isPC ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK';
                 var adWidth = isPC ? '728' : '320';
                 var adHeight = isPC ? '90' : '100';
                 
-                var adHtml = '<ins class="kakao_ad_area kakao-ad-fixed" style="display:none;" data-ad-unit="' + adUnit + '" data-ad-width="' + adWidth + '" data-ad-height="' + adHeight + '"></ins>';
-                var scriptHtml = '<script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async><\/script>';
+                var container = document.getElementById('kakao-ad-container');
+                if (!container) {
+                  console.error('광고 컨테이너를 찾을 수 없습니다');
+                  return;
+                }
                 
-                document.getElementById('kakao-ad-container').innerHTML = adHtml + scriptHtml;
+                // 기존 광고 제거
+                container.innerHTML = '';
+                
+                // 새 광고 요소 생성
+                var adElement = document.createElement('ins');
+                adElement.className = 'kakao_ad_area kakao-ad-fixed';
+                adElement.style.display = 'none';
+                adElement.setAttribute('data-ad-unit', adUnit);
+                adElement.setAttribute('data-ad-width', adWidth);
+                adElement.setAttribute('data-ad-height', adHeight);
+                
+                // 광고 스크립트 생성
+                var scriptElement = document.createElement('script');
+                scriptElement.type = 'text/javascript';
+                scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+                scriptElement.async = true;
+                
+                // DOM에 추가
+                container.appendChild(adElement);
+                container.appendChild(scriptElement);
+                
+                console.log('카카오 광고 로드 완료:', adUnit);
+              } catch (error) {
+                console.error('카카오 광고 로드 실패:', error);
               }
-              
-              // 페이지 로드 완료 후 광고 로드
-              if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', loadKakaoAd);
-              } else {
+            }
+            
+            // 페이지 로드 완료 후 광고 로드
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', loadKakaoAd);
+            } else {
+              loadKakaoAd();
+            }
+            
+            // 화면 크기 변경 시 광고 다시 로드
+            window.addEventListener('resize', function() {
+              setTimeout(loadKakaoAd, 100);
+            });
+            
+            // 3초 후에도 광고가 로드되지 않으면 다시 시도
+            setTimeout(function() {
+              var adElement = document.querySelector('.kakao_ad_area');
+              if (!adElement || adElement.style.display === 'none') {
+                console.log('광고 재로드 시도');
                 loadKakaoAd();
               }
-              
-              // 화면 크기 변경 시 광고 다시 로드
-              window.addEventListener('resize', function() {
-                setTimeout(loadKakaoAd, 100);
-              });
-            })();
+            }, 3000);
           `
         }}
       />
@@ -431,10 +467,16 @@ export default function TestPage() {
           left: 50%;
           transform: translateX(-50%);
           z-index: 1000;
+          min-height: 90px;
         }
         .kakao-ad-fixed {
           position: relative;
           display: block !important;
+        }
+        @media (max-width: 727px) {
+          #kakao-ad-container {
+            min-height: 100px;
+          }
         }
       `}</style>
     </MainWrap>
