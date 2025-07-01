@@ -68,26 +68,24 @@ const isValidTestUrl = (id) => {
 const TestContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   height: auto;
-  min-height: 500px;
+  min-height: 600px;
   margin: 2rem auto 2rem auto;
   margin-bottom: 3rem;
   background: white;
-  border-radius: 14px;
-  overflow: hidden;
+  border-radius: 24px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   display: flex;
   flex-direction: column;
-  @media (max-width: 900px) {
-    height: auto;
+  @media (max-width: 1200px) {
+    max-width: 100%;
     min-height: 300px;
     margin: 1rem 0 3rem 0;
   }
   @media (max-width: 600px) {
-    height: auto;
     min-height: 200px;
-    border-radius: 8px;
+    border-radius: 12px;
     margin: 0.5rem 0 3rem 0;
   }
 `;
@@ -117,16 +115,15 @@ const IframeRefreshButton = styled.button`
 
 const TestIframe = styled.iframe`
   width: 100%;
-  height: 100%;
-  min-height: 500px;
+  min-height: 600px;
+  height: auto;
   max-height: none;
   border: none;
   background: #fff;
-  border-radius: 0 0 14px 14px;
+  border-radius: 0 0 24px 24px;
   flex: 1;
-  overflow: hidden;
   @media (max-width: 600px) {
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 12px 12px;
     min-height: 200px;
   }
 `;
