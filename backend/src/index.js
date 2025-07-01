@@ -11,7 +11,7 @@ import multer from 'multer';
 import geoip from 'geoip-lite';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-let REGION_MAP = {};
+
 try {
   REGION_MAP = require('./utils/region-map.json');
 } catch (e) {
