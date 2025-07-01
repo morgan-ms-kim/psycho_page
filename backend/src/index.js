@@ -164,6 +164,11 @@ const getClientIP = (req) => {
          req.ip;
 };
 
+// 기존 getClientIP 함수 위에 추가 또는 대체
+function getUserKeyOrIP(req) {
+  return req.headers['x-user-key'] || getClientIP(req);
+}
+
 // test_deploy.sh 실행 함수
 async function runTestDeployScript(clonePath) {
   const scriptPath = path.join(process.cwd(), '..', 'test_deploy.sh');
@@ -244,14 +249,14 @@ app.get('/api/tests/:id', async (req, res, next) => {
     }
     
     // 조회수 증가 (IP 기반 중복 방지)
-    const clientIP = getClientIP(req);
+    const userKey = getUserKeyOrIP(req);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
     const existingView = await Visitor.findOne({
       where: {
         testId: req.params.id,
-        ip: clientIP,
+        ip: userKey,
         visitedAt: { [Op.gte]: today }
       }
     });
@@ -259,7 +264,7 @@ app.get('/api/tests/:id', async (req, res, next) => {
     if (!existingView) {
       await test.increment('views');
       await Visitor.create({
-        ip: clientIP,
+        ip: userKey,
         testId: req.params.id,
         userAgent: req.headers['user-agent']
       });
@@ -270,11 +275,7 @@ app.get('/api/tests/:id', async (req, res, next) => {
     
     // 사용자의 좋아요 상태 확인
     const userLike = await Like.findOne({
-      where: { 
-        testId: req.params.id, 
-        ip: clientIP,
-        commentId: null 
-      }
+      where: { testId: req.params.id, ip: userKey, commentId: null }
     });
     
     // 이미지 경로 수정
@@ -289,11 +290,11 @@ app.get('/api/tests/:id', async (req, res, next) => {
 // 좋아요 토글
 app.post('/api/tests/:id/like', async (req, res, next) => {
   try {
-    const clientIP = getClientIP(req);
+    const userKey = getUserKeyOrIP(req);
     const testId = req.params.id;
     
     const existingLike = await Like.findOne({
-      where: { testId, ip: clientIP, commentId: null }
+      where: { testId, ip: userKey, commentId: null }
     });
     
     if (existingLike) {
@@ -301,7 +302,7 @@ app.post('/api/tests/:id/like', async (req, res, next) => {
       await Test.decrement('likes', { where: { id: testId } });
       res.json({ liked: false, message: '좋아요가 취소되었습니다.' });
     } else {
-      await Like.create({ testId, ip: clientIP });
+      await Like.create({ testId, ip: userKey });
       await Test.increment('likes', { where: { id: testId } });
       res.json({ liked: true, message: '좋아요가 추가되었습니다.' });
     }
@@ -315,7 +316,7 @@ app.get('/api/tests/:id/comments', async (req, res, next) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
-    const clientIP = getClientIP(req);
+    const userKey = getUserKeyOrIP(req);
     
     const comments = await Comment.findAndCountAll({
       where: { testId: req.params.id },
@@ -330,7 +331,7 @@ app.get('/api/tests/:id/comments', async (req, res, next) => {
         delete commentData.password;
         
         const userLike = await Like.findOne({
-          where: { commentId: comment.id, ip: clientIP }
+          where: { commentId: comment.id, ip: userKey }
         });
         
         return {
@@ -368,12 +369,13 @@ app.post('/api/tests/:id/comments', async (req, res, next) => {
       return res.status(400).json({ error: '비밀번호는 4자 이상 입력해주세요.' });
     }
     
+    const userKey = getUserKeyOrIP(req);
     const comment = await Comment.create({
       testId: req.params.id,
       nickname: nickname.trim(),
       content: content.trim(),
       password: password,
-      ip: getClientIP(req)
+      ip: userKey
     });
     
     res.json(comment);
@@ -385,7 +387,7 @@ app.post('/api/tests/:id/comments', async (req, res, next) => {
 // 댓글 좋아요 토글
 app.post('/api/comments/:id/like', async (req, res, next) => {
   try {
-    const clientIP = getClientIP(req);
+    const userKey = getUserKeyOrIP(req);
     const commentId = req.params.id;
     
     const comment = await Comment.findByPk(commentId);
@@ -394,7 +396,7 @@ app.post('/api/comments/:id/like', async (req, res, next) => {
     }
     
     const existingLike = await Like.findOne({
-      where: { commentId, ip: clientIP }
+      where: { commentId, ip: userKey }
     });
     
     if (existingLike) {
@@ -403,7 +405,7 @@ app.post('/api/comments/:id/like', async (req, res, next) => {
     } else {
       await Like.create({ 
         commentId, 
-        ip: clientIP,
+        ip: userKey,
         testId: comment.testId
       });
       res.json({ liked: true });
@@ -463,8 +465,8 @@ app.get('/api/visitors/count', async (req, res, next) => {
 // 방문자 기록
 app.post('/api/visitors', async (req, res, next) => {
   try {
-    const ip = getClientIP(req);
-    const geo = geoip.lookup(ip);
+    const userKey = getUserKeyOrIP(req);
+    const geo = geoip.lookup(userKey);
     const country = geo ? geo.country : null;
     let region = geo ? geo.region : null;
     // 1. region-map.json 우선 적용
@@ -477,7 +479,7 @@ app.post('/api/visitors', async (req, res, next) => {
     const { testId, userAgent } = req.body;
     const visitor = await Visitor.create({
       testId,
-      ip,
+      ip: userKey,
       country,
       region,
       userAgent,
@@ -521,8 +523,8 @@ app.delete('/api/comments/:id', async (req, res, next) => {
     }
     
     if (!comment.password) {
-      const clientIP = getClientIP(req);
-      if (comment.ip !== clientIP) {
+      const userKey = getUserKeyOrIP(req);
+      if (comment.ip !== userKey) {
         return res.status(403).json({ error: '댓글을 삭제할 권한이 없습니다.' });
       }
     } else {

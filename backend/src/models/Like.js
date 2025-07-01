@@ -23,6 +23,8 @@ const Like = sequelize.define('Like', {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
   },
+}, {
+  tableName: 'Likes'
 });
 
 export default Like; 

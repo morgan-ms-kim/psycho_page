@@ -69,22 +69,22 @@ const isValidTestUrl = (id) => {
 const TestContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: 90vw;
-  min-width: 80vw;
-  max-height: 70vw;
-  min-height: 60vw;
+  max-width: 70vw;
+  min-width: 60vw;
+  max-height: 50vh;
+  min-height: 40vh;
   margin: 2rem auto;
   background: white;
   border-radius: 24px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   display: flex;
   flex-direction: column;
-  padding: 32px 16px;
+  padding: 24px 16px;
 
   @media (max-width: 1200px) {
     max-width: 98vw;
     border-radius: 16px;
-    padding: 24px 4px;
+    padding: 20px 12px;
   }
   @media (max-width: 600px) {
     max-width: 96vw;
@@ -92,7 +92,8 @@ const TestContainer = styled.div`
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     margin: 0.5rem 0 1.5rem 0;
-    padding: 8px 0;
+    padding: 16px 8px;
+    min-height: 300px;
   }
 `;
 
@@ -121,21 +122,19 @@ const IframeRefreshButton = styled.button`
 
 const TestIframe = styled.iframe`
   width: 100%;
-  min-height: 60vw;
-  max-height: 80vh;
-  height: 480px;
+  min-height: 400px;
+  max-height: 70vh;
+  height: auto;
   border: none;
   background: #fff;
   border-radius: 0 0 24px 24px;
   flex: 1;
   @media (max-width: 900px) {
-    min-height: 70vw;
-    height: 320px;
+    min-height: 350px;
     border-radius: 0 0 12px 12px;
   }
   @media (max-width: 600px) {
-    min-height: 80vw;
-    height: 220px;
+    min-height: 300px;
     border-radius: 0 0 8px 8px;
   }
 `;
@@ -177,6 +176,16 @@ function RenderedCommentItem({ comment }) {
       </div>
     </CommentItem>
   );
+}
+
+// uuid 생성 함수
+function getUserKey() {
+  let key = localStorage.getItem('psycho_user_key');
+  if (!key) {
+    key = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).substring(2, 18);
+    localStorage.setItem('psycho_user_key', key);
+  }
+  return key;
 }
 
 export default function TestPage() {
@@ -245,21 +254,19 @@ export default function TestPage() {
 
   const loadTestData = async () => {
     try {
-      // iframe 내부에서 실행 중인지 확인
       if (window.self !== window.top) {
-        console.log('iframe 내부에서 실행 중 - 테스트 데이터 API 호출 건너뜀');
         setLoading(false);
         return;
       }
-
       const testId = getTestIdFromFolder(id);
-      const response = await apiClient.get(`/tests/${testId}`);
+      const userKey = getUserKey();
+      const response = await apiClient.get(`/tests/${testId}`, {
+        headers: { 'x-user-key': userKey }
+      });
       setTest(response.data);
-      // userLiked 상태를 명확하게 설정
       setLiked(Boolean(response.data.userLiked));
       setLoading(false);
     } catch (error) {
-      console.error('테스트 데이터 로드 실패:', error);
       setError('테스트를 불러오는데 실패했습니다. 서버 연결을 확인해주세요.');
       setLoading(false);
     }
@@ -268,12 +275,11 @@ export default function TestPage() {
   const handleLike = async () => {
     try {
       const testId = getTestIdFromFolder(id);
-      const response = await apiClient.post(`/tests/${testId}/like`);
-      
-      // 좋아요 상태 업데이트
+      const userKey = getUserKey();
+      const response = await apiClient.post(`/tests/${testId}/like`, {}, {
+        headers: { 'x-user-key': userKey }
+      });
       setLiked(response.data.liked);
-      
-      // 좋아요 카운트 업데이트 (서버 응답 기반으로 정확하게)
       setTest(prev => ({
         ...prev,
         likes: response.data.liked ? (prev.likes || 0) + 1 : Math.max(0, (prev.likes || 0) - 1)
@@ -514,12 +520,16 @@ export default function TestPage() {
           {iframeSection}
           {/* 제목/설명 카드: iframe 아래로 이동, 여백 최소화 */}
           <InfoCard as={TestContainer} style={{
-            maxWidth: 1200,
-            margin: '40px auto 0 auto',
+            maxWidth: '90vw',
+            minWidth: '80vw',
+            margin: '24px auto 0 auto',
             background: '#fff',
             borderRadius: 24,
             boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-            padding: '40px 32px'
+            padding: '24px 16px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, width: '100%', textAlign: 'center' }}>
               <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
@@ -550,21 +560,25 @@ export default function TestPage() {
           </InfoCard>
           {/* 댓글 섹션 */}
           <CommentSection style={{
-            maxWidth: 1200,
-            margin: '40px auto',
+            maxWidth: '90vw',
+            minWidth: '80vw',
+            margin: '24px auto',
             background: '#fff',
             borderRadius: 24,
             boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-            padding: '40px 32px'
+            padding: '24px 16px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
           }}>
-            <CommentHeader>
+            <CommentHeader style={{ width: '100%', justifyContent: 'center' }}>
               <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
               <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>
                 {showCommentForm ? '취소' : '댓글 작성'}
               </CommentButton>
             </CommentHeader>
             {showCommentForm && (
-              <CommentFormContainer>
+              <CommentFormContainer style={{ width: '100%', maxWidth: '600px' }}>
                 <CommentInput
                   type="text"
                   placeholder="닉네임"
@@ -593,9 +607,11 @@ export default function TestPage() {
             {comments.length === 0 && (
               <div style={{ color: '#aaa', textAlign: 'center', margin: '1rem 0' }}>아직 댓글이 없습니다.</div>
             )}
-            {comments.map((comment) => (
-              <RenderedCommentItem key={comment.id} comment={comment} />
-            ))}
+            <div style={{ width: '100%', maxWidth: '800px' }}>
+              {comments.map((comment) => (
+                <RenderedCommentItem key={comment.id} comment={comment} />
+              ))}
+            </div>
           </CommentSection>
         </Section>
         <Footer style={{ marginTop: '0.5rem' }} />
