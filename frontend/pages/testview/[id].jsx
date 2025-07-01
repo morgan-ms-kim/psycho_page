@@ -159,26 +159,49 @@ function RenderedCommentItem({ comment }) {
       color: '#222',
       boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
       display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      minWidth: 200,
-      maxWidth: 300,
-      padding: '6px 10px',
-      justifyContent: 'center',
-      flex: '0 1 280px',
-      textAlign: 'left',
-      minHeight: 40,
+      flexDirection: 'column',
+      width: '100%',
+      maxWidth: 500,
+      padding: '8px 12px',
+      borderRadius: 8,
+      minHeight: 'auto',
     }}>
-      <span style={{ fontWeight: 600, color: '#6c63ff', fontSize: '0.9rem', marginRight: 6, minWidth: 35 }}>
-        {comment.nickname || '익명'}
-      </span>
-      <span style={{ fontSize: '1rem', whiteSpace: 'pre-line', wordBreak: 'break-all', flex: 1 }}>
+      {/* 제목과 날짜를 한 줄에 좌우 끝으로 */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        marginBottom: 6,
+        width: '100%'
+      }}>
+        <span style={{ 
+          fontWeight: 600, 
+          color: '#6c63ff', 
+          fontSize: '0.9rem',
+          marginLeft: 4
+        }}>
+          {comment.nickname || '익명'}
+        </span>
+        <span style={{ 
+          color: '#aaa', 
+          fontSize: '0.8rem',
+          marginRight: 4
+        }}>
+          {comment.createdAt ? new Date(comment.createdAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) : ''}
+        </span>
+      </div>
+      {/* 댓글 내용 */}
+      <div style={{ 
+        fontSize: '0.95rem', 
+        whiteSpace: 'pre-line', 
+        wordBreak: 'break-all',
+        lineHeight: '1.4',
+        paddingLeft: 4,
+        paddingRight: 4,
+        minHeight: 'auto'
+      }}>
         {comment.content}
-      </span>
-      <span style={{ color: '#aaa', fontSize: '0.8rem', marginLeft: 6, minWidth: 60, textAlign: 'right' }}>
-        {comment.createdAt ? new Date(comment.createdAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) : ''}
-      </span>
+      </div>
     </CommentItem>
   );
 }
