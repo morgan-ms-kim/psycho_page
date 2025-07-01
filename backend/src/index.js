@@ -196,13 +196,6 @@ app.get('/api/tests', async (req, res, next) => {
     // 이미지 경로 수정 및 중복 제거
     const testsWithCorrectPaths = tests.map(test => {
       const testData = test.toJSON();
-      if (testData.thumbnail) {
-        if (testData.thumbnail.startsWith('/uploads/')) {
-          testData.thumbnail = testData.thumbnail.replace('/uploads/', '/psycho_page/uploads/');
-        } else if (!testData.thumbnail.startsWith('/psycho_page/')) {
-          testData.thumbnail = `/psycho_page${testData.thumbnail}`;
-        }
-      }
       return testData;
     });
     
@@ -266,19 +259,7 @@ app.get('/api/tests/:id', async (req, res, next) => {
     
     // 이미지 경로 수정
     const testData = test.toJSON();
-    if (testData.thumbnail) {
-      if (testData.thumbnail.startsWith('/uploads/')) {
-        testData.thumbnail = testData.thumbnail.replace('/uploads/', '/psycho_page/uploads/');
-      } else if (!testData.thumbnail.startsWith('/psycho_page/')) {
-        testData.thumbnail = `/psycho_page${testData.thumbnail}`;
-      }
-    }
-    
-    res.json({
-      ...testData,
-      commentCount,
-      userLiked: !!userLike
-    });
+    return testData;
   } catch (error) {
     next(error);
   }
@@ -696,15 +677,7 @@ app.get('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => {
     
     // 이미지 경로 수정
     const testData = test.toJSON();
-    if (testData.thumbnail) {
-      if (testData.thumbnail.startsWith('/uploads/')) {
-        testData.thumbnail = testData.thumbnail.replace('/uploads/', '/psycho_page/uploads/');
-      } else if (!testData.thumbnail.startsWith('/psycho_page/')) {
-        testData.thumbnail = `/psycho_page${testData.thumbnail}`;
-      }
-    }
-    
-    res.json(testData);
+    return testData;
   } catch (error) {
     console.error('❌ 관리자 테스트 조회 실패:', error);
     next(error);
