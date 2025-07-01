@@ -799,7 +799,7 @@ app.get('/api/admin/analytics', authenticateAdmin, async (req, res, next) => {
   try {
     const { period = 'day', limit = 30, start, end } = req.query;
     let startDate = new Date();
-    let groupBy = 'DATE(visitedAt)';
+    let groupBy = 'DATE(CONVERT_TZ(visitedAt, "+00:00", "+09:00"))';
     let endDate = null;
     if (end) {
       endDate = new Date(end);
@@ -810,11 +810,11 @@ app.get('/api/admin/analytics', authenticateAdmin, async (req, res, next) => {
     switch (period) {
       case 'week':
         startDate.setDate(startDate.getDate() - 7);
-        groupBy = 'YEARWEEK(visitedAt)';
+        groupBy = 'YEARWEEK(CONVERT_TZ(visitedAt, "+00:00", "+09:00"))';
         break;
       case 'month':
         startDate.setMonth(startDate.getMonth() - 1);
-        groupBy = 'DATE_FORMAT(visitedAt, "%Y-%m")';
+        groupBy = 'DATE_FORMAT(CONVERT_TZ(visitedAt, "+00:00", "+09:00"), "%Y-%m")';
         break;
       default:
         startDate.setDate(startDate.getDate() - limit);
