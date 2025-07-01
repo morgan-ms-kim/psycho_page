@@ -82,9 +82,26 @@ export const Footer = styled.footer`
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   margin-bottom: 80px; /* 광고를 위한 여백 줄임 */
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -80px;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: -1;
+  }
   
   @media (max-width: 727px) {
     margin-bottom: 100px; /* 모바일에서는 더 큰 여백 */
+    
+    &::after {
+      bottom: -100px;
+      height: 100px;
+    }
   }
 `;
 

@@ -213,7 +213,10 @@ export default function Home() {
         sort: sort
       });
 
-      if (searchTerm) params.append('search', searchTerm);
+      if (searchTerm && searchTerm.trim()) {
+        params.append('search', searchTerm.trim());
+        console.log('검색 파라미터 추가:', searchTerm.trim());
+      }
       if (selectedCategory) params.append('category', selectedCategory);
 
       // 타임아웃 설정 (5초)
@@ -300,9 +303,10 @@ export default function Home() {
   // 검색어가 변경되면 검색 실행 (디바운스 적용)
   useEffect(() => {
     const timer = setTimeout(() => {
+      console.log('검색 실행:', { searchTerm, selectedCategory, sort });
       setPage(1);
       loadTests(true);
-    }, 500);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [searchTerm, selectedCategory, sort]);
@@ -436,7 +440,7 @@ export default function Home() {
       )}
 
       {/* 테스트 목록 */}
-      {sortedTests.length > 0 ? (
+      {!loading && sortedTests.length > 0 ? (
         <Section>
           <TestCount>총 {sortedTests.length}개의 테스트</TestCount>
           
@@ -499,12 +503,12 @@ export default function Home() {
             </LoadingMore>
           )}
         </Section>
-      ) : (
+      ) : !loading && (searchTerm || selectedCategory) ? (
         <NoResults>
           <h3>검색 결과가 없습니다</h3>
           <p>다른 검색어나 카테고리를 시도해보세요.</p>
         </NoResults>
-      )}
+      ) : null}
 
       {/* 푸터 */}
       <Footer>
