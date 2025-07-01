@@ -11,7 +11,13 @@ import multer from 'multer';
 import geoip from 'geoip-lite';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const regionNames = require('geoip-lite/regions.json');
+let regionNames = {};
+try {
+  regionNames = require('geoip-lite/regions.json');
+} catch (e) {
+  regionNames = {};
+  console.warn('geoip-lite/regions.json 파일을 찾을 수 없습니다. 지역명 매핑이 비활성화됩니다.');
+}
 
 const execAsync = promisify(exec);
 
