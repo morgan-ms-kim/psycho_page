@@ -31,7 +31,7 @@ npm run build
 
 # 관리자 디렉토리로 이동
 echo "📁 관리자 디렉토리로 이동..."
-cd /var/www/html/wordpress/admin
+cd /var/www/html/psycho_page/admin
 
 # 완전한 캐시 삭제
 echo "🗑️ 캐시 삭제 중..."
