@@ -13,9 +13,9 @@ git pull
 # 프론트엔드 디렉토리로 이동
 echo "📁 프론트엔드 디렉토리로 이동..."
 cd frontend
-# 빌드
-echo "🔨 빌드 중..."
-npm run build
+# 빌드 (빠른 빌드 사용)
+echo "🔨 빠른 빌드 중..."
+npm run build:fast
 
 # PM2 완전 재시작
 echo "🔄 PM2 완전 재시작 중..."

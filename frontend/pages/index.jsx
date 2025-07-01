@@ -202,7 +202,8 @@ export default function Home() {
 
       if (reset) {
         setLoading(true);
-        setError(null);
+        // 검색 시에는 에러 상태를 초기화하지 않음 (페이지 새로고침 방지)
+        // setError(null);
       } else {
         setLoadingMore(true);
       }
@@ -304,6 +305,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       console.log('검색 실행:', { searchTerm, selectedCategory, sort });
+      // 검색 시에는 페이지를 1로 리셋하고 리스트만 업데이트
       setPage(1);
       loadTests(true);
     }, 300);
@@ -349,7 +351,8 @@ export default function Home() {
     }
   }, [sortedTests]);
 
-  if (loading) {
+  // 초기 로딩 시에만 전체 로딩 화면 표시
+  if (loading && tests.length === 0) {
     return (
       <LoadingWrap>
         <LoadingSpinner />
@@ -440,7 +443,14 @@ export default function Home() {
       )}
 
       {/* 테스트 목록 */}
-      {!loading && sortedTests.length > 0 ? (
+      {loading ? (
+        <Section>
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <LoadingSpinner />
+            <p>검색 중...</p>
+          </div>
+        </Section>
+      ) : sortedTests.length > 0 ? (
         <Section>
           <TestCount>총 {sortedTests.length}개의 테스트</TestCount>
           
