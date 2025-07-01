@@ -22,7 +22,8 @@ import {
   SearchInput,
   SearchButton,
   FilterBar,
-  CategorySelect
+  CategorySelect,
+  Logo
 } from '../components/StyledComponents';
 import Head from 'next/head';
 
