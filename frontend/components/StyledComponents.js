@@ -480,6 +480,8 @@ export const CommentTextarea = styled.textarea`
   border-radius: 8px;
   font-size: 1rem;
   min-height: 80px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
 `;
 
 export const CommentSubmitButton = styled.button`
