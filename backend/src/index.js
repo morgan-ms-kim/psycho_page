@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import multer from 'multer';
 import geoip from 'geoip-lite';
+import regionNames from 'geoip-lite/regions.json';
 
 const execAsync = promisify(exec);
 
@@ -446,7 +447,10 @@ app.post('/api/visitors', async (req, res, next) => {
     const ip = getClientIP(req);
     const geo = geoip.lookup(ip);
     const country = geo ? geo.country : null;
-    const region = geo ? geo.region : null;
+    let region = geo ? geo.region : null;
+    if (country === 'KR' && region && regionNames['KR'] && regionNames['KR'][region]) {
+      region = regionNames['KR'][region];
+    }
     const { testId, userAgent } = req.body;
     const visitor = await Visitor.create({
       testId,

@@ -409,9 +409,6 @@ export default function TestPage() {
   } else if (buildExists) {
     iframeSection = (
       <TestContainer>
-        <IframeTopBar>
-          <IframeRefreshButton onClick={reloadIframe}>새로고침</IframeRefreshButton>
-        </IframeTopBar>
         {!iframeLoaded && (
           <LoadingOverlay>
             <LoadingSpinner />
@@ -440,7 +437,7 @@ export default function TestPage() {
 
   return (
     <MainWrap style={{ paddingTop: 0, background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
-      {/* 카카오 광고 컨테이너: 맨 위 */}
+      {/* 카카오 광고: 맨 위 */}
       <div id="kakao-ad-container" style={{ width: '100%', maxWidth: 900, margin: '0 auto', marginTop: 8, marginBottom: 8, borderRadius: 12, overflow: 'hidden', minHeight: 60, textAlign: 'center', background: '#fff' }} />
       <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
         <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>

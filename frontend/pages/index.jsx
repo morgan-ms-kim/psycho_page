@@ -473,6 +473,8 @@ export default function Home() {
 
   return (
     <MainWrap>
+      {/* 카카오 광고: 맨 위 */}
+      <div id="kakao-ad-container" style={{ width: '100%', maxWidth: 900, margin: '0 auto', marginTop: 8, marginBottom: 8, borderRadius: 12, overflow: 'hidden', minHeight: 60, textAlign: 'center', background: '#fff' }} />
       {/* 헤더 */}
       <Header>
         <Logo onClick={() => {
@@ -569,7 +571,6 @@ export default function Home() {
       {/* 푸터 */}
       <Footer>
         <p>© 2025 PSYCHO - 재미있는 심리테스트 모음</p>
-        <div id="kakao-ad-container"></div>
       </Footer>
 
     </MainWrap>
