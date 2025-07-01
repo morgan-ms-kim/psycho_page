@@ -279,6 +279,7 @@ app.get('/api/tests/:id', async (req, res, next) => {
     
     // 이미지 경로 수정
     const testData = test.toJSON();
+    testData.userLiked = !!userLike;
     res.json(testData);
   } catch (error) {
     next(error);

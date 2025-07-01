@@ -255,7 +255,8 @@ export default function TestPage() {
       const testId = getTestIdFromFolder(id);
       const response = await apiClient.get(`/tests/${testId}`);
       setTest(response.data);
-      setLiked(response.data.userLiked || false);
+      // userLiked 상태를 명확하게 설정
+      setLiked(Boolean(response.data.userLiked));
       setLoading(false);
     } catch (error) {
       console.error('테스트 데이터 로드 실패:', error);
@@ -268,10 +269,14 @@ export default function TestPage() {
     try {
       const testId = getTestIdFromFolder(id);
       const response = await apiClient.post(`/tests/${testId}/like`);
+      
+      // 좋아요 상태 업데이트
       setLiked(response.data.liked);
+      
+      // 좋아요 카운트 업데이트 (서버 응답 기반으로 정확하게)
       setTest(prev => ({
         ...prev,
-        likes: response.data.liked ? prev.likes + 1 : prev.likes - 1
+        likes: response.data.liked ? (prev.likes || 0) + 1 : Math.max(0, (prev.likes || 0) - 1)
       }));
     } catch (error) {
       console.error('좋아요 처리 실패:', error);
