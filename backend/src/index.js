@@ -582,15 +582,43 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     // 2. 폴더 생성 및 git clone
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
     const testPath = path.join(testsDir, folderName);
-    if (!fs.existsSync(testPath)) {
-      fs.mkdirSync(testPath, { recursive: true });
-      steps.directoryCreated = true;
+    
+    // 기존 폴더가 있으면 삭제
+    if (fs.existsSync(testPath)) {
+      try {
+        fs.rmSync(testPath, { recursive: true, force: true });
+        console.log('🗑️ 기존 폴더 삭제:', testPath);
+      } catch (error) {
+        console.error('⚠️ 기존 폴더 삭제 실패:', error.message);
+        // 삭제 실패 시 폴더 내용만 비우기
+        try {
+          const files = fs.readdirSync(testPath);
+          for (const file of files) {
+            const filePath = path.join(testPath, file);
+            if (fs.lstatSync(filePath).isDirectory()) {
+              fs.rmSync(filePath, { recursive: true, force: true });
+            } else {
+              fs.unlinkSync(filePath);
+            }
+          }
+          console.log('🗑️ 폴더 내용 비우기 완료:', testPath);
+        } catch (clearError) {
+          console.error('⚠️ 폴더 내용 비우기 실패:', clearError.message);
+        }
+      }
     }
-    // git clone
+    
+    // 새 폴더 생성
+    fs.mkdirSync(testPath, { recursive: true });
+    steps.directoryCreated = true;
+    
+    // git clone (--force 옵션 추가)
     try {
-      await execAsync(`git clone ${gitUrl} ${testPath}`, { timeout: 300000 });
+      await execAsync(`git clone --force ${gitUrl} ${testPath}`, { timeout: 300000 });
       steps.gitCloned = true;
+      console.log('✅ Git 클론 완료:', gitUrl);
     } catch (error) {
+      console.error('❌ Git 클론 실패:', error.message);
       return res.status(400).json({ error: 'Git 클론 실패', steps, detail: error.message });
     }
     // 3. package.json 수정 (homepage 필드 추가)
