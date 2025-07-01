@@ -6,9 +6,9 @@ const router = express.Router();
 router.get('/sitemap.xml', async (req, res) => {
   const baseUrl = "https://smartpick.website";
   try {
-    // DB에서 모든 테스트 id 조회
     const tests = await Test.findAll({ attributes: ['id'] });
-    const testIds = tests.map(t => t.id);
+    // id 중복 제거
+    const testIds = [...new Set(tests.map(t => t.id))];
 
     let urls = [
       "",
@@ -17,9 +17,12 @@ router.get('/sitemap.xml', async (req, res) => {
       ...testIds.map(id => `/tests/${id}/`)
     ];
 
+    // URL 중복 제거
+    const uniqueUrls = [...new Set(urls)];
+
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(path => `
+${uniqueUrls.map(path => `
   <url>
     <loc>${baseUrl}${path}</loc>
   </url>
