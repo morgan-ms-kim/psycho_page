@@ -85,11 +85,14 @@ export default function Home() {
 
   // 테스트 ID를 폴더명으로 변환하는 함수
   const getTestFolderName = (testId) => {
+    // testId가 문자열이 아닌 경우 문자열로 변환
+    const id = String(testId);
+    
     // 이미 test로 시작하는 경우 그대로 반환, 아니면 test 추가
-    if (testId.startsWith('test')) {
-      return testId;
+    if (id.startsWith('test')) {
+      return id;
     }
-    return `test${testId}`;
+    return `test${id}`;
   };
 
   // 테스트 데이터 로드
@@ -253,13 +256,23 @@ export default function Home() {
         params: params
       });
       
+      // 테스트 데이터 검증 및 로깅
+      console.log('받은 테스트 데이터:', response.data);
+      const validatedTests = response.data.map(test => {
+        console.log('테스트 ID 타입:', typeof test.id, '값:', test.id);
+        return {
+          ...test,
+          id: String(test.id) // ID를 문자열로 확실히 변환
+        };
+      });
+      
       if (reset) {
-        setTests(response.data);
+        setTests(validatedTests);
       } else {
         // 중복 제거 로직 추가
         setTests(prev => {
           const existingIds = new Set(prev.map(test => test.id));
-          const newTests = response.data.filter(test => !existingIds.has(test.id));
+          const newTests = validatedTests.filter(test => !existingIds.has(test.id));
           return [...prev, ...newTests];
         });
       }
@@ -449,9 +462,17 @@ export default function Home() {
               <Card 
                 key={test.id} 
                 onClick={() => {
-                  const testPath = `/tests/${getTestFolderName(test.id)}`;
-                  console.log('테스트 클릭:', testPath);
-                  router.push(testPath);
+                  try {
+                    if (!test.id) {
+                      console.error('테스트 ID가 없습니다:', test);
+                      return;
+                    }
+                    const testPath = `/tests/${getTestFolderName(test.id)}`;
+                    console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
+                    router.push(testPath);
+                  } catch (error) {
+                    console.error('테스트 클릭 에러:', error, '테스트 데이터:', test);
+                  }
                 }}
               >
                 <TestCardContent>
