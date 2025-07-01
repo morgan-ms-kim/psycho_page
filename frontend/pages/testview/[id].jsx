@@ -32,7 +32,14 @@ import {
   SocialButton,
   StatItem,
   StatLabel,
-  StatValue
+  StatValue,
+  CommentHeader,
+  CommentTitle,
+  CommentButton,
+  CommentFormContainer,
+  CommentInput,
+  CommentTextarea,
+  CommentSubmitButton
 } from '../../components/StyledComponents';
 
 // axios 인스턴스 생성

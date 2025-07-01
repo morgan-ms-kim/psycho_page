@@ -412,3 +412,74 @@ export const StatValue = styled.span`
 `;
 
 // TestItemStats는 프론트엔드 페이지에서 정의하므로 여기서는 제거 
+
+// 댓글 섹션 스타일 컴포넌트
+export const CommentHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
+
+export const CommentTitle = styled.h3`
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+`;
+
+export const CommentButton = styled.button`
+  background: #ffe066;
+  color: #333;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: #ffb3e6;
+    color: #222;
+  }
+`;
+
+export const CommentFormContainer = styled.div`
+  background: #fffbe7;
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+`;
+
+export const CommentInput = styled.input`
+  width: 100%;
+  padding: 0.7rem;
+  margin-bottom: 0.7rem;
+  border: 1px solid #ffe066;
+  border-radius: 8px;
+  font-size: 1rem;
+`;
+
+export const CommentTextarea = styled.textarea`
+  width: 100%;
+  padding: 0.7rem;
+  margin-bottom: 0.7rem;
+  border: 1px solid #ffe066;
+  border-radius: 8px;
+  font-size: 1rem;
+  min-height: 80px;
+`;
+
+export const CommentSubmitButton = styled.button`
+  background: #ff5e5e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: #ffb3e6;
+    color: #222;
+  }
+`; 
