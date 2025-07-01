@@ -75,16 +75,22 @@ else
   echo "[INFO] vite.config.js 파일이 없습니다."
 fi
 
-# src/App.jsx의 <Router> 또는 <BrowserRouter>를 <BrowserRouter basename="SERVICE_PATH">로 자동 치환
-APP_FILE="src/App.jsx"
-if [ -f "$APP_FILE" ]; then
+# src/App.jsx 또는 src/App.js의 <Router> 또는 <BrowserRouter>를 <BrowserRouter basename="SERVICE_PATH">로 자동 치환
+APP_FILE=""
+if [ -f "src/App.jsx" ]; then
+  APP_FILE="src/App.jsx"
+elif [ -f "src/App.js" ]; then
+  APP_FILE="src/App.js"
+fi
+
+if [ -n "$APP_FILE" ]; then
   echo "[INFO] $APP_FILE 파일에서 Router basename 자동 치환"
   sed -i "s#<Router>#<BrowserRouter basename=\"$SERVICE_PATH\">#" "$APP_FILE"
   sed -i "s#<BrowserRouter>#<BrowserRouter basename=\"$SERVICE_PATH\">#" "$APP_FILE"
-  echo "[INFO] 수정된 src/App.jsx Router 부분:"
+  echo "[INFO] 수정된 $APP_FILE Router 부분:"
   grep "Router basename=" "$APP_FILE"
 else
-  echo "[WARNING] $APP_FILE 파일이 없습니다."
+  echo "[WARNING] src/App.jsx 또는 src/App.js 파일이 없습니다."
 fi
 
 echo "[INFO] 빌드 전 vite.config.js:"
