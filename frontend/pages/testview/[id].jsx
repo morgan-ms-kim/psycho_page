@@ -68,9 +68,9 @@ const isValidTestUrl = (id) => {
 const TestContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1800px;
   height: auto;
-  min-height: 600px;
+  min-height: 800px;
   margin: 2rem auto 2rem auto;
   margin-bottom: 3rem;
   background: white;
@@ -78,9 +78,9 @@ const TestContainer = styled.div`
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   display: flex;
   flex-direction: column;
-  @media (max-width: 1200px) {
+  @media (max-width: 1800px) {
     max-width: 100%;
-    min-height: 300px;
+    min-height: 800px;
     margin: 1rem 0 3rem 0;
   }
   @media (max-width: 600px) {
