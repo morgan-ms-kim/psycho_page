@@ -30,6 +30,7 @@ import {
   BannerStats
 } from '../components/StyledComponents';
 import Head from 'next/head';
+import Image from 'next/image';
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
@@ -87,9 +88,12 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
               <TestCardContent>
                 <TestThumbnailContainer>
                   {test.thumbnail ? (
-                    <TestItemImage 
+                    <Image 
                       src={getImagePath(test.thumbnail)} 
                       alt={test.title}
+                      width={400}
+                      height={300}
+                      style={{ borderRadius: 16, objectFit: 'cover' }}
                       onError={(e) => {
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'flex';
