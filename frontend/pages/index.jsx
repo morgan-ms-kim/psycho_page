@@ -714,3 +714,27 @@ const TestItemImage = styled.img`
     transform: scale(1.05);
   }
 `;
+
+const TestContainer = styled.div`
+  width: 100%;
+  max-width: 1800px;
+  min-width: 600px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba(80,80,120,0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const TestIframe = styled.iframe`
+  width: 100%;
+  min-width: 600px;
+  min-height: 800px;
+  border: none;
+  background: #fff;
+  border-radius: 0 0 24px 24px;
+  flex: 1;
+  display: block;
+`;
