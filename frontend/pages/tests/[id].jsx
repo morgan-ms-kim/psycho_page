@@ -34,7 +34,7 @@ import {
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
-  baseURL: 'https://smartpick.website/psycho_page/api',
+  baseURL: 'https://smartpick.website/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export default function TestPage() {
 
   useEffect(() => {
     if (/^test\d+$/.test(id)) {
-      fetch(`/psycho_page/tests/${id}/index.html`, { method: 'HEAD' })
+      fetch(`/tests/${id}/index.html`, { method: 'HEAD' })
         .then(res => {
           setBuildExists(res.ok);
           setCheckedBuild(true);
@@ -205,7 +205,7 @@ export default function TestPage() {
         e.stopPropagation();
         
         // iframe 내부에서 상위 페이지로 리다이렉트
-        window.top.location.href = `/psycho_page/tests/${id}`;
+        window.top.location.href = `/tests/${id}`;
         return false;
       }
     };
@@ -275,7 +275,7 @@ export default function TestPage() {
   const commentCount = comments.length;
 
   // iframe URL 설정 - 간단하게
-  const testUrl = `/psycho_page/tests/${id}/`;
+  const testUrl = `/tests/${id}/`;
 
   if (!checkedBuild && /^test\d+$/.test(id)) {
     return (

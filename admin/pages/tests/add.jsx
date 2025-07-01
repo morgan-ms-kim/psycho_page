@@ -6,8 +6,8 @@ import Link from 'next/link';
 import ThumbnailUploader from '../../components/ThumbnailUploader';
 
 const apiClient = axios.create({
-  baseURL: 'https://smartpick.website/psycho_page/api',
-  timeout: 300000,
+  baseURL: 'https://smartpick.website/api',
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   }
@@ -34,7 +34,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('adminToken');
       // 히스토리를 완전히 초기화하고 로그인 페이지로 강제 이동
-      window.location.href = '/psycho_page/admin';
+      window.location.href = '/admin';
     }
     return Promise.reject(error);
   }
@@ -44,7 +44,7 @@ apiClient.interceptors.response.use(
 const validateAndFixPath = (path, router) => {
   // 현재 경로 확인
   const currentPath = router.asPath;
-  const basePath = '/psycho_page/admin';
+  const basePath = '/admin';
   
   // 중복 경로 확인
   if (currentPath.includes(`${basePath}${basePath}`)) {
@@ -299,7 +299,7 @@ export default function AddTest() {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     // 히스토리를 완전히 초기화하고 로그인 페이지로 강제 이동
-    window.location.href = '/psycho_page/admin';
+    window.location.href = '/admin';
   };
 
   return (

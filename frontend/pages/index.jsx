@@ -32,7 +32,7 @@ import {
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
-  baseURL: 'https://smartpick.website/psycho_page/api',
+  baseURL: 'https://smartpick.website/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ const apiClient = axios.create({
 const getApiBase = () => {
   // 타임스탬프를 추가하여 캐시 무효화
   const timestamp = Date.now();
-  return `https://smartpick.website/psycho_page/api?t=${timestamp}`.replace('?t=', '');
+  return `https://smartpick.website/api?t=${timestamp}`.replace('?t=', '');
 };
 
 export default function Home() {
@@ -76,10 +76,6 @@ export default function Home() {
   // 이미지 경로를 올바르게 처리하는 함수
   const getImagePath = (path) => {
     if (!path) return null;
-    // /tests/로 시작하는 경로를 /psycho_page/tests/로 변환
-    if (path.startsWith('/tests/')) {
-      return path.replace('/tests/', '/psycho_page/tests/');
-    }
     return path;
   };
 
@@ -101,6 +97,13 @@ export default function Home() {
     loadVisitorStats();
     loadCategories();
   }, []);
+
+  // 페이지 변경 시 추가 데이터 로드
+  useEffect(() => {
+    if (page > 1) {
+      loadTests();
+    }
+  }, [page]);
 
 
 
@@ -285,7 +288,6 @@ export default function Home() {
   const loadMore = () => {
     if (!loadingMore && hasMore) {
       setPage(prev => prev + 1);
-      loadTests();
     }
   };
 

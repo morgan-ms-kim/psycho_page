@@ -4,8 +4,8 @@ import styled from 'styled-components';
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://smartpick.website/psycho_page/api',
-  timeout: 30000,
+  baseURL: 'https://smartpick.website/api',
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   }
@@ -15,15 +15,15 @@ const apiClient = axios.create({
 const validateAndFixPath = (path, router) => {
   // 현재 경로 확인
   const currentPath = router.asPath;
-  const basePath = '/psycho_page/admin';
+  const basePath = '/admin';
   
   console.log('현재 경로:', currentPath);
   
   // 중복 경로 확인 (더 정확한 패턴 매칭)
-  if (currentPath.includes('/psycho_page/admin/psycho_page/admin')) {
+  if (currentPath.includes('/admin/admin')) {
     console.warn('중복 경로 감지:', currentPath);
     // 중복 제거하고 올바른 경로로 리다이렉트
-    const cleanPath = currentPath.replace('/psycho_page/admin/psycho_page/admin', basePath);
+    const cleanPath = currentPath.replace('/admin/admin', basePath);
     console.log('수정된 경로:', cleanPath);
     router.replace(cleanPath);
     return false;

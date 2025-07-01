@@ -5,8 +5,8 @@ import axios from 'axios';
 import Link from 'next/link';
 
 const apiClient = axios.create({
-  baseURL: 'https://smartpick.website/psycho_page/api',
-  timeout: 30000,
+  baseURL: 'https://smartpick.website/api',
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   }
@@ -43,7 +43,7 @@ apiClient.interceptors.response.use(
 const validateAndFixPath = (path, router) => {
   // 현재 경로 확인
   const currentPath = router.asPath;
-  const basePath = '/psycho_page/admin';
+  const basePath = '/admin';
   
   // 중복 경로 확인
   if (currentPath.includes(`${basePath}${basePath}`)) {
@@ -223,14 +223,14 @@ export default function TestManagement() {
                 <ActionButton onClick={() => {
                   console.log('수정 버튼 클릭:', test.id);
                   // 히스토리를 완전히 초기화하고 수정 페이지로 강제 이동
-                  window.location.href = `/psycho_page/admin/tests/${test.id}/edit`;
+                  window.location.href = `/admin/tests/${test.id}/edit`;
                 }}>
                   ✏️ 수정
                 </ActionButton>
                 <ActionButton onClick={() => {
                   console.log('썸네일 버튼 클릭:', test.id);
                   // 히스토리를 완전히 초기화하고 썸네일 페이지로 강제 이동
-                  window.location.href = `/psycho_page/admin/tests/${test.id}/thumbnail`;
+                  window.location.href = `/admin/tests/${test.id}/thumbnail`;
                 }}>
                   🖼️ 썸네일
                 </ActionButton>
