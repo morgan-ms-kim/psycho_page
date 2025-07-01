@@ -57,6 +57,19 @@ const isValidTestUrl = (id) => {
 export default function TestPage() {
   const router = useRouter();
   const { id } = router.query;
+  
+  // URL 경로 정규화 - 중복 test 제거
+  useEffect(() => {
+    if (id && typeof id === 'string') {
+      // testtest1 -> test1로 정규화
+      if (id.startsWith('testtest')) {
+        const normalizedId = id.replace('testtest', 'test');
+        console.log('URL 정규화:', id, '->', normalizedId);
+        router.replace(`/tests/${normalizedId}`);
+        return;
+      }
+    }
+  }, [id, router]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [test, setTest] = useState(null);
@@ -107,6 +120,13 @@ export default function TestPage() {
 
   const loadTestData = async () => {
     try {
+      // iframe 내부에서 실행 중인지 확인
+      if (window.self !== window.top) {
+        console.log('iframe 내부에서 실행 중 - 테스트 데이터 API 호출 건너뜀');
+        setLoading(false);
+        return;
+      }
+
       const testId = getTestIdFromFolder(id);
       const response = await apiClient.get(`/tests/${testId}`);
       setTest(response.data);
@@ -227,8 +247,8 @@ export default function TestPage() {
 
   const commentCount = comments.length;
 
-  // iframe URL에 새로고침 방지 파라미터 추가
-  const testUrl = `/psycho_page/tests/${id}/?embedded=true&parent=${encodeURIComponent(window.location.origin + '/tests/' + id)}`;
+  // iframe URL 설정 - 중복 경로 방지
+  const testUrl = `/psycho_page/tests/${id}/?embedded=true&parent=${encodeURIComponent(window.location.origin + '/tests/' + id)}&preventRefresh=true`;
 
   if (!checkedBuild && /^test\d+$/.test(id)) {
     return (
@@ -272,7 +292,7 @@ export default function TestPage() {
             onError={handleIframeError}
             title={test?.title || '테스트'}
             allow="fullscreen"
-            sandbox="allow-scripts allow-forms allow-popups"
+            sandbox="allow-scripts allow-forms allow-popups allow-same-origin"
           />
         </TestContainer>
       ) : (

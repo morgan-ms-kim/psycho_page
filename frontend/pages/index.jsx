@@ -63,6 +63,16 @@ export default function Home() {
   const [apiStatus, setApiStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
   const router = useRouter();
 
+  // URL 경로 정규화 - 중복 test 제거
+  useEffect(() => {
+    const currentPath = router.asPath;
+    if (currentPath.includes('/tests/testtest')) {
+      const normalizedPath = currentPath.replace('/tests/testtest', '/tests/test');
+      console.log('URL 정규화:', currentPath, '->', normalizedPath);
+      router.replace(normalizedPath);
+    }
+  }, [router.asPath, router]);
+
   // 이미지 경로를 올바르게 처리하는 함수
   const getImagePath = (path) => {
     if (!path) return null;
@@ -75,6 +85,10 @@ export default function Home() {
 
   // 테스트 ID를 폴더명으로 변환하는 함수
   const getTestFolderName = (testId) => {
+    // 이미 test로 시작하는 경우 그대로 반환, 아니면 test 추가
+    if (testId.startsWith('test')) {
+      return testId;
+    }
     return `test${testId}`;
   };
 
@@ -103,6 +117,18 @@ export default function Home() {
   // 방문자 통계 로드
   const loadVisitorStats = async () => {
     try {
+      // iframe 내부에서 실행 중인지 확인
+      if (window.self !== window.top) {
+        console.log('iframe 내부에서 실행 중 - API 호출 건너뜀');
+        setVisitorStats({ 
+          total: 15420, 
+          today: 342, 
+          week: 2156 
+        });
+        setApiStatus('failed');
+        return;
+      }
+
       const response = await apiClient.get('/visitors/count');
       setVisitorStats(response.data);
       setApiStatus('connected');
@@ -121,6 +147,20 @@ export default function Home() {
   // 카테고리 목록 로드
   const loadCategories = async () => {
     try {
+      // iframe 내부에서 실행 중인지 확인
+      if (window.self !== window.top) {
+        console.log('iframe 내부에서 실행 중 - 카테고리 API 호출 건너뜀');
+        setCategories([
+          { id: '성격', name: '성격' },
+          { id: '연애', name: '연애' },
+          { id: '직업', name: '직업' },
+          { id: '취미', name: '취미' },
+          { id: '지능', name: '지능' },
+          { id: '사회성', name: '사회성' }
+        ]);
+        return;
+      }
+
       const response = await apiClient.get('/categories');
       
       // API 응답이 배열인 경우 카테고리 객체로 변환
@@ -150,6 +190,48 @@ export default function Home() {
   // 테스트 데이터 로드
   const loadTests = async (reset = false) => {
     try {
+      // iframe 내부에서 실행 중인지 확인
+      if (window.self !== window.top) {
+        console.log('iframe 내부에서 실행 중 - 테스트 API 호출 건너뜀');
+        if (reset && tests.length === 0) {
+          setTests([
+            {
+              id: 'test1',
+              title: '성격 유형 테스트',
+              description: '당신의 성격 유형을 알아보세요',
+              category: 'personality',
+              views: 1250,
+              likes: 89,
+              comments: 23,
+              createdAt: new Date().toISOString()
+            },
+            {
+              id: 'test2',
+              title: '연애 성향 테스트',
+              description: '당신의 연애 스타일을 알아보세요',
+              category: 'love',
+              views: 980,
+              likes: 67,
+              comments: 15,
+              createdAt: new Date(Date.now() - 86400000).toISOString()
+            },
+            {
+              id: 'test3',
+              title: '직업 적성 테스트',
+              description: '당신에게 맞는 직업을 찾아보세요',
+              category: 'career',
+              views: 756,
+              likes: 45,
+              comments: 12,
+              createdAt: new Date(Date.now() - 172800000).toISOString()
+            }
+          ]);
+        }
+        setLoading(false);
+        setLoadingMore(false);
+        return;
+      }
+
       if (reset) {
         setLoading(true);
         setError(null);
@@ -366,7 +448,11 @@ export default function Home() {
             {sortedTests.map((test) => (
               <Card 
                 key={test.id} 
-                onClick={() => router.push(`/tests/${getTestFolderName(test.id)}`)}
+                onClick={() => {
+                  const testPath = `/tests/${getTestFolderName(test.id)}`;
+                  console.log('테스트 클릭:', testPath);
+                  router.push(testPath);
+                }}
                 style={{ cursor: 'pointer' }}
               >
                 {test.thumbnail ? (

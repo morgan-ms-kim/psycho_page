@@ -146,6 +146,14 @@ if [ -f "index.html" ]; then
         const parentUrl = urlParams.get('parent');
         const isEmbedded = urlParams.get('embedded') === 'true';
         
+        // 현재 URL에서 중복 경로 확인 및 수정
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('/tests/testtest')) {
+          // 중복 경로 감지 시 올바른 경로로 수정
+          const correctPath = currentPath.replace('/tests/testtest', '/tests/test');
+          window.history.replaceState(null, '', correctPath);
+        }
+        
         if (isEmbedded && parentUrl) {
           // iframe 내부에서 실행 중일 때
           window.addEventListener('beforeunload', function() {
@@ -162,6 +170,15 @@ if [ -f "index.html" ]; then
               if (window.top && window.top !== window.self) {
                 window.top.location.href = parentUrl;
               }
+            }
+          });
+          
+          // 페이지 로드 시 경로 검증
+          window.addEventListener('load', function() {
+            const currentPath = window.location.pathname;
+            if (currentPath.includes('/tests/testtest')) {
+              const correctPath = currentPath.replace('/tests/testtest', '/tests/test');
+              window.history.replaceState(null, '', correctPath);
             }
           });
         } else if (!isEmbedded && window.self === window.top) {
