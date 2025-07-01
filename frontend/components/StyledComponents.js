@@ -131,9 +131,16 @@ export const SocialButton = styled.button`
 export const Card = styled.div`
   background: rgba(255,255,255,0.1);
   border-radius: 15px;
-  padding: 25px;
+  padding: 20px;
   backdrop-filter: blur(10px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+  }
 `;
 
 export const QuestionCard = styled(Card)`
@@ -195,7 +202,17 @@ export const Textarea = styled.textarea`
 // 그리드 스타일들
 export const Grid = styled.div`
   display: grid;
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 15px;
+  }
 `;
 
 export const FlexRow = styled.div`

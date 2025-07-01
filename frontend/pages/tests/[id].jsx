@@ -392,29 +392,49 @@ export default function TestPage() {
       </Footer>
 
       {/* 카카오 광고 */}
+      <div id="kakao-ad-container"></div>
       <script
         dangerouslySetInnerHTML={{
           __html: `
-            <!-- PC 광고 -->
-            if( window.matchMedia('(min-width: 728px )').matches == true){
-              document.write('<ins class="kakao_ad_area kakao-ad-fixed" style="display:none;"   data-ad-unit = "DAN-NOAbzxQGMUQ8Mke7" data-ad-width = "728" data-ad-height = "90"></ins><scr'+'ipt type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></scr'+'ipt>');
-            }
-            <!-- Mobile 광고 -->
-            if( window.matchMedia('(max-width: 727px )').matches == true){
-              document.write('<ins class="kakao_ad_area kakao-ad-fixed" style="display:none;" data-ad-unit = "DAN-gNGXA6EnAXz8usSK" data-ad-width = "320" data-ad-height = "100"></ins> <scr'+'ipt type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></scr'+'ipt>');
-            }
+            (function() {
+              function loadKakaoAd() {
+                var isPC = window.matchMedia('(min-width: 728px)').matches;
+                var adUnit = isPC ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK';
+                var adWidth = isPC ? '728' : '320';
+                var adHeight = isPC ? '90' : '100';
+                
+                var adHtml = '<ins class="kakao_ad_area kakao-ad-fixed" style="display:none;" data-ad-unit="' + adUnit + '" data-ad-width="' + adWidth + '" data-ad-height="' + adHeight + '"></ins>';
+                var scriptHtml = '<script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async><\/script>';
+                
+                document.getElementById('kakao-ad-container').innerHTML = adHtml + scriptHtml;
+              }
+              
+              // 페이지 로드 완료 후 광고 로드
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadKakaoAd);
+              } else {
+                loadKakaoAd();
+              }
+              
+              // 화면 크기 변경 시 광고 다시 로드
+              window.addEventListener('resize', function() {
+                setTimeout(loadKakaoAd, 100);
+              });
+            })();
           `
         }}
       />
       <style jsx>{`
-        .kakao-ad-fixed {
+        #kakao-ad-container {
           position: fixed;
-          bottom: 20px; /* 하단에서 20px 위 */
-          left: 50%; /* 화면 중앙 */
-          transform: translateX(-50%); /* 정확한 중앙 정렬 */
-          width: 728px; /* 원래 크기로 복원 */
-          height: 90px; /* 원래 크기로 복원 */
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
           z-index: 1000;
+        }
+        .kakao-ad-fixed {
+          position: relative;
+          display: block !important;
         }
       `}</style>
     </MainWrap>

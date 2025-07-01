@@ -453,31 +453,37 @@ export default function Home() {
                   console.log('테스트 클릭:', testPath);
                   router.push(testPath);
                 }}
-                style={{ cursor: 'pointer' }}
               >
-                {test.thumbnail ? (
-                  <TestItemImage 
-                    src={getImagePath(test.thumbnail)} 
-                    alt={test.title}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                ) : null}
-                <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
-                  🧠
-                </TestItemPlaceholder>
-                <TestItemTitle>{test.title}</TestItemTitle>
-                <TestItemDesc>{test.description}</TestItemDesc>
-                <TestItemStats>
-                  <Stat>👁️ {test.views}</Stat>
-                  <Stat>💖 {test.likes}</Stat>
-                  <Stat>💬 {test.comments || 0}</Stat>
-                </TestItemStats>
-                <TestItemDate>
-                  {new Date(test.createdAt).toLocaleDateString()}
-                </TestItemDate>
+                <TestCardContent>
+                  <TestThumbnailContainer>
+                    {test.thumbnail ? (
+                      <TestItemImage 
+                        src={getImagePath(test.thumbnail)} 
+                        alt={test.title}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
+                      🧠
+                    </TestItemPlaceholder>
+                  </TestThumbnailContainer>
+                  
+                  <TestContent>
+                    <TestItemTitle>{test.title}</TestItemTitle>
+                    <TestItemDesc>{test.description}</TestItemDesc>
+                    <TestItemStats>
+                      <Stat>👁️ {test.views}</Stat>
+                      <Stat>💖 {test.likes}</Stat>
+                      <Stat>💬 {test.comments || 0}</Stat>
+                    </TestItemStats>
+                    <TestItemDate>
+                      {new Date(test.createdAt).toLocaleDateString()}
+                    </TestItemDate>
+                  </TestContent>
+                </TestCardContent>
               </Card>
             ))}
           </Grid>
@@ -502,29 +508,49 @@ export default function Home() {
       </Footer>
 
       {/* 카카오 광고 */}
+      <div id="kakao-ad-container"></div>
       <script
         dangerouslySetInnerHTML={{
           __html: `
-            <!-- PC 광고 -->
-            if( window.matchMedia('(min-width: 728px )').matches == true){
-              document.write('<ins class="kakao_ad_area kakao-ad-fixed" style="display:none;"   data-ad-unit = "DAN-NOAbzxQGMUQ8Mke7" data-ad-width = "728" data-ad-height = "90"></ins><scr'+'ipt type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></scr'+'ipt>');
-            }
-            <!-- Mobile 광고 -->
-            if( window.matchMedia('(max-width: 727px )').matches == true){
-              document.write('<ins class="kakao_ad_area kakao-ad-fixed" style="display:none;" data-ad-unit = "DAN-gNGXA6EnAXz8usSK" data-ad-width = "320" data-ad-height = "100"></ins> <scr'+'ipt type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></scr'+'ipt>');
-            }
+            (function() {
+              function loadKakaoAd() {
+                var isPC = window.matchMedia('(min-width: 728px)').matches;
+                var adUnit = isPC ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK';
+                var adWidth = isPC ? '728' : '320';
+                var adHeight = isPC ? '90' : '100';
+                
+                var adHtml = '<ins class="kakao_ad_area kakao-ad-fixed" style="display:none;" data-ad-unit="' + adUnit + '" data-ad-width="' + adWidth + '" data-ad-height="' + adHeight + '"></ins>';
+                var scriptHtml = '<script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async><\/script>';
+                
+                document.getElementById('kakao-ad-container').innerHTML = adHtml + scriptHtml;
+              }
+              
+              // 페이지 로드 완료 후 광고 로드
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadKakaoAd);
+              } else {
+                loadKakaoAd();
+              }
+              
+              // 화면 크기 변경 시 광고 다시 로드
+              window.addEventListener('resize', function() {
+                setTimeout(loadKakaoAd, 100);
+              });
+            })();
           `
         }}
       />
       <style jsx>{`
-        .kakao-ad-fixed {
+        #kakao-ad-container {
           position: fixed;
-          bottom: 20px; /* 하단에서 20px 위 */
-          left: 50%; /* 화면 중앙 */
-          transform: translateX(-50%); /* 정확한 중앙 정렬 */
-          width: 728px; /* 원래 크기로 복원 */
-          height: 90px; /* 원래 크기로 복원 */
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
           z-index: 1000;
+        }
+        .kakao-ad-fixed {
+          position: relative;
+          display: block !important;
         }
       `}</style>
     </MainWrap>
@@ -572,48 +598,79 @@ const TestCount = styled.div`
   opacity: 0.8;
 `;
 
+const TestCardContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
+
+const TestThumbnailContainer = styled.div`
+  position: relative;
+  margin-bottom: 15px;
+`;
+
 const TestItemPlaceholder = styled.div`
   width: 100%;
-  height: 150px;
+  height: 180px;
   background: linear-gradient(45deg, #667eea, #764ba2);
   border-radius: 10px;
-  margin-bottom: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 3rem;
   color: white;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+const TestContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 `;
 
 const TestItemTitle = styled.h3`
   font-size: 1.2rem;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 8px 0;
   line-height: 1.3;
+  font-weight: 600;
 `;
 
 const TestItemDesc = styled.p`
   font-size: 0.9rem;
-  margin: 0 0 1rem 0;
+  margin: 0 0 12px 0;
   opacity: 0.8;
   line-height: 1.4;
+  flex: 1;
 `;
 
-const Stat = styled.span`
+const TestItemStats = styled.div`
+  display: flex;
+  gap: 12px;
   font-size: 0.8rem;
   opacity: 0.7;
-  margin-right: 1rem;
+  margin-bottom: 8px;
 `;
+
+const Stat = styled.span``;
 
 const TestItemDate = styled.div`
   font-size: 0.8rem;
   opacity: 0.6;
-  margin-top: 0.5rem;
+  margin-top: auto;
 `;
 
 const TestItemImage = styled.img`
   width: 100%;
-  height: 150px;
+  height: 180px;
   object-fit: cover;
   border-radius: 10px;
-  margin-bottom: 1rem;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
 `; 
