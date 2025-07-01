@@ -549,10 +549,21 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     thumbnailReady: false
   };
   try {
-    // 1. nextId로 폴더명 미리 결정
-    const maxId = await Test.max('id');
-    const nextId = (maxId || 0) + 1;
-    const folderName = `test${nextId}`;
+    // === 폴더명 중 가장 큰 번호 찾기 (기존 maxId/nextId/폴더Name 완전 대체) ===
+    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
+    let maxFolderNum = 0;
+    if (fs.existsSync(testsDir)) {
+      const folderNames = fs.readdirSync(testsDir)
+        .filter(name => /^test\d+$/.test(name))
+        .map(name => parseInt(name.replace('test', ''), 10))
+        .filter(num => !isNaN(num));
+      if (folderNames.length > 0) {
+        maxFolderNum = Math.max(...folderNames);
+      }
+    }
+    const nextFolderNum = maxFolderNum + 1;
+    const folderName = `test${nextFolderNum}`;
+    // === 폴더명 생성 끝 ===
     const { gitUrl, title, description, category } = req.body;
     if (!gitUrl || !title) {
       return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.', steps });
@@ -561,7 +572,6 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
       return res.status(400).json({ error: 'GitHub 또는 GitLab 저장소만 지원합니다.', steps });
     }
     // 2. 폴더 생성 및 git clone
-    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
     const testPath = path.join(testsDir, folderName);
     
     // 기존 폴더가 있으면 삭제
@@ -1011,7 +1021,12 @@ app.post('/api/admin/cleanup-orphan-folders', authenticateAdmin, async (req, res
     });
   } catch (error) {
     console.error('❌ 등록되지 않은 폴더 정리 실패:', error);
-    next(error);
+    // 명확한 에러 메시지 반환
+    res.status(500).json({ 
+      success: false,
+      message: '등록되지 않은 폴더 정리 중 오류 발생',
+      error: error.message || error.toString()
+    });
   }
 });
 
