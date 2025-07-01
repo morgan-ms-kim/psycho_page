@@ -438,7 +438,7 @@ export default function TestPage() {
   return (
     <MainWrap style={{ paddingTop: 0, background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
       {/* 카카오 광고: 맨 위 */}
-      <div id="kakao-ad-container" style={{ width: '100%', maxWidth: 900, margin: '0 auto', marginTop: 8, marginBottom: 8, borderRadius: 12, overflow: 'hidden', minHeight: 60, textAlign: 'center', background: '#fff' }} />
+      <div id="kakao-ad-container" style={{ width: '100%', maxWidth: 900, margin: '0 auto', marginTop: 8, marginBottom: 0, borderRadius: 12, overflow: 'hidden', minHeight: 60, textAlign: 'center', background: '#fff' }} />
       <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
         <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
       </Header>
@@ -451,8 +451,8 @@ export default function TestPage() {
       {/* 테스트 앱(iframe) */}
       {iframeSection}
       {/* 제목/설명 카드: iframe 아래로 이동, 여백 최소화 */}
-      <Section style={{ marginTop: 0, marginBottom: 16 }}>
-        <InfoCard style={{ background: 'rgba(255,255,255,0.97)', color: '#222', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', padding: '16px 12px', margin: '0 auto', maxWidth: 600 }}>
+      <Section style={{ maxWidth: 900, margin: '0 auto', marginTop: 0, marginBottom: 16 }}>
+        <InfoCard style={{ maxWidth: 900, margin: '0 auto', background: 'rgba(255,255,255,0.97)', color: '#222', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', padding: '16px 12px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
             <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
@@ -482,7 +482,7 @@ export default function TestPage() {
         </InfoCard>
       </Section>
       {/* 댓글 섹션 */}
-      <CommentSection style={{ marginBottom: '1rem', padding: '0 1rem' }}>
+      <CommentSection style={{ maxWidth: 900, margin: '0 auto', marginBottom: '1rem', padding: '0 1rem' }}>
         <CommentHeader>
           <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
           <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>

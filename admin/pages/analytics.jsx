@@ -215,8 +215,8 @@ export default function Analytics() {
 
   // 진입 시 오늘 날짜로 자동 조회
   useEffect(() => {
-    loadAnalytics(today, today);
-    fetchVisitors(today, today);
+    loadAnalytics('', '');
+    fetchVisitors('', '');
   }, []);
 
   if (loading) {
@@ -378,7 +378,7 @@ export default function Analytics() {
                 <tr><td colSpan={4} style={{ textAlign: 'center' }}>방문자 데이터가 없습니다.</td></tr>
               ) : visitorList.map((v, i) => (
                 <tr key={v.id || i}>
-                  <td>{v.country || '-'}</td>
+                  <td>{v.country}{v.region ? ' / ' + v.region : ''}</td>
                   <td>{v.ip || '-'}</td>
                   <td>{v.isBot ? '🤖 봇' : '🧑 인간'}</td>
                   <td>{v.visitedAt ? new Date(v.visitedAt).toLocaleString('ko-KR') : '-'}</td>
