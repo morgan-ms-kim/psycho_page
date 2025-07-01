@@ -6,6 +6,7 @@ export const MainWrap = styled.div`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-y: auto;
 `;
 
 export const Header = styled.header`

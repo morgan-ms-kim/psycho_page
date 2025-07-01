@@ -69,8 +69,8 @@ const TestContainer = styled.div`
   position: relative;
   width: 100%;
   max-width: 900px;
-  height: 70vh;
-  min-height: 400px;
+  height: 50vh;
+  min-height: 250px;
   margin: 2rem auto 2rem auto;
   background: white;
   border-radius: 14px;
@@ -79,13 +79,13 @@ const TestContainer = styled.div`
   display: flex;
   flex-direction: column;
   @media (max-width: 900px) {
-    height: 60vh;
-    min-height: 300px;
+    height: 40vh;
+    min-height: 180px;
     margin: 1rem 0;
   }
   @media (max-width: 600px) {
-    height: 50vh;
-    min-height: 200px;
+    height: 30vh;
+    min-height: 120px;
     border-radius: 8px;
     margin: 0.5rem 0;
   }
@@ -418,7 +418,7 @@ export default function TestPage() {
         </InfoCard>
       </Section>
       {/* 댓글 섹션 */}
-      <CommentSection>
+      <CommentSection style={{ marginBottom: '2rem', padding: '0 1rem' }}>
         <CommentHeader>
           <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
           <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>
@@ -456,7 +456,7 @@ export default function TestPage() {
           <CommentItem key={comment.id} comment={comment} />
         ))}
       </CommentSection>
-      <Footer />
+      <Footer style={{ marginTop: '2rem' }} />
     </MainWrap>
   );
 } 
