@@ -870,7 +870,9 @@ app.get('/api/admin/analytics-country', authenticateAdmin, async (req, res, next
 app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
   try {
     const { page = 1, limit = 50, start, end } = req.query;
-    const offset = (page - 1) * limit;
+    const safePage = Math.max(1, parseInt(page));
+    const safeLimit = Math.max(1, parseInt(limit));
+    const offset = (safePage - 1) * safeLimit;
     let where = {};
     if (start) where.visitedAt = { [Op.gte]: new Date(start) };
     if (end) {
@@ -885,8 +887,8 @@ app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
       }],
       where,
       order: [['visitedAt', 'DESC']],
-      limit: parseInt(limit),
-      offset: parseInt(offset)
+      limit: safeLimit,
+      offset: offset
     });
     // userAgent로 봇 여부 판별
     const isBot = (ua) => {
@@ -902,8 +904,8 @@ app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
     res.json({
       visitors: visitorsWithBot,
       total: visitors.count,
-      pages: Math.ceil(visitors.count / limit),
-      currentPage: parseInt(page)
+      pages: Math.ceil(visitors.count / safeLimit),
+      currentPage: safePage
     });
   } catch (error) {
     next(error);
