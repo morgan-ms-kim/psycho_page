@@ -69,10 +69,10 @@ const isValidTestUrl = (id) => {
 const TestContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: 1200px;
-  min-width: 800px;
-  max-height: 1000px;
-  min-height: 800px;
+  max-width: 90vx;
+  min-width: 80vx;
+  max-height: 70vx;
+  min-height: 60vx;
   margin: 2rem auto;
   background: white;
   border-radius: 24px;
@@ -87,8 +87,8 @@ const TestContainer = styled.div`
     padding: 24px 4px;
   }
   @media (max-width: 600px) {
-    max-width: 100vw;
-    width: 100vw;
+    max-width: 96vw;
+    width: 96vw;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     margin: 0.5rem 0 1.5rem 0;
