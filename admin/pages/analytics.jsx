@@ -94,6 +94,8 @@ export default function Analytics() {
   const today = dayjs().format('YYYY-MM-DD');
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(today);
+  const [visitorPage, setVisitorPage] = useState(1);
+  const [visitorTotal, setVisitorTotal] = useState(0);
 
   useEffect(() => {
     // 로그인 확인
@@ -181,16 +183,18 @@ export default function Analytics() {
   };
 
   // 방문자 상세 리스트 로드 함수
-  const fetchVisitors = async (customStart, customEnd) => {
+  const fetchVisitors = async (page = 1, customStart, customEnd) => {
     try {
       setVisitorLoading(true);
-      let url = '/admin/visitors?page=1&limit=50';
+      let url = `/admin/visitors?page=${page}&limit=50`;
       if (customStart) url += `&start=${customStart}`;
       if (customEnd) url += `&end=${customEnd}`;
       const res = await apiClient.get(url);
       setVisitorList(res.data.visitors || []);
+      setVisitorTotal(res.data.total || 0);
     } catch (e) {
       setVisitorList([]);
+      setVisitorTotal(0);
     } finally {
       setVisitorLoading(false);
     }
@@ -205,7 +209,7 @@ export default function Analytics() {
   // 기간 적용 버튼
   const handleApplyPeriod = () => {
     loadAnalytics(startDate, endDate);
-    fetchVisitors(startDate, endDate);
+    fetchVisitors(visitorPage, startDate, endDate);
   };
 
   // 전체 기간 버튼
@@ -220,6 +224,11 @@ export default function Analytics() {
     loadAnalytics('', '');
     fetchVisitors('', '');
   }, []);
+
+  // visitorPage, startDate, endDate 변경 시 방문자 리스트 재요청
+  useEffect(() => {
+    fetchVisitors(visitorPage, startDate, endDate);
+  }, [visitorPage, startDate, endDate]);
 
   if (loading) {
     return (
@@ -388,6 +397,11 @@ export default function Analytics() {
               ))}
             </tbody>
           </Table>
+          <div style={{ textAlign: 'center', margin: '1rem 0' }}>
+            <button onClick={() => setVisitorPage(p => Math.max(1, p - 1))} disabled={visitorPage === 1}>이전</button>
+            <span style={{ margin: '0 1rem' }}>{visitorPage} / {Math.max(1, Math.ceil(visitorTotal / 50))}</span>
+            <button onClick={() => setVisitorPage(p => p + 1)} disabled={visitorPage >= Math.ceil(visitorTotal / 50)}>다음</button>
+          </div>
         </DataTable>
       </Main>
     </Container>

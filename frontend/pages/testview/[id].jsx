@@ -563,7 +563,7 @@ export default function TestPage() {
             <CommentHeader style={{ width: '100%', justifyContent: 'center', marginBottom: 16 }}>
               <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
               <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>
-                {showCommentForm ? '취소' : '💬댓글 작성'}
+                {showCommentForm ? '취소' : '댓글 작성'}
               </CommentButton>
             </CommentHeader>
             {showCommentForm && (
