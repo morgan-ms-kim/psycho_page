@@ -28,7 +28,8 @@ import {
   Image,
   ProgressBar,
   ProgressFill,
-  ProgressText
+  ProgressText,
+  SocialButton
 } from '../../components/StyledComponents';
 
 // axios 인스턴스 생성
