@@ -165,17 +165,20 @@ export const ResultCard = styled(Card)`
   text-align: center;
 `;
 
-export const InfoCard = styled.div`
-  max-width: 1100px;
-  margin: 32px auto 0 auto;
-  padding: 0 16px 32px 16px;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(80,80,120,0.10);
-  background: #fff;
+export const InfoCard = styled(Card)`
+  border-radius: 15px;
+  max-width: 1200px;
+  margin: 40px auto 0 auto;
+  padding: 40px 32px;
+
+  @media (max-width: 900px) {
+    padding: 24px 8px;
+    margin: 24px 0 0 0;
+  }
   @media (max-width: 600px) {
-    max-width: 100vw;
-    padding: 0 4px 16px 4px;
+    padding: 16px 2vw;
     border-radius: 8px;
+    margin: 16px 0 0 0;
   }
 `;
 
@@ -250,31 +253,20 @@ export const FlexColumn = styled.div`
 
 // 섹션 스타일들
 export const Section = styled.div`
-  max-width: 1100px;
-  margin: 32px auto 0 auto;
-  padding: 0 16px 32px 16px;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(80,80,120,0.10);
-  background: #fff;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  padding: 0 20px;
+
   @media (max-width: 600px) {
     max-width: 100vw;
-    padding: 0 4px 16px 4px;
-    border-radius: 8px;
+    padding: 0 2vw;
+    margin-bottom: 16px;
   }
 `;
 
 export const CommentSection = styled.div`
-  max-width: 1100px;
-  margin: 32px auto;
-  padding: 0 16px 32px 16px;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(80,80,120,0.10);
-  background: #fff;
-  @media (max-width: 600px) {
-    max-width: 100vw;
-    padding: 0 4px 16px 4px;
-    border-radius: 8px;
-  }
+  max-width: 800px;
+  margin: 0 auto;
 `;
 
 // 타이틀 스타일들
