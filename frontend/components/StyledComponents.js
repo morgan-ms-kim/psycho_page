@@ -203,7 +203,7 @@ export const Textarea = styled.textarea`
 // 그리드 스타일들
 export const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 600px));
   gap: 20px;
   max-width: 1200px;
   margin: 0 auto;

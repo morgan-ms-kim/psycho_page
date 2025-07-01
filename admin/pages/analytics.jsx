@@ -89,8 +89,9 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
   const [visitorList, setVisitorList] = useState([]);
   const [visitorLoading, setVisitorLoading] = useState(true);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const today = dayjs().format('YYYY-MM-DD');
+  const [startDate, setStartDate] = useState(today);
+  const [endDate, setEndDate] = useState(today);
 
   useEffect(() => {
     // 로그인 확인
@@ -212,13 +213,11 @@ export default function Analytics() {
     fetchVisitors('', '');
   };
 
-  // 기간 변경 시 자동 반영
+  // 진입 시 오늘 날짜로 자동 조회
   useEffect(() => {
-    if (startDate || endDate) {
-      loadAnalytics(startDate, endDate);
-      fetchVisitors(startDate, endDate);
-    }
-  }, [startDate, endDate]);
+    loadAnalytics(today, today);
+    fetchVisitors(today, today);
+  }, []);
 
   if (loading) {
     return (
@@ -395,12 +394,12 @@ export default function Analytics() {
 
 const Container = styled.div`
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background: linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%);
 `;
 
 const Header = styled.header`
-  background: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: transparent;
+  box-shadow: none;
   position: sticky;
   top: 0;
   z-index: 100;
