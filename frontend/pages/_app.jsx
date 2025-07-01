@@ -17,6 +17,11 @@ const theme = {
 
 export default function App({ Component, pageProps }) {
   useEffect(() => {
+    // testview 페이지에서는 광고를 로드하지 않음 (testview에서 직접 처리)
+    if (window.location.pathname.includes('/testview/')) {
+      return;
+    }
+    
     // 카카오 광고 로드 함수
     const loadKakaoAd = () => {
       try {

@@ -170,7 +170,9 @@ export const InfoCard = styled(Card)`
   max-width: 1200px;
   margin: 40px auto 0 auto;
   padding: 40px 32px;
-
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   @media (max-width: 900px) {
     padding: 24px 8px;
     margin: 24px 0 0 0;
@@ -256,7 +258,9 @@ export const Section = styled.div`
   max-width: 800px;
   margin: 0 auto 30px;
   padding: 0 20px;
-
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   @media (max-width: 600px) {
     max-width: 100vw;
     padding: 0 2vw;
@@ -267,6 +271,9 @@ export const Section = styled.div`
 export const CommentSection = styled.div`
   max-width: 800px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 // 타이틀 스타일들

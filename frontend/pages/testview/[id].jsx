@@ -179,6 +179,30 @@ function RenderedCommentItem({ comment }) {
   );
 }
 
+export const InfoCard = styled(Card)`
+  max-width: 90vw;
+  min-width: 80vw;
+  margin: 2rem auto 0 auto;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  padding: 32px 16px;
+  background: #fff;
+
+  @media (max-width: 1200px) {
+    max-width: 98vw;
+    border-radius: 16px;
+    padding: 24px 4px;
+  }
+  @media (max-width: 600px) {
+    max-width: 96vw;
+    min-width: 96vw;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin: 0.5rem 0 1.5rem 0;
+    padding: 8px 0;
+  }
+`;
+
 export default function TestPage() {
   const router = useRouter();
   const { id } = router.query;
@@ -352,28 +376,76 @@ export default function TestPage() {
   };
 
   useEffect(() => {
-    // 광고 컨테이너가 Section 내부에 이미 렌더링되어 있으므로, 해당 컨테이너에만 광고 삽입
-    const container = document.getElementById('kakao-ad-container');
-    if (container) {
-      container.innerHTML = '';
+    // 광고를 Section 내부 맨 위에 고정 배치
+    const section = document.querySelector('section');
+    if (section) {
+      // 기존 광고 컨테이너 제거
+      const existingContainer = document.getElementById('kakao-ad-container');
+      if (existingContainer) {
+        existingContainer.remove();
+      }
+      
+      // 새로운 광고 컨테이너 생성 (Section 맨 위에 고정)
+      const container = document.createElement('div');
+      container.id = 'kakao-ad-container';
+      container.style.cssText = `
+        position: relative;
+        width: 100%;
+        max-width: 728px;
+        margin: 0 auto 24px auto;
+        text-align: center;
+        min-height: 90px;
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        z-index: 10;
+      `;
+      
+      // Section 맨 위에 삽입
+      section.insertBefore(container, section.firstChild);
+      
       try {
         const isPC = window.matchMedia('(min-width: 728px)').matches;
         const adUnit = isPC ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK';
         const adWidth = isPC ? '728' : '320';
         const adHeight = isPC ? '90' : '100';
+        
         const adElement = document.createElement('ins');
         adElement.className = 'kakao_ad_area kakao-ad-fixed';
-        adElement.style.display = 'none';
+        adElement.style.cssText = `
+          display: block !important;
+          width: ${adWidth}px;
+          height: ${adHeight}px;
+          margin: 0 auto;
+        `;
         adElement.setAttribute('data-ad-unit', adUnit);
         adElement.setAttribute('data-ad-width', adWidth);
         adElement.setAttribute('data-ad-height', adHeight);
-        const scriptElement = document.createElement('script');
-        scriptElement.type = 'text/javascript';
-        scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-        scriptElement.async = true;
+        
+        // 기존 스크립트가 있는지 확인
+        const existingScript = document.querySelector('script[src*="daumcdn.net"]');
+        if (!existingScript) {
+          const scriptElement = document.createElement('script');
+          scriptElement.type = 'text/javascript';
+          scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+          scriptElement.async = true;
+          document.head.appendChild(scriptElement);
+        }
+        
         container.appendChild(adElement);
-        container.appendChild(scriptElement);
-      } catch (e) { console.error(e); }
+        
+        // 광고 로드 확인 및 재시도
+        setTimeout(() => {
+          if (adElement.style.display === 'none' || !adElement.innerHTML) {
+            console.log('광고 재로드 시도');
+            adElement.style.display = 'block';
+          }
+        }, 2000);
+        
+      } catch (e) { 
+        console.error('광고 로드 실패:', e); 
+      }
     }
   }, []);
 
@@ -460,7 +532,7 @@ export default function TestPage() {
           {/* 테스트 앱(iframe) */}
           {iframeSection}
           {/* 제목/설명 카드: iframe 아래로 이동, 여백 최소화 */}
-          <InfoCard style={{
+          <InfoCard as={TestContainer} style={{
             maxWidth: 1200,
             margin: '40px auto 0 auto',
             background: '#fff',
@@ -468,10 +540,10 @@ export default function TestPage() {
             boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
             padding: '40px 32px'
           }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, width: '100%', textAlign: 'center' }}>
               <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
               <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
-              <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center', width: '100%' }}>
                 <div style={{ textAlign: 'center' }}>
                   <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>조회수</StatLabel>
                   <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{test?.views || 0}</StatValue>
@@ -485,7 +557,7 @@ export default function TestPage() {
                   <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{commentCount}</StatValue>
                 </div>
               </div>
-              <FlexRow style={{ width: '100%', justifyContent: 'center', gap: 10, marginTop: 4 }}>
+              <FlexRow style={{ justifyContent: 'center', gap: 10, marginTop: 4 }}>
                 <SocialButton onClick={handleLike} liked={liked} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: liked ? '#fff' : '#222', background: liked ? '#7f7fd5' : '#fff', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
                   {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
                 </SocialButton>
