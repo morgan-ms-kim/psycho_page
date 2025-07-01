@@ -10,6 +10,7 @@ import path from 'path';
 import multer from 'multer';
 import geoip from 'geoip-lite';
 import { createRequire } from 'module';
+import sitemapRouter from './routes/sitemap.js';
 const require = createRequire(import.meta.url);
 let REGION_MAP = {};
 try {
@@ -1172,4 +1173,6 @@ sequelize.sync().then(() => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   });
-}); 
+});
+
+app.use('/', sitemapRouter); 
