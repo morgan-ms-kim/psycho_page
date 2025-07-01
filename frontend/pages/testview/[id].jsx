@@ -320,37 +320,7 @@ export default function TestPage() {
     );
   }
 
-  if (error) {
-    return (
-      <MainWrap>
-        <Header>
-          <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
-        </Header>
-        <ErrorMessage>
-          <p>🚫 {error}</p>
-          <button onClick={() => router.push('/')}>홈으로 돌아가기</button>
-        </ErrorMessage>
-      </MainWrap>
-    );
-  }
-
-  // 중복 렌더링 방지: test 데이터가 없거나 title이 비정상(예: github url)일 때 렌더링 X
-  if (!test || !test.title || test.title.startsWith('http')) {
-    return (
-      <MainWrap>
-        <Header>
-          <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
-        </Header>
-        <ErrorMessage>
-          <p>🚫 올바른 테스트 정보가 없습니다.</p>
-        </ErrorMessage>
-      </MainWrap>
-    );
-  }
-
   const commentCount = comments.length;
-
-  // iframe URL 설정 - 간단하게
   const testUrl = `/tests/${id}/`;
 
   // iframe 렌더링 부분 개선
@@ -400,14 +370,18 @@ export default function TestPage() {
         <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
         <TestTitle>{test?.title || '테스트'}</TestTitle>
       </Header>
+      {/* 에러 메시지(있을 때만) */}
+      {error && (
+        <ErrorMessage>
+          <p>🚫 {error}</p>
+        </ErrorMessage>
+      )}
       {iframeSection}
-
       {/* 테스트 정보 및 소셜 기능 */}
       <Section>
         <InfoCard>
-          <Title>{test?.title}</Title>
-          <SubTitle>{test?.description}</SubTitle>
-            
+          <Title>{test?.title || '테스트'}</Title>
+          <SubTitle>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
           <FlexRow>
             <SocialButton onClick={handleLike} liked={liked}>
               {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
@@ -416,7 +390,6 @@ export default function TestPage() {
               💬 댓글 작성
             </SocialButton>
           </FlexRow>
-          
           <Grid>
             <StatItem>
               <StatLabel>조회수</StatLabel>
@@ -433,7 +406,6 @@ export default function TestPage() {
           </Grid>
         </InfoCard>
       </Section>
-
       {/* 댓글 섹션 */}
       <CommentSection>
         <CommentHeader>
@@ -442,7 +414,6 @@ export default function TestPage() {
             {showCommentForm ? '취소' : '댓글 작성'}
           </CommentButton>
         </CommentHeader>
-
         {showCommentForm && (
           <CommentFormContainer>
             <CommentInput
@@ -470,12 +441,10 @@ export default function TestPage() {
             </CommentSubmitButton>
           </CommentFormContainer>
         )}
-
         {comments.map((comment) => (
           <CommentItem key={comment.id} comment={comment} />
         ))}
       </CommentSection>
-
       <Footer />
     </MainWrap>
   );
