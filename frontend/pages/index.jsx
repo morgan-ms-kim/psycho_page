@@ -487,7 +487,7 @@ export default function Home() {
                       console.error('테스트 ID가 없습니다:', test);
                       return;
                     }
-                    const testPath = `/tests/${getTestFolderName(test.id)}`;
+                    const testPath = `/testview/${getTestFolderName(test.id)}`;
                     console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
                     router.push(testPath);
                   } catch (error) {
@@ -596,78 +596,3 @@ const TestCount = styled.div`
 `;
 
 const TestCardContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-`;
-
-const TestThumbnailContainer = styled.div`
-  position: relative;
-  margin-bottom: 15px;
-`;
-
-const TestItemPlaceholder = styled.div`
-  width: 100%;
-  height: 180px;
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  color: white;
-  transition: transform 0.3s ease;
-  
-  &:hover {
-    transform: scale(1.05);
-  }
-`;
-
-const TestContent = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-`;
-
-const TestItemTitle = styled.h3`
-  font-size: 1.2rem;
-  margin: 0 0 8px 0;
-  line-height: 1.3;
-  font-weight: 600;
-`;
-
-const TestItemDesc = styled.p`
-  font-size: 0.9rem;
-  margin: 0 0 12px 0;
-  opacity: 0.8;
-  line-height: 1.4;
-  flex: 1;
-`;
-
-const TestItemStats = styled.div`
-  display: flex;
-  gap: 12px;
-  font-size: 0.8rem;
-  opacity: 0.7;
-  margin-bottom: 8px;
-`;
-
-const Stat = styled.span``;
-
-const TestItemDate = styled.div`
-  font-size: 0.8rem;
-  opacity: 0.6;
-  margin-top: auto;
-`;
-
-const TestItemImage = styled.img`
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 10px;
-  transition: transform 0.3s ease;
-  
-  &:hover {
-    transform: scale(1.05);
-  }
-`; 

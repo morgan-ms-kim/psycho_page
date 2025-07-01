@@ -50,7 +50,7 @@ export default function History() {
   };
 
   const retakeTest = (testId) => {
-    router.push(`/tests/${testId}`);
+    router.push(`/testview/${testId}`);
   };
 
   if (loading) {
