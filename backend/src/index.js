@@ -804,24 +804,66 @@ app.get('/api/admin/analytics', authenticateAdmin, async (req, res, next) => {
   }
 });
 
-// 방문자 상세 로그
+// 국가별 방문자수 집계 API
+app.get('/api/admin/analytics-country', authenticateAdmin, async (req, res, next) => {
+  try {
+    const { start, end } = req.query;
+    let where = {};
+    if (start) where.visitedAt = { [Op.gte]: new Date(start) };
+    if (end) {
+      where.visitedAt = where.visitedAt || {};
+      where.visitedAt[Op.lte] = new Date(end);
+    }
+    // 국가별 집계
+    const countryStats = await Visitor.findAll({
+      attributes: [
+        'country',
+        [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+      ],
+      where,
+      group: ['country'],
+      order: [[sequelize.literal('count'), 'DESC']]
+    });
+    res.json(countryStats);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 방문자 상세 로그 (isBot 필드 추가)
 app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
   try {
-    const { page = 1, limit = 50 } = req.query;
+    const { page = 1, limit = 50, start, end } = req.query;
     const offset = (page - 1) * limit;
-    
+    let where = {};
+    if (start) where.visitedAt = { [Op.gte]: new Date(start) };
+    if (end) {
+      where.visitedAt = where.visitedAt || {};
+      where.visitedAt[Op.lte] = new Date(end);
+    }
     const visitors = await Visitor.findAndCountAll({
       include: [{
         model: Test,
         attributes: ['title']
       }],
+      where,
       order: [['visitedAt', 'DESC']],
       limit: parseInt(limit),
       offset: parseInt(offset)
     });
-    
+    // userAgent로 봇 여부 판별
+    const isBot = (ua) => {
+      if (!ua) return false;
+      const botKeywords = ['bot', 'spider', 'crawl', 'slurp', 'baidu', 'bing', 'duckduck', 'yeti', 'naver', 'daum'];
+      return botKeywords.some(k => ua.toLowerCase().includes(k));
+    };
+    const visitorsWithBot = visitors.rows.map(v => {
+      const vObj = v.toJSON();
+      vObj.isBot = isBot(vObj.userAgent);
+      return vObj;
+    });
     res.json({
-      visitors: visitors.rows,
+      visitors: visitorsWithBot,
       total: visitors.count,
       pages: Math.ceil(visitors.count / limit),
       currentPage: parseInt(page)

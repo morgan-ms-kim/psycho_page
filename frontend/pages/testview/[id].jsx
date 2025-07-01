@@ -25,7 +25,6 @@ import {
   Title,
   SubTitle,
   SectionTitle,
-  Image,
   ProgressBar,
   ProgressFill,
   ProgressText,
