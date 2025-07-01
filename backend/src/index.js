@@ -829,7 +829,11 @@ app.get('/api/admin/analytics', authenticateAdmin, async (req, res, next) => {
       replacements: [startDate, parseInt(limit)],
       type: sequelize.QueryTypes.SELECT
     });
-    
+    // 오늘 날짜가 결과에 없으면 count 0으로 추가
+    const todayStr = new Date().toISOString().slice(0, 10);
+    if (period === 'day' && !visitors.some(v => v.date.startsWith(todayStr))) {
+      visitors.unshift({ date: todayStr, count: 0 });
+    }
     res.json(visitors);
   } catch (error) {
     next(error);
