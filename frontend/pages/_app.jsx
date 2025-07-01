@@ -36,7 +36,7 @@ export default function App({ Component, pageProps }) {
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1000;
+            z-index: 100;
             min-height: ${adHeight}px;
           `;
           document.body.appendChild(container);

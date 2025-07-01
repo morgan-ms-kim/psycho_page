@@ -81,6 +81,11 @@ export const Footer = styled.footer`
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 120px; /* 광고를 위한 여백 추가 */
+  
+  @media (max-width: 727px) {
+    margin-bottom: 140px; /* 모바일에서는 더 큰 여백 */
+  }
 `;
 
 // 버튼 스타일들

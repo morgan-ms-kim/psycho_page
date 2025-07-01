@@ -196,6 +196,33 @@ export default function TestPage() {
     }
   }, [test]);
 
+  // iframe 새로고침 방지 및 제어
+  useEffect(() => {
+    const preventRefresh = (e) => {
+      // iframe 내부에서 새로고침 시도 시
+      if (window.self !== window.top) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // iframe 내부에서 상위 페이지로 리다이렉트
+        window.top.location.href = `/psycho_page/tests/${id}`;
+        return false;
+      }
+    };
+
+    // 새로고침 이벤트 리스너 추가
+    window.addEventListener('beforeunload', preventRefresh);
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+        preventRefresh(e);
+      }
+    });
+
+    return () => {
+      window.removeEventListener('beforeunload', preventRefresh);
+    };
+  }, [id]);
+
   // 새로고침 버튼 핸들러
   const reloadIframe = () => {
     if (iframeRef.current) {
@@ -388,7 +415,7 @@ export default function TestPage() {
       </CommentSection>
 
       <Footer>
-        <p>© 2024 PSYCHO - 재미있는 심리테스트 모음</p>
+        <p>© 2025 PSYCHO - 재미있는 심리테스트 모음</p>
       </Footer>
 
 
