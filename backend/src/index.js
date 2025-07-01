@@ -9,7 +9,9 @@ import fs from 'fs';
 import path from 'path';
 import multer from 'multer';
 import geoip from 'geoip-lite';
-import regionNames from 'geoip-lite/regions.json';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const regionNames = require('geoip-lite/regions.json');
 
 const execAsync = promisify(exec);
 

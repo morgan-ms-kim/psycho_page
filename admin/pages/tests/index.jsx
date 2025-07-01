@@ -3,6 +3,8 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
 import Link from 'next/link';
+import geoip from 'geoip-lite';
+const regionNames = require('geoip-lite/regions.json');
 
 const apiClient = axios.create({
   baseURL: 'https://smartpick.website/api',
