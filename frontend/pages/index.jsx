@@ -192,43 +192,9 @@ export default function Home() {
   // 테스트 데이터 로드
   const loadTests = async (reset = false) => {
     try {
-      // iframe 내부에서 실행 중인지 확인
+      // iframe 내부에서 실행 중인지 확인 - 완전 차단
       if (window.self !== window.top) {
-        console.log('iframe 내부에서 실행 중 - 테스트 API 호출 건너뜀');
-        if (reset && tests.length === 0) {
-          setTests([
-            {
-              id: 'test1',
-              title: '성격 유형 테스트',
-              description: '당신의 성격 유형을 알아보세요',
-              category: 'personality',
-              views: 1250,
-              likes: 89,
-              comments: 23,
-              createdAt: new Date().toISOString()
-            },
-            {
-              id: 'test2',
-              title: '연애 성향 테스트',
-              description: '당신의 연애 스타일을 알아보세요',
-              category: 'love',
-              views: 980,
-              likes: 67,
-              comments: 15,
-              createdAt: new Date(Date.now() - 86400000).toISOString()
-            },
-            {
-              id: 'test3',
-              title: '직업 적성 테스트',
-              description: '당신에게 맞는 직업을 찾아보세요',
-              category: 'career',
-              views: 756,
-              likes: 45,
-              comments: 12,
-              createdAt: new Date(Date.now() - 172800000).toISOString()
-            }
-          ]);
-        }
+        console.log('iframe 내부에서 실행 중 - 모든 API 호출 차단');
         setLoading(false);
         setLoadingMore(false);
         return;

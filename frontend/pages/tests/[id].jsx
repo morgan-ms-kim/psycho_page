@@ -247,8 +247,8 @@ export default function TestPage() {
 
   const commentCount = comments.length;
 
-  // iframe URL 설정 - 중복 경로 방지
-  const testUrl = `/psycho_page/tests/${id}/?embedded=true&parent=${encodeURIComponent(window.location.origin + '/tests/' + id)}&preventRefresh=true`;
+  // iframe URL 설정 - 간단하게
+  const testUrl = `/psycho_page/tests/${id}/`;
 
   if (!checkedBuild && /^test\d+$/.test(id)) {
     return (
@@ -292,7 +292,7 @@ export default function TestPage() {
             onError={handleIframeError}
             title={test?.title || '테스트'}
             allow="fullscreen"
-            sandbox="allow-scripts allow-forms allow-popups allow-same-origin"
+            sandbox="allow-scripts allow-forms allow-popups"
           />
         </TestContainer>
       ) : (

@@ -138,68 +138,25 @@ else
   echo "[WARNING] build 또는 dist 폴더를 찾을 수 없습니다"
 fi
 
-# index.html에 새로고침 방지 스크립트 추가
+# index.html에 간단한 접근 제어 스크립트 추가
 if [ -f "index.html" ]; then
-  echo "[INFO] index.html에 새로고침 방지 스크립트 추가"
+  echo "[INFO] index.html에 접근 제어 스크립트 추가"
   
-  # 새로고침 방지 스크립트
-  REFRESH_SCRIPT="
+  # 간단한 접근 제어 스크립트
+  ACCESS_SCRIPT="
     <script>
-      // iframe 내부에서 새로고침 시 상위 페이지로 리다이렉트
-      (function() {
-        // URL 파라미터에서 parent 정보 확인
-        const urlParams = new URLSearchParams(window.location.search);
-        const parentUrl = urlParams.get('parent');
-        const isEmbedded = urlParams.get('embedded') === 'true';
-        
-        // 현재 URL에서 중복 경로 확인 및 수정
-        const currentPath = window.location.pathname;
-        if (currentPath.includes('/tests/testtest')) {
-          // 중복 경로 감지 시 올바른 경로로 수정
-          const correctPath = currentPath.replace('/tests/testtest', '/tests/test');
-          window.history.replaceState(null, '', correctPath);
-        }
-        
-        if (isEmbedded && parentUrl) {
-          // iframe 내부에서 실행 중일 때
-          window.addEventListener('beforeunload', function() {
-            // 새로고침 감지 시 상위 페이지로 리다이렉트
-            if (window.top && window.top !== window.self) {
-              window.top.location.href = parentUrl;
-            }
-          });
-          
-          // F5 키 감지
-          document.addEventListener('keydown', function(e) {
-            if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
-              e.preventDefault();
-              if (window.top && window.top !== window.self) {
-                window.top.location.href = parentUrl;
-              }
-            }
-          });
-          
-          // 페이지 로드 시 경로 검증
-          window.addEventListener('load', function() {
-            const currentPath = window.location.pathname;
-            if (currentPath.includes('/tests/testtest')) {
-              const correctPath = currentPath.replace('/tests/testtest', '/tests/test');
-              window.history.replaceState(null, '', correctPath);
-            }
-          });
-        } else if (!isEmbedded && window.self === window.top) {
-          // 직접 접근 시 홈으로 리다이렉트
-          window.location.href = '/';
-        }
-      })();
+      // iframe이 아닌 직접 접근 시 홈으로 리다이렉트
+      if (window.self === window.top) {
+        window.location.href = '/';
+      }
     </script>
   "
   
   # </head> 태그 앞에 스크립트 삽입
   cp index.html index.html.tmp
-  sed -i "s#</head>#$REFRESH_SCRIPT\n</head>#" index.html.tmp
+  sed -i "s#</head>#$ACCESS_SCRIPT\n</head>#" index.html.tmp
   mv index.html.tmp index.html
-  echo "[INFO] index.html 새로고침 방지 스크립트 추가 완료"
+  echo "[INFO] index.html 접근 제어 스크립트 추가 완료"
 else
   echo "[WARNING] index.html 파일을 찾을 수 없습니다"
 fi
