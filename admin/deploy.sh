@@ -4,7 +4,7 @@
 echo "🚀 강력한 배포 시작..."
 
 # 프로젝트 디렉토리로 이동
-cd /var/www/html/wordpress/psycho_page
+cd /var/www/html/psycho_page
 
 # Git pull
 echo "📥 Git pull 중..."
