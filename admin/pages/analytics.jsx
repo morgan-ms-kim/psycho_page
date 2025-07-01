@@ -14,6 +14,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
+import dayjs from 'dayjs';
 
 ChartJS.register(
   CategoryScale,
@@ -88,6 +89,8 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
   const [visitorList, setVisitorList] = useState([]);
   const [visitorLoading, setVisitorLoading] = useState(true);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   useEffect(() => {
     // 로그인 확인
@@ -118,10 +121,13 @@ export default function Analytics() {
     fetchVisitors();
   }, []);
 
-  const loadAnalytics = async () => {
+  const loadAnalytics = async (customStart, customEnd) => {
     try {
       setLoading(true);
-      const response = await apiClient.get(`/admin/analytics?period=${period}&limit=30`);
+      let url = `/admin/analytics?period=${period}&limit=30`;
+      if (customStart) url += `&start=${customStart}`;
+      if (customEnd) url += `&end=${customEnd}`;
+      const response = await apiClient.get(url);
       setAnalyticsData(response.data);
     } catch (error) {
       console.error('분석 데이터 로드 실패:', error);
@@ -170,6 +176,49 @@ export default function Analytics() {
       },
     },
   };
+
+  // 방문자 상세 리스트 로드 함수
+  const fetchVisitors = async (customStart, customEnd) => {
+    try {
+      setVisitorLoading(true);
+      let url = '/admin/visitors?page=1&limit=50';
+      if (customStart) url += `&start=${customStart}`;
+      if (customEnd) url += `&end=${customEnd}`;
+      const res = await apiClient.get(url);
+      setVisitorList(res.data.visitors || []);
+    } catch (e) {
+      setVisitorList([]);
+    } finally {
+      setVisitorLoading(false);
+    }
+  };
+
+  // 기간 변경 핸들러
+  const handlePeriodChange = (type, value) => {
+    if (type === 'start') setStartDate(value);
+    if (type === 'end') setEndDate(value);
+  };
+
+  // 기간 적용 버튼
+  const handleApplyPeriod = () => {
+    loadAnalytics(startDate, endDate);
+    fetchVisitors(startDate, endDate);
+  };
+
+  // 전체 기간 버튼
+  const handleAllPeriod = () => {
+    setStartDate(''); setEndDate('');
+    loadAnalytics('', '');
+    fetchVisitors('', '');
+  };
+
+  // 기간 변경 시 자동 반영
+  useEffect(() => {
+    if (startDate || endDate) {
+      loadAnalytics(startDate, endDate);
+      fetchVisitors(startDate, endDate);
+    }
+  }, [startDate, endDate]);
 
   if (loading) {
     return (
@@ -230,6 +279,11 @@ export default function Analytics() {
             >
               월별
             </PeriodButton>
+            <input type="date" value={startDate} onChange={e => handlePeriodChange('start', e.target.value)} style={{ marginLeft: 12, marginRight: 4 }} />
+            ~
+            <input type="date" value={endDate} onChange={e => handlePeriodChange('end', e.target.value)} style={{ marginLeft: 4, marginRight: 8 }} />
+            <button onClick={handleApplyPeriod} style={{ marginRight: 8, padding: '0.3rem 0.8rem', borderRadius: 5, border: '1px solid #aaa', background: '#fff', cursor: 'pointer' }}>적용</button>
+            <button onClick={handleAllPeriod} style={{ padding: '0.3rem 0.8rem', borderRadius: 5, border: '1px solid #aaa', background: '#f8f9fa', cursor: 'pointer' }}>전체 기간</button>
           </PeriodSelector>
         </PageHeader>
 
