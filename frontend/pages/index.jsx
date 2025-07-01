@@ -53,7 +53,6 @@ export default function Home() {
   const [currentBanner, setCurrentBanner] = useState(0);
   const [visitorStats, setVisitorStats] = useState({ total: 0, today: 0, week: 0 });
   const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]);
   const [page, setPage] = useState(1);
@@ -214,7 +213,7 @@ export default function Home() {
         sort: sort
       });
 
-      if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
+      if (searchTerm) params.append('search', searchTerm);
       if (selectedCategory) params.append('category', selectedCategory);
 
       // 타임아웃 설정 (5초)
@@ -298,22 +297,15 @@ export default function Home() {
     }
   };
 
-  // 검색어 디바운스 (500ms 후에 검색 실행)
+  // 검색어가 변경되면 검색 실행 (디바운스 적용)
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
+      setPage(1);
+      loadTests(true);
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  // 디바운스된 검색어가 변경되면 검색 실행
-  useEffect(() => {
-    if (debouncedSearchTerm !== searchTerm) {
-      setPage(1);
-      loadTests(true);
-    }
-  }, [debouncedSearchTerm]);
+  }, [searchTerm, selectedCategory, sort]);
 
   // 스크롤 이벤트 리스너
   useEffect(() => {
@@ -366,7 +358,15 @@ export default function Home() {
     <MainWrap>
       {/* 헤더 */}
       <Header>
-        <Logo onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
+        <Logo onClick={() => {
+          // 검색 상태 초기화
+          setSearchTerm('');
+          setSelectedCategory('');
+          setPage(1);
+          setError(null);
+          // 홈페이지로 이동
+          router.push('/');
+        }} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
         <Stats>
           <StatItem>👥 전체 방문자: {visitorStats.total.toLocaleString()}</StatItem>
           <StatItem>📊 오늘 방문자: {visitorStats.today.toLocaleString()}</StatItem>
