@@ -159,49 +159,53 @@ function RenderedCommentItem({ comment }) {
       color: '#222',
       boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
       display: 'flex',
-      flexDirection: 'column',
+      flexDirection: 'row',
+      alignItems: 'center',
       width: '100%',
       maxWidth: 500,
       padding: '8px 12px',
       borderRadius: 8,
       minHeight: 'auto',
+      gap: 12,
+      overflow: 'hidden',
+      wordWrap: 'break-word',
     }}>
-      {/* 제목과 날짜를 한 줄에 좌우 끝으로 */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: 6,
-        width: '100%'
+      {/* 제목 */}
+      <span style={{ 
+        fontWeight: 600, 
+        color: '#6c63ff', 
+        fontSize: '0.9rem',
+        marginLeft: 4,
+        minWidth: 60,
+        flexShrink: 0
       }}>
-        <span style={{ 
-          fontWeight: 600, 
-          color: '#6c63ff', 
-          fontSize: '0.9rem',
-          marginLeft: 4
-        }}>
-          {comment.nickname || '익명'}
-        </span>
-        <span style={{ 
-          color: '#aaa', 
-          fontSize: '0.8rem',
-          marginRight: 4
-        }}>
-          {comment.createdAt ? new Date(comment.createdAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) : ''}
-        </span>
-      </div>
+        {comment.nickname || '익명'}
+      </span>
       {/* 댓글 내용 */}
       <div style={{ 
         fontSize: '0.95rem', 
         whiteSpace: 'pre-line', 
         wordBreak: 'break-all',
         lineHeight: '1.4',
-        paddingLeft: 4,
-        paddingRight: 4,
-        minHeight: 'auto'
+        flex: 1,
+        textAlign: 'left',
+        overflow: 'hidden',
+        wordWrap: 'break-word',
+        maxWidth: '100%'
       }}>
         {comment.content}
       </div>
+      {/* 날짜 */}
+      <span style={{ 
+        color: '#aaa', 
+        fontSize: '0.8rem',
+        marginRight: 4,
+        minWidth: 80,
+        flexShrink: 0,
+        textAlign: 'right'
+      }}>
+        {comment.createdAt ? new Date(comment.createdAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) : ''}
+      </span>
     </CommentItem>
   );
 }
@@ -641,7 +645,7 @@ export default function TestPage() {
             )}
             <div style={{
               width: '100%',
-              maxWidth: '800px',
+              maxWidth: '100%',
               margin: '0 auto',
               display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 16
             }}>
