@@ -368,12 +368,25 @@ export default function TestPage() {
   };
 
   useEffect(() => {
-    // 광고 스크립트가 이미 로드된 경우 render만 보장
-    setTimeout(() => {
-      if (window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
-        window.kakao.adfit.render();
-      }
-    }, 500);
+    // 광고 스크립트가 없으면 삽입, 있으면 render만 보장
+    if (!document.querySelector('script[src*="daumcdn.net/kas/static/ba.min.js"]')) {
+      const scriptElement = document.createElement('script');
+      scriptElement.type = 'text/javascript';
+      scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+      scriptElement.async = true;
+      scriptElement.onload = () => {
+        if (window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
+          window.kakao.adfit.render();
+        }
+      };
+      document.body.appendChild(scriptElement);
+    } else {
+      setTimeout(() => {
+        if (window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
+          window.kakao.adfit.render();
+        }
+      }, 500);
+    }
   }, []);
 
   useEffect(() => {
@@ -454,12 +467,13 @@ export default function TestPage() {
           minHeight: 120,
           position: 'relative',
         }}>
-          {/* 카카오 광고 컨테이너 - SSR-safe */}
+          {/* 카카오 광고 컨테이너 - SSR-safe, 스타일 강제 */}
           <div
             id="kakao-ad-container"
             style={{
               position: 'relative',
               width: '100%',
+              minWidth: 320,
               maxWidth: 728,
               margin: '0 auto 24px auto',
               textAlign: 'center',
@@ -474,11 +488,10 @@ export default function TestPage() {
             dangerouslySetInnerHTML={{
               __html: `
                 <ins class="kakao_ad_area"
-                  style="display:block;width:100%;min-width:320px;max-width:728px;height:90px;margin:0 auto;"
+                  style="display:block !important;width:100%;min-width:320px;max-width:728px;height:90px;margin:0 auto;text-align:center;"
                   data-ad-unit="DAN-NOAbzxQGMUQ8Mke7"
                   data-ad-width="728"
                   data-ad-height="90"></ins>
-                <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
               `
             }}
           />
@@ -561,9 +574,9 @@ export default function TestPage() {
             alignItems: 'center',
             width: '100%'
           }}>
-            <CommentHeader style={{ width: '100%', justifyContent: 'center', marginBottom: 16 }}>
+            <CommentHeader style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, display: 'flex' }}>
               <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
-              <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>
+              <CommentButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ marginLeft: 'auto' }}>
                 {showCommentForm ? '취소' : '댓글 작성'}
               </CommentButton>
             </CommentHeader>
@@ -597,7 +610,12 @@ export default function TestPage() {
             {comments.length === 0 && (
               <div style={{ color: '#aaa', textAlign: 'center', margin: '1rem 0' }}>아직 댓글이 없습니다.</div>
             )}
-            <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16 }}>
+            <div style={{
+              width: '100%',
+              maxWidth: '800px',
+              margin: '0 auto',
+              display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 16
+            }}>
               {comments.map((comment) => (
                 <RenderedCommentItem key={comment.id} comment={comment} />
               ))}
