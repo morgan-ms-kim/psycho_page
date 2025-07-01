@@ -17,6 +17,10 @@ cd frontend
 echo "🔨 빠른 빌드 중..."
 npm run build:fast
 
+# 정적 파일을 올바른 위치로 복사
+echo "📁 정적 파일 복사 중..."
+cp -r out/* /var/www/html/wordpress/psycho_page/
+
 # PM2 완전 재시작
 echo "🔄 PM2 완전 재시작 중..."
 #pm2 delete psycho-frontend
