@@ -492,7 +492,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>🧠PSYCHO - 심리테스트</title>
+        <title>PSYCHO - 심리테스트</title>
       </Head>
       <MainWrap>
         <Section style={{
