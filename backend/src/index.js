@@ -603,9 +603,9 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     // fs.mkdirSync(testPath, { recursive: true });
     // steps.directoryCreated = true;
     
-    // git clone (--force 옵션 추가)
+    // git clone (옵션에서 --force 제거)
     try {
-      await execAsync(`git clone --force ${gitUrl} ${testPath}`, { timeout: 300000 });
+      await execAsync(`git clone ${gitUrl} ${testPath}`, { timeout: 300000 });
       steps.gitCloned = true;
       console.log('✅ Git 클론 완료:', gitUrl);
     } catch (error) {
