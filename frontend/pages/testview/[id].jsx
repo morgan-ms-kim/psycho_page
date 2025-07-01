@@ -120,7 +120,7 @@ const IframeRefreshButton = styled.button`
 
 const TestIframe = styled.iframe`
   width: 100%;
-  min-height: 50vh;
+  min-height: 65vh;
   max-height: 70vh;
   height: auto;
   border: none;
