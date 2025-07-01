@@ -205,6 +205,7 @@ export default function TestPage() {
   const [buildExists, setBuildExists] = useState(false);
   const [checkedBuild, setCheckedBuild] = useState(false);
   const iframeRef = useRef(); // iframe 제어용 ref 추가
+  const adRef = useRef(null); // 광고 컨테이너 ref
 
   // 테스트 데이터 로드
   useEffect(() => {
@@ -353,73 +354,27 @@ export default function TestPage() {
   };
 
   useEffect(() => {
-    // 광고 컨테이너 Section 맨 위에 고정
-    const section = document.querySelector('section');
-    if (section) {
-      let container = document.getElementById('kakao-ad-container');
-      if (!container) {
-        container = document.createElement('div');
-        container.id = 'kakao-ad-container';
-        container.style.cssText = `
-          position: relative;
-          width: 100%;
-          max-width: 728px;
-          margin: 0 auto 24px auto;
-          text-align: center;
-          min-height: 90px;
-          background: #fff;
-          border-radius: 12px;
-          padding: 16px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-          z-index: 10;
-          display: block !important;
-        `;
-        section.insertBefore(container, section.firstChild);
-      } else {
-        container.innerHTML = '';
-      }
-
-      // 광고 ins 태그 생성
-      const isPC = window.matchMedia('(min-width: 728px)').matches;
-      const adUnit = isPC ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK';
-      const adWidth = isPC ? '728' : '320';
-      const adHeight = isPC ? '90' : '100';
-
-      const adElement = document.createElement('ins');
-      adElement.className = 'kakao_ad_area';
-      adElement.style.cssText = `
-        display: block !important;
-        width: ${adWidth}px;
-        height: ${adHeight}px;
-        margin: 0 auto;
-      `;
-      adElement.setAttribute('data-ad-unit', adUnit);
-      adElement.setAttribute('data-ad-width', adWidth);
-      adElement.setAttribute('data-ad-height', adHeight);
-
-      container.appendChild(adElement);
-
-      // 광고 스크립트 삽입(중복 방지)
-      if (!document.querySelector('script[src*="daumcdn.net/kas/static/ba.min.js"]')) {
-        const scriptElement = document.createElement('script');
-        scriptElement.type = 'text/javascript';
-        scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-        scriptElement.async = true;
-        scriptElement.onload = () => {
-          if (window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
-            window.kakao.adfit.render();
-          }
-        };
-        document.body.appendChild(scriptElement);
-      } else {
-        setTimeout(() => {
-          if (window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
-            window.kakao.adfit.render();
-          }
-        }, 500);
-      }
+    // 광고 스크립트 1회만 삽입
+    if (!document.querySelector('script[src*="daumcdn.net/kas/static/ba.min.js"]')) {
+      const scriptElement = document.createElement('script');
+      scriptElement.type = 'text/javascript';
+      scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+      scriptElement.async = true;
+      scriptElement.onload = () => {
+        if (window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
+          window.kakao.adfit.render();
+        }
+      };
+      document.body.appendChild(scriptElement);
     }
   }, []);
+
+  useEffect(() => {
+    // 광고 컨테이너가 마운트된 후 광고 렌더
+    if (adRef.current && window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
+      window.kakao.adfit.render();
+    }
+  });
 
   if (loading) {
     return (
@@ -597,6 +552,38 @@ export default function TestPage() {
               ))}
             </div>
           </CommentSection>
+          {/* 카카오 광고 컨테이너 */}
+          <div
+            ref={adRef}
+            id="kakao-ad-container"
+            style={{
+              position: 'relative',
+              width: '100%',
+              maxWidth: 728,
+              margin: '0 auto 24px auto',
+              textAlign: 'center',
+              minHeight: 90,
+              background: '#fff',
+              borderRadius: 12,
+              padding: 16,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              zIndex: 10,
+              display: 'block'
+            }}
+          >
+            <ins
+              className="kakao_ad_area"
+              style={{
+                display: 'block',
+                width: window && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 728 : 320,
+                height: window && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 90 : 100,
+                margin: '0 auto'
+              }}
+              data-ad-unit={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK'}
+              data-ad-width={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? '728' : '320'}
+              data-ad-height={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? '90' : '100'}
+            ></ins>
+          </div>
         </Section>
         <Footer style={{ marginTop: '0.5rem' }} />
       </MainWrap>
