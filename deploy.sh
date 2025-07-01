@@ -20,7 +20,7 @@ rm -rf .next
 rm -rf node_modules/.cache
 
 # 의존성 재설치 
-echo "📦 의존성 재설치 중..."
+echo "📦 의존성 재설치 중.."
 rm -rf node_modules package-lock.json
 npm install
 
