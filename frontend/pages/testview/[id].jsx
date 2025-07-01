@@ -54,6 +54,221 @@ const isValidTestUrl = (id) => {
   return /^test\d+$/.test(id);
 };
 
+// 스타일 컴포넌트 추가 및 개선
+const TestContainer = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  height: 70vh;
+  min-height: 400px;
+  margin: 2rem auto 2rem auto;
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  display: flex;
+  flex-direction: column;
+  @media (max-width: 900px) {
+    height: 60vh;
+    min-height: 300px;
+    margin: 1rem 0;
+  }
+  @media (max-width: 600px) {
+    height: 50vh;
+    min-height: 200px;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+  }
+`;
+
+const IframeTopBar = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px 12px 0 0;
+  background: transparent;
+  z-index: 2;
+`;
+
+const IframeRefreshButton = styled.button`
+  padding: 6px 18px;
+  border-radius: 8px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s;
+  &:hover {
+    background: #e0e0e0;
+  }
+`;
+
+const TestIframe = styled.iframe`
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+  border-radius: 0 0 14px 14px;
+  flex: 1;
+  @media (max-width: 600px) {
+    border-radius: 0 0 8px 8px;
+  }
+`;
+
+const InfoCard = styled.div`
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  padding: 2rem 2.5rem;
+  margin: 2rem auto 1.5rem auto;
+  max-width: 700px;
+  @media (max-width: 900px) {
+    padding: 1.2rem 1rem;
+    margin: 1rem 0;
+  }
+`;
+
+const FlexRow = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+`;
+
+const SocialButton = styled.button`
+  background: #f7f7fa;
+  color: #667eea;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+  &:hover {
+    background: #667eea;
+    color: #fff;
+  }
+  ${({ liked }) => liked && `background: #667eea; color: #fff;`}
+`;
+
+const CommentSection = styled.div`
+  background: #fafbfc;
+  border-radius: 12px;
+  max-width: 700px;
+  margin: 2rem auto 2rem auto;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  @media (max-width: 900px) {
+    padding: 1.2rem 1rem;
+    margin: 1rem 0;
+  }
+`;
+
+const CommentHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+`;
+
+const CommentButton = styled.button`
+  background: #667eea;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: #4b5fd6;
+  }
+`;
+
+const CommentFormContainer = styled.div`
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+`;
+
+const CommentInput = styled(Input)`
+  margin-bottom: 1rem;
+`;
+
+const CommentTextarea = styled(Textarea)`
+  margin-bottom: 1rem;
+  min-height: 100px;
+`;
+
+const CommentSubmitButton = styled.button`
+  background: #667eea;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.7rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+  &:hover {
+    background: #4b5fd6;
+  }
+`;
+
+const StatItem = styled.div`
+  text-align: center;
+  padding: 1rem;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  min-width: 90px;
+`;
+
+const StatLabel = styled.div`
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+`;
+
+const StatValue = styled.div`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #667eea;
+`;
+
+const TestTitle = styled.h1`
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0 0 1rem 0;
+  flex: 1;
+  text-align: center;
+`;
+
+const LoadingOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  p {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    color: #333;
+  }
+`;
+
 export default function TestPage() {
   const router = useRouter();
   const { id } = router.query;
@@ -273,17 +488,44 @@ export default function TestPage() {
   // iframe URL 설정 - 간단하게
   const testUrl = `/tests/${id}/`;
 
+  // iframe 렌더링 부분 개선
+  let iframeSection = null;
   if (!checkedBuild && /^test\d+$/.test(id)) {
-    return (
-      <MainWrap>
-        <Header>
-          <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
-        </Header>
-        <LoadingWrap>
-          <LoadingSpinner />
-          <p>테스트 앱 상태를 확인 중...</p>
-        </LoadingWrap>
-      </MainWrap>
+    iframeSection = (
+      <LoadingWrap>
+        <LoadingSpinner />
+        <p>테스트 앱 상태를 확인 중...</p>
+      </LoadingWrap>
+    );
+  } else if (buildExists) {
+    iframeSection = (
+      <TestContainer>
+        <IframeTopBar>
+          <IframeRefreshButton onClick={reloadIframe}>새로고침</IframeRefreshButton>
+        </IframeTopBar>
+        {!iframeLoaded && (
+          <LoadingOverlay>
+            <LoadingSpinner />
+            <p>테스트 앱을 로드하는 중...</p>
+          </LoadingOverlay>
+        )}
+        <TestIframe
+          ref={iframeRef}
+          src={testUrl}
+          onLoad={handleIframeLoad}
+          onError={handleIframeError}
+          title={test?.title || '테스트'}
+          allow="fullscreen"
+          sandbox="allow-scripts allow-forms allow-popups"
+          style={{ display: iframeLoaded ? 'block' : 'none' }}
+        />
+      </TestContainer>
+    );
+  } else {
+    iframeSection = (
+      <ErrorMessage>
+        <p>아직 빌드된 테스트 앱이 없습니다.</p>
+      </ErrorMessage>
     );
   }
 
@@ -293,36 +535,7 @@ export default function TestPage() {
         <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
         <TestTitle>{test?.title || '테스트'}</TestTitle>
       </Header>
-
-      {/* 빌드된 테스트만 iframe으로 띄움 */}
-      {buildExists ? (
-        <TestContainer>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 12px 0 0' }}>
-            <button onClick={reloadIframe} style={{ padding: '6px 16px', borderRadius: 5, background: '#eee', border: 'none', cursor: 'pointer' }}>
-              새로고침
-            </button>
-          </div>
-          {!iframeLoaded && (
-            <LoadingOverlay>
-              <LoadingSpinner />
-              <p>테스트 앱을 로드하는 중...</p>
-            </LoadingOverlay>
-          )}
-          <TestIframe
-            ref={iframeRef}
-            src={testUrl}
-            onLoad={handleIframeLoad}
-            onError={handleIframeError}
-            title={test?.title || '테스트'}
-            allow="fullscreen"
-            sandbox="allow-scripts allow-forms allow-popups"
-          />
-        </TestContainer>
-      ) : (
-        <ErrorMessage>
-          <p>아직 빌드된 테스트 앱이 없습니다.</p>
-        </ErrorMessage>
-      )}
+      {iframeSection}
 
       {/* 테스트 정보 및 소셜 기능 */}
       <Section>
@@ -333,10 +546,10 @@ export default function TestPage() {
           <FlexRow>
             <SocialButton onClick={handleLike} liked={liked}>
               {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
-                </SocialButton>
+            </SocialButton>
             <SocialButton onClick={() => setShowCommentForm(!showCommentForm)}>
               💬 댓글 작성
-                </SocialButton>
+            </SocialButton>
           </FlexRow>
           
           <Grid>
@@ -401,6 +614,4 @@ export default function TestPage() {
       <Footer />
     </MainWrap>
   );
-}
-
-// 스타일 컴포넌트 정의 (생략, 필요시 추가) 
+} 
