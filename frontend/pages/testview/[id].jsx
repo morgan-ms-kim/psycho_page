@@ -69,31 +69,27 @@ const isValidTestUrl = (id) => {
 const TestContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: 70vw;
-  min-width: 60vw;
-  max-height: 50vh;
-  min-height: 40vh;
-  margin: 2rem auto;
+  max-width: 900px;
+  min-width: 0;
+  margin: 32px auto 0 auto;
   background: white;
   border-radius: 24px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   display: flex;
   flex-direction: column;
-  padding: 24px 16px;
-
-  @media (max-width: 1200px) {
+  align-items: center;
+  padding: 24px 0;
+  @media (max-width: 1000px) {
     max-width: 98vw;
     border-radius: 16px;
-    padding: 20px 12px;
+    padding: 16px 0;
   }
   @media (max-width: 600px) {
-    max-width: 96vw;
-    width: 96vw;
+    max-width: 100vw;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     margin: 0.5rem 0 1.5rem 0;
-    padding: 16px 8px;
-    min-height: 300px;
+    padding: 8px 0;
   }
 `;
 
@@ -129,14 +125,6 @@ const TestIframe = styled.iframe`
   background: #fff;
   border-radius: 0 0 24px 24px;
   flex: 1;
-  @media (max-width: 900px) {
-    min-height: 350px;
-    border-radius: 0 0 12px 12px;
-  }
-  @media (max-width: 600px) {
-    min-height: 300px;
-    border-radius: 0 0 8px 8px;
-  }
 `;
 
 const LoadingOverlay = styled.div`
@@ -520,18 +508,19 @@ export default function TestPage() {
           {iframeSection}
           {/* 제목/설명 카드: iframe 아래로 이동, 여백 최소화 */}
           <InfoCard as={TestContainer} style={{
-            maxWidth: '90vw',
-            minWidth: '80vw',
-            margin: '24px auto 0 auto',
+            maxWidth: '900px',
+            minWidth: 0,
+            margin: '32px auto 0 auto',
             background: '#fff',
             borderRadius: 24,
             boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-            padding: '24px 16px',
+            padding: '24px 0',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'center',
+            width: '100%'
           }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, width: '100%', textAlign: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%', textAlign: 'center' }}>
               <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
               <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
               <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center', width: '100%' }}>
@@ -548,7 +537,7 @@ export default function TestPage() {
                   <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{commentCount}</StatValue>
                 </div>
               </div>
-              <FlexRow style={{ justifyContent: 'center', gap: 10, marginTop: 4 }}>
+              <FlexRow style={{ justifyContent: 'center', gap: 10, marginTop: 4, width: '100%' }}>
                 <SocialButton onClick={handleLike} liked={liked} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: liked ? '#fff' : '#222', background: liked ? '#7f7fd5' : '#fff', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
                   {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
                 </SocialButton>
@@ -560,16 +549,17 @@ export default function TestPage() {
           </InfoCard>
           {/* 댓글 섹션 */}
           <CommentSection style={{
-            maxWidth: '90vw',
-            minWidth: '80vw',
-            margin: '24px auto',
+            maxWidth: '900px',
+            minWidth: 0,
+            margin: '32px auto',
             background: '#fff',
             borderRadius: 24,
             boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-            padding: '24px 16px',
+            padding: '24px 0',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'center',
+            width: '100%'
           }}>
             <CommentHeader style={{ width: '100%', justifyContent: 'center' }}>
               <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
@@ -578,7 +568,7 @@ export default function TestPage() {
               </CommentButton>
             </CommentHeader>
             {showCommentForm && (
-              <CommentFormContainer style={{ width: '100%', maxWidth: '600px' }}>
+              <CommentFormContainer style={{ width: '100%', maxWidth: '600px', margin: '0 auto' }}>
                 <CommentInput
                   type="text"
                   placeholder="닉네임"
@@ -607,7 +597,7 @@ export default function TestPage() {
             {comments.length === 0 && (
               <div style={{ color: '#aaa', textAlign: 'center', margin: '1rem 0' }}>아직 댓글이 없습니다.</div>
             )}
-            <div style={{ width: '100%', maxWidth: '800px' }}>
+            <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto' }}>
               {comments.map((comment) => (
                 <RenderedCommentItem key={comment.id} comment={comment} />
               ))}

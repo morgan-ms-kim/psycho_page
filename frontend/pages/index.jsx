@@ -63,58 +63,75 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
     return null; // 에러는 상위에서 처리
   }
   if (sortedTests.length > 0) {
+    // hot/new 계산
+    const now = Date.now();
+    const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
+    // 조회수 상위 10개 id 추출
+    const hotIds = sortedTests
+      .slice()
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 10)
+      .map(t => t.id);
     return (
       <Section>
         <TestCount>총 {sortedTests.length}개의 테스트</TestCount>
         <Grid>
-          {sortedTests.map((test) => (
-            <Card 
-              key={test.id} 
-              onClick={() => {
-                try {
-                  if (!test.id) {
-                    console.error('테스트 ID가 없습니다:', test);
-                    return;
+          {sortedTests.map((test) => {
+            const isNew = new Date(test.createdAt).getTime() > weekAgo;
+            const isHot = hotIds.includes(test.id);
+            return (
+              <Card 
+                key={test.id} 
+                onClick={() => {
+                  try {
+                    if (!test.id) {
+                      console.error('테스트 ID가 없습니다:', test);
+                      return;
+                    }
+                    const testPath = `/testview/${getTestFolderName(test.id)}`;
+                    console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
+                    router.push(testPath);
+                  } catch (error) {
+                    console.error('테스트 클릭 에러:', error, '테스트 데이터:', test);
                   }
-                  const testPath = `/testview/${getTestFolderName(test.id)}`;
-                  console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
-                  router.push(testPath);
-                } catch (error) {
-                  console.error('테스트 클릭 에러:', error, '테스트 데이터:', test);
-                }
-              }}
-            >
-              <TestCardContent>
-                <TestThumbnailContainer>
-                  {test.thumbnail ? (
-                    <TestItemImage  
-                      src={getImagePath(test.thumbnail)} 
-                      alt={test.title}
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                    />
-                  ) : null}
-                  <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
-                    🧠
-                  </TestItemPlaceholder>
-                </TestThumbnailContainer>
-                <TestContent>
-                  <TestItemTitle>{test.title}</TestItemTitle>
-                  <TestItemDesc>{test.description}</TestItemDesc>
-                  <TestItemStats>
-                    <Stat>👁️ {test.views}</Stat>
-                    <Stat>💖 {test.likes}</Stat>
-                    <Stat>💬 {test.comments || 0}</Stat>
-                  </TestItemStats>
-                  <TestItemDate>
-                    {new Date(test.createdAt).toLocaleDateString()}
-                  </TestItemDate>
-                </TestContent>
-              </TestCardContent>
-            </Card>
-          ))}
+                }}
+              >
+                <TestCardContent>
+                  <TestThumbnailContainer>
+                    {test.thumbnail ? (
+                      <TestItemImage  
+                        src={getImagePath(test.thumbnail)} 
+                        alt={test.title}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
+                      🧠
+                    </TestItemPlaceholder>
+                  </TestThumbnailContainer>
+                  <TestContent>
+                    <TestItemTitle>
+                      {test.title}
+                      {isNew && <Badge type="new">NEW</Badge>}
+                      {isHot && <Badge type="hot">HOT</Badge>}
+                    </TestItemTitle>
+                    <TestItemDesc>{test.description}</TestItemDesc>
+                    <TestItemStats>
+                      <Stat>👁️ {test.views}</Stat>
+                      <Stat>💖 {test.likes}</Stat>
+                      <Stat>💬 {test.comments || 0}</Stat>
+                    </TestItemStats>
+                    <TestItemDate>
+                      {new Date(test.createdAt).toLocaleDateString()}
+                    </TestItemDate>
+                  </TestContent>
+                </TestCardContent>
+              </Card>
+            );
+          })}
         </Grid>
         {loadingMore && (
           <LoadingMore>
@@ -743,4 +760,16 @@ const TestIframe = styled.iframe`
   border-radius: 0 0 24px 24px;
   flex: 1;
   display: block;
+`;
+
+// 뱃지 스타일 추가
+const Badge = styled.span`
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #fff;
+  background: ${props => props.type === 'hot' ? '#ff5e5e' : '#7f7fd5'};
 `;
