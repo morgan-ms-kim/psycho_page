@@ -166,21 +166,29 @@ export const ResultCard = styled(Card)`
 `;
 
 export const InfoCard = styled(Card)`
-  border-radius: 15px;
-  max-width: 1200px;
-  margin: 40px auto 0 auto;
-  padding: 40px 32px;
+  max-width: 90vw;
+  min-width: 80vw;
+  margin: 2rem auto 0 auto;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  padding: 32px 16px;
+  background: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  @media (max-width: 900px) {
-    padding: 24px 8px;
-    margin: 24px 0 0 0;
+
+  @media (max-width: 1200px) {
+    max-width: 98vw;
+    border-radius: 16px;
+    padding: 24px 4px;
   }
   @media (max-width: 600px) {
-    padding: 16px 2vw;
+    max-width: 96vw;
+    min-width: 96vw;
     border-radius: 8px;
-    margin: 16px 0 0 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin: 0.5rem 0 1.5rem 0;
+    padding: 8px 0;
   }
 `;
 

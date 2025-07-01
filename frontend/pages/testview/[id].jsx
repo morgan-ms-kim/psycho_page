@@ -179,30 +179,6 @@ function RenderedCommentItem({ comment }) {
   );
 }
 
-export const InfoCard = styled(Card)`
-  max-width: 90vw;
-  min-width: 80vw;
-  margin: 2rem auto 0 auto;
-  border-radius: 24px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  padding: 32px 16px;
-  background: #fff;
-
-  @media (max-width: 1200px) {
-    max-width: 98vw;
-    border-radius: 16px;
-    padding: 24px 4px;
-  }
-  @media (max-width: 600px) {
-    max-width: 96vw;
-    min-width: 96vw;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    margin: 0.5rem 0 1.5rem 0;
-    padding: 8px 0;
-  }
-`;
-
 export default function TestPage() {
   const router = useRouter();
   const { id } = router.query;
