@@ -416,6 +416,7 @@ export default function TestPage() {
 
       <Footer>
         <p>© 2025 PSYCHO - 재미있는 심리테스트 모음</p>
+        <div id="kakao-ad-container"></div>
       </Footer>
 
 

@@ -49,6 +49,7 @@ const getApiBase = () => {
 export default function Home() {
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [sort, setSort] = useState('latest');
   const [currentBanner, setCurrentBanner] = useState(0);
   const [visitorStats, setVisitorStats] = useState({ total: 0, today: 0, week: 0 });
@@ -108,13 +109,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // 검색어나 카테고리 변경 시 테스트 다시 로드
-  useEffect(() => {
-    setPage(1);
-    setTests([]);
-    setHasMore(true);
-    loadTests(true);
-  }, [searchTerm, selectedCategory, sort]);
+
 
   // 방문자 통계 로드
   const loadVisitorStats = async () => {
@@ -301,13 +296,46 @@ export default function Home() {
     }
   };
 
+  // 검색 전용 함수 (리스트만 업데이트)
+  const searchTests = async () => {
+    try {
+      console.log('검색 실행:', { searchTerm, selectedCategory, sort });
+      setSearching(true);
+      
+      const params = new URLSearchParams({
+        page: 1,
+        limit: 10,
+        sort: sort
+      });
+
+      if (searchTerm && searchTerm.trim()) {
+        params.append('search', searchTerm.trim());
+        console.log('검색 파라미터 추가:', searchTerm.trim());
+      }
+      if (selectedCategory) params.append('category', selectedCategory);
+
+      const response = await apiClient.get('/tests', { params });
+      
+      const validatedTests = response.data.map(test => ({
+        ...test,
+        id: String(test.id)
+      }));
+      
+      // 검색 결과만 업데이트 (전체 상태 초기화 없음)
+      setTests(validatedTests);
+      setHasMore(response.data.length === 10);
+      setPage(1);
+    } catch (error) {
+      console.error('검색 실패:', error);
+    } finally {
+      setSearching(false);
+    }
+  };
+
   // 검색어가 변경되면 검색 실행 (디바운스 적용)
   useEffect(() => {
     const timer = setTimeout(() => {
-      console.log('검색 실행:', { searchTerm, selectedCategory, sort });
-      // 검색 시에는 페이지를 1로 리셋하고 리스트만 업데이트
-      setPage(1);
-      loadTests(true);
+      searchTests();
     }, 300);
 
     return () => clearTimeout(timer);
@@ -443,7 +471,7 @@ export default function Home() {
       )}
 
       {/* 테스트 목록 */}
-      {loading ? (
+      {searching ? (
         <Section>
           <div style={{ textAlign: 'center', padding: '2rem' }}>
             <LoadingSpinner />
@@ -523,6 +551,7 @@ export default function Home() {
       {/* 푸터 */}
       <Footer>
         <p>© 2025 PSYCHO - 재미있는 심리테스트 모음</p>
+        <div id="kakao-ad-container"></div>
       </Footer>
 
 

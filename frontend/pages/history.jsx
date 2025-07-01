@@ -128,6 +128,7 @@ export default function History() {
       {/* 푸터 */}
       <Footer>
         <p>© 2024 PSYCHO - 재미있는 심리테스트 모음</p>
+        <div id="kakao-ad-container"></div>
       </Footer>
 
 

@@ -32,14 +32,20 @@ export default function App({ Component, pageProps }) {
           container = document.createElement('div');
           container.id = 'kakao-ad-container';
           container.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
+            position: relative;
+            margin-top: 1rem;
+            text-align: center;
             min-height: ${adHeight}px;
           `;
-          document.body.appendChild(container);
+          
+          // 푸터를 찾아서 광고를 추가
+          const footer = document.querySelector('footer');
+          if (footer) {
+            footer.appendChild(container);
+          } else {
+            // 푸터가 없으면 body에 추가
+            document.body.appendChild(container);
+          }
         }
         
         // 기존 광고 제거
