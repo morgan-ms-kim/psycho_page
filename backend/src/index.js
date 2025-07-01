@@ -11,7 +11,7 @@ import multer from 'multer';
 import geoip from 'geoip-lite';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-
+let REGION_MAP = {};
 try {
   REGION_MAP = require('./utils/region-map.json');
 } catch (e) {
@@ -28,37 +28,7 @@ try {
 
 const execAsync = promisify(exec);
 
-const REGION_MAP = {
-  KR: {
-    '11': '서울특별시',
-    '26': '부산광역시',
-    '27': '대구광역시',
-    '28': '인천광역시',
-    '29': '광주광역시',
-    '30': '대전광역시',
-    '31': '울산광역시',
-    '41': '경기도',
-    '42': '강원도',
-    '43': '충청북도',
-    '44': '충청남도',
-    '45': '전라북도',
-    '46': '전라남도',
-    '47': '경상북도',
-    '48': '경상남도',
-    '49': '제주특별자치도'
-  },
-  US: {
-    'CA': 'California',
-    'NY': 'New York',
-    // ...필요한 주 추가
-  },
-  JP: {
-    '13': '도쿄도',
-    '27': '오사카부',
-    // ...필요한 현 추가
-  }
-  // 필요시 더 추가
-};
+
 
 // multer 설정
 const storage = multer.diskStorage({
