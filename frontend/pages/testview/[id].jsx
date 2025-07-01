@@ -68,9 +68,9 @@ const isValidTestUrl = (id) => {
 // 스타일 컴포넌트 추가 및 개선
 const TestContainer = styled.div`
   position: relative;
-  width: 100%;
-  max-width: 900px;
-  min-width: 0;
+  width: 98vw;
+  max-width: 95vw;
+  min-width: 92vw;
   margin: 32px auto 0 auto;
   background: white;
   border-radius: 24px;
@@ -81,11 +81,13 @@ const TestContainer = styled.div`
   padding: 24px 0;
   @media (max-width: 1000px) {
     max-width: 98vw;
+    min-width: 97vw;
     border-radius: 16px;
     padding: 16px 0;
   }
   @media (max-width: 600px) {
     max-width: 100vw;
+    min-width: 98vw;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     margin: 0.5rem 0 1.5rem 0;
@@ -97,7 +99,7 @@ const IframeTopBar = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 8px 12px 0 0;
+  padding: 2px 2px 0 0;
   background: transparent;
   z-index: 2;
 `;
@@ -118,7 +120,7 @@ const IframeRefreshButton = styled.button`
 
 const TestIframe = styled.iframe`
   width: 100%;
-  min-height: 400px;
+  min-height: 50vh;
   max-height: 70vh;
   height: auto;
   border: none;

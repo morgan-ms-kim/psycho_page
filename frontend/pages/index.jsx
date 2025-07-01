@@ -115,10 +115,14 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                   <TestContent>
                     <TestItemTitle>
                       {test.title}
-                      {isNew && <Badge type="new">NEW</Badge>}
-                      {isHot && <Badge type="hot">HOT</Badge>}
                     </TestItemTitle>
                     <TestItemDesc>{test.description}</TestItemDesc>
+                    {(isNew || isHot) && (
+                      <div style={{ margin: '4px 0 8px 0', minHeight: 24 }}>
+                        {isNew && <Badge type="new">NEW</Badge>}
+                        {isHot && <Badge type="hot">HOT</Badge>}
+                      </div>
+                    )}
                     <TestItemStats>
                       <Stat>👁️ {test.views}</Stat>
                       <Stat>💖 {test.likes}</Stat>

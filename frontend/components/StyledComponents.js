@@ -362,6 +362,15 @@ export const StatItem = styled.span`
 export const HistoryButton = styled(SecondaryButton)`
   font-size: 0.9rem;
   padding: 10px 15px;
+  background: #7f7fd5 !important;
+  color: #fff !important;
+  border: none;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(127,127,213,0.08);
+  &:hover {
+    background: #b3aaff !important;
+    color: #222 !important;
+  }
 `;
 
 export const SearchSection = styled.div`
