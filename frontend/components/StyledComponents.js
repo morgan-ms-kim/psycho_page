@@ -430,6 +430,7 @@ export const CommentTitle = styled.h3`
 export const CommentButton = styled.button`
   background: #ffe066;
   color: #333;
+  border: none;
   border-radius: 8px;
   padding: 0.5rem 1.2rem;
   font-size: 1rem;
