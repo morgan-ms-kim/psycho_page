@@ -7,7 +7,6 @@ import ThumbnailUploader from '../../components/ThumbnailUploader';
 
 const apiClient = axios.create({
   baseURL: 'https://smartpick.website/api',
-  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   }
