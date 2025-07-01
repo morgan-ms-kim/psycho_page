@@ -154,7 +154,7 @@ function RenderedCommentItem({ comment }) {
   if (!comment) return null;
   return (
     <CommentItem style={{
-      marginBottom: 12,
+      marginBottom: 8,
       background: '#fff',
       color: '#222',
       boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
@@ -163,12 +163,13 @@ function RenderedCommentItem({ comment }) {
       alignItems: 'center',
       width: '100%',
       maxWidth: '100%',
-      padding: '8px 12px',
+      padding: '0 8px',
       borderRadius: 8,
       minHeight: 'auto',
       gap: 12,
       overflow: 'hidden',
       wordWrap: 'break-word',
+      boxSizing: 'border-box',
     }}>
       {/* 제목 */}
       <span style={{ 
@@ -191,7 +192,8 @@ function RenderedCommentItem({ comment }) {
         textAlign: 'left',
         overflow: 'hidden',
         wordWrap: 'break-word',
-        maxWidth: '100%'
+        maxWidth: '100%',
+        boxSizing: 'border-box'
       }}>
         {comment.content}
       </div>
@@ -647,7 +649,9 @@ export default function TestPage() {
               width: '100%',
               maxWidth: '100%',
               margin: '0 auto',
-              display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 16
+              display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12,
+              boxSizing: 'border-box',
+              padding: 0
             }}>
               {comments.map((comment) => (
                 <RenderedCommentItem key={comment.id} comment={comment} />
