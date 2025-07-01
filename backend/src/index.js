@@ -880,8 +880,10 @@ app.get('/api/admin/analytics-country', authenticateAdmin, async (req, res, next
 app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
   try {
     const { page = 1, limit = 50, start, end } = req.query;
-    const safePage = Math.max(1, parseInt(page));
-    const safeLimit = Math.max(1, parseInt(limit));
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
+    const safePage = Math.max(1, Number.isNaN(parsedPage) ? 1 : parsedPage);
+    const safeLimit = Math.max(1, Number.isNaN(parsedLimit) ? 50 : parsedLimit);
     const offset = (safePage - 1) * safeLimit;
     let where = {};
     if (start) where.visitedAt = { [Op.gte]: new Date(start) };
