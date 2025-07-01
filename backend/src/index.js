@@ -870,6 +870,7 @@ app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
       where.visitedAt[Op.lte] = new Date(end);
     }
     const visitors = await Visitor.findAndCountAll({
+      attributes: ['id', 'country', 'region', 'ip', 'userAgent', 'visitedAt', 'testId'],
       include: [{
         model: Test,
         attributes: ['title']
