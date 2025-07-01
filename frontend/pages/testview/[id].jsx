@@ -68,9 +68,9 @@ const isValidTestUrl = (id) => {
 // 스타일 컴포넌트 추가 및 개선
 const TestContainer = styled.div`
   position: relative;
-  width: 98vw;
-  max-width: 95vw;
-  min-width: 92vw;
+  width: 60vw;
+  max-width: 65vw;
+  min-width: 60vw;
   margin: 32px auto 0 auto;
   background: white;
   border-radius: 24px;
