@@ -11,6 +11,7 @@ import multer from 'multer';
 import geoip from 'geoip-lite';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
+const REGION_MAP = require('./utils/region-map.json');
 let regionNames = {};
 try {
   regionNames = require('geoip-lite/regions.json');
@@ -488,8 +489,12 @@ app.post('/api/visitors', async (req, res, next) => {
     const geo = geoip.lookup(ip);
     const country = geo ? geo.country : null;
     let region = geo ? geo.region : null;
-    if (country === 'KR' && region && REGION_MAP['KR'] && REGION_MAP['KR'][region]) {
-      region = REGION_MAP['KR'][region];
+    // 1. region-map.json 우선 적용
+    if (country && region && REGION_MAP[country] && REGION_MAP[country][region]) {
+      region = REGION_MAP[country][region];
+    } else if (country === 'KR' && region && regionNames['KR'] && regionNames['KR'][region]) {
+      // 2. geoip-lite/regions.json (한국만)
+      region = regionNames['KR'][region];
     }
     const { testId, userAgent } = req.body;
     const visitor = await Visitor.create({
