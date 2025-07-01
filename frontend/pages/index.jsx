@@ -503,7 +503,9 @@ export default function Home() {
             setError(null);
             // 홈페이지로 이동
             router.push('/');
-          }} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
+          }} style={{ cursor: 'pointer' }}>
+            <span style={{ color: 'initial', filter: 'none' }}>🧠</span> PSYCHO
+          </Logo>
           <Stats>
             <StatItem>👥 전체 방문자: {visitorStats.total.toLocaleString()}</StatItem>
             <StatItem>📊 오늘 방문자: {visitorStats.today.toLocaleString()}</StatItem>

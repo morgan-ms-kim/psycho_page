@@ -20,16 +20,19 @@ export const Header = styled.header`
 `;
 
 export const BackButton = styled.button`
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  padding: 0.5rem 1rem;
+  background: #fff;
+  color: #764ba2;
+  border: 2px solid #764ba2;
+  padding: 0.5rem 1.2rem;
   border-radius: 20px;
   cursor: pointer;
-  font-size: 1rem;
-  
+  font-size: 1.1rem;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(80,80,120,0.08);
+  transition: background 0.2s, color 0.2s;
   &:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: #ede7f6;
+    color: #5a3e8b;
   }
 `;
 
@@ -132,16 +135,19 @@ export const SocialButton = styled.button`
 export const Card = styled.div`
   background: rgba(255,255,255,0.1);
   border-radius: 15px;
-  padding: 20px;
+  padding: 16px 8px;
   backdrop-filter: blur(10px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   width: 100%;
   max-width: 340px;
-  min-width: 280px;
-  margin: 0 auto;
-  
+  min-width: 0;
+  margin: 0 8px 24px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(0,0,0,0.3);
@@ -331,15 +337,15 @@ export const SearchSection = styled.div`
 
 export const SearchBar = styled.div`
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 25px;
-  padding: 5px;
-  backdrop-filter: blur(10px);
+  align-items: center;
+  width: 100%;
+  margin: 0 auto 1rem auto;
+  max-width: 400px;
 `;
 
 export const SearchInput = styled.input`
+  flex: 1;
+  min-width: 0;
   background: #fff;
   color: #222;
   border: 2px solid #764ba2;
@@ -353,16 +359,21 @@ export const SearchInput = styled.input`
 `;
 
 export const SearchButton = styled.button`
+  width: 40px;
+  height: 40px;
+  margin-left: 8px;
   background: linear-gradient(45deg, #ff6b6b, #ffa500);
   border: none;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 20px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  font-size: 1rem;
-  
+  transition: background 0.2s;
   &:hover {
-    opacity: 0.9;
+    background: linear-gradient(45deg, #ffa500, #ff6b6b);
   }
 `;
 
