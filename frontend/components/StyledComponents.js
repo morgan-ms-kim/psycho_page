@@ -340,19 +340,15 @@ export const SearchBar = styled.div`
 `;
 
 export const SearchInput = styled.input`
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: white;
-  padding: 12px 20px;
-  font-size: 1rem;
-  
+  background: #fff;
+  color: #222;
+  border: 2px solid #764ba2;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  padding: 0.8rem 1.2rem;
   &::placeholder {
-    color: rgba(255,255,255,0.6);
-  }
-  
-  &:focus {
-    outline: none;
+    color: #888;
+    opacity: 1;
   }
 `;
 

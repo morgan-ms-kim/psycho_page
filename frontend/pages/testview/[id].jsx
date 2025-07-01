@@ -438,12 +438,12 @@ export default function TestPage() {
   return (
     <MainWrap style={{ paddingTop: 0, background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
       <Section style={{
-        maxWidth: 1200,
-        margin: '32px auto 0 auto',
+        maxWidth: 1400,
+        margin: '40px auto 0 auto',
         background: '#fff',
-        borderRadius: 18,
-        boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
-        padding: '0 0 32px 0',
+        borderRadius: 24,
+        boxShadow: '0 8px 40px rgba(80,80,120,0.12)',
+        padding: '0 0 48px 0',
         minHeight: 120,
         position: 'relative'
       }}>
@@ -470,12 +470,12 @@ export default function TestPage() {
         {iframeSection}
         {/* 제목/설명 카드: iframe 아래로 이동, 여백 최소화 */}
         <InfoCard style={{
-          maxWidth: 1100,
-          margin: '32px auto 0 auto',
+          maxWidth: 1200,
+          margin: '40px auto 0 auto',
           background: '#fff',
-          borderRadius: 18,
+          borderRadius: 24,
           boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-          padding: '32px 24px'
+          padding: '40px 32px'
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
@@ -506,12 +506,12 @@ export default function TestPage() {
         </InfoCard>
         {/* 댓글 섹션 */}
         <CommentSection style={{
-          maxWidth: 1100,
-          margin: '32px auto',
+          maxWidth: 1200,
+          margin: '40px auto',
           background: '#fff',
-          borderRadius: 18,
+          borderRadius: 24,
           boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-          padding: '32px 24px'
+          padding: '40px 32px'
         }}>
           <CommentHeader>
             <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
