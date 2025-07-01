@@ -71,6 +71,7 @@ const TestContainer = styled.div`
   width: 50vw;
   max-width: 50vw;
   min-width: 40vw;
+
   margin: 32px auto 0 auto;
   background: white;
   border-radius: 24px;
@@ -152,18 +153,31 @@ const LoadingOverlay = styled.div`
 function RenderedCommentItem({ comment }) {
   if (!comment) return null;
   return (
-    <CommentItem style={{ marginBottom: 16, background: '#fff', color: '#222', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
-        <span style={{ fontWeight: 600, color: '#6c63ff', fontSize: '1rem', marginRight: 8 }}>
-          {comment.nickname || '익명'}
-        </span>
-        <span style={{ color: '#aaa', fontSize: '0.9rem' }}>
-          {comment.createdAt ? new Date(comment.createdAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) : ''}
-        </span>
-      </div>
-      <div style={{ fontSize: '1.08rem', whiteSpace: 'pre-line', wordBreak: 'break-all', marginBottom: 2 }}>
+    <CommentItem style={{
+      marginBottom: 16,
+      background: '#fff',
+      color: '#222',
+      boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      minWidth: 220,
+      maxWidth: 350,
+      padding: '8px 16px',
+      justifyContent: 'center',
+      flex: '0 1 320px',
+      textAlign: 'left',
+    }}>
+      <span style={{ fontWeight: 600, color: '#6c63ff', fontSize: '1rem', marginRight: 8, minWidth: 48 }}>
+        {comment.nickname || '익명'}
+      </span>
+      <span style={{ fontSize: '1.08rem', whiteSpace: 'pre-line', wordBreak: 'break-all', flex: 1 }}>
         {comment.content}
-      </div>
+      </span>
+      <span style={{ color: '#aaa', fontSize: '0.9rem', marginLeft: 8, minWidth: 80, textAlign: 'right' }}>
+        {comment.createdAt ? new Date(comment.createdAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) : ''}
+      </span>
     </CommentItem>
   );
 }
@@ -354,19 +368,12 @@ export default function TestPage() {
   };
 
   useEffect(() => {
-    // 광고 스크립트 1회만 삽입
-    if (!document.querySelector('script[src*="daumcdn.net/kas/static/ba.min.js"]')) {
-      const scriptElement = document.createElement('script');
-      scriptElement.type = 'text/javascript';
-      scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-      scriptElement.async = true;
-      scriptElement.onload = () => {
-        if (window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
-          window.kakao.adfit.render();
-        }
-      };
-      document.body.appendChild(scriptElement);
-    }
+    // 광고 스크립트가 이미 로드된 경우 render만 보장
+    setTimeout(() => {
+      if (window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
+        window.kakao.adfit.render();
+      }
+    }, 500);
   }, []);
 
   useEffect(() => {
@@ -404,7 +411,7 @@ export default function TestPage() {
     );
   } else if (buildExists) {
     iframeSection = (
-      <TestContainer style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
+      <TestContainer style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 600 }}>
         {!iframeLoaded && (
           <LoadingOverlay>
             <LoadingSpinner />
@@ -447,9 +454,8 @@ export default function TestPage() {
           minHeight: 120,
           position: 'relative',
         }}>
-          {/* 카카오 광고 컨테이너 - 맨 위 */}
+          {/* 카카오 광고 컨테이너 - SSR-safe */}
           <div
-            ref={adRef}
             id="kakao-ad-container"
             style={{
               position: 'relative',
@@ -465,20 +471,17 @@ export default function TestPage() {
               zIndex: 10,
               display: 'block',
             }}
-          >
-            <ins
-              className="kakao_ad_area"
-              style={{
-                display: 'block',
-                width: typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 728 : 320,
-                height: typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 90 : 100,
-                margin: '0 auto'
-              }}
-              data-ad-unit={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK'}
-              data-ad-width={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? '728' : '320'}
-              data-ad-height={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? '90' : '100'}
-            ></ins>
-          </div>
+            dangerouslySetInnerHTML={{
+              __html: `
+                <ins class="kakao_ad_area"
+                  style="display:block;width:100%;min-width:320px;max-width:728px;height:90px;margin:0 auto;"
+                  data-ad-unit="DAN-NOAbzxQGMUQ8Mke7"
+                  data-ad-width="728"
+                  data-ad-height="90"></ins>
+                <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+              `
+            }}
+          />
           <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
             <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
           </Header>
