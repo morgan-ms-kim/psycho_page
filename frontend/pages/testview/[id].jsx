@@ -368,7 +368,7 @@ export default function TestPage() {
     <MainWrap>
       <Header>
         <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
-        <TestTitle>{test?.title || '테스트'}</TestTitle>
+        <Title>{test?.title || '테스트'}</Title>
       </Header>
       {/* 에러 메시지(있을 때만) */}
       {error && (
