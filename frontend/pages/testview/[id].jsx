@@ -68,9 +68,9 @@ const isValidTestUrl = (id) => {
 // 스타일 컴포넌트 추가 및 개선
 const TestContainer = styled.div`
   position: relative;
-  width: 60vw;
-  max-width: 65vw;
-  min-width: 60vw;
+  width: 50vw;
+  max-width: 50vw;
+  min-width: 40vw;
   margin: 32px auto 0 auto;
   background: white;
   border-radius: 24px;
@@ -80,8 +80,8 @@ const TestContainer = styled.div`
   align-items: center;
   padding: 24px 0;
   @media (max-width: 1000px) {
-    max-width: 98vw;
-    min-width: 97vw;
+    max-width: 90vw;
+    min-width: 80vw;
     border-radius: 16px;
     padding: 16px 0;
   }
@@ -454,7 +454,7 @@ export default function TestPage() {
     );
   } else if (buildExists) {
     iframeSection = (
-      <TestContainer>
+      <TestContainer style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
         {!iframeLoaded && (
           <LoadingOverlay>
             <LoadingSpinner />
@@ -469,7 +469,7 @@ export default function TestPage() {
           title={test?.title || '테스트'}
           allow="fullscreen"
           sandbox="allow-scripts allow-forms allow-popups"
-          style={{ display: iframeLoaded ? 'block' : 'none' }}
+          style={{ display: iframeLoaded ? 'block' : 'none', margin: '0 auto' }}
         />
       </TestContainer>
     );
@@ -543,9 +543,6 @@ export default function TestPage() {
                 <SocialButton onClick={handleLike} liked={liked} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: liked ? '#fff' : '#222', background: liked ? '#7f7fd5' : '#fff', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
                   {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
                 </SocialButton>
-                <SocialButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: '#fff', background: '#7f7fd5', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
-                  💬 댓글 작성
-                </SocialButton>
               </FlexRow>
             </div>
           </InfoCard>
@@ -563,14 +560,14 @@ export default function TestPage() {
             alignItems: 'center',
             width: '100%'
           }}>
-            <CommentHeader style={{ width: '100%', justifyContent: 'center' }}>
+            <CommentHeader style={{ width: '100%', justifyContent: 'center', marginBottom: 16 }}>
               <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
               <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>
-                {showCommentForm ? '취소' : '댓글 작성'}
+                {showCommentForm ? '취소' : '💬댓글 작성'}
               </CommentButton>
             </CommentHeader>
             {showCommentForm && (
-              <CommentFormContainer style={{ width: '100%', maxWidth: '600px', margin: '0 auto' }}>
+              <CommentFormContainer style={{ width: '100%', maxWidth: '600px', margin: '0 auto 24px auto' }}>
                 <CommentInput
                   type="text"
                   placeholder="닉네임"

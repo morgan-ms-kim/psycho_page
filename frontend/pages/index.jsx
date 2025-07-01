@@ -126,7 +126,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                     <TestItemStats>
                       <Stat>👁️ {test.views}</Stat>
                       <Stat>💖 {test.likes}</Stat>
-                      <Stat>💬 {test.comments || 0}</Stat>
+                      <Stat>💬 {typeof test.comments === 'number' ? test.comments : 0}</Stat>
                     </TestItemStats>
                   </TestContent>
                 </TestCardContent>
@@ -671,9 +671,18 @@ const TestCardContent = styled.div`
 const TestThumbnailContainer = styled.div`
   position: relative;
   margin-bottom: 15px;
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const TestItemPlaceholder = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  transform: translate(-50%, -50%);
   width: 100%;
   height: 180px;
   background: linear-gradient(45deg, #667eea, #764ba2);
@@ -684,9 +693,8 @@ const TestItemPlaceholder = styled.div`
   font-size: 3rem;
   color: white;
   transition: transform 0.3s ease;
-  
   &:hover {
-    transform: scale(1.05);
+    transform: translate(-50%, -50%) scale(1.05);
   }
 `;
 
