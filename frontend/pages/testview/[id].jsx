@@ -439,10 +439,10 @@ export default function TestPage() {
   }
 
   return (
-    <MainWrap>
+    <MainWrap style={{ paddingTop: 0, background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
       {/* 카카오 광고 컨테이너: 맨 위 */}
-      <div id="kakao-ad-container" style={{ width: '100%', maxWidth: 900, margin: '0 auto', marginTop: 24, marginBottom: 24, borderRadius: 16, overflow: 'hidden', minHeight: 90, textAlign: 'center' }} />
-      <Header>
+      <div id="kakao-ad-container" style={{ width: '100%', maxWidth: 900, margin: '0 auto', marginTop: 8, marginBottom: 8, borderRadius: 12, overflow: 'hidden', minHeight: 60, textAlign: 'center', background: '#fff' }} />
+      <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
         <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
       </Header>
       {/* 에러 메시지(있을 때만) */}
@@ -451,41 +451,41 @@ export default function TestPage() {
           <p>🚫 {error}</p>
         </ErrorMessage>
       )}
-      {/* 테스트 제목/설명/통계 */}
-      <Section style={{ marginTop: 0, marginBottom: 32 }}>
-        <InfoCard style={{ background: 'rgba(255,255,255,0.95)', color: '#222', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-            <Title style={{ color: '#222', fontSize: '2rem', marginBottom: 8 }}>{test?.title || '테스트'}</Title>
-            <SubTitle style={{ color: '#555', fontSize: '1.1rem', marginBottom: 16 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
-            <div style={{ display: 'flex', gap: 32, margin: '16px 0', justifyContent: 'center' }}>
+      {/* 테스트 앱(iframe) */}
+      {iframeSection}
+      {/* 제목/설명 카드: iframe 아래로 이동, 여백 최소화 */}
+      <Section style={{ marginTop: 0, marginBottom: 16 }}>
+        <InfoCard style={{ background: 'rgba(255,255,255,0.97)', color: '#222', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', padding: '16px 12px', margin: '0 auto', maxWidth: 600 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
+            <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
+            <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center' }}>
               <div style={{ textAlign: 'center' }}>
-                <StatLabel style={{ color: '#888', fontSize: '1rem' }}>조회수</StatLabel>
-                <StatValue style={{ color: '#222', fontSize: '1.3rem' }}>{test?.views || 0}</StatValue>
+                <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>조회수</StatLabel>
+                <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{test?.views || 0}</StatValue>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <StatLabel style={{ color: '#888', fontSize: '1rem' }}>좋아요</StatLabel>
-                <StatValue style={{ color: '#ff5e5e', fontSize: '1.3rem' }}>{test?.likes || 0}</StatValue>
+                <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>좋아요</StatLabel>
+                <StatValue style={{ color: '#ff5e5e', fontSize: '1.1rem' }}>{test?.likes || 0}</StatValue>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <StatLabel style={{ color: '#888', fontSize: '1rem' }}>댓글</StatLabel>
-                <StatValue style={{ color: '#222', fontSize: '1.3rem' }}>{commentCount}</StatValue>
+                <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>댓글</StatLabel>
+                <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{commentCount}</StatValue>
               </div>
             </div>
-            <FlexRow style={{ width: '100%', justifyContent: 'center', gap: 16, marginTop: 8 }}>
-              <SocialButton onClick={handleLike} liked={liked} style={{ minWidth: 120 }}>
+            <FlexRow style={{ width: '100%', justifyContent: 'center', gap: 10, marginTop: 4 }}>
+              <SocialButton onClick={handleLike} liked={liked} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: liked ? '#fff' : '#222', background: liked ? '#7f7fd5' : '#fff', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
                 {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
               </SocialButton>
-              <SocialButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ minWidth: 120 }}>
+              <SocialButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: '#fff', background: '#7f7fd5', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
                 💬 댓글 작성
               </SocialButton>
             </FlexRow>
           </div>
         </InfoCard>
       </Section>
-      {/* 테스트 앱(iframe) */}
-      {iframeSection}
       {/* 댓글 섹션 */}
-      <CommentSection style={{ marginBottom: '2rem', padding: '0 1rem' }}>
+      <CommentSection style={{ marginBottom: '1rem', padding: '0 1rem' }}>
         <CommentHeader>
           <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
           <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>
@@ -520,13 +520,13 @@ export default function TestPage() {
           </CommentFormContainer>
         )}
         {comments.length === 0 && (
-          <div style={{ color: '#aaa', textAlign: 'center', margin: '2rem 0' }}>아직 댓글이 없습니다.</div>
+          <div style={{ color: '#aaa', textAlign: 'center', margin: '1rem 0' }}>아직 댓글이 없습니다.</div>
         )}
         {comments.map((comment) => (
           <RenderedCommentItem key={comment.id} comment={comment} />
         ))}
       </CommentSection>
-      <Footer style={{ marginTop: '2rem' }} />
+      <Footer style={{ marginTop: '0.5rem' }} />
     </MainWrap>
   );
 } 

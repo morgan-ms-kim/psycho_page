@@ -86,6 +86,8 @@ export default function Analytics() {
   const [period, setPeriod] = useState('day');
   const [analyticsData, setAnalyticsData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [visitorList, setVisitorList] = useState([]);
+  const [visitorLoading, setVisitorLoading] = useState(true);
 
   useEffect(() => {
     // 로그인 확인
@@ -99,6 +101,22 @@ export default function Analytics() {
 
     loadAnalytics();
   }, [router, period]);
+
+  // 방문자 상세 리스트 로드
+  useEffect(() => {
+    const fetchVisitors = async () => {
+      try {
+        setVisitorLoading(true);
+        const res = await apiClient.get('/admin/visitors?page=1&limit=50');
+        setVisitorList(res.data.visitors || []);
+      } catch (e) {
+        setVisitorList([]);
+      } finally {
+        setVisitorLoading(false);
+      }
+    };
+    fetchVisitors();
+  }, []);
 
   const loadAnalytics = async () => {
     try {
@@ -282,6 +300,35 @@ export default function Analytics() {
                 <tr key={index}>
                   <td>{item.date}</td>
                   <td>{item.count.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </DataTable>
+
+        {/* 방문자 상세 리스트 */}
+        <DataTable style={{ marginTop: '2rem' }}>
+          <TableTitle>방문자 상세 리스트</TableTitle>
+          <Table>
+            <thead>
+              <tr>
+                <th>국가</th>
+                <th>IP</th>
+                <th>구분</th>
+                <th>방문 시각</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visitorLoading ? (
+                <tr><td colSpan={4} style={{ textAlign: 'center' }}>로딩 중...</td></tr>
+              ) : visitorList.length === 0 ? (
+                <tr><td colSpan={4} style={{ textAlign: 'center' }}>방문자 데이터가 없습니다.</td></tr>
+              ) : visitorList.map((v, i) => (
+                <tr key={v.id || i}>
+                  <td>{v.country || '-'}</td>
+                  <td>{v.ip || '-'}</td>
+                  <td>{v.isBot ? '🤖 봇' : '🧑 인간'}</td>
+                  <td>{v.visitedAt ? new Date(v.visitedAt).toLocaleString('ko-KR') : '-'}</td>
                 </tr>
               ))}
             </tbody>
