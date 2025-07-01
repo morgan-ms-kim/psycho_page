@@ -30,7 +30,9 @@ import {
   ProgressFill,
   ProgressText,
   SocialButton,
-  StatItem
+  StatItem,
+  StatLabel,
+  StatValue
 } from '../../components/StyledComponents';
 
 // axios 인스턴스 생성

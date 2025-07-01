@@ -396,4 +396,19 @@ export const BannerStats = styled.div`
   font-size: 0.9rem;
 `;
 
+// 통계용 라벨/값
+export const StatLabel = styled.span`
+  display: block;
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 2px;
+`;
+
+export const StatValue = styled.span`
+  display: block;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+`;
+
 // TestItemStats는 프론트엔드 페이지에서 정의하므로 여기서는 제거 
