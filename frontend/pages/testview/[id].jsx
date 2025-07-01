@@ -69,8 +69,8 @@ const isValidTestUrl = (id) => {
 const TestContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: 1800px;
-  min-width: 1000px;
+  max-width: 1200px;
+  min-width: 800px;
   max-height: 1000px;
   min-height: 800px;
   margin: 2rem auto;
@@ -352,40 +352,28 @@ export default function TestPage() {
   };
 
   useEffect(() => {
-    // 광고 컨테이너가 없으면 광고 로드 시도
-    if (!document.getElementById('kakao-ad-container')) {
-      if (typeof window !== 'undefined') {
-        // _app.jsx의 loadKakaoAd와 동일한 방식으로 광고 로드
-        const loadKakaoAd = () => {
-          try {
-            const isPC = window.matchMedia('(min-width: 728px)').matches;
-            const adUnit = isPC ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK';
-            const adWidth = isPC ? '728' : '320';
-            const adHeight = isPC ? '90' : '100';
-            let container = document.getElementById('kakao-ad-container');
-            if (!container) {
-              container = document.createElement('div');
-              container.id = 'kakao-ad-container';
-              container.style.cssText = `position: relative; margin-top: 1rem; text-align: center; min-height: ${adHeight}px;`;
-              document.body.prepend(container);
-            }
-            container.innerHTML = '';
-            const adElement = document.createElement('ins');
-            adElement.className = 'kakao_ad_area kakao-ad-fixed';
-            adElement.style.display = 'none';
-            adElement.setAttribute('data-ad-unit', adUnit);
-            adElement.setAttribute('data-ad-width', adWidth);
-            adElement.setAttribute('data-ad-height', adHeight);
-            const scriptElement = document.createElement('script');
-            scriptElement.type = 'text/javascript';
-            scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-            scriptElement.async = true;
-            container.appendChild(adElement);
-            container.appendChild(scriptElement);
-          } catch (e) { console.error(e); }
-        };
-        loadKakaoAd();
-      }
+    // 광고 컨테이너가 Section 내부에 이미 렌더링되어 있으므로, 해당 컨테이너에만 광고 삽입
+    const container = document.getElementById('kakao-ad-container');
+    if (container) {
+      container.innerHTML = '';
+      try {
+        const isPC = window.matchMedia('(min-width: 728px)').matches;
+        const adUnit = isPC ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK';
+        const adWidth = isPC ? '728' : '320';
+        const adHeight = isPC ? '90' : '100';
+        const adElement = document.createElement('ins');
+        adElement.className = 'kakao_ad_area kakao-ad-fixed';
+        adElement.style.display = 'none';
+        adElement.setAttribute('data-ad-unit', adUnit);
+        adElement.setAttribute('data-ad-width', adWidth);
+        adElement.setAttribute('data-ad-height', adHeight);
+        const scriptElement = document.createElement('script');
+        scriptElement.type = 'text/javascript';
+        scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+        scriptElement.async = true;
+        container.appendChild(adElement);
+        container.appendChild(scriptElement);
+      } catch (e) { console.error(e); }
     }
   }, []);
 
@@ -460,16 +448,6 @@ export default function TestPage() {
           minHeight: 120,
           position: 'relative'
         }}>
-          <div id="kakao-ad-container"
-            style={{
-              width: '100%',
-              minHeight: 60,
-              textAlign: 'center',
-              background: 'transparent',
-              margin: 0,
-              padding: '24px 0 0 0'
-            }}
-          />
           <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
             <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
           </Header>
