@@ -167,6 +167,19 @@ export const ResultCard = styled(Card)`
 
 export const InfoCard = styled(Card)`
   border-radius: 15px;
+  max-width: 1200px;
+  margin: 40px auto 0 auto;
+  padding: 40px 32px;
+
+  @media (max-width: 900px) {
+    padding: 24px 8px;
+    margin: 24px 0 0 0;
+  }
+  @media (max-width: 600px) {
+    padding: 16px 2vw;
+    border-radius: 8px;
+    margin: 16px 0 0 0;
+  }
 `;
 
 export const CommentForm = styled(Card)`
@@ -242,6 +255,13 @@ export const FlexColumn = styled.div`
 export const Section = styled.div`
   max-width: 800px;
   margin: 0 auto 30px;
+  padding: 0 20px;
+
+  @media (max-width: 600px) {
+    max-width: 100vw;
+    padding: 0 2vw;
+    margin-bottom: 16px;
+  }
 `;
 
 export const CommentSection = styled.div`
@@ -470,6 +490,10 @@ export const CommentInput = styled.input`
   border: 1px solid #ffe066;
   border-radius: 8px;
   font-size: 1rem;
+  @media (max-width: 600px) {
+    font-size: 1rem;
+    padding: 0.6rem;
+  }
 `;
 
 export const CommentTextarea = styled.textarea`
@@ -481,7 +505,11 @@ export const CommentTextarea = styled.textarea`
   font-size: 1rem;
   min-height: 80px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-
+  @media (max-width: 600px) {
+    font-size: 1rem;
+    padding: 0.6rem;
+    min-height: 60px;
+  }
 `;
 
 export const CommentSubmitButton = styled.button`
@@ -497,5 +525,9 @@ export const CommentSubmitButton = styled.button`
   &:hover {
     background: #ffb3e6;
     color: #222;
+  }
+  @media (max-width: 600px) {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
   }
 `; 

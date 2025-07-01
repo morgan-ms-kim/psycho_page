@@ -71,25 +71,26 @@ const TestContainer = styled.div`
   width: 100%;
   max-width: 1200px;
   min-width: 1000px;
-  height: auto;
-  max-height: 2000px;
-  min-height: 1000px;
   margin: 2rem auto 2rem auto;
-  margin-bottom: 3rem;
   background: white;
   border-radius: 24px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   display: flex;
   flex-direction: column;
-  @media (max-width: 1800px) {
-    max-width: 100%;
-    min-height: 800px;
-    margin: 1rem 0 3rem 0;
+
+  @media (max-width: 1200px) {
+    min-width: 0;
+    max-width: 100vw;
+    margin: 1rem 0 2rem 0;
+    border-radius: 16px;
   }
   @media (max-width: 600px) {
-    min-height: 200px;
-    border-radius: 12px;
-    margin: 0.5rem 0 3rem 0;
+    min-width: 0;
+    max-width: 100vw;
+    width: 100vw;
+    margin: 0.5rem 0 1.5rem 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
 `;
 
