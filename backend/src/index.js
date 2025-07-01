@@ -599,9 +599,9 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
       }
     }
     
-    // 새 폴더 생성
-    fs.mkdirSync(testPath, { recursive: true });
-    steps.directoryCreated = true;
+    // 새 폴더 생성 (삭제)
+    // fs.mkdirSync(testPath, { recursive: true });
+    // steps.directoryCreated = true;
     
     // git clone (--force 옵션 추가)
     try {
