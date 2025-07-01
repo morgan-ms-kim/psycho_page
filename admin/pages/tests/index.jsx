@@ -127,7 +127,7 @@ export default function TestManagement() {
     setModalMessage(message);
     setModalType(type);
     setShowModal(true);
-    setTimeout(() => setShowModal(false), 3000);
+    setTimeout(() => setShowModal(false), 1000);
   };
 
   const handleCleanupOrphanFolders = async () => {

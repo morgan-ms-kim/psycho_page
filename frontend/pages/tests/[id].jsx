@@ -370,6 +370,33 @@ export default function TestPage() {
       <Footer>
         <p>© 2024 PSYCHO - 재미있는 심리테스트 모음</p>
       </Footer>
+
+      {/* 카카오 광고 */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            <!-- PC 광고 -->
+            if( window.matchMedia('(min-width: 728px )').matches == true){
+              document.write('<ins class="kakao_ad_area kakao-ad-fixed" style="display:none;"   data-ad-unit = "DAN-NOAbzxQGMUQ8Mke7" data-ad-width = "728" data-ad-height = "90"></ins><scr'+'ipt type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></scr'+'ipt>');
+            }
+            <!-- Mobile 광고 -->
+            if( window.matchMedia('(max-width: 727px )').matches == true){
+              document.write('<ins class="kakao_ad_area kakao-ad-fixed" style="display:none;" data-ad-unit = "DAN-gNGXA6EnAXz8usSK" data-ad-width = "320" data-ad-height = "100"></ins> <scr'+'ipt type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></scr'+'ipt>');
+            }
+          `
+        }}
+      />
+      <style jsx>{`
+        .kakao-ad-fixed {
+          position: fixed;
+          bottom: 20px; /* 하단에서 20px 위 */
+          left: 50%; /* 화면 중앙 */
+          transform: translateX(-50%); /* 정확한 중앙 정렬 */
+          width: 728px; /* 원래 크기로 복원 */
+          height: 90px; /* 원래 크기로 복원 */
+          z-index: 1000;
+        }
+      `}</style>
     </MainWrap>
   );
 }
