@@ -14,8 +14,8 @@ git pull
 echo "📁 프론트엔드 디렉토리로 이동..."
 cd frontend
 # 빌드 (빠른 빌드 사용)
-echo "🔨 빠른 빌드 중..."
-npm run build:fast
+echo "🔨 빌드 중..."
+npm run build
 
 # 정적 파일을 올바른 위치로 복사
 echo "📁 정적 파일 복사 중..."

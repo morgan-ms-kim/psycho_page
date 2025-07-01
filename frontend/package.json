@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && next export",
-    "build:fast": "NODE_ENV=development next build && next export",
     "start": "next start"
   },
   "dependencies": {
