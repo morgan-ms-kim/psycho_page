@@ -8,6 +8,7 @@ import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
 import multer from 'multer';
+import geoip from 'geoip-lite';
 
 const execAsync = promisify(exec);
 
@@ -442,18 +443,20 @@ app.get('/api/visitors/count', async (req, res, next) => {
 // 방문자 기록
 app.post('/api/visitors', async (req, res, next) => {
   try {
-    const { country, region, testId } = req.body;
-    const clientIP = getClientIP(req);
-    
-    await Visitor.create({
-      ip: clientIP,
+    const ip = getClientIP(req);
+    const geo = geoip.lookup(ip);
+    const country = geo ? geo.country : null;
+    const region = geo ? geo.region : null;
+    const { testId, userAgent } = req.body;
+    const visitor = await Visitor.create({
+      testId,
+      ip,
       country,
       region,
-      userAgent: req.headers['user-agent'],
-      testId
+      userAgent,
+      visitedAt: new Date()
     });
-    
-    res.json({ success: true });
+    res.json({ success: true, visitor });
   } catch (error) {
     next(error);
   }
@@ -885,7 +888,6 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
     // 관련 데이터 삭제 (댓글, 좋아요, 방문자 기록)
     await Comment.destroy({ where: { testId } });
     await Like.destroy({ where: { testId } });
-    await Visitor.destroy({ where: { testId } });
     // 테스트 폴더 삭제
     if (test.folder) {
       const testFolderPath = path.join(process.cwd(), '..', 'frontend', 'public', 'tests', test.folder);
