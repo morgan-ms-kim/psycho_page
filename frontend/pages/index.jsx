@@ -12,12 +12,8 @@ import {
   PrimaryButton,
   SecondaryButton,
   Grid,
-  FlexRow,
   Section,
   Title,
-  SectionTitle,
-  Card,
-  Logo,
   Stats,
   StatItem,
   HistoryButton,
@@ -26,8 +22,7 @@ import {
   SearchInput,
   SearchButton,
   FilterBar,
-  CategorySelect,
-  BannerStats
+  CategorySelect
 } from '../components/StyledComponents';
 import Head from 'next/head';
 
