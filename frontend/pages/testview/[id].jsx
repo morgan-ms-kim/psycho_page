@@ -41,6 +41,7 @@ import {
   CommentTextarea,
   CommentSubmitButton
 } from '../../components/StyledComponents';
+import Image from 'next/image';
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
@@ -70,8 +71,9 @@ const TestContainer = styled.div`
   width: 100%;
   max-width: 900px;
   height: auto;
-  min-height: 300px;
+  min-height: 500px;
   margin: 2rem auto 2rem auto;
+  margin-bottom: 3rem;
   background: white;
   border-radius: 14px;
   overflow: hidden;
@@ -80,14 +82,14 @@ const TestContainer = styled.div`
   flex-direction: column;
   @media (max-width: 900px) {
     height: auto;
-    min-height: 180px;
-    margin: 1rem 0;
+    min-height: 300px;
+    margin: 1rem 0 3rem 0;
   }
   @media (max-width: 600px) {
     height: auto;
-    min-height: 100px;
+    min-height: 200px;
     border-radius: 8px;
-    margin: 0.5rem 0;
+    margin: 0.5rem 0 3rem 0;
   }
 `;
 
@@ -117,12 +119,16 @@ const IframeRefreshButton = styled.button`
 const TestIframe = styled.iframe`
   width: 100%;
   height: 100%;
+  min-height: 500px;
+  max-height: none;
   border: none;
   background: #fff;
   border-radius: 0 0 14px 14px;
   flex: 1;
+  overflow: hidden;
   @media (max-width: 600px) {
     border-radius: 0 0 8px 8px;
+    min-height: 200px;
   }
 `;
 
@@ -144,6 +150,26 @@ const LoadingOverlay = styled.div`
     color: #333;
   }
 `;
+
+// 댓글 렌더링용 컴포넌트
+function RenderedCommentItem({ comment }) {
+  if (!comment) return null;
+  return (
+    <CommentItem style={{ marginBottom: 16, background: '#fff', color: '#222', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
+        <span style={{ fontWeight: 600, color: '#6c63ff', fontSize: '1rem', marginRight: 8 }}>
+          {comment.nickname || '익명'}
+        </span>
+        <span style={{ color: '#aaa', fontSize: '0.9rem' }}>
+          {comment.createdAt ? new Date(comment.createdAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) : ''}
+        </span>
+      </div>
+      <div style={{ fontSize: '1.08rem', whiteSpace: 'pre-line', wordBreak: 'break-all', marginBottom: 2 }}>
+        {comment.content}
+      </div>
+    </CommentItem>
+  );
+}
 
 export default function TestPage() {
   const router = useRouter();
@@ -317,6 +343,44 @@ export default function TestPage() {
     }
   };
 
+  useEffect(() => {
+    // 광고 컨테이너가 없으면 광고 로드 시도
+    if (!document.getElementById('kakao-ad-container')) {
+      if (typeof window !== 'undefined') {
+        // _app.jsx의 loadKakaoAd와 동일한 방식으로 광고 로드
+        const loadKakaoAd = () => {
+          try {
+            const isPC = window.matchMedia('(min-width: 728px)').matches;
+            const adUnit = isPC ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK';
+            const adWidth = isPC ? '728' : '320';
+            const adHeight = isPC ? '90' : '100';
+            let container = document.getElementById('kakao-ad-container');
+            if (!container) {
+              container = document.createElement('div');
+              container.id = 'kakao-ad-container';
+              container.style.cssText = `position: relative; margin-top: 1rem; text-align: center; min-height: ${adHeight}px;`;
+              document.body.prepend(container);
+            }
+            container.innerHTML = '';
+            const adElement = document.createElement('ins');
+            adElement.className = 'kakao_ad_area kakao-ad-fixed';
+            adElement.style.display = 'none';
+            adElement.setAttribute('data-ad-unit', adUnit);
+            adElement.setAttribute('data-ad-width', adWidth);
+            adElement.setAttribute('data-ad-height', adHeight);
+            const scriptElement = document.createElement('script');
+            scriptElement.type = 'text/javascript';
+            scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+            scriptElement.async = true;
+            container.appendChild(adElement);
+            container.appendChild(scriptElement);
+          } catch (e) { console.error(e); }
+        };
+        loadKakaoAd();
+      }
+    }
+  }, []);
+
   if (loading) {
     return (
       <MainWrap>
@@ -377,9 +441,10 @@ export default function TestPage() {
 
   return (
     <MainWrap>
+      {/* 카카오 광고 컨테이너: 맨 위 */}
+      <div id="kakao-ad-container" style={{ width: '100%', maxWidth: 900, margin: '0 auto', marginTop: 24, marginBottom: 24, borderRadius: 16, overflow: 'hidden', minHeight: 90, textAlign: 'center' }} />
       <Header>
         <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
-        <Title>{test?.title || '테스트'}</Title>
       </Header>
       {/* 에러 메시지(있을 때만) */}
       {error && (
@@ -387,36 +452,39 @@ export default function TestPage() {
           <p>🚫 {error}</p>
         </ErrorMessage>
       )}
-      {iframeSection}
-      {/* 테스트 정보 및 소셜 기능 */}
-      <Section>
-        <InfoCard>
-          <Title>{test?.title || '테스트'}</Title>
-          <SubTitle>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
-          <FlexRow>
-            <SocialButton onClick={handleLike} liked={liked}>
-              {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
-            </SocialButton>
-            <SocialButton onClick={() => setShowCommentForm(!showCommentForm)}>
-              💬 댓글 작성
-            </SocialButton>
-          </FlexRow>
-          <Grid>
-            <StatItem>
-              <StatLabel>조회수</StatLabel>
-              <StatValue>{test?.views || 0}</StatValue>
-            </StatItem>
-            <StatItem>
-              <StatLabel>좋아요</StatLabel>
-              <StatValue>{test?.likes || 0}</StatValue>
-            </StatItem>
-            <StatItem>
-              <StatLabel>댓글</StatLabel>
-              <StatValue>{commentCount}</StatValue>
-            </StatItem>
-          </Grid>
+      {/* 테스트 제목/설명/통계 */}
+      <Section style={{ marginTop: 0, marginBottom: 32 }}>
+        <InfoCard style={{ background: 'rgba(255,255,255,0.95)', color: '#222', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <Title style={{ color: '#222', fontSize: '2rem', marginBottom: 8 }}>{test?.title || '테스트'}</Title>
+            <SubTitle style={{ color: '#555', fontSize: '1.1rem', marginBottom: 16 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
+            <div style={{ display: 'flex', gap: 32, margin: '16px 0', justifyContent: 'center' }}>
+              <div style={{ textAlign: 'center' }}>
+                <StatLabel style={{ color: '#888', fontSize: '1rem' }}>조회수</StatLabel>
+                <StatValue style={{ color: '#222', fontSize: '1.3rem' }}>{test?.views || 0}</StatValue>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <StatLabel style={{ color: '#888', fontSize: '1rem' }}>좋아요</StatLabel>
+                <StatValue style={{ color: '#ff5e5e', fontSize: '1.3rem' }}>{test?.likes || 0}</StatValue>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <StatLabel style={{ color: '#888', fontSize: '1rem' }}>댓글</StatLabel>
+                <StatValue style={{ color: '#222', fontSize: '1.3rem' }}>{commentCount}</StatValue>
+              </div>
+            </div>
+            <FlexRow style={{ width: '100%', justifyContent: 'center', gap: 16, marginTop: 8 }}>
+              <SocialButton onClick={handleLike} liked={liked} style={{ minWidth: 120 }}>
+                {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
+              </SocialButton>
+              <SocialButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ minWidth: 120 }}>
+                💬 댓글 작성
+              </SocialButton>
+            </FlexRow>
+          </div>
         </InfoCard>
       </Section>
+      {/* 테스트 앱(iframe) */}
+      {iframeSection}
       {/* 댓글 섹션 */}
       <CommentSection style={{ marginBottom: '2rem', padding: '0 1rem' }}>
         <CommentHeader>
@@ -452,8 +520,11 @@ export default function TestPage() {
             </CommentSubmitButton>
           </CommentFormContainer>
         )}
+        {comments.length === 0 && (
+          <div style={{ color: '#aaa', textAlign: 'center', margin: '2rem 0' }}>아직 댓글이 없습니다.</div>
+        )}
         {comments.map((comment) => (
-          <CommentItem key={comment.id} comment={comment} />
+          <RenderedCommentItem key={comment.id} comment={comment} />
         ))}
       </CommentSection>
       <Footer style={{ marginTop: '2rem' }} />

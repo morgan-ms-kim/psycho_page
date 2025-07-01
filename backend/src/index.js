@@ -980,12 +980,17 @@ app.get('/api/admin/tests/next-id', authenticateAdmin, async (req, res, next) =>
 app.post('/api/admin/cleanup-orphan-folders', authenticateAdmin, async (req, res, next) => {
   try {
     console.log('🧹 등록되지 않은 테스트 폴더 정리 시작');
-    // DB에 등록된 테스트 폴더 목록 (null/빈값 제외)
-    const registeredFolders = new Set(
-      (await Test.findAll({ attributes: ['folder'], raw: true }))
-        .map(t => t.folder)
-        .filter(folder => !!folder)
-    );
+    // DB에 등록된 테스트 폴더 목록 (null/빈값은 id값으로 추정)
+    const tests = await Test.findAll({ attributes: ['id', 'folder'], raw: true });
+    const registeredFolders = new Set();
+    for (const t of tests) {
+      if (t.folder && t.folder.trim()) {
+        registeredFolders.add(t.folder.trim());
+      } else {
+        // folder가 null/빈값이면 id값으로 폴더명 추정
+        registeredFolders.add(`test${t.id}`);
+      }
+    }
     // 파일시스템의 테스트 폴더 목록
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
     const filesystemFolders = fs.existsSync(testsDir) 
@@ -993,7 +998,7 @@ app.post('/api/admin/cleanup-orphan-folders', authenticateAdmin, async (req, res
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name)
       : [];
-    // 등록된 폴더 중 실제로 존재하는 폴더만 보호
+    // 보호 폴더: DB에 등록된 폴더(또는 id값 추정) 중 실제로 존재하는 폴더만 보호
     const protectedFolders = new Set(
       Array.from(registeredFolders).filter(folder => filesystemFolders.includes(folder))
     );
@@ -1056,6 +1061,26 @@ app.get('/api/admin/orphan-folders', authenticateAdmin, async (req, res, next) =
     });
   } catch (error) {
     next(error);
+  }
+});
+
+// 모든 테스트의 folder 컬럼을 id값 기준으로 일괄 업데이트하는 API
+app.post('/api/admin/update-all-folder-names', authenticateAdmin, async (req, res, next) => {
+  try {
+    const tests = await Test.findAll();
+    let updatedCount = 0;
+    for (const test of tests) {
+      const expectedFolder = `test${test.id}`;
+      if (test.folder !== expectedFolder) {
+        test.folder = expectedFolder;
+        await test.save();
+        updatedCount++;
+      }
+    }
+    res.json({ success: true, message: `${updatedCount}개 테스트의 folder 컬럼이 업데이트되었습니다.`, updatedCount });
+  } catch (error) {
+    console.error('❌ 폴더명 일괄 업데이트 실패:', error);
+    res.status(500).json({ success: false, message: '폴더명 일괄 업데이트 실패', error: error.message });
   }
 });
 

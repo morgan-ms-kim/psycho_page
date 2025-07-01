@@ -171,7 +171,7 @@ export default function Analytics() {
                 router.push('/dashboard');
               }
             }
-          }} style={{ cursor: 'pointer' }}>�� PSYCHO 관리자</Logo>
+          }} style={{ cursor: 'pointer' }}>🧠 PSYCHO 관리자</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
             <NavLink href="/tests">테스트 관리</NavLink>
