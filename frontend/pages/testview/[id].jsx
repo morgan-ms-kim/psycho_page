@@ -445,8 +445,40 @@ export default function TestPage() {
           boxShadow: '0 8px 40px rgba(80,80,120,0.12)',
           padding: '0 0 48px 0',
           minHeight: 120,
-          position: 'relative'
+          position: 'relative',
         }}>
+          {/* 카카오 광고 컨테이너 - 맨 위 */}
+          <div
+            ref={adRef}
+            id="kakao-ad-container"
+            style={{
+              position: 'relative',
+              width: '100%',
+              maxWidth: 728,
+              margin: '0 auto 24px auto',
+              textAlign: 'center',
+              minHeight: 90,
+              background: '#fff',
+              borderRadius: 12,
+              padding: 16,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              zIndex: 10,
+              display: 'block',
+            }}
+          >
+            <ins
+              className="kakao_ad_area"
+              style={{
+                display: 'block',
+                width: typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 728 : 320,
+                height: typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 90 : 100,
+                margin: '0 auto'
+              }}
+              data-ad-unit={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK'}
+              data-ad-width={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? '728' : '320'}
+              data-ad-height={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? '90' : '100'}
+            ></ins>
+          </div>
           <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
             <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
           </Header>
@@ -456,46 +488,62 @@ export default function TestPage() {
               <p>🚫 {error}</p>
             </ErrorMessage>
           )}
+          {/* 광고+InfoCard 한 줄 배치 */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              gap: 32,
+              width: '100%',
+              margin: '0 auto',
+              maxWidth: 1200,
+              flexWrap: 'wrap',
+            }}
+          >
+            {/* InfoCard(제목/설명/통계) */}
+            <InfoCard as={TestContainer} style={{
+              maxWidth: '900px',
+              minWidth: 0,
+              margin: '0',
+              background: '#fff',
+              borderRadius: 24,
+              boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
+              padding: '24px 0',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              width: '100%',
+              flex: '1 1 400px',
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%', textAlign: 'center' }}>
+                <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
+                <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
+                <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center', width: '100%' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>조회수</StatLabel>
+                    <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{test?.views || 0}</StatValue>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>좋아요</StatLabel>
+                    <StatValue style={{ color: '#ff5e5e', fontSize: '1.1rem' }}>{test?.likes || 0}</StatValue>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>댓글</StatLabel>
+                    <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{commentCount}</StatValue>
+                  </div>
+                </div>
+                <FlexRow style={{ justifyContent: 'center', gap: 10, marginTop: 4, width: '100%' }}>
+                  <SocialButton onClick={handleLike} liked={liked} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: liked ? '#fff' : '#222', background: liked ? '#7f7fd5' : '#fff', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
+                    {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
+                  </SocialButton>
+                </FlexRow>
+              </div>
+            </InfoCard>
+          </div>
           {/* 테스트 앱(iframe) */}
           {iframeSection}
-          {/* 제목/설명 카드: iframe 아래로 이동, 여백 최소화 */}
-          <InfoCard as={TestContainer} style={{
-            maxWidth: '900px',
-            minWidth: 0,
-            margin: '32px auto 0 auto',
-            background: '#fff',
-            borderRadius: 24,
-            boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-            padding: '24px 0',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%'
-          }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%', textAlign: 'center' }}>
-              <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
-              <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
-              <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center', width: '100%' }}>
-                <div style={{ textAlign: 'center' }}>
-                  <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>조회수</StatLabel>
-                  <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{test?.views || 0}</StatValue>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>좋아요</StatLabel>
-                  <StatValue style={{ color: '#ff5e5e', fontSize: '1.1rem' }}>{test?.likes || 0}</StatValue>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>댓글</StatLabel>
-                  <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{commentCount}</StatValue>
-                </div>
-              </div>
-              <FlexRow style={{ justifyContent: 'center', gap: 10, marginTop: 4, width: '100%' }}>
-                <SocialButton onClick={handleLike} liked={liked} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: liked ? '#fff' : '#222', background: liked ? '#7f7fd5' : '#fff', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
-                  {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
-                </SocialButton>
-              </FlexRow>
-            </div>
-          </InfoCard>
           {/* 댓글 섹션 */}
           <CommentSection style={{
             maxWidth: '900px',
@@ -546,44 +594,12 @@ export default function TestPage() {
             {comments.length === 0 && (
               <div style={{ color: '#aaa', textAlign: 'center', margin: '1rem 0' }}>아직 댓글이 없습니다.</div>
             )}
-            <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto' }}>
+            <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16 }}>
               {comments.map((comment) => (
                 <RenderedCommentItem key={comment.id} comment={comment} />
               ))}
             </div>
           </CommentSection>
-          {/* 카카오 광고 컨테이너 */}
-          <div
-            ref={adRef}
-            id="kakao-ad-container"
-            style={{
-              position: 'relative',
-              width: '100%',
-              maxWidth: 728,
-              margin: '0 auto 24px auto',
-              textAlign: 'center',
-              minHeight: 90,
-              background: '#fff',
-              borderRadius: 12,
-              padding: 16,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-              zIndex: 10,
-              display: 'block'
-            }}
-          >
-            <ins
-              className="kakao_ad_area"
-              style={{
-                display: 'block',
-                width: window && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 728 : 320,
-                height: window && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 90 : 100,
-                margin: '0 auto'
-              }}
-              data-ad-unit={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK'}
-              data-ad-width={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? '728' : '320'}
-              data-ad-height={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 728px)').matches ? '90' : '100'}
-            ></ins>
-          </div>
         </Section>
         <Footer style={{ marginTop: '0.5rem' }} />
       </MainWrap>
