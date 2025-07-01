@@ -259,7 +259,7 @@ app.get('/api/tests/:id', async (req, res, next) => {
     
     // 이미지 경로 수정
     const testData = test.toJSON();
-    return testData;
+    res.json(testData);
   } catch (error) {
     next(error);
   }
@@ -687,7 +687,7 @@ app.get('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => {
     
     // 이미지 경로 수정
     const testData = test.toJSON();
-    return testData;
+    res.json(testData);
   } catch (error) {
     console.error('❌ 관리자 테스트 조회 실패:', error);
     next(error);

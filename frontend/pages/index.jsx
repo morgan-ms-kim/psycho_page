@@ -105,8 +105,6 @@ export default function Home() {
     }
   }, [page]);
 
-
-
   // 방문자 통계 로드
   const loadVisitorStats = async () => {
     try {
@@ -549,7 +547,6 @@ export default function Home() {
         <div id="kakao-ad-container"></div>
       </Footer>
 
-
     </MainWrap>
   );
 }
@@ -670,4 +667,13 @@ const TestItemImage = styled.img`
   &:hover {
     transform: scale(1.05);
   }
+`;
+
+// MainWrap에 overflow-y: auto; 추가 (필요시)
+export const MainWrap = styled.div`
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-y: auto; // 추가
 `;
