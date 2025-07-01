@@ -70,7 +70,9 @@ const TestContainer = styled.div`
   position: relative;
   width: 100%;
   max-width: 1800px;
+  min-width: 1000px;
   height: auto;
+  max-height: 2000px;
   min-height: 800px;
   margin: 2rem auto 2rem auto;
   margin-bottom: 3rem;
