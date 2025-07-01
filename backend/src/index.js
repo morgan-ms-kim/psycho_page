@@ -11,7 +11,13 @@ import multer from 'multer';
 import geoip from 'geoip-lite';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const REGION_MAP = require('./utils/region-map.json');
+let REGION_MAP = {};
+try {
+  REGION_MAP = require('./utils/region-map.json');
+} catch (e) {
+  REGION_MAP = {};
+  console.warn('region-map.json 파일을 찾을 수 없습니다. 직접 매핑이 비활성화됩니다.');
+}
 let regionNames = {};
 try {
   regionNames = require('geoip-lite/regions.json');
