@@ -69,28 +69,27 @@ const isValidTestUrl = (id) => {
 const TestContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: 1200px;
-  min-width: 1000px;
-  margin: 2rem auto 2rem auto;
+  max-width: 1100px;
+  margin: 2rem auto;
   background: white;
   border-radius: 24px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   display: flex;
   flex-direction: column;
+  padding: 40px 32px;
 
   @media (max-width: 1200px) {
-    min-width: 0;
-    max-width: 100vw;
-    margin: 1rem 0 2rem 0;
+    max-width: 96vw;
     border-radius: 16px;
+    padding: 32px 16px;
   }
   @media (max-width: 600px) {
-    min-width: 0;
     max-width: 100vw;
-    width: 100vw;
-    margin: 0.5rem 0 1.5rem 0;
+    width: 100%;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin: 0.5rem 0 1.5rem 0;
+    padding: 16px 6px;
   }
 `;
 
