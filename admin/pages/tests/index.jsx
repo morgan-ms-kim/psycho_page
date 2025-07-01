@@ -120,7 +120,7 @@ export default function TestManagement() {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     // 히스토리를 완전히 초기화하고 로그인 페이지로 강제 이동
-    window.location.href = '/psycho_page/admin';
+    router.push('/');
   };
 
   const showMessage = (message, type = 'info') => {

@@ -189,7 +189,8 @@ app.get('/api/tests', async (req, res, next) => {
       where: whereClause,
       order: orderClause,
       limit: parseInt(limit),
-      distinct: true // 중복 제거
+      distinct: true, // 중복 제거
+      attributes: { exclude: ['password'] } // 불필요한 필드 제외
     });
     
     // 이미지 경로 수정 및 중복 제거
@@ -205,10 +206,14 @@ app.get('/api/tests', async (req, res, next) => {
       return testData;
     });
     
-    // 중복 제거 (id 기준)
-    const uniqueTests = testsWithCorrectPaths.filter((test, index, self) => 
-      index === self.findIndex(t => t.id === test.id)
-    );
+    // 중복 제거 (id 기준) - 더 강화된 로직
+    const uniqueTests = testsWithCorrectPaths.reduce((acc, test) => {
+      const existingTest = acc.find(t => t.id === test.id);
+      if (!existingTest) {
+        acc.push(test);
+      }
+      return acc;
+    }, []);
     
     console.log(`📊 테스트 목록 조회: ${uniqueTests.length}개 (중복 제거 후)`);
     res.json(uniqueTests);
@@ -964,14 +969,12 @@ app.get('/api/admin/tests/next-id', authenticateAdmin, async (req, res, next) =>
 app.post('/api/admin/cleanup-orphan-folders', authenticateAdmin, async (req, res, next) => {
   try {
     console.log('🧹 등록되지 않은 테스트 폴더 정리 시작');
-    
-    // DB에 등록된 테스트 폴더 목록
+    // DB에 등록된 테스트 폴더 목록 (null/빈값 제외)
     const registeredFolders = new Set(
       (await Test.findAll({ attributes: ['folder'], raw: true }))
         .map(t => t.folder)
-        .filter(Boolean)
+        .filter(folder => !!folder)
     );
-    
     // 파일시스템의 테스트 폴더 목록
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
     const filesystemFolders = fs.existsSync(testsDir) 
@@ -979,15 +982,15 @@ app.post('/api/admin/cleanup-orphan-folders', authenticateAdmin, async (req, res
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name)
       : [];
-    
-    // 등록되지 않은 폴더 찾기
-    const orphanFolders = filesystemFolders.filter(folder => !registeredFolders.has(folder));
-    
-    console.log('📁 등록된 폴더:', Array.from(registeredFolders));
-    console.log('📁 파일시스템 폴더:', filesystemFolders);
+    // 등록된 폴더 중 실제로 존재하는 폴더만 보호
+    const protectedFolders = new Set(
+      Array.from(registeredFolders).filter(folder => filesystemFolders.includes(folder))
+    );
+    // 삭제 대상: 파일시스템에 있지만 protectedFolders에 없는 폴더
+    const orphanFolders = filesystemFolders.filter(folder => !protectedFolders.has(folder));
+    console.log('📁 보호 폴더:', Array.from(protectedFolders));
     console.log('🗑️ 정리 대상 폴더:', orphanFolders);
-    
-    // 등록되지 않은 폴더 삭제
+    // 삭제
     let deletedCount = 0;
     for (const folder of orphanFolders) {
       try {
@@ -999,8 +1002,6 @@ app.post('/api/admin/cleanup-orphan-folders', authenticateAdmin, async (req, res
         console.error('⚠️ 폴더 삭제 실패:', folder, error.message);
       }
     }
-    
-    console.log(`✅ ${deletedCount}개 등록되지 않은 폴더 정리 완료`);
     res.json({ 
       success: true, 
       message: `${deletedCount}개 등록되지 않은 폴더가 정리되었습니다.`,

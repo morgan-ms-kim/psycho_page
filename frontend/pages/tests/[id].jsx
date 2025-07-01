@@ -225,8 +225,10 @@ export default function TestPage() {
     );
   }
 
-  const testUrl = `/psycho_page/tests/${id}/`;
   const commentCount = comments.length;
+
+  // iframe URL에 새로고침 방지 파라미터 추가
+  const testUrl = `/psycho_page/tests/${id}/?embedded=true&parent=${encodeURIComponent(window.location.origin + '/tests/' + id)}`;
 
   if (!checkedBuild && /^test\d+$/.test(id)) {
     return (

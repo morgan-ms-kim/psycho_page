@@ -86,7 +86,7 @@ export default function ThumbnailTest() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    window.location.href = '/psycho_page/admin';
+    router.push('/');
   };
 
   if (loading) {

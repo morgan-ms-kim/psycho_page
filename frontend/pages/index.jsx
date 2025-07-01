@@ -174,7 +174,12 @@ export default function Home() {
       if (reset) {
         setTests(response.data);
       } else {
-        setTests(prev => [...prev, ...response.data]);
+        // 중복 제거 로직 추가
+        setTests(prev => {
+          const existingIds = new Set(prev.map(test => test.id));
+          const newTests = response.data.filter(test => !existingIds.has(test.id));
+          return [...prev, ...newTests];
+        });
       }
       
       setHasMore(response.data.length === 10);
@@ -244,8 +249,16 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loadingMore, hasMore]);
 
-  // 정렬된 테스트 목록
-  const sortedTests = [...tests].sort((a, b) => {
+  // 중복 제거 및 정렬된 테스트 목록
+  const uniqueTests = tests.reduce((acc, test) => {
+    const existingTest = acc.find(t => t.id === test.id);
+    if (!existingTest) {
+      acc.push(test);
+    }
+    return acc;
+  }, []);
+
+  const sortedTests = [...uniqueTests].sort((a, b) => {
     if (sort === 'views') return b.views - a.views;
     if (sort === 'likes') return b.likes - a.likes;
     if (sort === 'popular') return (b.views + b.likes) - (a.views + a.likes);
