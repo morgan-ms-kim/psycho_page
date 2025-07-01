@@ -27,8 +27,7 @@ import {
   SearchButton,
   FilterBar,
   CategorySelect,
-  BannerStats,
-  TestItemStats
+  BannerStats
 } from '../components/StyledComponents';
 
 // axios 인스턴스 생성

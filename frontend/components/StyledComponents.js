@@ -396,10 +396,4 @@ export const BannerStats = styled.div`
   font-size: 0.9rem;
 `;
 
-export const TestItemStats = styled.div`
-  display: flex;
-  gap: 15px;
-  font-size: 0.9rem;
-  opacity: 0.8;
-  margin-top: 10px;
-`; 
+// TestItemStats는 프론트엔드 페이지에서 정의하므로 여기서는 제거 
