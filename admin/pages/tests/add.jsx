@@ -181,7 +181,7 @@ export default function AddTest() {
       console.log('🔄 테스트 추가 시작:', formData);
       setCurrentStep('테스트 추가 중...');
       
-      const response = await apiClient.post('/admin/tests/add', formData);
+      const response = await apiClient.post('/admin/tests/add', formData, { timeout: 300000 });
       addLog('API 응답: ' + JSON.stringify(response.data));
       
       console.log('✅ 테스트 추가 성공:', response.data);
