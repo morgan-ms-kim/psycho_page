@@ -46,6 +46,95 @@ const getApiBase = () => {
   return `https://smartpick.website/api?t=${timestamp}`.replace('?t=', '');
 };
 
+// 리스트 영역 분리 컴포넌트
+function TestListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath }) {
+  if (searching) {
+    return (
+      <Section>
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <LoadingSpinner />
+          <p>검색 중...</p>
+        </div>
+      </Section>
+    );
+  }
+  if (error) {
+    return null; // 에러는 상위에서 처리
+  }
+  if (sortedTests.length > 0) {
+    return (
+      <Section>
+        <TestCount>총 {sortedTests.length}개의 테스트</TestCount>
+        <Grid>
+          {sortedTests.map((test) => (
+            <Card 
+              key={test.id} 
+              onClick={() => {
+                try {
+                  if (!test.id) {
+                    console.error('테스트 ID가 없습니다:', test);
+                    return;
+                  }
+                  const testPath = `/testview/${getTestFolderName(test.id)}`;
+                  console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
+                  router.push(testPath);
+                } catch (error) {
+                  console.error('테스트 클릭 에러:', error, '테스트 데이터:', test);
+                }
+              }}
+            >
+              <TestCardContent>
+                <TestThumbnailContainer>
+                  {test.thumbnail ? (
+                    <TestItemImage 
+                      src={getImagePath(test.thumbnail)} 
+                      alt={test.title}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
+                    🧠
+                  </TestItemPlaceholder>
+                </TestThumbnailContainer>
+                <TestContent>
+                  <TestItemTitle>{test.title}</TestItemTitle>
+                  <TestItemDesc>{test.description}</TestItemDesc>
+                  <TestItemStats>
+                    <Stat>👁️ {test.views}</Stat>
+                    <Stat>💖 {test.likes}</Stat>
+                    <Stat>💬 {test.comments || 0}</Stat>
+                  </TestItemStats>
+                  <TestItemDate>
+                    {new Date(test.createdAt).toLocaleDateString()}
+                  </TestItemDate>
+                </TestContent>
+              </TestCardContent>
+            </Card>
+          ))}
+        </Grid>
+        {loadingMore && (
+          <LoadingMore>
+            <LoadingSpinner />
+            <p>더 많은 테스트를 불러오는 중...</p>
+          </LoadingMore>
+        )}
+      </Section>
+    );
+  }
+  if (!searching && (searchTerm || selectedCategory)) {
+    return (
+      <NoResults>
+        <h3>검색 결과가 없습니다</h3>
+        <p>다른 검색어나 카테고리를 시도해보세요.</p>
+      </NoResults>
+    );
+  }
+  return null;
+}
+
 export default function Home() {
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -463,83 +552,19 @@ export default function Home() {
         </ErrorMessage>
       )}
 
-      {/* 테스트 목록 */}
-      {searching ? (
-        <Section>
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <LoadingSpinner />
-            <p>검색 중...</p>
-          </div>
-        </Section>
-      ) : sortedTests.length > 0 ? (
-        <Section>
-          <TestCount>총 {sortedTests.length}개의 테스트</TestCount>
-          
-          <Grid>
-            {sortedTests.map((test) => (
-              <Card 
-                key={test.id} 
-                onClick={() => {
-                  try {
-                    if (!test.id) {
-                      console.error('테스트 ID가 없습니다:', test);
-                      return;
-                    }
-                    const testPath = `/testview/${getTestFolderName(test.id)}`;
-                    console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
-                    router.push(testPath);
-                  } catch (error) {
-                    console.error('테스트 클릭 에러:', error, '테스트 데이터:', test);
-                  }
-                }}
-              >
-                <TestCardContent>
-                  <TestThumbnailContainer>
-                    {test.thumbnail ? (
-                      <TestItemImage 
-                        src={getImagePath(test.thumbnail)} 
-                        alt={test.title}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
-                      🧠
-                    </TestItemPlaceholder>
-                  </TestThumbnailContainer>
-                  
-                  <TestContent>
-                    <TestItemTitle>{test.title}</TestItemTitle>
-                    <TestItemDesc>{test.description}</TestItemDesc>
-                    <TestItemStats>
-                      <Stat>👁️ {test.views}</Stat>
-                      <Stat>💖 {test.likes}</Stat>
-                      <Stat>💬 {test.comments || 0}</Stat>
-                    </TestItemStats>
-                    <TestItemDate>
-                      {new Date(test.createdAt).toLocaleDateString()}
-                    </TestItemDate>
-                  </TestContent>
-                </TestCardContent>
-              </Card>
-            ))}
-          </Grid>
-
-          {loadingMore && (
-            <LoadingMore>
-              <LoadingSpinner />
-              <p>더 많은 테스트를 불러오는 중...</p>
-            </LoadingMore>
-          )}
-        </Section>
-      ) : !loading && (searchTerm || selectedCategory) ? (
-        <NoResults>
-          <h3>검색 결과가 없습니다</h3>
-          <p>다른 검색어나 카테고리를 시도해보세요.</p>
-        </NoResults>
-      ) : null}
+      {/* 리스트 영역만 분리 렌더링 */}
+      <TestListSection
+        searching={searching}
+        sortedTests={sortedTests}
+        loadingMore={loadingMore}
+        error={error}
+        searchTerm={searchTerm}
+        selectedCategory={selectedCategory}
+        loadMore={loadMore}
+        getTestFolderName={getTestFolderName}
+        router={router}
+        getImagePath={getImagePath}
+      />
 
       {/* 푸터 */}
       <Footer>
