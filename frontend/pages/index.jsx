@@ -29,6 +29,7 @@ import {
   CategorySelect,
   BannerStats
 } from '../components/StyledComponents';
+import Head from 'next/head';
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
@@ -472,128 +473,133 @@ export default function Home() {
   }
 
   return (
-    <MainWrap>
-      <Section style={{
-        maxWidth: 1200,
-        margin: '32px auto 0 auto',
-        background: '#fff',
-        borderRadius: 18,
-        boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
-        padding: '0 0 32px 0',
-        minHeight: 120,
-        position: 'relative'
-      }}>
-        <div id="kakao-ad-container"
-          style={{
-            width: '100%',
-            minHeight: 60,
-            textAlign: 'center',
-            background: 'transparent',
-            margin: 0,
-            padding: '24px 0 0 0'
-          }}
-        />
-        {/* 헤더 */}
-        <Header>
-          <Logo onClick={() => {
-            // 검색 상태 초기화
-            setSearchTerm('');
-            setSelectedCategory('');
-            setPage(1);
-            setError(null);
-            // 홈페이지로 이동
-            router.push('/');
-          }} style={{ cursor: 'pointer' }}>
-            <span style={{ color: 'initial', filter: 'none' }}>🧠</span> PSYCHO
-          </Logo>
-          <Stats>
-            <StatItem>👥 전체 방문자: {visitorStats.total.toLocaleString()}</StatItem>
-            <StatItem>📊 오늘 방문자: {visitorStats.today.toLocaleString()}</StatItem>
-            <StatItem>📈 주간 방문자: {visitorStats.week.toLocaleString()}</StatItem>
-            <StatItem style={{ 
-              color: apiStatus === 'connected' ? '#4CAF50' : 
-                     apiStatus === 'failed' ? '#f44336' : '#ff9800',
-              fontWeight: 'bold'
-            }}>
-              {apiStatus === 'connected' ? '🟢 서버 연결됨' : 
-               apiStatus === 'failed' ? '🔴 서버 연결 실패' : '🟡 연결 중...'}
-            </StatItem>
-          </Stats>
-          <HistoryButton onClick={() => router.push('/history')}>
-            📋 기록보기
-          </HistoryButton>
-        </Header>
-
-        {/* 검색 및 필터 섹션 */}
-        <SearchSection>
-          <SearchBar>
-            <SearchInput
-              type="text"
-              placeholder="테스트 검색..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <SearchButton>🔍</SearchButton>
-          </SearchBar>
-          
-          <FilterBar>
-            <CategorySelect 
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-            >
-              <option value="">모든 카테고리</option>
-              {categories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </CategorySelect>
-            
-            <SortSelect value={sort} onChange={(e) => setSort(e.target.value)}>
-              <option value="latest">최신순</option>
-              <option value="views">조회순</option>
-              <option value="likes">좋아요순</option>
-              <option value="popular">인기순</option>
-            </SortSelect>
-          </FilterBar>
-        </SearchSection>
-
-        {/* 에러 메시지 */}
-        {error && (
-          <ErrorMessage>
-            <p>🚫 {error}</p>
-            <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
-              백엔드 서버 연결에 실패했습니다. 기본 테스트 데이터를 표시합니다.
-            </p>
-            <button onClick={() => {
+    <>
+      <Head>
+        <title>🧠PSYCHO - 심리테스트</title>
+      </Head>
+      <MainWrap>
+        <Section style={{
+          maxWidth: 1200,
+          margin: '32px auto 0 auto',
+          background: '#fff',
+          borderRadius: 18,
+          boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
+          padding: '0 0 32px 0',
+          minHeight: 120,
+          position: 'relative'
+        }}>
+          <div id="kakao-ad-container"
+            style={{
+              width: '100%',
+              minHeight: 60,
+              textAlign: 'center',
+              background: 'transparent',
+              margin: 0,
+              padding: '24px 0 0 0'
+            }}
+          />
+          {/* 헤더 */}
+          <Header>
+            <Logo onClick={() => {
+              // 검색 상태 초기화
+              setSearchTerm('');
+              setSelectedCategory('');
+              setPage(1);
               setError(null);
-              loadTests(true);
-              loadVisitorStats();
-              loadCategories();
-            }}>🔄 다시 시도</button>
-          </ErrorMessage>
-        )}
+              // 홈페이지로 이동
+              router.push('/');
+            }} style={{ cursor: 'pointer' }}>
+              <span style={{ color: 'initial', filter: 'none' }}>🧠</span> PSYCHO
+            </Logo>
+            <Stats>
+              <StatItem>👥 전체 방문자: {visitorStats.total.toLocaleString()}</StatItem>
+              <StatItem>📊 오늘 방문자: {visitorStats.today.toLocaleString()}</StatItem>
+              <StatItem>📈 주간 방문자: {visitorStats.week.toLocaleString()}</StatItem>
+              <StatItem style={{ 
+                color: apiStatus === 'connected' ? '#4CAF50' : 
+                       apiStatus === 'failed' ? '#f44336' : '#ff9800',
+                fontWeight: 'bold'
+              }}>
+                {apiStatus === 'connected' ? '🟢 서버 연결됨' : 
+                 apiStatus === 'failed' ? '🔴 서버 연결 실패' : '🟡 연결 중...'}
+              </StatItem>
+            </Stats>
+            <HistoryButton onClick={() => router.push('/history')}>
+              📋 기록보기
+            </HistoryButton>
+          </Header>
 
-        {/* 리스트 영역만 분리 렌더링 */}
-        <TestListSection
-          searching={searching}
-          sortedTests={sortedTests}
-          loadingMore={loadingMore}
-          error={error}
-          searchTerm={searchTerm}
-          selectedCategory={selectedCategory}
-          loadMore={loadMore}
-          getTestFolderName={getTestFolderName}
-          router={router}
-          getImagePath={getImagePath}
-        />
+          {/* 검색 및 필터 섹션 */}
+          <SearchSection>
+            <SearchBar>
+              <SearchInput
+                type="text"
+                placeholder="테스트 검색..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <SearchButton>🔍</SearchButton>
+            </SearchBar>
+            
+            <FilterBar>
+              <CategorySelect 
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <option value="">모든 카테고리</option>
+                {categories.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </CategorySelect>
+              
+              <SortSelect value={sort} onChange={(e) => setSort(e.target.value)}>
+                <option value="latest">최신순</option>
+                <option value="views">조회순</option>
+                <option value="likes">좋아요순</option>
+                <option value="popular">인기순</option>
+              </SortSelect>
+            </FilterBar>
+          </SearchSection>
 
-        {/* 푸터 */}
-        <Footer>
-          <p>© 2025 PSYCHO - 재미있는 심리테스트 모음</p>
-        </Footer>
-      </Section>
-    </MainWrap>
+          {/* 에러 메시지 */}
+          {error && (
+            <ErrorMessage>
+              <p>🚫 {error}</p>
+              <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
+                백엔드 서버 연결에 실패했습니다. 기본 테스트 데이터를 표시합니다.
+              </p>
+              <button onClick={() => {
+                setError(null);
+                loadTests(true);
+                loadVisitorStats();
+                loadCategories();
+              }}>🔄 다시 시도</button>
+            </ErrorMessage>
+          )}
+
+          {/* 리스트 영역만 분리 렌더링 */}
+          <TestListSection
+            searching={searching}
+            sortedTests={sortedTests}
+            loadingMore={loadingMore}
+            error={error}
+            searchTerm={searchTerm}
+            selectedCategory={selectedCategory}
+            loadMore={loadMore}
+            getTestFolderName={getTestFolderName}
+            router={router}
+            getImagePath={getImagePath}
+          />
+
+          {/* 푸터 */}
+          <Footer>
+            <p>© 2025 PSYCHO - 재미있는 심리테스트 모음</p>
+          </Footer>
+        </Section>
+      </MainWrap>
+    </>
   );
 }
 

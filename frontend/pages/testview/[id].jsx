@@ -41,6 +41,7 @@ import {
   CommentSubmitButton
 } from '../../components/StyledComponents';
 import Image from 'next/image';
+import Head from 'next/head';
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
@@ -433,125 +434,130 @@ export default function TestPage() {
   }
 
   return (
-    <MainWrap style={{ paddingTop: 0, background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
-      <Section style={{
-        maxWidth: 1400,
-        margin: '40px auto 0 auto',
-        background: '#fff',
-        borderRadius: 24,
-        boxShadow: '0 8px 40px rgba(80,80,120,0.12)',
-        padding: '0 0 48px 0',
-        minHeight: 120,
-        position: 'relative'
-      }}>
-        <div id="kakao-ad-container"
-          style={{
-            width: '100%',
-            minHeight: 60,
-            textAlign: 'center',
-            background: 'transparent',
-            margin: 0,
-            padding: '24px 0 0 0'
-          }}
-        />
-        <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
-          <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
-        </Header>
-        {/* 에러 메시지(있을 때만) */}
-        {error && (
-          <ErrorMessage>
-            <p>🚫 {error}</p>
-          </ErrorMessage>
-        )}
-        {/* 테스트 앱(iframe) */}
-        {iframeSection}
-        {/* 제목/설명 카드: iframe 아래로 이동, 여백 최소화 */}
-        <InfoCard style={{
-          maxWidth: 1200,
+    <>
+      <Head>
+        <title>{test?.title ? `${test.title} - PSYCHO` : '테스트 상세 - PSYCHO'}</title>
+      </Head>
+      <MainWrap style={{ paddingTop: 0, background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
+        <Section style={{
+          maxWidth: 1400,
           margin: '40px auto 0 auto',
           background: '#fff',
           borderRadius: 24,
-          boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-          padding: '40px 32px'
+          boxShadow: '0 8px 40px rgba(80,80,120,0.12)',
+          padding: '0 0 48px 0',
+          minHeight: 120,
+          position: 'relative'
         }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
-            <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
-            <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center' }}>
-              <div style={{ textAlign: 'center' }}>
-                <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>조회수</StatLabel>
-                <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{test?.views || 0}</StatValue>
+          <div id="kakao-ad-container"
+            style={{
+              width: '100%',
+              minHeight: 60,
+              textAlign: 'center',
+              background: 'transparent',
+              margin: 0,
+              padding: '24px 0 0 0'
+            }}
+          />
+          <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
+            <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
+          </Header>
+          {/* 에러 메시지(있을 때만) */}
+          {error && (
+            <ErrorMessage>
+              <p>🚫 {error}</p>
+            </ErrorMessage>
+          )}
+          {/* 테스트 앱(iframe) */}
+          {iframeSection}
+          {/* 제목/설명 카드: iframe 아래로 이동, 여백 최소화 */}
+          <InfoCard style={{
+            maxWidth: 1200,
+            margin: '40px auto 0 auto',
+            background: '#fff',
+            borderRadius: 24,
+            boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
+            padding: '40px 32px'
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
+              <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
+              <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>조회수</StatLabel>
+                  <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{test?.views || 0}</StatValue>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>좋아요</StatLabel>
+                  <StatValue style={{ color: '#ff5e5e', fontSize: '1.1rem' }}>{test?.likes || 0}</StatValue>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>댓글</StatLabel>
+                  <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{commentCount}</StatValue>
+                </div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>좋아요</StatLabel>
-                <StatValue style={{ color: '#ff5e5e', fontSize: '1.1rem' }}>{test?.likes || 0}</StatValue>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>댓글</StatLabel>
-                <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{commentCount}</StatValue>
-              </div>
+              <FlexRow style={{ width: '100%', justifyContent: 'center', gap: 10, marginTop: 4 }}>
+                <SocialButton onClick={handleLike} liked={liked} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: liked ? '#fff' : '#222', background: liked ? '#7f7fd5' : '#fff', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
+                  {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
+                </SocialButton>
+                <SocialButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: '#fff', background: '#7f7fd5', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
+                  💬 댓글 작성
+                </SocialButton>
+              </FlexRow>
             </div>
-            <FlexRow style={{ width: '100%', justifyContent: 'center', gap: 10, marginTop: 4 }}>
-              <SocialButton onClick={handleLike} liked={liked} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: liked ? '#fff' : '#222', background: liked ? '#7f7fd5' : '#fff', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
-                {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
-              </SocialButton>
-              <SocialButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: '#fff', background: '#7f7fd5', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
-                💬 댓글 작성
-              </SocialButton>
-            </FlexRow>
-          </div>
-        </InfoCard>
-        {/* 댓글 섹션 */}
-        <CommentSection style={{
-          maxWidth: 1200,
-          margin: '40px auto',
-          background: '#fff',
-          borderRadius: 24,
-          boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-          padding: '40px 32px'
-        }}>
-          <CommentHeader>
-            <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
-            <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>
-              {showCommentForm ? '취소' : '댓글 작성'}
-            </CommentButton>
-          </CommentHeader>
-          {showCommentForm && (
-            <CommentFormContainer>
-              <CommentInput
-                type="text"
-                placeholder="닉네임"
-                value={newComment.nickname}
-                onChange={(e) => setNewComment({...newComment, nickname: e.target.value})}
-                maxLength={20}
-              />
-              <CommentInput
-                type="password"
-                placeholder="비밀번호 (4자 이상)"
-                value={newComment.password}
-                onChange={(e) => setNewComment({...newComment, password: e.target.value})}
-                minLength={4}
-              />
-              <CommentTextarea
-                placeholder="댓글을 작성해주세요..."
-                value={newComment.content}
-                onChange={(e) => setNewComment({...newComment, content: e.target.value})}
-                maxLength={500}
-              />
-              <CommentSubmitButton onClick={submitComment}>
-                댓글 작성
-              </CommentSubmitButton>
-            </CommentFormContainer>
-          )}
-          {comments.length === 0 && (
-            <div style={{ color: '#aaa', textAlign: 'center', margin: '1rem 0' }}>아직 댓글이 없습니다.</div>
-          )}
-          {comments.map((comment) => (
-            <RenderedCommentItem key={comment.id} comment={comment} />
-          ))}
-        </CommentSection>
-      </Section>
-      <Footer style={{ marginTop: '0.5rem' }} />
-    </MainWrap>
+          </InfoCard>
+          {/* 댓글 섹션 */}
+          <CommentSection style={{
+            maxWidth: 1200,
+            margin: '40px auto',
+            background: '#fff',
+            borderRadius: 24,
+            boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
+            padding: '40px 32px'
+          }}>
+            <CommentHeader>
+              <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
+              <CommentButton onClick={() => setShowCommentForm(!showCommentForm)}>
+                {showCommentForm ? '취소' : '댓글 작성'}
+              </CommentButton>
+            </CommentHeader>
+            {showCommentForm && (
+              <CommentFormContainer>
+                <CommentInput
+                  type="text"
+                  placeholder="닉네임"
+                  value={newComment.nickname}
+                  onChange={(e) => setNewComment({...newComment, nickname: e.target.value})}
+                  maxLength={20}
+                />
+                <CommentInput
+                  type="password"
+                  placeholder="비밀번호 (4자 이상)"
+                  value={newComment.password}
+                  onChange={(e) => setNewComment({...newComment, password: e.target.value})}
+                  minLength={4}
+                />
+                <CommentTextarea
+                  placeholder="댓글을 작성해주세요..."
+                  value={newComment.content}
+                  onChange={(e) => setNewComment({...newComment, content: e.target.value})}
+                  maxLength={500}
+                />
+                <CommentSubmitButton onClick={submitComment}>
+                  댓글 작성
+                </CommentSubmitButton>
+              </CommentFormContainer>
+            )}
+            {comments.length === 0 && (
+              <div style={{ color: '#aaa', textAlign: 'center', margin: '1rem 0' }}>아직 댓글이 없습니다.</div>
+            )}
+            {comments.map((comment) => (
+              <RenderedCommentItem key={comment.id} comment={comment} />
+            ))}
+          </CommentSection>
+        </Section>
+        <Footer style={{ marginTop: '0.5rem' }} />
+      </MainWrap>
+    </>
   );
 } 
