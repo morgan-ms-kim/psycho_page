@@ -668,12 +668,3 @@ const TestItemImage = styled.img`
     transform: scale(1.05);
   }
 `;
-
-// MainWrap에 overflow-y: auto; 추가 (필요시)
-export const MainWrap = styled.div`
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow-y: auto; // 추가
-`;
