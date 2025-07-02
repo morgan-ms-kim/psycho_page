@@ -245,79 +245,54 @@ export default function TestPage() {
   const [comments, setComments] = useState([]);
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [newComment, setNewComment] = useState({ nickname: '', content: '', password: '' });
-  const [iframeLoaded, setIframeLoaded] = useState(false);
   const [buildExists, setBuildExists] = useState(false);
   const [checkedBuild, setCheckedBuild] = useState(false);
-  const [iframeHeight, setIframeHeight] = useState('65vh'); // iframe 최적화: 동적 높이, preload, loading="lazy", sandbox 최소화, 렌더링 최적화
-  const iframeRef = useRef(); // iframe 제어용 ref 추가
-  const adRef = useRef(null); // 광고 컨테이너 ref
+  const iframeRef = useRef();
+  const adRef = useRef(null);
 
-  // postMessage로 iframe 내부에서 높이 전달받아 동적 조절
+  // 테스트 데이터/댓글 병렬 로드
   useEffect(() => {
-    function handleMessage(event) {
-      if (typeof event.data === 'object' && event.data.type === 'set-iframe-height') {
-        setIframeHeight(event.data.height + 'px');
-      }
-    }
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  // 테스트 데이터 로드
-  useEffect(() => {
-    if (id) {
-      loadTestData();
-      recordVisit();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    if (/^test\d+$/.test(id)) {
-      fetch(`/tests/${id}/index.html`, { method: 'HEAD' })
-        .then(res => {
-          setBuildExists(res.ok);
-          setCheckedBuild(true);
-        })
-        .catch(() => {
-          setBuildExists(false);
-          setCheckedBuild(true);
-        });
-    } else {
-      setBuildExists(false);
+    if (!id) return;
+    setLoading(true);
+    Promise.all([
+      (async () => {
+        const testId = getTestIdFromFolder(id);
+        const userKey = getUserKey();
+        return apiClient.get(`/tests/${testId}`, { headers: { 'x-user-key': userKey } });
+      })(),
+      (async () => {
+        const testId = getTestIdFromFolder(id);
+        return apiClient.get(`/tests/${testId}/comments`);
+      })(),
+      (async () => {
+        if (/^test\d+$/.test(id)) {
+          const res = await fetch(`/tests/${id}/index.html`, { method: 'HEAD' });
+          return res.ok;
+        }
+        return false;
+      })()
+    ]).then(([testRes, commentsRes, buildOk]) => {
+      setTest(testRes.data);
+      setLiked(Boolean(testRes.data.userLiked));
+      setComments(commentsRes.data.comments);
+      setBuildExists(buildOk);
       setCheckedBuild(true);
-    }
-  }, [id]);
-
-  const recordVisit = async () => {
-    try {
-      const testId = getTestIdFromFolder(id);
-      await apiClient.post(`/visitors`, {
-        testId: testId
-      });
-    } catch (error) {
-      console.error('방문 기록 실패:', error);
-    }
-  };
-
-  const loadTestData = async () => {
-    try {
-      if (window.self !== window.top) {
-        setLoading(false);
-        return;
-      }
-      const testId = getTestIdFromFolder(id);
-      const userKey = getUserKey();
-      const response = await apiClient.get(`/tests/${testId}`, {
-        headers: { 'x-user-key': userKey }
-      });
-      setTest(response.data);
-      setLiked(Boolean(response.data.userLiked));
       setLoading(false);
-    } catch (error) {
+    }).catch(() => {
       setError('테스트를 불러오는데 실패했습니다. 서버 연결을 확인해주세요.');
       setLoading(false);
-    }
-  };
+      setCheckedBuild(true);
+    });
+    // 방문 기록
+    (async () => {
+      try {
+        const testId = getTestIdFromFolder(id);
+        await apiClient.post(`/visitors`, { testId });
+      } catch (error) {
+        // 무시
+      }
+    })();
+  }, [id]);
 
   const handleLike = async () => {
     try {
@@ -336,92 +311,40 @@ export default function TestPage() {
     }
   };
 
-  const loadComments = async () => {
-    try {
-      const testId = getTestIdFromFolder(id);
-      const response = await apiClient.get(`/tests/${testId}/comments`);
-      setComments(response.data.comments);
-    } catch (error) {
-      console.error('댓글 로드 실패:', error);
-    }
-  };
-
   const submitComment = async () => {
     if (!newComment.nickname || !newComment.content || !newComment.password) {
       alert('모든 필드를 입력해주세요.');
       return;
     }
-    
     try {
       const testId = getTestIdFromFolder(id);
       await apiClient.post(`/tests/${testId}/comments`, newComment);
       setNewComment({ nickname: '', content: '', password: '' });
       setShowCommentForm(false);
-      loadComments();
+      // 댓글 새로고침
+      const response = await apiClient.get(`/tests/${testId}/comments`);
+      setComments(response.data.comments);
     } catch (error) {
       console.error('댓글 작성 실패:', error);
       alert('댓글 작성에 실패했습니다.');
     }
   };
 
-  const handleIframeLoad = () => {
-    setIframeLoaded(true);
-  };
-    
-  const handleIframeError = () => {
-    setError('테스트 앱을 로드하는데 실패했습니다.');
-    setLoading(false);
-  };
-
+  // 광고 스크립트 중복 삽입 방지
   useEffect(() => {
-    if (test) {
-      loadComments();
-    }
-  }, [test]);
-
-  // iframe 새로고침 방지 및 제어
-  useEffect(() => {
-    const preventRefresh = (e) => {
-      // iframe 내부에서 새로고침 시도 시
-      if (window.self !== window.top) {
-        e.preventDefault();
-        e.stopPropagation();
-        // iframe 내부에서 상위 페이지로 리다이렉트
-        window.top.location.href = `/testview/${id}`;
-        return false;
+    if (!window.kakao || !window.kakao.adfit) {
+      if (!document.querySelector('script[src*="daumcdn.net/kas/static/ba.min.js"]')) {
+        const scriptElement = document.createElement('script');
+        scriptElement.type = 'text/javascript';
+        scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+        scriptElement.async = true;
+        scriptElement.onload = () => {
+          if (window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
+            window.kakao.adfit.render();
+          }
+        };
+        document.body.appendChild(scriptElement);
       }
-    };
-    window.addEventListener('beforeunload', preventRefresh);
-    window.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
-        preventRefresh(e);
-      }
-    });
-    return () => {
-      window.removeEventListener('beforeunload', preventRefresh);
-    };
-  }, [id]);
-
-  // 새로고침 버튼 핸들러
-  const reloadIframe = () => {
-    if (iframeRef.current) {
-      iframeRef.current.contentWindow.location.reload();
-    }
-  };
-
-  useEffect(() => {
-    // 광고 스크립트가 없으면 삽입, 있으면 render만 보장
-    if (!document.querySelector('script[src*="daumcdn.net/kas/static/ba.min.js"]')) {
-      const scriptElement = document.createElement('script');
-      scriptElement.type = 'text/javascript';
-      scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-      scriptElement.async = true;
-      scriptElement.onload = () => {
-        if (window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
-          window.kakao.adfit.render();
-        }
-      };
-      document.body.appendChild(scriptElement);
     } else {
       setTimeout(() => {
         if (window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
@@ -431,23 +354,16 @@ export default function TestPage() {
     }
   }, []);
 
-  useEffect(() => {
-    // 광고 컨테이너가 마운트된 후 광고 렌더
-    if (adRef.current && window.kakao && window.kakao.adfit && window.kakao.adfit.render) {
-      window.kakao.adfit.render();
-    }
-  });
-
   if (loading) {
     return (
       <MainWrap>
         <Header>
           <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
         </Header>
-      <LoadingWrap>
-        <LoadingSpinner />
-        <p>테스트를 불러오는 중...</p>
-      </LoadingWrap>
+        <LoadingWrap>
+          <LoadingSpinner />
+          <p>테스트를 불러오는 중...</p>
+        </LoadingWrap>
       </MainWrap>
     );
   }

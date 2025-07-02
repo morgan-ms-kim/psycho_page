@@ -201,9 +201,11 @@ export default function Home() {
 
   // 테스트 데이터 로드
   useEffect(() => {
+    Promise.all([
+      loadVisitorStats(),
+      loadCategories()
+    ]);
     loadTests();
-    loadVisitorStats();
-    loadCategories();
   }, []);
 
   // 페이지 변경 시 추가 데이터 로드
@@ -728,16 +730,13 @@ const TestItemStats = styled.div`
 
 const Stat = styled.span``;
 
-const TestItemImage = styled.img`
+const TestItemImage = styled.img.attrs({ loading: 'lazy' })`
   width: 100%;
   height: 180px;
   object-fit: cover;
   border-radius: 10px;
   transition: transform 0.3s ease;
-  
-  &:hover {
-    transform: scale(1.05);
-  }
+  &:hover { transform: scale(1.05); }
 `;
 
 const TestContainer = styled.div`
