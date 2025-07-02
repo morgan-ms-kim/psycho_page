@@ -680,11 +680,10 @@ const TestThumbnailContainer = styled.div`
 
 const TestItemPlaceholder = styled.div`
   position: absolute;
-  top: 50%;
-  left: 20%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 180px;
+  height: 100%;
   background: linear-gradient(45deg, #667eea, #764ba2);
   border-radius: 10px;
   display: flex;
@@ -694,7 +693,7 @@ const TestItemPlaceholder = styled.div`
   color: white;
   transition: transform 0.3s ease;
   &:hover {
-    transform: translate(-50%, -50%) scale(1.05);
+    transform: scale(1.05);
   }
 `;
 
