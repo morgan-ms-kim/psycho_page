@@ -312,7 +312,7 @@ export default function TestPage() {
       });
       setTest(response.data);
       setLiked(Boolean(response.data.userLiked));
-      setLoading(false);
+      setLoading(false;
     } catch (error) {
       setError('테스트를 불러오는데 실패했습니다. 서버 연결을 확인해주세요.');
       setLoading(false);
@@ -455,7 +455,7 @@ export default function TestPage() {
   const commentCount = comments.length;
   const testUrl = `/tests/${id}/`;
 
-  // iframe 렌더링 부분 개선
+  // iframe 렌더링 부분 (단순 고정형 + loading="lazy"만 적용)
   let iframeSection = null;
   if (!checkedBuild && /^test\d+$/.test(id)) {
     iframeSection = (
@@ -467,26 +467,15 @@ export default function TestPage() {
   } else if (buildExists) {
     iframeSection = (
       <TestContainer style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 600 }}>
-        {!iframeLoaded && (
-          <LoadingOverlay>
-            <LoadingSpinner />
-            <p>테스트 앱을 로드하는 중...</p>
-          </LoadingOverlay>
-        )}
         <TestIframe
-          ref={iframeRef}
           src={testUrl}
-          onLoad={handleIframeLoad}
-          onError={handleIframeError}
           title={test?.title || '테스트'}
-          allow="fullscreen"
-          sandbox="allow-scripts allow-forms allow-popups"
           loading="lazy"
           style={{
-            display: iframeLoaded ? 'block' : 'none',
             margin: '0 auto',
             width: '100%',
-            height: iframeHeight,
+            minHeight: 600,
+            maxHeight: 700,
             border: 'none',
             background: '#fff',
             borderRadius: '0 0 24px 24px',
@@ -507,7 +496,6 @@ export default function TestPage() {
     <>
       <Head>
         <title>{test?.title ? `${test.title} - PSYCHO` : '테스트 상세 - PSYCHO'}</title>
-        <link rel="preload" as="document" href={testUrl} />
       </Head>
       <MainWrap style={{ paddingTop: 0, background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
         {/* 광고 컨테이너 - 그대로 */}
@@ -541,7 +529,6 @@ export default function TestPage() {
             }}
             scrolling="no"
             title="카카오광고"
-            loading="lazy"
           />
         </div>
         <Section style={{
@@ -618,34 +605,7 @@ export default function TestPage() {
             </InfoCard>
           </div>
           {/* 테스트 앱(iframe) */}
-          <TestContainer style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 600 }}>
-            {!iframeLoaded && (
-              <LoadingOverlay>
-                <LoadingSpinner />
-                <p>테스트 앱을 로드하는 중...</p>
-              </LoadingOverlay>
-            )}
-            <TestIframe
-              ref={iframeRef}
-              src={testUrl}
-              onLoad={handleIframeLoad}
-              onError={handleIframeError}
-              title={test?.title || '테스트'}
-              allow="fullscreen"
-              sandbox="allow-scripts allow-forms allow-popups"
-              loading="lazy"
-              style={{
-                display: iframeLoaded ? 'block' : 'none',
-                margin: '0 auto',
-                width: '100%',
-                height: iframeHeight,
-                border: 'none',
-                background: '#fff',
-                borderRadius: '0 0 24px 24px',
-                flex: 1
-              }}
-            />
-          </TestContainer>
+          {iframeSection}
           {/* 댓글 섹션 */}
           <CommentSection style={{
             maxWidth: '900px',
