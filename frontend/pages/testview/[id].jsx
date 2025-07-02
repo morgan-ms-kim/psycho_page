@@ -312,7 +312,7 @@ export default function TestPage() {
       });
       setTest(response.data);
       setLiked(Boolean(response.data.userLiked));
-      setLoading(false;
+      setLoading(false);
     } catch (error) {
       setError('테스트를 불러오는데 실패했습니다. 서버 연결을 확인해주세요.');
       setLoading(false);
