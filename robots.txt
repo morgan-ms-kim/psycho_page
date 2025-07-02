@@ -5,4 +5,4 @@ Allow: /
 Sitemap: https://smartpick.website/sitemap.xml
 
 # 광고/애드센스 관련 크롤링 차단 없음
-# (AdSense, AdFit 등 광고 정상 노출을 위해 차단 규칙 없음) 
+# (AdSense, AdFit 등 광고 정상 노출을 위해 차단 규칙 없음)  
