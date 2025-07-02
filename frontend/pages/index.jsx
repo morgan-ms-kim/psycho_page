@@ -6,7 +6,6 @@ import {
   MainWrap,
   Header,
   LoadingWrap,
-  LoadingSpinner,
   ErrorMessage,
   Footer,
   PrimaryButton,
@@ -136,8 +135,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
         </Grid>
         {loadingMore && (
           <LoadingMore>
-            <LoadingSpinner />
-            <p>더 많은 테스트를 불러오는 중...</p>
+            <span style={{ color: '#888', fontSize: '1.1rem' }}>더 많은 테스트를 불러오는 중...</span>
           </LoadingMore>
         )}
       </Section>
@@ -486,8 +484,7 @@ export default function Home() {
   if (loading && tests.length === 0) {
     return (
       <LoadingWrap>
-        <LoadingSpinner />
-        <p>테스트를 불러오는 중...</p>
+        <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
       </LoadingWrap>
     );
   }

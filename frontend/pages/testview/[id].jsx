@@ -361,9 +361,8 @@ export default function TestPage() {
           <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
         </Header>
         <LoadingWrap>
-          <LoadingSpinner />
-          <p>테스트를 불러오는 중...</p>
-        </LoadingWrap>
+        <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
+      </LoadingWrap>
       </MainWrap>
     );
   }
