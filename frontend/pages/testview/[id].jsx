@@ -248,8 +248,20 @@ export default function TestPage() {
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [buildExists, setBuildExists] = useState(false);
   const [checkedBuild, setCheckedBuild] = useState(false);
+  const [iframeHeight, setIframeHeight] = useState('65vh'); // iframe 최적화: 동적 높이, preload, loading="lazy", sandbox 최소화, 렌더링 최적화
   const iframeRef = useRef(); // iframe 제어용 ref 추가
   const adRef = useRef(null); // 광고 컨테이너 ref
+
+  // postMessage로 iframe 내부에서 높이 전달받아 동적 조절
+  useEffect(() => {
+    function handleMessage(event) {
+      if (typeof event.data === 'object' && event.data.type === 'set-iframe-height') {
+        setIframeHeight(event.data.height + 'px');
+      }
+    }
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   // 테스트 데이터 로드
   useEffect(() => {
@@ -469,7 +481,17 @@ export default function TestPage() {
           title={test?.title || '테스트'}
           allow="fullscreen"
           sandbox="allow-scripts allow-forms allow-popups"
-          style={{ display: iframeLoaded ? 'block' : 'none', margin: '0 auto' }}
+          loading="lazy"
+          style={{
+            display: iframeLoaded ? 'block' : 'none',
+            margin: '0 auto',
+            width: '100%',
+            height: iframeHeight,
+            border: 'none',
+            background: '#fff',
+            borderRadius: '0 0 24px 24px',
+            flex: 1
+          }}
         />
       </TestContainer>
     );
@@ -485,9 +507,10 @@ export default function TestPage() {
     <>
       <Head>
         <title>{test?.title ? `${test.title} - PSYCHO` : '테스트 상세 - PSYCHO'}</title>
+        <link rel="preload" as="document" href={testUrl} />
       </Head>
       <MainWrap style={{ paddingTop: 0, background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
-        {/* 카카오 광고 컨테이너 - iframe 방식 */}
+        {/* 광고 컨테이너 - 그대로 */}
         <div
           style={{
             width: '100%',
@@ -518,6 +541,7 @@ export default function TestPage() {
             }}
             scrolling="no"
             title="카카오광고"
+            loading="lazy"
           />
         </div>
         <Section style={{
@@ -594,7 +618,34 @@ export default function TestPage() {
             </InfoCard>
           </div>
           {/* 테스트 앱(iframe) */}
-          {iframeSection}
+          <TestContainer style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 600 }}>
+            {!iframeLoaded && (
+              <LoadingOverlay>
+                <LoadingSpinner />
+                <p>테스트 앱을 로드하는 중...</p>
+              </LoadingOverlay>
+            )}
+            <TestIframe
+              ref={iframeRef}
+              src={testUrl}
+              onLoad={handleIframeLoad}
+              onError={handleIframeError}
+              title={test?.title || '테스트'}
+              allow="fullscreen"
+              sandbox="allow-scripts allow-forms allow-popups"
+              loading="lazy"
+              style={{
+                display: iframeLoaded ? 'block' : 'none',
+                margin: '0 auto',
+                width: '100%',
+                height: iframeHeight,
+                border: 'none',
+                background: '#fff',
+                borderRadius: '0 0 24px 24px',
+                flex: 1
+              }}
+            />
+          </TestContainer>
           {/* 댓글 섹션 */}
           <CommentSection style={{
             maxWidth: '900px',
@@ -663,4 +714,4 @@ export default function TestPage() {
       </MainWrap>
     </>
   );
-} 
+}
