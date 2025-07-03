@@ -581,7 +581,7 @@ export default function Home() {
             <Stats>
               <StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>
               <StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>
-              <!--<StatItem>📈 Weekly: {visitorStats.week.toLocaleString()}</StatItem>-->
+              {/*<StatItem>📈 Weekly: {visitorStats.week.toLocaleString()}</StatItem>*/}
               <StatItem style={{ 
                 color: apiStatus === 'connected' ? '#4CAF50' : 
                        apiStatus === 'failed' ? '#f44336' : '#ff9800',
