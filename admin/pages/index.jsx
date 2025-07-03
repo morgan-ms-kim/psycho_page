@@ -126,6 +126,10 @@ const LoginContainer = styled.div`
   justify-content: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  @media (max-width: 600px) {
+    padding: 0;
+    min-height: 100vh;
+  }
 `;
 
 const LoginCard = styled.div`
@@ -135,6 +139,12 @@ const LoginCard = styled.div`
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 400px;
+  margin: 0 auto;
+  @media (max-width: 600px) {
+    max-width: 98vw;
+    min-width: 0;
+    padding: 1rem 0.5rem;
+  }
 `;
 
 const LoginHeader = styled.div`

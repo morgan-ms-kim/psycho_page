@@ -7,6 +7,10 @@ export const MainWrap = styled.div`
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow-y: auto;
+  @media (max-width: 600px) {
+    padding: 0;
+    min-height: 100vh;
+  }
 `;
 
 export const Header = styled.header`
@@ -152,6 +156,12 @@ export const Card = styled.div`
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(0,0,0,0.3);
   }
+  @media (max-width: 600px) {
+    max-width: 98vw;
+    min-width: 0;
+    margin: 0 0 16px 0;
+    padding: 8px 0;
+  }
 `;
 
 export const QuestionCard = styled(Card)`
@@ -237,7 +247,7 @@ export const Textarea = styled.textarea`
 export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  justify-content: center;
+  justify-items: center;
   width: 100%;
   gap: 2rem 2rem; /* 카드 간격 넉넉하게 */
   max-width: 1200px;
@@ -278,7 +288,8 @@ export const FlexColumn = styled.div`
 
 // 섹션 스타일들
 export const Section = styled.div`
-  max-width: 800px;
+  max-width: 1200px;
+  min-width: 1200px;
   margin: 0 auto 30px;
   padding: 0 20px;
   display: flex;
@@ -286,6 +297,7 @@ export const Section = styled.div`
   align-items: center;
   @media (max-width: 600px) {
     max-width: 100vw;
+    min-width: 0;
     padding: 0 2vw;
     margin-bottom: 16px;
   }
