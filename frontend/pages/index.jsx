@@ -27,7 +27,7 @@ import {
   SearchButton,
   FilterBar,
   CategorySelect,
-  SortSelect
+  BannerStats
 } from '../components/StyledComponents';
 import Head from 'next/head';
 
@@ -60,49 +60,31 @@ const getApiBase = () => {
   return `https://smartpick.website/api?t=${timestamp}`.replace('?t=', '');
 };
 
-// PC/모바일 분기형 sectionContainerStyle
-const isMobile = typeof window !== 'undefined' && window.innerWidth <= 600;
-const sectionContainerStyle = isMobile
-  ? {
-      width: '100vw',
-      minWidth: 0,
-      maxWidth: '100vw',
-      minHeight: 'calc(100vh - 32px)',
-      margin: '16px 0 0 0',
-      background: '#fff',
-      borderRadius: 10,
-      boxShadow: '0 2px 12px rgba(80,80,120,0.08)',
-      padding: '0 0 16px 0',
-      position: 'relative',
-      boxSizing: 'border-box',
-    }
-  : {
-      width: 1200,
-      minWidth: 1200,
-      maxWidth: 1200,
-      minHeight: 1200,
-      margin: '32px auto 0 auto',
-      background: '#fff',
-      borderRadius: 18,
-      boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
-      padding: '0 0 32px 0',
-      position: 'relative',
-      boxSizing: 'border-box',
-    };
-
 // Section 스타일 상수 (흰색 컨테이너 공통)
+const sectionContainerStyle = {
+  maxWidth: 1200,
+  minWidth: 1200,
+  minHeight : 1200,
+  margin: '32px auto 0 auto',
+  background: '#fff',
+  borderRadius: 18,
+  boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
+  padding: '0 0 32px 0',
+  //minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
+  position: 'relative',
+  // 모바일 중앙정렬 보정
+  width: '100%',
+  boxSizing: 'border-box',
+};
 const sectionCenterStyle = {
   ...sectionContainerStyle,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
 };
-// 모바일 대응: Section에 width 100%, minWidth 0, maxWidth 100vw 적용
 const sectionBlockStyle = {
   ...sectionContainerStyle,
   display: 'block',
-  maxWidth: '100vw',
-  minWidth: 0,
 };
 
 // 리스트 영역 분리 컴포넌트
@@ -123,14 +105,10 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
       {loading ? (
         <LoadingWrap style={loadingContainerStyle}>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
-          {/* 빈 그리드 영역을 시각적으로 채워줌 */}
-          <Grid style={{ minHeight: 320, background: '#f4f6fa', borderRadius: 16, marginTop: 24, boxShadow: '0 2px 8px rgba(80,80,120,0.04)' }} />
         </LoadingWrap>
       ) : searching ? (
         <LoadingWrap style={loadingContainerStyle}>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>검색 중...</span>
-          {/* 빈 그리드 영역을 시각적으로 채워줌 */}
-          <Grid style={{ minHeight: 320, background: '#f4f6fa', borderRadius: 16, marginTop: 24, boxShadow: '0 2px 8px rgba(80,80,120,0.04)' }} />
         </LoadingWrap>
       ) : showNoResults ? (
         <NoResults>
@@ -490,9 +468,8 @@ export default function Home() {
     }
   };
 
-  // 검색어/카테고리/정렬 변경 시 검색 실행 (초기값일 때는 실행 안 함)
+  // 검색어가 변경되면 검색 실행 (디바운스 적용)
   useEffect(() => {
-    if (!searchTerm && !selectedCategory && sort === 'latest') return;
     const timer = setTimeout(() => {
       searchTests();
     }, 300);
@@ -572,7 +549,7 @@ export default function Home() {
             <Stats>
               <StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>
               <StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>
-              {/*<StatItem>📈 Weekly: {visitorStats.week.toLocaleString()}</StatItem>*/}
+              <StatItem>📈 Weekly: {visitorStats.week.toLocaleString()}</StatItem>
               <StatItem style={{ 
                 color: apiStatus === 'connected' ? '#4CAF50' : 
                        apiStatus === 'failed' ? '#f44336' : '#ff9800',
@@ -672,6 +649,27 @@ export default function Home() {
 }
 
 // 페이지 전용 스타일 컴포넌트들
+const SortSelect = styled.select`
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 20px;
+  background: #f4f6fa !important;
+  color: #222 !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(80,80,120,0.07);
+  margin-left: 10px;
+  transition: box-shadow 0.2s;
+  appearance: none;
+  &:focus {
+    outline: 2px solid #7f7fd5;
+    box-shadow: 0 0 0 2px #7f7fd5;
+  }
+  option {
+    background: #fff !important;
+    color: #222 !important;
+  }
+`;
+
 const LoadingMore = styled.div`
   text-align: center;
   padding: 2rem;
