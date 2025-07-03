@@ -249,7 +249,7 @@ export default function AddTest() {
           updateProgressStep('썸네일 업로드', 'failed');
           addLog('❌ 썸네일 업로드 실패: ' + (thumbnailError.response?.data?.error || thumbnailError.message));
           addLog('❌ 에러 상세: ' + JSON.stringify(thumbnailError.response?.data || thumbnailError.message));
-          addLog('⚠️ 썸네일 업로드 실패했지만 테스트 등록은 완료되었습니다.');
+          addLog('⚠️ 썸네일 업로드는 실패했지만 테스트 등록은 완료되었습니다.');
           console.error('썸네일 업로드 실패:', thumbnailError);
         }
       } else {
@@ -257,12 +257,11 @@ export default function AddTest() {
       }
       
       setCurrentStep('완료!');
-      addLog('🎉 테스트 추가 완료!');
+      addLog('🎉 테스트 추가가 완료되었습니다!');
       showMessage('테스트가 성공적으로 추가되었습니다!', 'success');
       
       // 테스트 등록 완료 후 해당 테스트 페이지로 이동
-      const folderName = response.data.folderName || `test${response.data.test.id}`;
-      const testUrl = `/tests/${folderName}/`;
+      const testUrl = `/tests/test${response.data.test.id}/`;
       addLog('🔗 테스트 페이지: ' + testUrl);
       
       // 3초 후 테스트 페이지로 이동
@@ -276,7 +275,7 @@ export default function AddTest() {
       setCurrentStep('오류 발생');
       
       // 에러 상세 정보 로깅
-      addLog('❌ 테스트 추가 실패');
+      addLog('❌ 테스트 추가에 실패했습니다.');
       addLog('에러 메시지: ' + (error.response?.data?.error || error.message));
       if (error.response?.data?.detail) {
         addLog('상세 정보: ' + error.response.data.detail);
