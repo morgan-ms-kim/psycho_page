@@ -87,7 +87,7 @@ const sectionBlockStyle = {
 
 // 리스트 영역 분리 컴포넌트
 function TestListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath, loading }) {
-  // 항상 Section/TestCount/Grid 구조 유지
+  // 항상 Section/TestCount 구조 유지, Grid는 리스트 있을 때만
   const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
   // hot/new 계산
   const now = Date.now();
@@ -106,22 +106,22 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
           : showNoResults ? '검색 결과가 없습니다'
           : `총 ${sortedTests.length}개의 테스트`}
       </TestCount>
-      <Grid>
-        {loading ? (
-          <LoadingWrap style={loadingContainerStyle}>
-            <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
-          </LoadingWrap>
-        ) : searching ? (
-          <LoadingWrap style={loadingContainerStyle}>
-            <span style={{ color: '#888', fontSize: '1.1rem' }}>검색 중...</span>
-          </LoadingWrap>
-        ) : showNoResults ? (
-          <NoResults>
-            <h3>검색 결과가 없습니다</h3>
-            <p>다른 검색어나 카테고리를 시도해보세요.</p>
-          </NoResults>
-        ) : (
-          sortedTests.map((test) => {
+      {loading ? (
+        <LoadingWrap style={loadingContainerStyle}>
+          <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
+        </LoadingWrap>
+      ) : searching ? (
+        <LoadingWrap style={loadingContainerStyle}>
+          <span style={{ color: '#888', fontSize: '1.1rem' }}>검색 중...</span>
+        </LoadingWrap>
+      ) : showNoResults ? (
+        <NoResults>
+          <h3>검색 결과가 없습니다</h3>
+          <p>다른 검색어나 카테고리를 시도해보세요.</p>
+        </NoResults>
+      ) : (
+        <Grid>
+          {sortedTests.map((test) => {
             const isNew = new Date(test.createdAt).getTime() > weekAgo;
             const isHot = hotIds.includes(test.id);
             return (
@@ -177,9 +177,9 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                 </TestCardContent>
               </Card>
             );
-          })
-        )}
-      </Grid>
+          })}
+        </Grid>
+      )}
       {loadingMore && !loading && !searching && !showNoResults && (
         <LoadingMore>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>더 많은 테스트를 불러오는 중...</span>
