@@ -581,21 +581,9 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     databaseSaved: false,
     thumbnailReady: false
   };
+  let test = null; // 생성된 테스트 객체 추적
   try {
-    // === 폴더명 생성: DB의 auto_increment 기준으로 ===
-    // MySQL에서 현재 auto_increment 값을 조회
-    let nextId = 1;
-    try {
-      const [[row]] = await sequelize.query(`SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Tests'`);
-      if (row && row.AUTO_INCREMENT) nextId = row.AUTO_INCREMENT;
-    } catch (autoErr) {
-      // 실패 시 fallback
-      const maxId = await Test.max('id');
-      nextId = (maxId || 0) + 1;
-    }
-    const folderName = `test${nextId}`;
-    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
-    // === 폴더명 생성 끝 ===
+    // 1. DB에 insert (임시 folder: null)
     const { gitUrl, title, description, category } = req.body;
     if (!gitUrl || !title) {
       return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.', steps });
@@ -603,9 +591,23 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     if (!gitUrl.includes('github.com') && !gitUrl.includes('gitlab.com')) {
       return res.status(400).json({ error: 'GitHub 또는 GitLab 저장소만 지원합니다.', steps });
     }
-    // 2. 폴더 생성 및 git clone
+    let thumbnailPath = '/uploads/thumbnails/default-thumb.png';
+    try {
+      test = await Test.create({
+        title,
+        description: description || '',
+        category: category || '기타',
+        thumbnail: thumbnailPath,
+        folder: null
+      });
+      steps.databaseSaved = true;
+    } catch (error) {
+      return res.status(500).json({ error: 'DB 저장 실패', steps, detail: error.message });
+    }
+    // 2. 실제 id로 폴더명 생성
+    const folderName = `test${test.id}`;
+    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
     const testPath = path.join(testsDir, folderName);
-    
     // 기존 폴더가 있으면 삭제
     if (fs.existsSync(testPath)) {
       try {
@@ -630,21 +632,16 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
         }
       }
     }
-    
-    // 새 폴더 생성 (삭제)
-    // fs.mkdirSync(testPath, { recursive: true });
-    // steps.directoryCreated = true;
-    
-    // git clone (옵션에서 --force 제거)
+    // git clone
     try {
       await execAsync(`git clone ${gitUrl} ${testPath}`, { timeout: 300000 });
       steps.gitCloned = true;
       console.log('✅ Git 클론 완료:', gitUrl);
     } catch (error) {
-      console.error('❌ Git 클론 실패:', error.message);
+      if (test) await test.destroy();
       return res.status(400).json({ error: 'Git 클론 실패', steps, detail: error.message });
     }
-    // 3. package.json 수정 (homepage 필드 추가)
+    // package.json 수정
     const packageJsonPath = path.join(testPath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
       try {
@@ -653,37 +650,29 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
         fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
         steps.packageJsonModified = true;
       } catch (error) {
+        if (test) await test.destroy();
         return res.status(500).json({ error: 'package.json 수정 실패', steps, detail: error.message });
       }
     } else {
+      if (test) await test.destroy();
       return res.status(400).json({ error: 'package.json 없음', steps, path: packageJsonPath });
     }
-    // 4. test_deploy.sh 실행 (폴더명 인자로)
+    // test_deploy.sh 실행
     try {
       const scriptPath = path.join(process.cwd(), '..', 'test_deploy.sh');
       const deployResult = await execAsync(`bash ${scriptPath} ${folderName}`, { cwd: testsDir });
       steps.npmInstalled = true;
       steps.buildCompleted = true;
     } catch (error) {
+      if (test) await test.destroy();
       return res.status(400).json({ error: '테스트 배포 스크립트 실패', steps, detail: error.message });
     }
-    // 5. 썸네일 등 기타 파일 작업 (필요시, 기본값 사용)
-    let thumbnailPath = '/uploads/thumbnails/default-thumb.png';
-    // 6. DB에 insert (모든 작업 성공 시)
-    try {
-      const test = await Test.create({
-        title,
-        description: description || '',
-        category: category || '기타',
-        thumbnail: thumbnailPath,
-        folder: folderName
-      });
-      steps.databaseSaved = true;
-      return res.json({ success: true, test, steps, folderName });
-    } catch (error) {
-      return res.status(500).json({ error: 'DB 저장 실패', steps, detail: error.message });
-    }
+    // 3. folder 컬럼 업데이트
+    test.folder = folderName;
+    await test.save();
+    return res.json({ success: true, test, steps, folderName });
   } catch (error) {
+    if (test) await test.destroy();
     return res.status(500).json({ error: '서버 오류', steps, detail: error.message });
   }
 });
