@@ -69,7 +69,10 @@ const sectionContainerStyle = {
   boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
   padding: '0 0 32px 0',
   minHeight: 'calc(100vh - 64px)',
-  position: 'relative'
+  position: 'relative',
+  // 모바일 중앙정렬 보정
+  width: '100%',
+  boxSizing: 'border-box',
 };
 const sectionCenterStyle = {
   ...sectionContainerStyle,
@@ -517,145 +520,131 @@ export default function Home() {
     }
   }, [sortedTests]);
 
-  // 초기 로딩 시에만 전체 로딩 화면 표시
-  if (loading && tests.length === 0) {
-    return (
-      <MainWrap style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
-        <Section style={sectionCenterStyle}>
-          <LoadingWrap style={loadingContainerStyle}>
-            <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
-          </LoadingWrap>
-        </Section>
-      </MainWrap>
-    );
-  }
-
+  // 항상 MainWrap을 최상위로 렌더링하고, 내부에서 상태별로 Section을 분기 처리
   return (
     <>
       <Head>
         <title>PSYCHO - 심리테스트</title>
       </Head>
-      <MainWrap>
-        <Section style={{
-          maxWidth: 1200,
-          margin: '32px auto 0 auto',
-          background: '#fff',
-          borderRadius: 18,
-          boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
-          padding: '0 0 32px 0',
-          minHeight: 'calc(100vh - 64px)',
-          position: 'relative'
-        }}>
-          <div id="kakao-ad-container"
-            style={{
-              width: '100%',
-              minHeight: 60,
-              textAlign: 'center',
-              background: 'transparent',
-              margin: 0,
-              padding: '24px 0 0 0'
-            }}
-          />
-          {/* 헤더 */}
-          <Header>
-            <Logo onClick={() => {
-              // 검색 상태 초기화
-              setSearchTerm('');
-              setSelectedCategory('');
-              setPage(1);
-              setError(null);
-              // 홈페이지로 이동
-              router.push('/');
-            }} style={{ cursor: 'pointer' }}>
-              <span style={{ color: 'initial', filter: 'none' }}>🧠</span> PSYCHO
-            </Logo>
-            <Stats>
-              <StatItem>👥 전체 방문자: {visitorStats.total.toLocaleString()}</StatItem>
-              <StatItem>📊 오늘 방문자: {visitorStats.today.toLocaleString()}</StatItem>
-              <StatItem>📈 주간 방문자: {visitorStats.week.toLocaleString()}</StatItem>
-              <StatItem style={{ 
-                color: apiStatus === 'connected' ? '#4CAF50' : 
-                       apiStatus === 'failed' ? '#f44336' : '#ff9800',
-                fontWeight: 'bold'
-              }}>
-                {apiStatus === 'connected' ? '🟢 서버 연결됨' : 
-                 apiStatus === 'failed' ? '🔴 서버 연결 실패' : '🟡 연결 중...'}
-              </StatItem>
-            </Stats>
-            <HistoryButton onClick={() => router.push('/history')}>
-              📋 기록보기
-            </HistoryButton>
-          </Header>
-
-          {/* 검색 및 필터 섹션 */}
-          <SearchSection>
-            <SearchBar>
-              <SearchInput
-                type="text"
-                placeholder="테스트 검색..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <SearchButton>🔍</SearchButton>
-            </SearchBar>
-            
-            <FilterBar>
-              <CategorySelect 
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                <option value="">모든 카테고리</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </CategorySelect>
-              
-              <SortSelect value={sort} onChange={(e) => setSort(e.target.value)}>
-                <option value="latest">최신순</option>
-                <option value="views">조회순</option>
-                <option value="likes">좋아요순</option>
-                <option value="popular">인기순</option>
-              </SortSelect>
-            </FilterBar>
-          </SearchSection>
-
-          {/* 에러 메시지 */}
-          {error && (
-            <ErrorMessage>
-              <p>🚫 {error}</p>
-              <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
-                백엔드 서버 연결에 실패했습니다. 기본 테스트 데이터를 표시합니다.
-              </p>
-              <button onClick={() => {
+      <MainWrap style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
+        {/* 로딩 상태 */}
+        {loading && tests.length === 0 ? (
+          <Section style={sectionCenterStyle}>
+            <LoadingWrap style={loadingContainerStyle}>
+              <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
+            </LoadingWrap>
+          </Section>
+        ) : (
+          <Section style={sectionContainerStyle}>
+            <div id="kakao-ad-container"
+              style={{
+                width: '100%',
+                minHeight: 60,
+                textAlign: 'center',
+                background: 'transparent',
+                margin: 0,
+                padding: '24px 0 0 0'
+              }}
+            />
+            {/* 헤더 */}
+            <Header>
+              <Logo onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('');
+                setPage(1);
                 setError(null);
-                loadTests(true);
-                loadVisitorStats();
-                loadCategories();
-              }}>🔄 다시 시도</button>
-            </ErrorMessage>
-          )}
+                router.push('/');
+              }} style={{ cursor: 'pointer' }}>
+                <span style={{ color: 'initial', filter: 'none' }}>🧠</span> PSYCHO
+              </Logo>
+              <Stats>
+                <StatItem>👥 전체 방문자: {visitorStats.total.toLocaleString()}</StatItem>
+                <StatItem>📊 오늘 방문자: {visitorStats.today.toLocaleString()}</StatItem>
+                <StatItem>📈 주간 방문자: {visitorStats.week.toLocaleString()}</StatItem>
+                <StatItem style={{ 
+                  color: apiStatus === 'connected' ? '#4CAF50' : 
+                         apiStatus === 'failed' ? '#f44336' : '#ff9800',
+                  fontWeight: 'bold'
+                }}>
+                  {apiStatus === 'connected' ? '🟢 서버 연결됨' : 
+                   apiStatus === 'failed' ? '🔴 서버 연결 실패' : '🟡 연결 중...'}
+                </StatItem>
+              </Stats>
+              <HistoryButton onClick={() => router.push('/history')}>
+                📋 기록보기
+              </HistoryButton>
+            </Header>
 
-          {/* 리스트 영역만 분리 렌더링 */}
-          <TestListSection
-            searching={searching}
-            sortedTests={sortedTests}
-            loadingMore={loadingMore}
-            error={error}
-            searchTerm={searchTerm}
-            selectedCategory={selectedCategory}
-            loadMore={loadMore}
-            getTestFolderName={getTestFolderName}
-            router={router}
-            getImagePath={getImagePath}
-          />
+            {/* 검색 및 필터 섹션 */}
+            <SearchSection>
+              <SearchBar>
+                <SearchInput
+                  type="text"
+                  placeholder="테스트 검색..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <SearchButton>🔍</SearchButton>
+              </SearchBar>
+              
+              <FilterBar>
+                <CategorySelect 
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                  <option value="">모든 카테고리</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </CategorySelect>
+                
+                <SortSelect value={sort} onChange={(e) => setSort(e.target.value)}>
+                  <option value="latest">최신순</option>
+                  <option value="views">조회순</option>
+                  <option value="likes">좋아요순</option>
+                  <option value="popular">인기순</option>
+                </SortSelect>
+              </FilterBar>
+            </SearchSection>
 
-          {/* 푸터 */}
-          <Footer>
-            <p>© 2025 PSYCHO - 재미있는 심리테스트 모음</p>
-          </Footer>
-        </Section>
+            {/* 에러 메시지 */}
+            {error && (
+              <ErrorMessage>
+                <p>🚫 {error}</p>
+                <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
+                  백엔드 서버 연결에 실패했습니다. 기본 테스트 데이터를 표시합니다.
+                </p>
+                <button onClick={() => {
+                  setError(null);
+                  loadTests(true);
+                  loadVisitorStats();
+                  loadCategories();
+                }}>🔄 다시 시도</button>
+              </ErrorMessage>
+            )}
+
+            {/* 리스트/검색/로딩 영역 */}
+            <TestListSection
+              searching={searching}
+              sortedTests={sortedTests}
+              loadingMore={loadingMore}
+              error={error}
+              searchTerm={searchTerm}
+              selectedCategory={selectedCategory}
+              loadMore={loadMore}
+              getTestFolderName={getTestFolderName}
+              router={router}
+              getImagePath={getImagePath}
+            />
+
+            {/* 푸터 */}
+            <Footer>
+              <p>© 2025 PSYCHO - 재미있는 심리테스트 모음</p>
+            </Footer>
+          </Section>
+        )}
       </MainWrap>
     </>
   );
