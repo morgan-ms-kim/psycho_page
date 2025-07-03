@@ -63,12 +63,14 @@ const getApiBase = () => {
 // Section 스타일 상수 (흰색 컨테이너 공통)
 const sectionContainerStyle = {
   maxWidth: 1200,
+  minWidth: 1200,
+  minHeight : 1200,
   margin: '32px auto 0 auto',
   background: '#fff',
   borderRadius: 18,
   boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
   padding: '0 0 32px 0',
-  minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
+  //minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
   position: 'relative',
   // 모바일 중앙정렬 보정
   width: '100%',
