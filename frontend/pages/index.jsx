@@ -503,6 +503,8 @@ export default function Home() {
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
 
+    // showNoResults를 Home 컴포넌트에서 정의
+  const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
   // 배너 자동 슬라이드
   useEffect(() => {
     if (sortedTests.length > 0) {
