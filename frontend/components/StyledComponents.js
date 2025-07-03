@@ -27,18 +27,20 @@ export const Header = styled.header`
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  width: 100vw;
+  width: 100%; // 100vw → 100%
   max-width: 100vw;
   min-width: 0;
   box-sizing: border-box;
   @media (max-width: 600px) {
     padding: 0.7rem 1rem;
-    width: 100vw;
+    width: 100%;
     max-width: 100vw;
     min-width: 0;
     box-sizing: border-box;
   }
 `;
+
+
 
 export const BackButton = styled.button`
   background: #fff;
@@ -399,6 +401,11 @@ export const Logo = styled.h1`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
 `;
 
 export const Stats = styled.div`
