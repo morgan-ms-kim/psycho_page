@@ -575,13 +575,8 @@ export default function Home() {
               />
               <SearchButton>🔍</SearchButton>
             </SearchBar>
-            <TestCount>
-              {loading ? '테스트를 불러오는 중...'
-                : searching ? '검색 중...'
-                : showNoResults ? '검색 결과가 없습니다'
-                : `총 ${sortedTests.length}개의 테스트`}
-            </TestCount>
-            <FilterBar>
+            
+            <FilterBar style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px rgba(80,80,120,0.07)', padding: '12px 0', margin: '0 0 16px 0', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px' }}>
               <CustomCategorySelect
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -600,6 +595,13 @@ export default function Home() {
                 <option value="likes">좋아요순</option>
                 <option value="popular">인기순</option>
               </SortSelect>
+
+              <TestCount>
+              {loading ? '테스트를 불러오는 중...'
+                : searching ? '검색 중...'
+                : showNoResults ? '검색 결과가 없습니다'
+                : `총 ${sortedTests.length}개의 테스트`}
+            </TestCount>
             </FilterBar>
           </SearchSection>
 
