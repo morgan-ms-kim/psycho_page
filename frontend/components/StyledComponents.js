@@ -3,6 +3,7 @@ import styled from 'styled-components';
 // 공통 스타일 컴포넌트들
 export const MainWrap = styled.div`
   min-height: 100vh;
+  max-width: 100vw;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -183,8 +184,8 @@ export const InfoCard = styled(Card)`
     padding: 24px 4px;
   }
   @media (max-width: 600px) {
-    max-width: 96vw;
-    min-width: 96vw;
+    max-width: 100%;
+    min-width: 100%;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     margin: 0.5rem 0 1.5rem 0;
@@ -273,7 +274,7 @@ export const Section = styled.div`
   flex-direction: column;
   align-items: center;
   @media (max-width: 600px) {
-    max-width: 100vw;
+    max-width: 100%;
     padding: 0 2vw;
     margin-bottom: 16px;
   }
