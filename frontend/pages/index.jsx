@@ -57,7 +57,7 @@ const getApiBase = () => {
 // Section 스타일 상수 (흰색 컨테이너 공통)
 const sectionContainerStyle = {
   maxWidth: 1200,
-  minWidth: 1200,
+  //minWidth: 1200,
   margin: '32px auto 0 auto',
   background: '#fff',
   borderRadius: 18,

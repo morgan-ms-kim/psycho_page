@@ -74,12 +74,21 @@ export const BackButton = styled.button`
 
 export const LoadingWrap = styled.div`
   display: flex;
+  max-width: 1200px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
   background: #ffffff;
   color: white;
+  @media (max-width: 600px) {
+    max-width: 96vw;
+    min-width: 96vw;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin: 0.5rem 0 1.5rem 0;
+    padding: 8px 0;
+  }
 `;
 
 export const LoadingSpinner = styled.div`
@@ -188,6 +197,11 @@ export const Card = styled.div`
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(0,0,0,0.3);
   }
+    @media (max-width: 600px) {
+    max-width: 98vw;
+    margin: 0 0 16px 0;
+    padding: 12px 4px;
+  }
 `;
 
 export const QuestionCard = styled(Card)`
@@ -275,13 +289,14 @@ export const Grid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
   width: 100%;
-  gap: 1.5rem 1.5rem; /* 카드 사이 간격을 줄임 */
+  gap: 1rem 1rem; /* 카드 사이 간격을 줄임 */
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 40px; /* 바깥쪽 여백을 넓힘 */
   background: rgba(255, 255, 255, 0.1);
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    max-width: 100vw;
     gap: 15px;
     padding: 0 15px;
   }
