@@ -6,8 +6,9 @@ export const MainWrap = styled.div`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden;
   overflow-y: auto;
-  width: 100vw;
+  width: 100%;
   min-width: 0;
   max-width: 100vw;
   @media (max-width: 600px) {
@@ -15,7 +16,7 @@ export const MainWrap = styled.div`
     min-height: 100vh;
     min-width: 0;
     max-width: 100vw;
-    width: 100vw;
+    width: 100%;
     overflow-x: hidden;
   }
 `;
@@ -155,6 +156,7 @@ export const SocialButton = styled.button`
 `;
 
 // 카드 스타일들
+// Card
 export const Card = styled.div`
   background: rgba(255,255,255,0.1);
   border-radius: 15px;
@@ -182,12 +184,13 @@ export const Card = styled.div`
     padding: 8px 0;
   }
   @media (max-width: 600px) {
-    max-width: 98vw;
+    max-width: 100vw;
     min-width: 0;
     margin: 0 0 12px 0;
     padding: 6px 0;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    width: 100%;
   }
 `;
 
@@ -280,6 +283,7 @@ export const Grid = styled.div`
   padding: 0 8px 24px 8px;
   box-sizing: border-box;
   min-height: 320px;
+  min-width: 0;
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
     gap: 16px 0;
@@ -292,10 +296,10 @@ export const Grid = styled.div`
     gap: 10px 0;
     padding: 0 2vw 10px 2vw;
     max-width: 100vw;
-    min-width: 0;
+    min-width: 60vw;
+    width: 100%;
   }
 `;
-
 
 export const FlexRow = styled.div`
   display: flex;
@@ -310,6 +314,7 @@ export const FlexColumn = styled.div`
 
 // 섹션 스타일들
 export const Section = styled.div`
+  width: 100%;
   max-width: 100vw;
   min-width: 0;
   margin: 0 auto 20px;
@@ -324,6 +329,7 @@ export const Section = styled.div`
   @media (max-width: 600px) {
     max-width: 100vw;
     min-width: 0;
+    width: 100%;
     padding: 0 2vw;
     margin-bottom: 12px;
     border-radius: 10px;
@@ -401,11 +407,15 @@ export const Logo = styled.h1`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  max-width: 100%;
+  max-width: 80vw;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: center;
+  @media (max-width: 600px) {
+    font-size: 1.2rem;
+    max-width: 70vw;
+  }
 `;
 
 export const Stats = styled.div`
