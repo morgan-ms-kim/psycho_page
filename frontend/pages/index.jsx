@@ -121,6 +121,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
   return (
     <Section style={sectionBlockStyle}>
       {loading ? (
+        <>
         <LoadingWrap style={loadingContainerStyle}>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
           
@@ -129,7 +130,9 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
           {/* 빈 그리드 영역을 시각적으로 채워줌 */}
           <Grid style={{ minHeight: 320, background: '#f4f6fa', borderRadius: 16, marginTop: 24, boxShadow: '0 2px 8px rgba(80,80,120,0.04)' }} />
         </NoResults>
+        </>
       ) : searching ? (
+        <>
         <LoadingWrap style={loadingContainerStyle}>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>검색 중...</span>
         </LoadingWrap>
@@ -138,6 +141,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
         
           <Grid style={{ minHeight: 320, background: '#f4f6fa', borderRadius: 16, marginTop: 24, boxShadow: '0 2px 8px rgba(80,80,120,0.04)' }} />
         </NoResults>
+        </>
       ) : showNoResults ? (
         <NoResults>
           <h3>검색 결과가 없습니다</h3>
