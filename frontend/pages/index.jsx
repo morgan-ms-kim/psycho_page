@@ -597,7 +597,7 @@ export default function Home() {
           : searching ? '검색 중...'
           : showNoResults ? '검색 결과가 없습니다'
           : `총 ${sortedTests.length}개의 테스트`}
-      </TestCount>(searchTerm || selectedCategory);
+      </TestCount>;
             </FilterBar>
           </SearchSection>
 
