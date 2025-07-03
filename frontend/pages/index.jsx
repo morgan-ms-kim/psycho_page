@@ -500,8 +500,9 @@ export default function Home() {
     }
   };
 
-  // 검색어가 변경되면 검색 실행 (디바운스 적용)
+  // 검색어/카테고리/정렬 변경 시 검색 실행 (초기값일 때는 실행 안 함)
   useEffect(() => {
+    if (!searchTerm && !selectedCategory && sort === 'latest') return;
     const timer = setTimeout(() => {
       searchTests();
     }, 300);
