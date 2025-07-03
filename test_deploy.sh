@@ -84,12 +84,27 @@ fi
 
 if [ -n "$APP_FILE" ]; then
   echo "[INFO] SERVICE_PATH: $SERVICE_PATH"
-  echo "[INFO] $APP_FILE 파일에서 Router basename 자동 치환"
-  sed -i "s|<Router>|<BrowserRouter basename=\"$SERVICE_PATH\">|" "$APP_FILE"
-  sed -i "s|<BrowserRouter>|<BrowserRouter basename=\"$SERVICE_PATH\">|" "$APP_FILE"
-  sed -i "s|</Router>|</BrowserRouter>|" "$APP_FILE"
+  echo "[INFO] $APP_FILE 파일에서 Router/Basename 자동 치환"
+  # <Router> → <Router basename=...>
+  sed -i "s|<Router>|<Router basename=\"$SERVICE_PATH\">|g" "$APP_FILE"
+  # </Router> → </Router>
+  # (닫는 태그는 그대로)
+  # <BrowserRouter> → <BrowserRouter basename=...>
+  sed -i "s|<BrowserRouter>|<BrowserRouter basename=\"$SERVICE_PATH\">|g" "$APP_FILE"
+  # </BrowserRouter> → </BrowserRouter>
+  # (닫는 태그는 그대로)
+  # BrowserRouter import가 없으면 자동 추가 (alias 포함)
+  if ! grep -q "import { BrowserRouter" "$APP_FILE"; then
+    sed -i '1iimport { BrowserRouter } from "react-router-dom";' "$APP_FILE"
+    echo "[INFO] BrowserRouter import 구문 자동 추가"
+  fi
+  # BrowserRouter as Router alias import가 있는 경우도 지원
+  if grep -q "import { BrowserRouter as Router" "$APP_FILE"; then
+    # JSX에서 <Router> ... </Router>를 <Router ...> ... </Router>로 변환 (이미 위에서 처리)
+    echo "[INFO] BrowserRouter as Router alias import 및 JSX 치환 처리 완료"
+  fi
   echo "[INFO] 수정된 $APP_FILE Router 부분:"
-  grep "Router basename=" "$SERVICE_PATH"
+  grep "Router" "$APP_FILE"
 else
   echo "[WARNING] src/App.jsx 또는 src/App.js 파일이 없습니다."
 fi
