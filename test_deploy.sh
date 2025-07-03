@@ -103,7 +103,7 @@ echo "[INFO] npm 버전:"
 npm --version
 
 echo "[INFO] npm install 시작"
-npm install
+npm install --legacy-peer-deps
 if [ $? -ne 0 ]; then
   echo "[ERROR] npm install 실패"
   exit 2
@@ -160,6 +160,14 @@ else
   echo "[WARNING] index.html 파일을 찾을 수 없습니다"
 fi
 
+# === 디버깅: 최종 파일/폴더 구조 및 주요 파일 존재 여부 ===
+echo "[DEBUG] 현재 디렉토리: $(pwd)"
+echo "[DEBUG] index.html 존재 여부: $(ls -l index.html 2>/dev/null || echo '없음')"
+echo "[DEBUG] build 디렉토리: $(ls -l build 2>/dev/null || echo '없음')"
+echo "[DEBUG] dist 디렉토리: $(ls -l dist 2>/dev/null || echo '없음')"
+echo "[DEBUG] package.json: $(ls -l package.json 2>/dev/null || echo '없음')"
+echo "[DEBUG] node_modules: $(ls -l node_modules 2>/dev/null || echo '없음')"
+
 echo "[INFO] chmod 755"
 chmod -R 755 "$FOLDER_NAME"
 
@@ -167,4 +175,4 @@ echo "[INFO] 최종 디렉토리 구조:"
 find . -type f -name "*.js" -o -name "*.html" -o -name "*.css" | head -10
 
 echo "[INFO] test_deploy.sh 완료"
-exit 0 
+exit 0

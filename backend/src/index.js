@@ -1175,29 +1175,14 @@ app.post('/api/admin/update-all-folder-names', authenticateAdmin, async (req, re
     }
     res.json({ success: true, message: `${updatedCount}개 테스트의 folder 컬럼이 업데이트되었습니다.`, updatedCount });
   } catch (error) {
-    console.error('❌ 폴더명 일괄 업데이트 실패:', error);
-    res.status(500).json({ success: false, message: '폴더명 일괄 업데이트 실패', error: error.message });
+    console.error('❌ folder 컬럼 업데이트 실패:', error);
+    res.status(500).json({ error: 'folder 컬럼 업데이트 실패', detail: error.message });
   }
 });
 
-// 에러 핸들링 미들웨어
-const errorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ 
-    error: '서버 오류가 발생했습니다.',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-};
+app.use('/sitemap.xml', sitemapRouter);
 
-app.use(errorHandler);
-
-// 서버 시작 및 DB 동기화
 const PORT = process.env.PORT || 4000;
-sequelize.sync().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  });
+app.listen(PORT, () => {
+  console.log(`🚀 서버가 시작되었습니다. 포트: ${PORT}`);
 });
-
-app.use('/', sitemapRouter); 
