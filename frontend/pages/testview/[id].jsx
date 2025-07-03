@@ -73,10 +73,9 @@ const CONTAINER_MINWIDTH = '40vw';
 // 스타일 컴포넌트 추가 및 개선
 const TestContainer = styled.div`
   position: relative;
-  width: ${CONTAINER_WIDTH};
-  max-width: ${CONTAINER_MAXWIDTH};
-  min-width: ${CONTAINER_MINWIDTH};
-
+  width: 800px;
+  max-width: 800px;
+  min-width: 800px;
   margin: 32px auto 0 auto;
   background: white;
   border-radius: 24px;
@@ -85,15 +84,19 @@ const TestContainer = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 24px 0;
+  overflow: hidden;
+  box-sizing: border-box;
   @media (max-width: 1000px) {
-    max-width: 90vw;
-    min-width: 80vw;
+    max-width: 98vw;
+    min-width: 98vw;
+    width: 98vw;
     border-radius: 16px;
     padding: 16px 0;
   }
   @media (max-width: 600px) {
-    max-width: 100vw;
+    max-width: 98vw;
     min-width: 98vw;
+    width: 98vw;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     margin: 0.5rem 0 1.5rem 0;
@@ -126,13 +129,17 @@ const IframeRefreshButton = styled.button`
 
 const TestIframe = styled.iframe`
   width: 100%;
-  min-height: 65vh;
-  max-height: 70vh;
-  height: auto;
+  min-width: 100%;
+  max-width: 100%;
+  height: 700px;
+  min-height: 600px;
+  max-height: 700px;
   border: none;
   background: #fff;
   border-radius: 0 0 24px 24px;
   flex: 1;
+  overflow: hidden;
+  display: block;
 `;
 
 const LoadingOverlay = styled.div`
@@ -400,20 +407,25 @@ export default function TestPage() {
     );
   } else if (buildExists) {
     iframeSection = (
-      <TestContainer style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 600 }}>
+      <TestContainer>
         <TestIframe
           src={testUrl}
           title={test?.title || '테스트'}
           loading="lazy"
+          scrolling="no"
           style={{
-            margin: '0 auto',
             width: '100%',
+            minWidth: '100%',
+            maxWidth: '100%',
+            height: 700,
             minHeight: 600,
             maxHeight: 700,
             border: 'none',
             background: '#fff',
             borderRadius: '0 0 24px 24px',
-            flex: 1
+            flex: 1,
+            overflow: 'hidden',
+            display: 'block',
           }}
         />
       </TestContainer>

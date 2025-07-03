@@ -235,9 +235,7 @@ export const Textarea = styled.textarea`
 
 // 그리드 스타일들
 export const Grid = styled.div`
-  display: flex;
-  
-  flex-wrap: wrap;
+  display: grid;
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
   width: 100%;
@@ -245,7 +243,7 @@ export const Grid = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 15px;
@@ -559,4 +557,4 @@ export const CommentSubmitButton = styled.button`
     font-size: 1rem;
     padding: 0.6rem 1.2rem;
   }
-`; 
+`;
