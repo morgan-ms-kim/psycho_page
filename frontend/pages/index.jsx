@@ -86,34 +86,38 @@ const sectionBlockStyle = {
 };
 
 // 리스트 영역 분리 컴포넌트
-function TestListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath }) {
-  if (searching) {
-    return (
-      <Section style={sectionCenterStyle}>
-        <LoadingWrap style={loadingContainerStyle}>
-          <span style={{ color: '#888', fontSize: '1.1rem' }}>검색 중...</span>
-        </LoadingWrap>
-      </Section>
-    );
-  }
-  if (error) {
-    return null; // 에러는 상위에서 처리
-  }
-  if (sortedTests.length > 0) {
-    // hot/new 계산
-    const now = Date.now();
-    const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
-    // 조회수 상위 10개 id 추출
-    const hotIds = sortedTests
-      .slice()
-      .sort((a, b) => b.views - a.views)
-      .slice(0, 10)
-      .map(t => t.id);
-    return (
-      <Section style={sectionBlockStyle}>
-        <TestCount>총 {sortedTests.length}개의 테스트</TestCount>
-        <Grid>
-          {sortedTests.map((test) => {
+function TestListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath, loading }) {
+  // 항상 Section/TestCount/Grid 구조 유지
+  // 상태별 메시지/리스트만 변경
+  // 에러는 상위에서 처리
+  const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
+
+  // hot/new 계산
+  const now = Date.now();
+  const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const hotIds = sortedTests
+    .slice()
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 10)
+    .map(t => t.id);
+
+  return (
+    <Section style={sectionBlockStyle}>
+      <TestCount>
+        {loading ? '테스트를 불러오는 중...' : searching ? '검색 중...' : showNoResults ? '검색 결과가 없습니다' : `총 ${sortedTests.length}개의 테스트`}
+      </TestCount>
+      <Grid>
+        {loading || searching ? (
+          <LoadingWrap style={loadingContainerStyle}>
+            <span style={{ color: '#888', fontSize: '1.1rem' }}>{loading ? '테스트를 불러오는 중...' : '검색 중...'}</span>
+          </LoadingWrap>
+        ) : showNoResults ? (
+          <NoResults>
+            <h3>검색 결과가 없습니다</h3>
+            <p>다른 검색어나 카테고리를 시도해보세요.</p>
+          </NoResults>
+        ) : (
+          sortedTests.map((test) => {
             const isNew = new Date(test.createdAt).getTime() > weekAgo;
             const isHot = hotIds.includes(test.id);
             return (
@@ -169,27 +173,16 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                 </TestCardContent>
               </Card>
             );
-          })}
-        </Grid>
-        {loadingMore && (
-          <LoadingMore>
-            <span style={{ color: '#888', fontSize: '1.1rem' }}>더 많은 테스트를 불러오는 중...</span>
-          </LoadingMore>
+          })
         )}
-      </Section>
-    );
-  }
-  if (!searching && (searchTerm || selectedCategory)) {
-    return (
-      <Section style={sectionCenterStyle}>
-        <NoResults>
-          <h3>검색 결과가 없습니다</h3>
-          <p>다른 검색어나 카테고리를 시도해보세요.</p>
-        </NoResults>
-      </Section>
-    );
-  }
-  return null;
+      </Grid>
+      {loadingMore && !loading && !searching && !showNoResults && (
+        <LoadingMore>
+          <span style={{ color: '#888', fontSize: '1.1rem' }}>더 많은 테스트를 불러오는 중...</span>
+        </LoadingMore>
+      )}
+    </Section>
+  );
 }
 
 export default function Home() {
@@ -618,26 +611,19 @@ export default function Home() {
           )}
 
           {/* 리스트/검색/로딩 영역 */}
-          {loading && tests.length === 0 ? (
-            <Section style={sectionCenterStyle}>
-              <LoadingWrap style={loadingContainerStyle}>
-                <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
-              </LoadingWrap>
-            </Section>
-          ) : (
-            <TestListSection
-              searching={searching}
-              sortedTests={sortedTests}
-              loadingMore={loadingMore}
-              error={error}
-              searchTerm={searchTerm}
-              selectedCategory={selectedCategory}
-              loadMore={loadMore}
-              getTestFolderName={getTestFolderName}
-              router={router}
-              getImagePath={getImagePath}
-            />
-          )}
+          <TestListSection
+            searching={searching}
+            sortedTests={sortedTests}
+            loadingMore={loadingMore}
+            error={error}
+            searchTerm={searchTerm}
+            selectedCategory={selectedCategory}
+            loadMore={loadMore}
+            getTestFolderName={getTestFolderName}
+            router={router}
+            getImagePath={getImagePath}
+            loading={loading && tests.length === 0}
+          />
 
           {/* 푸터 */}
           <Footer>
