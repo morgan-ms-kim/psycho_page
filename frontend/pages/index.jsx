@@ -88,10 +88,7 @@ const sectionBlockStyle = {
 // 리스트 영역 분리 컴포넌트
 function TestListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath, loading }) {
   // 항상 Section/TestCount/Grid 구조 유지
-  // 상태별 메시지/리스트만 변경
-  // 에러는 상위에서 처리
   const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
-
   // hot/new 계산
   const now = Date.now();
   const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
@@ -104,12 +101,19 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
   return (
     <Section style={sectionBlockStyle}>
       <TestCount>
-        {loading ? '테스트를 불러오는 중...' : searching ? '검색 중...' : showNoResults ? '검색 결과가 없습니다' : `총 ${sortedTests.length}개의 테스트`}
+        {loading ? '테스트를 불러오는 중...'
+          : searching ? '검색 중...'
+          : showNoResults ? '검색 결과가 없습니다'
+          : `총 ${sortedTests.length}개의 테스트`}
       </TestCount>
       <Grid>
-        {loading || searching ? (
+        {loading ? (
           <LoadingWrap style={loadingContainerStyle}>
-            <span style={{ color: '#888', fontSize: '1.1rem' }}>{loading ? '테스트를 불러오는 중...' : '검색 중...'}</span>
+            <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
+          </LoadingWrap>
+        ) : searching ? (
+          <LoadingWrap style={loadingContainerStyle}>
+            <span style={{ color: '#888', fontSize: '1.1rem' }}>검색 중...</span>
           </LoadingWrap>
         ) : showNoResults ? (
           <NoResults>
@@ -611,19 +615,21 @@ export default function Home() {
           )}
 
           {/* 리스트/검색/로딩 영역 */}
-          <TestListSection
-            searching={searching}
-            sortedTests={sortedTests}
-            loadingMore={loadingMore}
-            error={error}
-            searchTerm={searchTerm}
-            selectedCategory={selectedCategory}
-            loadMore={loadMore}
-            getTestFolderName={getTestFolderName}
-            router={router}
-            getImagePath={getImagePath}
-            loading={loading && tests.length === 0}
-          />
+          {
+            <TestListSection
+              searching={searching}
+              sortedTests={sortedTests}
+              loadingMore={loadingMore}
+              error={error}
+              searchTerm={searchTerm}
+              selectedCategory={selectedCategory}
+              loadMore={loadMore}
+              getTestFolderName={getTestFolderName}
+              router={router}
+              getImagePath={getImagePath}
+              loading={loading}
+            />
+          }
 
           {/* 푸터 */}
           <Footer>
