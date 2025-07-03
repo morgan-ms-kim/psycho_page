@@ -35,6 +35,15 @@ import Head from 'next/head';
 const CONTAINER_WIDTH = '100%';
 const CONTAINER_MAXWIDTH = 1800;
 const CONTAINER_MINWIDTH = 600;
+const loadingContainerStyle = {
+  width: CONTAINER_WIDTH,
+  maxWidth: CONTAINER_MAXWIDTH,
+  minWidth: CONTAINER_MINWIDTH,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  minHeight: 300
+};
 // axios 인스턴스 생성
 const apiClient = axios.create({
   baseURL: 'https://smartpick.website/api',
@@ -519,16 +528,6 @@ export default function Home() {
       return () => clearInterval(interval);
     }
   }, [sortedTests]);
-
-const loadingContainerStyle = {
-  width: CONTAINER_WIDTH,
-  maxWidth: CONTAINER_MAXWIDTH,
-  minWidth: CONTAINER_MINWIDTH,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  minHeight: 300
-};
 
   // 초기 로딩 시에만 전체 로딩 화면 표시
   if (loading && tests.length === 0) {
