@@ -507,12 +507,14 @@ export default function TestPage() {
               margin: '0 auto',
               maxWidth: 1200,
               flexWrap: 'wrap',
+              // 추가: 브라우저가 넓을 때도 세로로 쌓이도록
+              ...(typeof window !== 'undefined' && window.innerWidth > 1000
+                ? { flexDirection: 'row' }
+                : { flexDirection: 'column' }),
             }}
           >
-            
-          {/* 테스트 앱(iframe) */}
-          {iframeSection}
-          
+            {/* 테스트 앱(iframe) */}
+            {iframeSection}
             {/* InfoCard(제목/설명/통계) */}
             <InfoCard as={TestContainer} style={{
               maxWidth: '900px',
@@ -527,6 +529,8 @@ export default function TestPage() {
               alignItems: 'center',
               width: '100%',
               flex: '1 1 400px',
+              // 추가: 항상 100%로
+              maxWidth: '100%',
             }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%', textAlign: 'center' }}>
                 <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
