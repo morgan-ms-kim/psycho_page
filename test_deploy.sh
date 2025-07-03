@@ -94,9 +94,13 @@ if [ -n "$APP_FILE" ]; then
   # </BrowserRouter> → </BrowserRouter>
   # (닫는 태그는 그대로)
   # BrowserRouter import가 없으면 자동 추가 (alias 포함)
-  if ! grep -q "import { BrowserRouter" "$APP_FILE"; then
-    sed -i '1iimport { BrowserRouter } from "react-router-dom";' "$APP_FILE"
-    echo "[INFO] BrowserRouter import 구문 자동 추가"
+  if grep -q "<BrowserRouter" "$APP_FILE"; then
+    if ! grep -q "import { BrowserRouter" "$APP_FILE"; then
+      sed -i '1iimport { BrowserRouter } from "react-router-dom";' "$APP_FILE"
+      echo "[INFO] BrowserRouter import 구문 자동 추가"
+    fi
+  else
+    echo "[INFO] <BrowserRouter> 태그가 없어 import를 추가하지 않음"
   fi
   # BrowserRouter as Router alias import가 있는 경우도 지원
   if grep -q "import { BrowserRouter as Router" "$APP_FILE"; then
