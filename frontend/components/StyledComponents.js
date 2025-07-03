@@ -8,11 +8,14 @@ export const MainWrap = styled.div`
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow-y: auto;
   width: 100vw;
-  min-width: 60vw;
+  min-width: 0;
+  max-width: 100vw;
   @media (max-width: 600px) {
     padding: 0;
     min-height: 100vh;
-    min-width: 96vw;
+    min-width: 0;
+    max-width: 100vw;
+    width: 100vw;
     overflow-x: hidden;
   }
 `;
