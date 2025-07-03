@@ -78,7 +78,8 @@ app.use(cors({
   origin: ['https://smartpick.website', 'http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'
+  ]
 }));
 
 // 정적 파일 서빙 (업로드된 썸네일)
@@ -581,9 +582,17 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     thumbnailReady: false
   };
   try {
-    // === 폴더명 생성: DB의 id 기준으로 ===
-    const maxId = await Test.max('id');
-    const nextId = (maxId || 0) + 1;
+    // === 폴더명 생성: DB의 auto_increment 기준으로 ===
+    // MySQL에서 현재 auto_increment 값을 조회
+    let nextId = 1;
+    try {
+      const [[row]] = await sequelize.query(`SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Tests'`);
+      if (row && row.AUTO_INCREMENT) nextId = row.AUTO_INCREMENT;
+    } catch (autoErr) {
+      // 실패 시 fallback
+      const maxId = await Test.max('id');
+      nextId = (maxId || 0) + 1;
+    }
     const folderName = `test${nextId}`;
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
     // === 폴더명 생성 끝 ===
@@ -1166,14 +1175,10 @@ app.post('/api/admin/update-all-folder-names', authenticateAdmin, async (req, re
     }
     res.json({ success: true, message: `${updatedCount}개 테스트의 folder 컬럼이 업데이트되었습니다.`, updatedCount });
   } catch (error) {
-    console.error('❌ folder 컬럼 업데이트 실패:', error);
-    res.status(500).json({ error: 'folder 컬럼 업데이트 실패', detail: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.use('/sitemap.xml', sitemapRouter);
+app.use('/api/sitemap', sitemapRouter);
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 서버가 시작되었습니다. 포트: ${PORT}`);
-});
+export default app;
