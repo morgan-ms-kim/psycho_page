@@ -581,20 +581,11 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     thumbnailReady: false
   };
   try {
-    // === 폴더명 중 가장 큰 번호 찾기 (기존 maxId/nextId/폴더Name 완전 대체) ===
+    // === 폴더명 생성: DB의 id 기준으로 ===
+    const maxId = await Test.max('id');
+    const nextId = (maxId || 0) + 1;
+    const folderName = `test${nextId}`;
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
-    let maxFolderNum = 0;
-    if (fs.existsSync(testsDir)) {
-      const folderNames = fs.readdirSync(testsDir)
-        .filter(name => /^test\d+$/.test(name))
-        .map(name => parseInt(name.replace('test', ''), 10))
-        .filter(num => !isNaN(num));
-      if (folderNames.length > 0) {
-        maxFolderNum = Math.max(...folderNames);
-      }
-    }
-    const nextFolderNum = maxFolderNum + 1;
-    const folderName = `test${nextFolderNum}`;
     // === 폴더명 생성 끝 ===
     const { gitUrl, title, description, category } = req.body;
     if (!gitUrl || !title) {

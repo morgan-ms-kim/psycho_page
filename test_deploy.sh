@@ -99,11 +99,6 @@ if [ -n "$APP_FILE" ]; then
       sed -i '1iimport { BrowserRouter } from "react-router-dom";' "$APP_FILE"
       echo "[INFO] BrowserRouter import 구문 자동 추가"
     fi
-    # react-router-dom이 package.json에 없으면 자동 설치
-    if ! grep -q '"react-router-dom"' package.json; then
-      echo "[INFO] package.json에 react-router-dom이 없어 자동 설치"
-      npm install react-router-dom --save
-    fi
   else
     echo "[INFO] <BrowserRouter> 태그가 없어 import를 추가하지 않음"
   fi
