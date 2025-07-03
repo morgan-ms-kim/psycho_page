@@ -60,19 +60,37 @@ const getApiBase = () => {
   return `https://smartpick.website/api?t=${timestamp}`.replace('?t=', '');
 };
 
+// PC/모바일 분기형 sectionContainerStyle
+const isMobile = typeof window !== 'undefined' && window.innerWidth <= 600;
+const sectionContainerStyle = isMobile
+  ? {
+      width: '100vw',
+      minWidth: 0,
+      maxWidth: '100vw',
+      minHeight: 'calc(100vh - 32px)',
+      margin: '16px 0 0 0',
+      background: '#fff',
+      borderRadius: 10,
+      boxShadow: '0 2px 12px rgba(80,80,120,0.08)',
+      padding: '0 0 16px 0',
+      position: 'relative',
+      boxSizing: 'border-box',
+    }
+  : {
+      width: 1200,
+      minWidth: 1200,
+      maxWidth: 1200,
+      minHeight: 1200,
+      margin: '32px auto 0 auto',
+      background: '#fff',
+      borderRadius: 18,
+      boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
+      padding: '0 0 32px 0',
+      position: 'relative',
+      boxSizing: 'border-box',
+    };
+
 // Section 스타일 상수 (흰색 컨테이너 공통)
-const sectionContainerStyle = {
-  maxWidth: 1200,
-  minWidth: 0, // 모바일에서 minWidth 제한 해제
-  margin: '32px auto 0 auto',
-  background: '#fff',
-  borderRadius: 18,
-  boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
-  padding: '0 0 32px 0',
-  position: 'relative',
-  width: '100%',
-  boxSizing: 'border-box',
-};
 const sectionCenterStyle = {
   ...sectionContainerStyle,
   display: 'flex',
