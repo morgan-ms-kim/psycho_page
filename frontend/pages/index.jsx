@@ -89,6 +89,7 @@ const sectionBlockStyle = {
 function TestListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath, loading }) {
   // 항상 Section/TestCount 구조 유지, Grid는 리스트 있을 때만
   const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
+  
   // hot/new 계산
   const now = Date.now();
   const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
@@ -100,12 +101,6 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
 
   return (
     <Section style={sectionBlockStyle}>
-      <TestCount>
-        {loading ? '테스트를 불러오는 중...'
-          : searching ? '검색 중...'
-          : showNoResults ? '검색 결과가 없습니다'
-          : `총 ${sortedTests.length}개의 테스트`}
-      </TestCount>
       {loading ? (
         <LoadingWrap style={loadingContainerStyle}>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
@@ -517,6 +512,7 @@ export default function Home() {
     }
   }, [sortedTests]);
 
+    const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
   // 항상 MainWrap을 최상위로 렌더링하고, 내부에서 상태별로 Section을 분기 처리
   return (
     <>
@@ -547,9 +543,9 @@ export default function Home() {
               <span style={{ color: 'initial', filter: 'none' }}>🧠</span> PSYCHO
             </Logo>
             <Stats>
-              <StatItem>👥 전체 방문자: {visitorStats.total.toLocaleString()}</StatItem>
-              <StatItem>📊 오늘 방문자: {visitorStats.today.toLocaleString()}</StatItem>
-              <StatItem>📈 주간 방문자: {visitorStats.week.toLocaleString()}</StatItem>
+              <StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>
+              <StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>
+              {/*<StatItem>📈 Week: {visitorStats.week.toLocaleString()}</StatItem>*/}
               <StatItem style={{ 
                 color: apiStatus === 'connected' ? '#4CAF50' : 
                        apiStatus === 'failed' ? '#f44336' : '#ff9800',
@@ -595,6 +591,13 @@ export default function Home() {
                 <option value="likes">좋아요순</option>
                 <option value="popular">인기순</option>
               </SortSelect>
+
+        <TestCount>
+        {loading ? '테스트를 불러오는 중...'
+          : searching ? '검색 중...'
+          : showNoResults ? '검색 결과가 없습니다'
+          : `총 ${sortedTests.length}개의 테스트`}
+      </TestCount>(searchTerm || selectedCategory);
             </FilterBar>
           </SearchSection>
 
