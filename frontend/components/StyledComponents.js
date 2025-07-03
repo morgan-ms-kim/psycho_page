@@ -6,95 +6,17 @@ export const MainWrap = styled.div`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow-x: hidden;
   overflow-y: auto;
-  width: 100%;
-  min-width: 0;
-  max-width: 100vw;
-`;
-
-// Section
-export const Section = styled.div`
-  width: 100%;
-  margin: 0 auto 20px;
-  padding: 0 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 6px 32px rgba(80,80,120,0.10);
-  box-sizing: border-box;
-  @media (max-width: 900px) {
-    padding: 0 4px;
-    border-radius: 14px;
-  }
+  width: 100vw;
+  min-width: 60vw;
   @media (max-width: 600px) {
-    padding: 0 2vw;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(80,80,120,0.08);
-  }
-`;
-// Grid
-export const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  justify-items: center;
-  width: 100%;
-  gap: 24px 12px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 8px 24px 8px;
-  box-sizing: border-box;
-  min-height: 320px;
-  min-width: 0;
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-    gap: 16px 0;
-    padding: 0 4px 16px 4px;
-    max-width: 100vw;
-    min-width: 0;
-  }
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-    gap: 10px 0;
-    padding: 0 2vw 10px 2vw;
-    max-width: 100vw;
-    min-width: 0;
-    width: 100%;
+    padding: 0;
+    min-height: 100vh;
+    min-width: 96vw;
+    overflow-x: hidden;
   }
 `;
 
-
-// Card
-export const Card = styled.div`
-  width: 100%;
-  max-width: 360px;
-  margin: 0 auto 24px;
-  padding: 16px;
-  border-radius: 15px;
-  background: rgba(255,255,255,0.1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  @media (max-width: 900px) {
-    max-width: 98vw;
-    padding: 12px;
-    border-radius: 12px;
-  }
-  @media (max-width: 600px) {
-    max-width: 98vw;
-    min-width: 0;
-    margin: 0 0 12px 0;
-    padding: 8px 4px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    width: 100%;
-  }
-`;
 export const Header = styled.header`
   display: flex;
   justify-content: space-between;
@@ -103,20 +25,7 @@ export const Header = styled.header`
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  width: 100%; // 100vw → 100%
-  max-width: 100vw;
-  min-width: 0;
-  box-sizing: border-box;
-  @media (max-width: 600px) {
-    padding: 0.7rem 1rem;
-    width: 100%;
-    max-width: 100vw;
-    min-width: 0;
-    box-sizing: border-box;
-  }
 `;
-
-
 
 export const BackButton = styled.button`
   background: #fff;
@@ -141,7 +50,7 @@ export const LoadingWrap = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: transparent;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 `;
 
@@ -230,6 +139,34 @@ export const SocialButton = styled.button`
   }
 `;
 
+// 카드 스타일들
+export const Card = styled.div`
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  padding: 16px 8px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  width: 100%;
+  max-width: 340px;
+  min-width: 0;
+  margin: 0 8px 24px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+  }
+  @media (max-width: 600px) {
+    max-width: 98vw;
+    min-width: 0;
+    margin: 0 0 16px 0;
+    padding: 8px 0;
+  }
+`;
 
 export const QuestionCard = styled(Card)`
   padding: 40px;
@@ -244,7 +181,7 @@ export const ResultCard = styled(Card)`
 
 export const InfoCard = styled(Card)`
   max-width: 90vw;
-  min-width: 0;
+  min-width: 80vw;
   margin: 2rem auto 0 auto;
   border-radius: 24px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
@@ -253,20 +190,22 @@ export const InfoCard = styled(Card)`
   display: flex;
   flex-direction: column;
   align-items: center;
+
   @media (max-width: 1200px) {
     max-width: 98vw;
     border-radius: 16px;
     padding: 24px 4px;
   }
   @media (max-width: 600px) {
-    max-width: 98vw;
-    min-width: 0;
+    max-width: 96vw;
+    min-width: 96vw;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     margin: 0.5rem 0 1.5rem 0;
     padding: 8px 0;
   }
 `;
+
 export const CommentForm = styled(Card)`
   margin-bottom: 20px;
 `;
@@ -308,6 +247,37 @@ export const Textarea = styled.textarea`
   }
 `;
 
+// 그리드 스타일들
+export const Grid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-items: center;
+  width: 100%;
+  gap: 2rem 2rem; /* 카드 간격 넉넉하게 */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px 32px 32px;
+  background: rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+  min-height: 320px;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 0 8px 24px 8px;
+    max-width: 100vw;
+    min-width: 0;
+  }
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0 2vw 16px 2vw;
+    max-width: 100vw;
+    min-width: 0;
+    background: transparent;
+  }
+`;
+
+
 
 export const FlexRow = styled.div`
   display: flex;
@@ -320,6 +290,22 @@ export const FlexColumn = styled.div`
   flex-direction: column;
 `;
 
+// 섹션 스타일들
+export const Section = styled.div`
+  max-width: 1200px;
+  min-width: 1200px;
+  margin: 0 auto 30px;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  @media (max-width: 600px) {
+    max-width: 100vw;
+    min-width: 0;
+    padding: 0 2vw;
+    margin-bottom: 16px;
+  }
+`;
 
 export const CommentSection = styled.div`
   max-width: 800px;
@@ -391,15 +377,6 @@ export const Logo = styled.h1`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  max-width: 80vw;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: center;
-  @media (max-width: 600px) {
-    font-size: 1.2rem;
-    max-width: 70vw;
-  }
 `;
 
 export const Stats = styled.div`
