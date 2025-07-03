@@ -55,11 +55,22 @@ const getApiBase = () => {
 function TestListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath }) {
   if (searching) {
     return (
-      <Section>
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <LoadingSpinner />
-          <p>검색 중...</p>
-        </div>
+      <Section style={{
+        maxWidth: 1200,
+        margin: '32px auto 0 auto',
+        background: '#fff',
+        borderRadius: 18,
+        boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
+        padding: '0 0 32px 0',
+        minHeight: 'calc(100vh - 64px)',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <LoadingWrap style={loadingContainerStyle}>
+          <span style={{ color: '#888', fontSize: '1.1rem' }}>검색 중...</span>
+        </LoadingWrap>
       </Section>
     );
   }
@@ -77,7 +88,17 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
       .slice(0, 10)
       .map(t => t.id);
     return (
-      <Section>
+      <Section style={{
+        maxWidth: 1200,
+        margin: '32px auto 0 auto',
+        background: '#fff',
+        borderRadius: 18,
+        boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
+        padding: '0 0 32px 0',
+        minHeight: 'calc(100vh - 64px)',
+        position: 'relative',
+        display: 'block',
+      }}>
         <TestCount>총 {sortedTests.length}개의 테스트</TestCount>
         <Grid>
           {sortedTests.map((test) => {
@@ -148,10 +169,24 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
   }
   if (!searching && (searchTerm || selectedCategory)) {
     return (
-      <NoResults>
-        <h3>검색 결과가 없습니다</h3>
-        <p>다른 검색어나 카테고리를 시도해보세요.</p>
-      </NoResults>
+      <Section style={{
+        maxWidth: 1200,
+        margin: '32px auto 0 auto',
+        background: '#fff',
+        borderRadius: 18,
+        boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
+        padding: '0 0 32px 0',
+        minHeight: 'calc(100vh - 64px)',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <NoResults>
+          <h3>검색 결과가 없습니다</h3>
+          <p>다른 검색어나 카테고리를 시도해보세요.</p>
+        </NoResults>
+      </Section>
     );
   }
   return null;
@@ -498,9 +533,25 @@ const loadingContainerStyle = {
   // 초기 로딩 시에만 전체 로딩 화면 표시
   if (loading && tests.length === 0) {
     return (
-      <LoadingWrap style={loadingContainerStyle}>
-        <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
-      </LoadingWrap>
+      <MainWrap style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
+        <Section style={{
+          maxWidth: 1200,
+          margin: '32px auto 0 auto',
+          background: '#fff',
+          borderRadius: 18,
+          boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
+          padding: '0 0 32px 0',
+          minHeight: 'calc(100vh - 64px)', // 화면을 거의 채우도록
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <LoadingWrap style={loadingContainerStyle}>
+            <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
+          </LoadingWrap>
+        </Section>
+      </MainWrap>
     );
   }
 
@@ -517,7 +568,7 @@ const loadingContainerStyle = {
           borderRadius: 18,
           boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
           padding: '0 0 32px 0',
-          minHeight: 120,
+          minHeight: 'calc(100vh - 64px)',
           position: 'relative'
         }}>
           <div id="kakao-ad-container"

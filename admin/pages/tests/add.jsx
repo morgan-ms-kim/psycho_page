@@ -154,9 +154,15 @@ export default function AddTest() {
       return;
     }
 
-    // Git URL 형식 검증
+    // Git URL 형식 검증 및 자동 .git 추가
+    let gitUrl = formData.gitUrl.trim();
+    const baseGitPattern = /^https:\/\/(github\.com|gitlab\.com)\/[^\/]+\/[^\/]+$/;
     const gitUrlPattern = /^https:\/\/(github\.com|gitlab\.com)\/[^\/]+\/[^\/]+\.git$/;
-    if (!gitUrlPattern.test(formData.gitUrl)) {
+    if (baseGitPattern.test(gitUrl) && !gitUrl.endsWith('.git')) {
+      gitUrl += '.git';
+      setFormData(prev => ({ ...prev, gitUrl }));
+    }
+    if (!gitUrlPattern.test(gitUrl)) {
       setError('올바른 GitHub 또는 GitLab 저장소 URL을 입력해주세요. (예: https://github.com/username/repository.git)');
       setLoading(false);
       return;
@@ -180,7 +186,7 @@ export default function AddTest() {
       console.log('🔄 테스트 추가 시작:', formData);
       setCurrentStep('테스트 추가 중...');
       
-      const response = await apiClient.post('/admin/tests/add', formData, { timeout: 300000 });
+      const response = await apiClient.post('/admin/tests/add', { ...formData, gitUrl }, { timeout: 300000 });
       addLog('API 응답: ' + JSON.stringify(response.data));
       
       console.log('✅ 테스트 추가 성공:', response.data);
@@ -790,4 +796,4 @@ const LogPanel = styled.div`
   max-height: 180px;
   overflow-y: auto;
   font-family: 'Fira Mono', 'Consolas', monospace;
-`; 
+`;
