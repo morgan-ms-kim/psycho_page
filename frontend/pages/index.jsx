@@ -800,11 +800,3 @@ const Badge = styled.span`
   color: #fff;
   background: ${props => props.type === 'hot' ? '#ff5e5e' : '#7f7fd5'};
 `;
-
-const Grid = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem 2rem;
-  width: 100%;
-`;

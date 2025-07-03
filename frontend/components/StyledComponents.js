@@ -235,10 +235,13 @@ export const Textarea = styled.textarea`
 
 // 그리드 스타일들
 export const Grid = styled.div`
-  display: grid;
+  display: flex;
+  
+  flex-wrap: wrap;
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
-  gap: 20px;
+  width: 100%;
+  gap: 2rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
@@ -249,6 +252,8 @@ export const Grid = styled.div`
     padding: 0 15px;
   }
 `;
+
+
 
 export const FlexRow = styled.div`
   display: flex;
