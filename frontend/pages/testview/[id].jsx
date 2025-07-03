@@ -505,12 +505,12 @@ export default function TestPage() {
               gap: 32,
               width: '100%',
               margin: '0 auto',
-              maxWidth: 1200,
+              maxWidth: 1200, 
               flexWrap: 'wrap',
               // 추가: 브라우저가 넓을 때도 세로로 쌓이도록
               ...(typeof window !== 'undefined' && window.innerWidth > 1000
                 ? { flexDirection: 'row' }
-                : { flexDirection: 'column' }),
+                : { flexDirection: 'column' }), 
             }}
           >
             {/* 테스트 앱(iframe) */}

@@ -169,6 +169,7 @@ echo "[DEBUG] package.json: $(ls -l package.json 2>/dev/null || echo '없음')"
 echo "[DEBUG] node_modules: $(ls -l node_modules 2>/dev/null || echo '없음')"
 
 echo "[INFO] chmod 755"
+cd .. # 상위로 이동
 chmod -R 755 "$FOLDER_NAME"
 
 echo "[INFO] 최종 디렉토리 구조:"
