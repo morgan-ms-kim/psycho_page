@@ -262,15 +262,13 @@ export default function AddTest() {
       
       // 테스트 등록 완료 후 해당 테스트 페이지로 이동
       const folderName = response.data.folderName || `test${response.data.test.id}`;
-      const testUrl = `/tests/${folderName}/`;
+      const testUrl = `/admin/tests/${folderName}/`;
       addLog('🔗 테스트 페이지: ' + testUrl);
       
       // 3초 후 테스트 페이지로 이동
       setTimeout(() => {
-        window.open(testUrl, '_blank'); // 새 탭에서 테스트 페이지 열기
-        if (validateAndFixPath('/tests', router)) {
-          router.push('/tests'); // 관리자 목록 페이지로 이동
-        }
+        window.open(testUrl, '_blank'); // 새 탭에서 테스트 상세 열기
+        router.push('/admin/tests'); // 기존 창은 항상 목록으로 이동
       }, 3000);
       
     } catch (error) {
