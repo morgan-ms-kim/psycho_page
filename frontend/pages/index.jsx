@@ -638,21 +638,6 @@ export default function Home() {
   );
 }
 
-// 페이지 전용 스타일 컴포넌트들
-const SortSelect = styled.select`
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  backdrop-filter: blur(10px);
-  
-  option {
-    background: #333;
-    color: white;
-  }
-`;
-
 const LoadingMore = styled.div`
   text-align: center;
   padding: 2rem;
