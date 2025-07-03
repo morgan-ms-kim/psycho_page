@@ -431,7 +431,16 @@ export default function TestPage() {
       <Head>
         <title>{test?.title ? `${test.title} - PSYCHO` : '테스트 상세 - PSYCHO'}</title>
       </Head>
-      <MainWrap style={{ paddingTop: 0, background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
+      <MainWrap style={{
+        paddingTop: 0,
+        background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)',
+        width: '100vw',
+        minWidth: 320,
+        maxWidth: 1400,
+        margin: '0 auto',
+        boxSizing: 'border-box',
+        overflowX: 'hidden',
+      }}>
         {/* 광고 컨테이너 - 그대로 */}
         <div
           style={{
@@ -474,6 +483,8 @@ export default function TestPage() {
           padding: '0 0 48px 0',
           minHeight: 120,
           position: 'relative',
+          width: '100%', // 추가: Section도 MainWrap과 동일하게
+          boxSizing: 'border-box',
         }}>
           <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
             <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
