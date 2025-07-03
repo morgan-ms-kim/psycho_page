@@ -123,17 +123,18 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
       {loading ? (
         <LoadingWrap style={loadingContainerStyle}>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
-          <NoResults>
+          
+        </LoadingWrap>
+        <NoResults>
           {/* 빈 그리드 영역을 시각적으로 채워줌 */}
           <Grid style={{ minHeight: 320, background: '#f4f6fa', borderRadius: 16, marginTop: 24, boxShadow: '0 2px 8px rgba(80,80,120,0.04)' }} />
         </NoResults>
-        </LoadingWrap>
       ) : searching ? (
         <LoadingWrap style={loadingContainerStyle}>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>검색 중...</span>
         </LoadingWrap>
-        {/* 빈 그리드 영역을 시각적으로 채워줌 */}
         <NoResults>
+          {/* 빈 그리드 영역을 시각적으로 채워줌 */}
         
           <Grid style={{ minHeight: 320, background: '#f4f6fa', borderRadius: 16, marginTop: 24, boxShadow: '0 2px 8px rgba(80,80,120,0.04)' }} />
         </NoResults>
