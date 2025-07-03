@@ -615,15 +615,33 @@ const Textarea = styled.textarea`
 `;
 
 const Select = styled.select`
-  padding: 0.75rem;
-  border: 2px solid #e1e5e9;
-  border-radius: 8px;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  -ms-appearance: none !important;
+  background: #fff !important;
+  color: #222 !important;
+  border: 2px solid #e1e5e9 !important;
+  border-radius: 8px !important;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
-
+  min-width: 110px;
+  padding: 0.75rem 1.2rem !important;
+  font-family: inherit;
+  font-weight: 500;
+  outline: none !important;
+  transition: border-color 0.3s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(80,80,120,0.07);
+  cursor: pointer;
   &:focus {
-    outline: none;
-    border-color: #667eea;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 2px #ede7f6;
+  }
+  &::-ms-expand {
+    display: none;
+  }
+  option {
+    background: #fff;
+    color: #222;
   }
 `;
 

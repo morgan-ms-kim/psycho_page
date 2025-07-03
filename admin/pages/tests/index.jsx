@@ -365,7 +365,26 @@ const AddButton = styled(Link)`
 const TestsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px 32px 32px;
+  box-sizing: border-box;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 0 8px 24px 8px;
+    max-width: 100vw;
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0 2vw 16px 2vw;
+    max-width: 100vw;
+  }
 `;
 
 const TestCard = styled.div`
@@ -533,4 +552,4 @@ const ModalIcon = styled.div`
 const ModalMessage = styled.p`
   font-size: 1rem;
   color: #333;
-`; 
+`;

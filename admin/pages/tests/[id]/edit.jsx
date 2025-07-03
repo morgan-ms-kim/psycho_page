@@ -365,14 +365,36 @@ const Textarea = styled.textarea`
 `;
 
 const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  -ms-appearance: none !important;
+  background: #fff !important;
+  color: #222 !important;
+  border: 1.5px solid #d1c4e9 !important;
+  border-radius: 8px !important;
   font-size: 1rem;
-  
+  min-width: 110px;
+  padding: 0.75rem 1.2rem !important;
+  font-family: inherit;
+  font-weight: 500;
+  outline: none !important;
+  transition: border-color 0.3s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(80,80,120,0.07);
+  cursor: pointer;
+
   &:focus {
-    outline: none;
-    border-color: #667eea;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 2px #ede7f6;
+  }
+
+  &::-ms-expand {
+    display: none;
+  }
+
+  option {
+    background: #fff;
+    color: #222;
   }
 `;
 
@@ -415,4 +437,4 @@ const SubmitButton = styled.button`
     background: #ccc;
     cursor: not-allowed;
   }
-`; 
+`;

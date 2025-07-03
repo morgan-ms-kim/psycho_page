@@ -525,8 +525,26 @@ const ChartContainer = styled.div`
 const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 2rem auto;
+  padding: 0 32px 32px 32px;
+  box-sizing: border-box;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 0 8px 24px 8px;
+    max-width: 100vw;
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0 2vw 16px 2vw;
+    max-width: 100vw;
+  }
 `;
 
 const StatCard = styled.div`
@@ -597,4 +615,4 @@ const LoadingMessage = styled.div`
   height: 100vh;
   font-size: 1.2rem;
   color: #666;
-`; 
+`;

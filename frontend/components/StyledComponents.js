@@ -239,15 +239,27 @@ export const Grid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
   width: 100%;
-  gap: 1.5rem 1.5rem; /* 카드 사이 간격을 줄임 */
+  gap: 2rem 2rem; /* 카드 간격 넉넉하게 */
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 40px; /* 바깥쪽 여백을 넓힘 */
+  padding: 0 32px 32px 32px;
   background: rgba(255, 255, 255, 0.1);
-  @media (max-width: 768px) {
+  box-sizing: border-box;
+  min-height: 320px;
+  @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    gap: 15px;
-    padding: 0 15px;
+    gap: 18px;
+    padding: 0 8px 24px 8px;
+    max-width: 100vw;
+    min-width: 0;
+  }
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0 2vw 16px 2vw;
+    max-width: 100vw;
+    min-width: 0;
+    background: transparent;
   }
 `;
 
@@ -432,17 +444,72 @@ export const FilterBar = styled.div`
 `;
 
 export const CategorySelect = styled.select`
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  padding: 10px 15px;
-  border-radius: 20px;
+  /* 크로스브라우저 appearance 제거 및 강제 스타일 */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  -ms-appearance: none !important;
+  background: #fff !important;
+  color: #222 !important;
+  border: 1.5px solid #d1c4e9 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 2px 8px rgba(80,80,120,0.08);
+  padding: 10px 15px !important;
+  font-size: 0.98rem !important;
+  font-family: inherit;
+  font-weight: 500;
+  outline: none !important;
+  min-width: 110px;
   cursor: pointer;
-  font-size: 0.9rem;
+  transition: border 0.2s, box-shadow 0.2s;
+  
+  &:focus {
+    border: 2px solid #764ba2 !important;
+    box-shadow: 0 0 0 2px #ede7f6;
+  }
+  
+  &::-ms-expand {
+    display: none;
+  }
   
   option {
-    background: #333;
-    color: white;
+    background: #fff;
+    color: #222;
+  }
+`;
+
+// 정렬 셀렉트도 동일 스타일로 분리
+export const SortSelect = styled.select`
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  -ms-appearance: none !important;
+  background: #fff !important;
+  color: #222 !important;
+  border: 1.5px solid #d1c4e9 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 2px 8px rgba(80,80,120,0.08);
+  padding: 10px 15px !important;
+  font-size: 0.98rem !important;
+  font-family: inherit;
+  font-weight: 500;
+  outline: none !important;
+  min-width: 110px;
+  cursor: pointer;
+  transition: border 0.2s, box-shadow 0.2s;
+  
+  &:focus {
+    border: 2px solid #764ba2 !important;
+    box-shadow: 0 0 0 2px #ede7f6;
+  }
+  
+  &::-ms-expand {
+    display: none;
+  }
+  
+  option {
+    background: #fff;
+    color: #222;
   }
 `;
 

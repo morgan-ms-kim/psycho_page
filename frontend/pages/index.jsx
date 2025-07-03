@@ -27,7 +27,7 @@ import {
   SearchButton,
   FilterBar,
   CategorySelect,
-  BannerStats
+  SortSelect
 } from '../components/StyledComponents';
 import Head from 'next/head';
 
@@ -63,16 +63,13 @@ const getApiBase = () => {
 // Section 스타일 상수 (흰색 컨테이너 공통)
 const sectionContainerStyle = {
   maxWidth: 1200,
-  minWidth: 1200,
-  minHeight : 1200,
+  minWidth: 0, // 모바일에서 minWidth 제한 해제
   margin: '32px auto 0 auto',
   background: '#fff',
   borderRadius: 18,
   boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
   padding: '0 0 32px 0',
-  //minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
   position: 'relative',
-  // 모바일 중앙정렬 보정
   width: '100%',
   boxSizing: 'border-box',
 };
@@ -82,9 +79,12 @@ const sectionCenterStyle = {
   alignItems: 'center',
   justifyContent: 'center',
 };
+// 모바일 대응: Section에 width 100%, minWidth 0, maxWidth 100vw 적용
 const sectionBlockStyle = {
   ...sectionContainerStyle,
   display: 'block',
+  maxWidth: '100vw',
+  minWidth: 0,
 };
 
 // 리스트 영역 분리 컴포넌트
@@ -649,27 +649,6 @@ export default function Home() {
 }
 
 // 페이지 전용 스타일 컴포넌트들
-const SortSelect = styled.select`
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 20px;
-  background: #f4f6fa !important;
-  color: #222 !important;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(80,80,120,0.07);
-  margin-left: 10px;
-  transition: box-shadow 0.2s;
-  appearance: none;
-  &:focus {
-    outline: 2px solid #7f7fd5;
-    box-shadow: 0 0 0 2px #7f7fd5;
-  }
-  option {
-    background: #fff !important;
-    color: #222 !important;
-  }
-`;
-
 const LoadingMore = styled.div`
   text-align: center;
   padding: 2rem;
