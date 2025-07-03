@@ -297,11 +297,16 @@ export const Section = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px rgba(80,80,120,0.10);
   @media (max-width: 600px) {
     max-width: 100vw;
     min-width: 0;
     padding: 0 2vw;
     margin-bottom: 16px;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(80,80,120,0.08);
   }
 `;
 
