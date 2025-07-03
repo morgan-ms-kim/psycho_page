@@ -604,7 +604,7 @@ const Textarea = styled.textarea`
   font-size: 1rem;
   resize: vertical;
   transition: border-color 0.3s ease;
-
+  font-family: 'Fira Sans', sans-serif;
   &:focus {
     outline: none;
     border-color: #667eea;

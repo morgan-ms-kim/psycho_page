@@ -31,6 +31,10 @@ import {
 } from '../components/StyledComponents';
 import Head from 'next/head';
 
+// 스타일 상수 정의 (공통 사용)
+const CONTAINER_WIDTH = '100%';
+const CONTAINER_MAXWIDTH = 1800;
+const CONTAINER_MINWIDTH = 600;
 // axios 인스턴스 생성
 const apiClient = axios.create({
   baseURL: 'https://smartpick.website/api',
@@ -481,10 +485,20 @@ export default function Home() {
     }
   }, [sortedTests]);
 
+const loadingContainerStyle = {
+  width: CONTAINER_WIDTH,
+  maxWidth: CONTAINER_MAXWIDTH,
+  minWidth: CONTAINER_MINWIDTH,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  minHeight: 300
+};
+
   // 초기 로딩 시에만 전체 로딩 화면 표시
   if (loading && tests.length === 0) {
     return (
-      <LoadingWrap>
+      <LoadingWrap style={loadingContainerStyle}>
         <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
       </LoadingWrap>
     );

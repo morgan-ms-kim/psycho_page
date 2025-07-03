@@ -65,12 +65,17 @@ const isValidTestUrl = (id) => {
   return /^test\d+$/.test(id);
 };
 
+// TestContainer/로딩 스타일 공통 상수 선언
+const CONTAINER_WIDTH = '50vw';
+const CONTAINER_MAXWIDTH = '50vw';
+const CONTAINER_MINWIDTH = '40vw';
+
 // 스타일 컴포넌트 추가 및 개선
 const TestContainer = styled.div`
   position: relative;
-  width: 50vw;
-  max-width: 50vw;
-  min-width: 40vw;
+  width: ${CONTAINER_WIDTH};
+  max-width: ${CONTAINER_MAXWIDTH};
+  min-width: ${CONTAINER_MINWIDTH};
 
   margin: 32px auto 0 auto;
   background: white;
@@ -354,15 +359,30 @@ export default function TestPage() {
     }
   }, []);
 
+  // TestContainer와 동일한 스타일을 변수로 분리
+  const loadingContainerStyle = {
+    width: '100%', // Section/TestContainer와 동일하게 전체 너비
+    maxWidth: CONTAINER_MAXWIDTH,
+    minWidth: CONTAINER_MINWIDTH,
+    margin: '32px auto 0 auto',
+    background: 'white',
+    borderRadius: 24,
+    boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '24px 0',
+  };
+
   if (loading) {
     return (
       <MainWrap>
         <Header>
           <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
         </Header>
-        <LoadingWrap>
-        <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
-      </LoadingWrap>
+        <LoadingWrap style={loadingContainerStyle}>
+          <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
+        </LoadingWrap>
       </MainWrap>
     );
   }
@@ -374,9 +394,8 @@ export default function TestPage() {
   let iframeSection = null;
   if (!checkedBuild && /^test\d+$/.test(id)) {
     iframeSection = (
-      <LoadingWrap>
-        <LoadingSpinner />
-        <p>테스트 앱 상태를 확인 중...</p>
+      <LoadingWrap style={loadingContainerStyle}>
+        <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트 앱 상태를 확인 중...</span>
       </LoadingWrap>
     );
   } else if (buildExists) {
@@ -479,6 +498,10 @@ export default function TestPage() {
               flexWrap: 'wrap',
             }}
           >
+            
+          {/* 테스트 앱(iframe) */}
+          {iframeSection}
+          
             {/* InfoCard(제목/설명/통계) */}
             <InfoCard as={TestContainer} style={{
               maxWidth: '900px',
@@ -499,28 +522,23 @@ export default function TestPage() {
                 <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
                 <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center', width: '100%' }}>
                   <div style={{ textAlign: 'center' }}>
-                    <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>조회수</StatLabel>
+                    <StatLabel style={{ color: '#888', fontSize: '1.2rem' }}>👁️</StatLabel>
                     <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{test?.views || 0}</StatValue>
                   </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>좋아요</StatLabel>
+                  <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={handleLike}>
+                    <StatLabel style={{ color: liked ? '#ff5e5e' : '#bbb', fontSize: '1.2rem', transition: 'color 0.2s' }}>
+                      {liked ? '💖' : '🤍'}
+                    </StatLabel>
                     <StatValue style={{ color: '#ff5e5e', fontSize: '1.1rem' }}>{test?.likes || 0}</StatValue>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <StatLabel style={{ color: '#888', fontSize: '0.95rem' }}>댓글</StatLabel>
+                    <StatLabel style={{ color: '#888', fontSize: '1.2rem' }}>💬</StatLabel>
                     <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{commentCount}</StatValue>
                   </div>
                 </div>
-                <FlexRow style={{ justifyContent: 'center', gap: 10, marginTop: 4, width: '100%' }}>
-                  <SocialButton onClick={handleLike} liked={liked} style={{ minWidth: 100, fontWeight: 700, fontSize: '1.05rem', color: liked ? '#fff' : '#222', background: liked ? '#7f7fd5' : '#fff', border: '2px solid #7f7fd5', boxShadow: '0 1px 4px rgba(127,127,213,0.08)' }}>
-                    {liked ? '💖 좋아요 취소' : '🤍 좋아요'}
-                  </SocialButton>
-                </FlexRow>
               </div>
             </InfoCard>
           </div>
-          {/* 테스트 앱(iframe) */}
-          {iframeSection}
           {/* 댓글 섹션 */}
           <CommentSection style={{
             maxWidth: '900px',
