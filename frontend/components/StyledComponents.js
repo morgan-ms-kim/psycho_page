@@ -239,10 +239,10 @@ export const Grid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
   width: 100%;
-  gap: 2rem 2rem;
+  gap: 1.5rem 1.5rem; /* 카드 사이 간격을 줄임 */
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 40px; /* 바깥쪽 여백을 넓힘 */
   background: rgba(255, 255, 255, 0.1);
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
