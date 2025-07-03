@@ -63,14 +63,12 @@ const getApiBase = () => {
 // Section 스타일 상수 (흰색 컨테이너 공통)
 const sectionContainerStyle = {
   maxWidth: 1200,
-  minWidth: 1200,
-  minHeight : 1200,
   margin: '32px auto 0 auto',
   background: '#fff',
   borderRadius: 18,
   boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
   padding: '0 0 32px 0',
-  //minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
+  minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
   position: 'relative',
   // 모바일 중앙정렬 보정
   width: '100%',
@@ -102,6 +100,12 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
 
   return (
     <Section style={sectionBlockStyle}>
+      <TestCount>
+        {loading ? '테스트를 불러오는 중...'
+          : searching ? '검색 중...'
+          : showNoResults ? '검색 결과가 없습니다'
+          : `총 ${sortedTests.length}개의 테스트`}
+      </TestCount>
       {loading ? (
         <LoadingWrap style={loadingContainerStyle}>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
@@ -114,8 +118,6 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
         <NoResults>
           <h3>검색 결과가 없습니다</h3>
           <p>다른 검색어나 카테고리를 시도해보세요.</p>
-          {/* 빈 그리드 영역을 시각적으로 채워줌 */}
-          <Grid style={{ minHeight: 320, background: '#f4f6fa', borderRadius: 16, marginTop: 24, boxShadow: '0 2px 8px rgba(80,80,120,0.04)' }} />
         </NoResults>
       ) : (
         <Grid>
@@ -505,8 +507,6 @@ export default function Home() {
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
 
-    // showNoResults를 Home 컴포넌트에서 정의
-  const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
   // 배너 자동 슬라이드
   useEffect(() => {
     if (sortedTests.length > 0) {
@@ -547,9 +547,9 @@ export default function Home() {
               <span style={{ color: 'initial', filter: 'none' }}>🧠</span> PSYCHO
             </Logo>
             <Stats>
-              <StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>
-              <StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>
-              <StatItem>📈 Weekly: {visitorStats.week.toLocaleString()}</StatItem>
+              <StatItem>👥 전체 방문자: {visitorStats.total.toLocaleString()}</StatItem>
+              <StatItem>📊 오늘 방문자: {visitorStats.today.toLocaleString()}</StatItem>
+              <StatItem>📈 주간 방문자: {visitorStats.week.toLocaleString()}</StatItem>
               <StatItem style={{ 
                 color: apiStatus === 'connected' ? '#4CAF50' : 
                        apiStatus === 'failed' ? '#f44336' : '#ff9800',
@@ -576,8 +576,8 @@ export default function Home() {
               <SearchButton>🔍</SearchButton>
             </SearchBar>
             
-            <FilterBar style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px rgba(80,80,120,0.07)', padding: '12px 0', margin: '0 0 16px 0', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px' }}>
-              <CustomCategorySelect
+            <FilterBar>
+              <CategorySelect 
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
@@ -587,7 +587,7 @@ export default function Home() {
                     {category.name}
                   </option>
                 ))}
-              </CustomCategorySelect>
+              </CategorySelect>
               
               <SortSelect value={sort} onChange={(e) => setSort(e.target.value)}>
                 <option value="latest">최신순</option>
@@ -595,13 +595,6 @@ export default function Home() {
                 <option value="likes">좋아요순</option>
                 <option value="popular">인기순</option>
               </SortSelect>
-
-              <TestCount>
-              {loading ? '테스트를 불러오는 중...'
-                : searching ? '검색 중...'
-                : showNoResults ? '검색 결과가 없습니다'
-                : `총 ${sortedTests.length}개의 테스트`}
-            </TestCount>
             </FilterBar>
           </SearchSection>
 
@@ -653,20 +646,13 @@ const SortSelect = styled.select`
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 20px;
-  background: #f4f6fa !important;
-  color: #222 !important;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(80,80,120,0.07);
-  margin-left: 10px;
-  transition: box-shadow 0.2s;
-  appearance: none;
-  &:focus {
-    outline: 2px solid #7f7fd5;
-    box-shadow: 0 0 0 2px #7f7fd5;
-  }
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  backdrop-filter: blur(10px);
+  
   option {
-    background: #fff !important;
-    color: #222 !important;
+    background: #333;
+    color: white;
   }
 `;
 
@@ -795,9 +781,7 @@ const TestIframe = styled.iframe`
   display: block;
 `;
 
-// 뱃지 스타일 추가 (중복 정의 금지, 반드시 StyledComponents.js에서만 정의)
-// Badge 컴포넌트는 ../components/StyledComponents.js에서만 정의 및 export 되어야 하며,
-// 이 파일에서는 import만 사용해야 합니다.
+// 뱃지 스타일 추가
 const Badge = styled.span`
   display: inline-block;
   margin-left: 8px;
@@ -809,23 +793,30 @@ const Badge = styled.span`
   background: ${props => props.type === 'hot' ? '#ff5e5e' : '#7f7fd5'};
 `;
 
-const CustomCategorySelect = styled(CategorySelect)`
-  background: #f4f6fa !important;
-  color: #222 !important;
-  font-weight: 600;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(80,80,120,0.07);
-  border: none;
-  padding: 0.5rem 1rem;
-  margin-right: 10px;
-  transition: box-shadow 0.2s;
-  appearance: none;
-  &:focus {
-    outline: 2px solid #7f7fd5;
-    box-shadow: 0 0 0 2px #7f7fd5;
+export const Stats = styled.div`
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  @media (max-width: 768px) {
+    gap: 10px;
+    font-size: 0.92rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    width: 100%;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
   }
-  option {
-    background: #fff !important;
-    color: #222 !important;
+`;
+
+export const StatItem = styled.span`
+  font-size: 0.9rem;
+  opacity: 0.9;
+  @media (max-width: 768px) {
+    font-size: 0.92rem;
+    min-width: 110px;
+    padding: 0 2px;
+    text-align: center;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 `;

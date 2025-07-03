@@ -7,14 +7,6 @@ export const MainWrap = styled.div`
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow-y: auto;
-  width: 100vw;
-  min-width: 60vw;
-  @media (max-width: 600px) {
-    padding: 0;
-    min-height: 100vh;
-    min-width: 96vw;
-    overflow-x: hidden;
-  }
 `;
 
 export const Header = styled.header`
@@ -160,12 +152,6 @@ export const Card = styled.div`
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(0,0,0,0.3);
   }
-  @media (max-width: 600px) {
-    max-width: 98vw;
-    min-width: 0;
-    margin: 0 0 16px 0;
-    padding: 8px 0;
-  }
 `;
 
 export const QuestionCard = styled(Card)`
@@ -251,29 +237,17 @@ export const Textarea = styled.textarea`
 export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  justify-items: center;
+  justify-content: center;
   width: 100%;
-  gap: 2rem 2rem; /* 카드 간격 넉넉하게 */
+  gap: 1.5rem 1.5rem; /* 카드 사이 간격을 줄임 */
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 32px 32px 32px;
+  padding: 0 40px; /* 바깥쪽 여백을 넓힘 */
   background: rgba(255, 255, 255, 0.1);
-  box-sizing: border-box;
-  min-height: 320px;
-  @media (max-width: 900px) {
+  @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 18px;
-    padding: 0 8px 24px 8px;
-    max-width: 100vw;
-    min-width: 0;
-  }
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 0 2vw 16px 2vw;
-    max-width: 100vw;
-    min-width: 0;
-    background: transparent;
+    gap: 15px;
+    padding: 0 15px;
   }
 `;
 
@@ -292,8 +266,7 @@ export const FlexColumn = styled.div`
 
 // 섹션 스타일들
 export const Section = styled.div`
-  max-width: 1200px;
-  min-width: 1200px;
+  max-width: 800px;
   margin: 0 auto 30px;
   padding: 0 20px;
   display: flex;
@@ -301,7 +274,6 @@ export const Section = styled.div`
   align-items: center;
   @media (max-width: 600px) {
     max-width: 100vw;
-    min-width: 0;
     padding: 0 2vw;
     margin-bottom: 16px;
   }
@@ -460,72 +432,17 @@ export const FilterBar = styled.div`
 `;
 
 export const CategorySelect = styled.select`
-  /* 크로스브라우저 appearance 제거 및 강제 스타일 */
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  -ms-appearance: none !important;
-  background: #fff !important;
-  color: #222 !important;
-  border: 1.5px solid #d1c4e9 !important;
-  border-radius: 20px !important;
-  box-shadow: 0 2px 8px rgba(80,80,120,0.08);
-  padding: 10px 15px !important;
-  font-size: 0.98rem !important;
-  font-family: inherit;
-  font-weight: 500;
-  outline: none !important;
-  min-width: 110px;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 20px;
   cursor: pointer;
-  transition: border 0.2s, box-shadow 0.2s;
-  
-  &:focus {
-    border: 2px solid #764ba2 !important;
-    box-shadow: 0 0 0 2px #ede7f6;
-  }
-  
-  &::-ms-expand {
-    display: none;
-  }
+  font-size: 0.9rem;
   
   option {
-    background: #fff;
-    color: #222;
-  }
-`;
-
-// 정렬 셀렉트도 동일 스타일로 분리
-export const SortSelect = styled.select`
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  -ms-appearance: none !important;
-  background: #fff !important;
-  color: #222 !important;
-  border: 1.5px solid #d1c4e9 !important;
-  border-radius: 20px !important;
-  box-shadow: 0 2px 8px rgba(80,80,120,0.08);
-  padding: 10px 15px !important;
-  font-size: 0.98rem !important;
-  font-family: inherit;
-  font-weight: 500;
-  outline: none !important;
-  min-width: 110px;
-  cursor: pointer;
-  transition: border 0.2s, box-shadow 0.2s;
-  
-  &:focus {
-    border: 2px solid #764ba2 !important;
-    box-shadow: 0 0 0 2px #ede7f6;
-  }
-  
-  &::-ms-expand {
-    display: none;
-  }
-  
-  option {
-    background: #fff;
-    color: #222;
+    background: #333;
+    color: white;
   }
 `;
 
