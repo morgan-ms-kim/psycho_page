@@ -1175,10 +1175,16 @@ app.post('/api/admin/update-all-folder-names', authenticateAdmin, async (req, re
     }
     res.json({ success: true, message: `${updatedCount}개 테스트의 folder 컬럼이 업데이트되었습니다.`, updatedCount });
   } catch (error) {
+    console.error('❌ folder 컬럼 업데이트 실패:', error);
+    res.status(500).json({ error: 'folder 컬럼 업데이트 실패', detail: error.message });
+
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
 app.use('/api/sitemap', sitemapRouter);
-
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`🚀 서버가 시작되었습니다. 포트: ${PORT}`);
+});
 export default app;
