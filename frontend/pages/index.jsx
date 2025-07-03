@@ -27,7 +27,7 @@ import Head from 'next/head';
 
 // 스타일 상수 정의 (공통 사용)
 const CONTAINER_WIDTH = '100%';
-const CONTAINER_MAXWIDTH = 1800;
+const CONTAINER_MAXWIDTH = 1200;
 const CONTAINER_MINWIDTH = 600;
 const loadingContainerStyle = {
   width: CONTAINER_WIDTH,
@@ -57,6 +57,7 @@ const getApiBase = () => {
 // Section 스타일 상수 (흰색 컨테이너 공통)
 const sectionContainerStyle = {
   maxWidth: 1200,
+  minWidth: 1200,
   margin: '32px auto 0 auto',
   background: '#fff',
   borderRadius: 18,
@@ -513,7 +514,7 @@ export default function Home() {
       <Head>
         <title>PSYCHO - 심리테스트</title>
       </Head>
-      <MainWrap style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
+      <MainWrap style={{minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
         <Section style={sectionContainerStyle}>
           <div id="kakao-ad-container"
             style={{
