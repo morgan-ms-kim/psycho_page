@@ -30,7 +30,7 @@ export const Section = styled.div`
   @media (max-width: 600px) {
     width: 100%;
     max-width: 100vw;
-    min-width: 0;
+    min-width: 70vw;
     padding: 0 2vw;
     margin-bottom: 12px;
     border-radius: 10px;
@@ -62,7 +62,7 @@ export const Grid = styled.div`
     padding: 0 2vw 10px 2vw;
     width: 100%;
     max-width: 100vw;
-    min-width: 0;
+    min-width: 60vw;
   }
 `;
 
