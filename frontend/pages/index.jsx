@@ -6,16 +6,10 @@ import {
   MainWrap,
   Header,
   LoadingWrap,
-  LoadingSpinner,
   ErrorMessage,
   Footer,
-  PrimaryButton,
-  SecondaryButton,
   Grid,
-  FlexRow,
   Section,
-  Title,
-  SectionTitle,
   Card,
   Logo,
   Stats,
@@ -27,7 +21,7 @@ import {
   SearchButton,
   FilterBar,
   CategorySelect,
-  BannerStats
+  SortSelect,
 } from '../components/StyledComponents';
 import Head from 'next/head';
 
@@ -597,7 +591,7 @@ export default function Home() {
           : searching ? '검색 중...'
           : showNoResults ? '검색 결과가 없습니다'
           : `총 ${sortedTests.length}개의 테스트`}
-      </TestCount>;
+      </TestCount>
             </FilterBar>
           </SearchSection>
 

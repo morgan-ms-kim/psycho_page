@@ -2,11 +2,47 @@ import styled from 'styled-components';
 
 // 공통 스타일 컴포넌트들
 export const MainWrap = styled.div`
-  min-height: 100vh;
+max-width: 96vw;
+min-width: 96vw;  
+min-height: 100vh;
+  
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow-y: auto;
+
+   @media (max-width: 1200px) {
+    max-width: 98vw;
+    border-radius: 16px;
+    padding: 24px 4px;
+  }
+  @media (max-width: 600px) {
+    max-width: 96vw;
+    min-width: 96vw;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin: 0.5rem 0 1.5rem 0;
+    padding: 8px 0;
+  }
+  @media (max-width: 400px) {
+    max-width: 94vw;
+    min-width: 94vw;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0
+,0.05);
+    margin: 0.5rem 0 1rem 0;    
+    padding: 4px 0;
+  }
+  @media (max-width: 320px) { 
+    max-width: 92vw;
+    min-width: 92vw;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    margin: 0.5rem 0 1rem 0;    
+    padding: 2px 0;
+  }
+
+
 `;
 
 export const Header = styled.header`
@@ -442,19 +478,57 @@ export const FilterBar = styled.div`
   align-items: center;
   flex-wrap: wrap;
 `;
+// 완전 커스텀 셀렉트 스타일 (항상 동일하게 보이도록)
+const baseSelectStyle = `
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: rgba(255,255,255,0.2);
+  border: 1.5px solid #764ba2;
+  color: #222;
+  padding: 0.7rem 2.2rem 0.7rem 1rem;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 500;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: none;
+  cursor: pointer;
+  min-width: 120px;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7.293 7.293a1 1 0 011.414 0L10 8.586l1.293-1.293a1 1 0 111.414 1.414l-2 2a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  background-size: 1.2em;
+  &:focus {
+    border: 2px solid #ff6b6b;
+    background: #fff;
+    color: #222;
+  }
+  &::-ms-expand {
+    display: none;
+  }
+`;
 
 export const CategorySelect = styled.select`
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  padding: 10px 15px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  
+  ${baseSelectStyle}
+  background-color: #fffbe7;
+  color: #222;
   option {
-    background: #333;
-    color: white;
+    background: #fffbe7;
+    color: #222;
+    font-size: 1rem;
+  }
+`;
+
+export const SortSelect = styled.select`
+  ${baseSelectStyle}
+  background-color: #fff;
+  color: #222;
+  option {
+    background: #fff;
+    color: #222;
+    font-size: 1rem;
   }
 `;
 
