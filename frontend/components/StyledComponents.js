@@ -253,11 +253,10 @@ export const Grid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   justify-items: center;
   width: 100%;
-  gap: 2rem 2rem; /* 카드 간격 넉넉하게 */
+  gap: 2rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 32px 32px 32px;
-  background: rgba(255, 255, 255, 0.1);
   box-sizing: border-box;
   min-height: 320px;
   @media (max-width: 900px) {
@@ -273,7 +272,6 @@ export const Grid = styled.div`
     padding: 0 2vw 16px 2vw;
     max-width: 100vw;
     min-width: 0;
-    background: transparent;
   }
 `;
 
