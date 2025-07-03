@@ -555,8 +555,8 @@ export default function Home() {
                        apiStatus === 'failed' ? '#f44336' : '#ff9800',
                 fontWeight: 'bold'
               }}>
-                {apiStatus === 'connected' ? '🟢 서버 연결됨' : 
-                 apiStatus === 'failed' ? '🔴 서버 연결 실패' : '🟡 연결 중...'}
+                {apiStatus === 'connected' ? '🟢' : 
+                 apiStatus === 'failed' ? '🔴' : '🟡'}
               </StatItem>
             </Stats>
             <HistoryButton onClick={() => router.push('/history')}>
@@ -791,4 +791,32 @@ const Badge = styled.span`
   font-weight: bold;
   color: #fff;
   background: ${props => props.type === 'hot' ? '#ff5e5e' : '#7f7fd5'};
+`;
+
+export const Stats = styled.div`
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  @media (max-width: 768px) {
+    gap: 10px;
+    font-size: 0.92rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    width: 100%;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+`;
+
+export const StatItem = styled.span`
+  font-size: 0.9rem;
+  opacity: 0.9;
+  @media (max-width: 768px) {
+    font-size: 0.92rem;
+    min-width: 110px;
+    padding: 0 2px;
+    text-align: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
 `;
