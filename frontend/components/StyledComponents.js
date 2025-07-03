@@ -7,9 +7,13 @@ export const MainWrap = styled.div`
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow-y: auto;
+  width: 100vw;
+  min-width: 60vw;
   @media (max-width: 600px) {
     padding: 0;
     min-height: 100vh;
+    min-width: 96vw;
+    overflow-x: hidden;
   }
 `;
 
