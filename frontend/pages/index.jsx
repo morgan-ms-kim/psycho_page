@@ -547,9 +547,9 @@ export default function Home() {
               <span style={{ color: 'initial', filter: 'none' }}>🧠</span> PSYCHO
             </Logo>
             <Stats>
-              <StatItem>👥 전체 방문자: {visitorStats.total.toLocaleString()}</StatItem>
-              <StatItem>📊 오늘 방문자: {visitorStats.today.toLocaleString()}</StatItem>
-              <StatItem>📈 주간 방문자: {visitorStats.week.toLocaleString()}</StatItem>
+              <StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>
+              <StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>
+              <StatItem>📈 Weekly: {visitorStats.week.toLocaleString()}</StatItem>
               <StatItem style={{ 
                 color: apiStatus === 'connected' ? '#4CAF50' : 
                        apiStatus === 'failed' ? '#f44336' : '#ff9800',
@@ -781,7 +781,9 @@ const TestIframe = styled.iframe`
   display: block;
 `;
 
-// 뱃지 스타일 추가
+// 뱃지 스타일 추가 (중복 정의 금지, 반드시 StyledComponents.js에서만 정의)
+// Badge 컴포넌트는 ../components/StyledComponents.js에서만 정의 및 export 되어야 하며,
+// 이 파일에서는 import만 사용해야 합니다.
 const Badge = styled.span`
   display: inline-block;
   margin-left: 8px;
@@ -791,32 +793,4 @@ const Badge = styled.span`
   font-weight: bold;
   color: #fff;
   background: ${props => props.type === 'hot' ? '#ff5e5e' : '#7f7fd5'};
-`;
-
-export const Stats = styled.div`
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  @media (max-width: 768px) {
-    gap: 10px;
-    font-size: 0.92rem;
-    overflow-x: auto;
-    white-space: nowrap;
-    width: 100%;
-    padding-bottom: 2px;
-    -webkit-overflow-scrolling: touch;
-  }
-`;
-
-export const StatItem = styled.span`
-  font-size: 0.9rem;
-  opacity: 0.9;
-  @media (max-width: 768px) {
-    font-size: 0.92rem;
-    min-width: 110px;
-    padding: 0 2px;
-    text-align: center;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
 `;

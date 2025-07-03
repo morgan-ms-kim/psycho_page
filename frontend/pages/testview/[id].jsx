@@ -548,15 +548,16 @@ export default function TestPage() {
                 <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
                 <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다.'}</SubTitle>
                 <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center', width: '100%' }}>
+                  
+                  <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={handleLike}>
+                    <StatLabel style={{ color: liked ? '#ff5e5e' : '#bbb', fontSize: '1.2rem', transition: 'color 0.2s' }}>
+                      {liked ? '❤️' : '🤍'}
+                    </StatLabel>
+                    <StatValue style={{ color: '#ff5e5e', fontSize: '1.1rem' }}>{test?.likes || 0}</StatValue>
+                  </div>
                   <div style={{ textAlign: 'center' }}>
                     <StatLabel style={{ color: '#888', fontSize: '1.2rem' }}>👁️</StatLabel>
                     <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{test?.views || 0}</StatValue>
-                  </div>
-                  <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={handleLike}>
-                    <StatLabel style={{ color: liked ? '#ff5e5e' : '#bbb', fontSize: '1.2rem', transition: 'color 0.2s' }}>
-                      {liked ? '💖' : '🤍'}
-                    </StatLabel>
-                    <StatValue style={{ color: '#ff5e5e', fontSize: '1.1rem' }}>{test?.likes || 0}</StatValue>
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <StatLabel style={{ color: '#888', fontSize: '1.2rem' }}>💬</StatLabel>
