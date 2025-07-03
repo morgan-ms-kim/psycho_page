@@ -271,24 +271,23 @@ export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   justify-items: center;
-  width: 100vw;
-  max-width: 100vw;
-  min-width: 0;
-  gap: 2rem 2rem;
+  width: 100%;
+  gap: 24px 12px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 8px 24px 8px;
   box-sizing: border-box;
   min-height: 320px;
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 16px 0;
     padding: 0 4px 16px 4px;
     max-width: 100vw;
     min-width: 0;
   }
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 10px 0;
     padding: 0 2vw 10px 2vw;
     max-width: 100vw;
     min-width: 0;
