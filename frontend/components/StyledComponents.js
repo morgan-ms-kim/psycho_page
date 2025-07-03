@@ -25,9 +25,12 @@ export const Section = styled.div`
   border-radius: 18px;
   box-shadow: 0 6px 32px rgba(80,80,120,0.10);
   box-sizing: border-box;
-
+  @media (max-width: 900px) {
+    padding: 0 4px;
+    border-radius: 14px;
+  }
   @media (max-width: 600px) {
-    padding: 0 12px;
+    padding: 0 2vw;
     margin-bottom: 12px;
     border-radius: 10px;
     box-shadow: 0 2px 12px rgba(80,80,120,0.08);
@@ -36,27 +39,60 @@ export const Section = styled.div`
 // Grid
 export const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-  padding: 0 12px;
+  grid-template-columns: repeat(2, 1fr);
+  justify-items: center;
   width: 100%;
+  gap: 24px 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 8px 24px 8px;
   box-sizing: border-box;
+  min-height: 320px;
+  min-width: 0;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 16px 0;
+    padding: 0 4px 16px 4px;
+    max-width: 100vw;
+    min-width: 0;
+  }
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 10px 0;
+    padding: 0 2vw 10px 2vw;
+    max-width: 100vw;
+    min-width: 0;
+    width: 100%;
+  }
 `;
+
 
 // Card
 export const Card = styled.div`
   width: 100%;
-  max-width: 360px; // 고정값 또는 %
+  max-width: 360px;
   margin: 0 auto 24px;
   padding: 16px;
   border-radius: 15px;
   background: rgba(255,255,255,0.1);
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   text-align: center;
-
-  @media (max-width: 600px) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  @media (max-width: 900px) {
+    max-width: 98vw;
     padding: 12px;
-    max-width: 95%; // vw 대신 %
+    border-radius: 12px;
+  }
+  @media (max-width: 600px) {
+    max-width: 98vw;
+    min-width: 0;
+    margin: 0 0 12px 0;
+    padding: 8px 4px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    width: 100%;
   }
 `;
 export const Header = styled.header`
