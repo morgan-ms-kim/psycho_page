@@ -60,23 +60,33 @@ const getApiBase = () => {
   return `https://smartpick.website/api?t=${timestamp}`.replace('?t=', '');
 };
 
+// Section 스타일 상수 (흰색 컨테이너 공통)
+const sectionContainerStyle = {
+  maxWidth: 1200,
+  margin: '32px auto 0 auto',
+  background: '#fff',
+  borderRadius: 18,
+  boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
+  padding: '0 0 32px 0',
+  minHeight: 'calc(100vh - 64px)',
+  position: 'relative'
+};
+const sectionCenterStyle = {
+  ...sectionContainerStyle,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+const sectionBlockStyle = {
+  ...sectionContainerStyle,
+  display: 'block',
+};
+
 // 리스트 영역 분리 컴포넌트
 function TestListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath }) {
   if (searching) {
     return (
-      <Section style={{
-        maxWidth: 1200,
-        margin: '32px auto 0 auto',
-        background: '#fff',
-        borderRadius: 18,
-        boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
-        padding: '0 0 32px 0',
-        minHeight: 'calc(100vh - 64px)',
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      <Section style={sectionCenterStyle}>
         <LoadingWrap style={loadingContainerStyle}>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>검색 중...</span>
         </LoadingWrap>
@@ -97,17 +107,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
       .slice(0, 10)
       .map(t => t.id);
     return (
-      <Section style={{
-        maxWidth: 1200,
-        margin: '32px auto 0 auto',
-        background: '#fff',
-        borderRadius: 18,
-        boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
-        padding: '0 0 32px 0',
-        minHeight: 'calc(100vh - 64px)',
-        position: 'relative',
-        display: 'block',
-      }}>
+      <Section style={sectionBlockStyle}>
         <TestCount>총 {sortedTests.length}개의 테스트</TestCount>
         <Grid>
           {sortedTests.map((test) => {
@@ -178,19 +178,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
   }
   if (!searching && (searchTerm || selectedCategory)) {
     return (
-      <Section style={{
-        maxWidth: 1200,
-        margin: '32px auto 0 auto',
-        background: '#fff',
-        borderRadius: 18,
-        boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
-        padding: '0 0 32px 0',
-        minHeight: 'calc(100vh - 64px)',
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      <Section style={sectionCenterStyle}>
         <NoResults>
           <h3>검색 결과가 없습니다</h3>
           <p>다른 검색어나 카테고리를 시도해보세요.</p>
@@ -533,19 +521,7 @@ export default function Home() {
   if (loading && tests.length === 0) {
     return (
       <MainWrap style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
-        <Section style={{
-          maxWidth: 1200,
-          margin: '32px auto 0 auto',
-          background: '#fff',
-          borderRadius: 18,
-          boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
-          padding: '0 0 32px 0',
-          minHeight: 'calc(100vh - 64px)', // 화면을 거의 채우도록
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
+        <Section style={sectionCenterStyle}>
           <LoadingWrap style={loadingContainerStyle}>
             <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
           </LoadingWrap>
