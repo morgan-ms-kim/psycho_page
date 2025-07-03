@@ -50,12 +50,12 @@ else
   grep '"homepage"' package.json
 fi
 
+TEST_PATH="/tests/$FOLDER_NAME/"
+SERVICE_PATH="/tests/$FOLDER_NAME"
 # vite.config.js 파일 확인 및 base 설정 추가
 echo "[INFO] vite.config.js 파일 확인 중..."
 if [ -f "vite.config.js" ]; then
   echo "[INFO] vite.config.js 파일이 발견되었습니다."
-  TEST_PATH="/tests/$FOLDER_NAME/"
-  SERVICE_PATH="/tests/$FOLDER_NAME"
   echo "[INFO] 현재 vite.config.js 내용:"
   cat vite.config.js
   if ! grep -q "base:" vite.config.js; then
@@ -83,11 +83,13 @@ elif [ -f "src/App.js" ]; then
 fi
 
 if [ -n "$APP_FILE" ]; then
+  echo "[INFO] SERVICE_PATH: $SERVICE_PATH"
   echo "[INFO] $APP_FILE 파일에서 Router basename 자동 치환"
-  sed -i "s#<Router>#<BrowserRouter basename=\"$SERVICE_PATH\">#" "$APP_FILE"
-  sed -i "s#<BrowserRouter>#<BrowserRouter basename=\"$SERVICE_PATH\">#" "$APP_FILE"
+  sed -i "s|<Router>|<BrowserRouter basename=\"$SERVICE_PATH\">|" "$APP_FILE"
+  sed -i "s|<BrowserRouter>|<BrowserRouter basename=\"$SERVICE_PATH\">|" "$APP_FILE"
+  sed -i "s|</Router>|</BrowserRouter>|" "$APP_FILE"
   echo "[INFO] 수정된 $APP_FILE Router 부분:"
-  grep "Router basename=" "$APP_FILE"
+  grep "Router basename=" "$SERVICE_PATH"
 else
   echo "[WARNING] src/App.jsx 또는 src/App.js 파일이 없습니다."
 fi
@@ -95,7 +97,12 @@ fi
 echo "[INFO] 빌드 전 vite.config.js:"
 cat vite.config.js
 echo "[INFO] 빌드 전 src/App.jsx Router 부분:"
+
 grep "Router" src/App.jsx
+grep "Router" src/App.js
+
+grep "BrowserRouter" src/App.jsx
+grep "BrowserRouter" src/App.js
 
 echo "[INFO] Node.js 버전:"
 node --version
