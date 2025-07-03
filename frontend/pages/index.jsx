@@ -653,19 +653,20 @@ const SortSelect = styled.select`
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 20px;
-  background: #f4f6fa; /* 밝은 회색 배경으로 변경 */
-  color: #222;
+  background: #f4f6fa !important;
+  color: #222 !important;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(80,80,120,0.07);
   margin-left: 10px;
   transition: box-shadow 0.2s;
+  appearance: none;
   &:focus {
     outline: 2px solid #7f7fd5;
     box-shadow: 0 0 0 2px #7f7fd5;
   }
   option {
-    background: #fff;
-    color: #222;
+    background: #fff !important;
+    color: #222 !important;
   }
 `;
 
@@ -818,12 +819,13 @@ const CustomCategorySelect = styled(CategorySelect)`
   padding: 0.5rem 1rem;
   margin-right: 10px;
   transition: box-shadow 0.2s;
+  appearance: none;
   &:focus {
     outline: 2px solid #7f7fd5;
     box-shadow: 0 0 0 2px #7f7fd5;
   }
   option {
-    background: #fff;
-    color: #222;
+    background: #fff !important;
+    color: #222 !important;
   }
 `;
