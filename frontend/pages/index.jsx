@@ -100,12 +100,6 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
 
   return (
     <Section style={sectionBlockStyle}>
-      <TestCount>
-        {loading ? '테스트를 불러오는 중...'
-          : searching ? '검색 중...'
-          : showNoResults ? '검색 결과가 없습니다'
-          : `총 ${sortedTests.length}개의 테스트`}
-      </TestCount>
       {loading ? (
         <LoadingWrap style={loadingContainerStyle}>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
@@ -118,6 +112,8 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
         <NoResults>
           <h3>검색 결과가 없습니다</h3>
           <p>다른 검색어나 카테고리를 시도해보세요.</p>
+          {/* 빈 그리드 영역을 시각적으로 채워줌 */}
+          <Grid style={{ minHeight: 320, background: '#f4f6fa', borderRadius: 16, marginTop: 24, boxShadow: '0 2px 8px rgba(80,80,120,0.04)' }} />
         </NoResults>
       ) : (
         <Grid>
@@ -575,9 +571,14 @@ export default function Home() {
               />
               <SearchButton>🔍</SearchButton>
             </SearchBar>
-            
+            <TestCount>
+              {loading ? '테스트를 불러오는 중...'
+                : searching ? '검색 중...'
+                : showNoResults ? '검색 결과가 없습니다'
+                : `총 ${sortedTests.length}개의 테스트`}
+            </TestCount>
             <FilterBar>
-              <CategorySelect 
+              <CustomCategorySelect
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
@@ -587,7 +588,7 @@ export default function Home() {
                     {category.name}
                   </option>
                 ))}
-              </CategorySelect>
+              </CustomCategorySelect>
               
               <SortSelect value={sort} onChange={(e) => setSort(e.target.value)}>
                 <option value="latest">최신순</option>
@@ -646,13 +647,19 @@ const SortSelect = styled.select`
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  backdrop-filter: blur(10px);
-  
+  background: #f4f6fa; /* 밝은 회색 배경으로 변경 */
+  color: #222;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(80,80,120,0.07);
+  margin-left: 10px;
+  transition: box-shadow 0.2s;
+  &:focus {
+    outline: 2px solid #7f7fd5;
+    box-shadow: 0 0 0 2px #7f7fd5;
+  }
   option {
-    background: #333;
-    color: white;
+    background: #fff;
+    color: #222;
   }
 `;
 
@@ -793,4 +800,24 @@ const Badge = styled.span`
   font-weight: bold;
   color: #fff;
   background: ${props => props.type === 'hot' ? '#ff5e5e' : '#7f7fd5'};
+`;
+
+const CustomCategorySelect = styled(CategorySelect)`
+  background: #f4f6fa !important;
+  color: #222 !important;
+  font-weight: 600;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(80,80,120,0.07);
+  border: none;
+  padding: 0.5rem 1rem;
+  margin-right: 10px;
+  transition: box-shadow 0.2s;
+  &:focus {
+    outline: 2px solid #7f7fd5;
+    box-shadow: 0 0 0 2px #7f7fd5;
+  }
+  option {
+    background: #fff;
+    color: #222;
+  }
 `;
