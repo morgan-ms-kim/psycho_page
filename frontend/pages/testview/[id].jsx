@@ -117,7 +117,6 @@ const TestIframe = styled.iframe`
   min-width: 500px;
   max-width: 500px;
   height: 500px;
-  min-height: 400px;
   max-height: 500px;
   border: none;
   background: #fff;
@@ -332,7 +331,6 @@ export default function TestPage() {
         minWidth: '100%',
         maxWidth: '100%',
         height: '500px',
-        minHeight: '400px',
         maxHeight: '500px',
         border: 'none',
         background: '#fff',
