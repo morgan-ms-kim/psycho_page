@@ -610,7 +610,7 @@ export default function TestPage() {
               </CommentFormContainer>
             )}
             {comments.length === 0 && (
-              <div style={{ color: '#aaa', textAlign: 'center', margin: '1rem 0' }}>아직 댓글이 없습니다.</div>
+              <div style={{ color: '#aaa', textAlign: 'center', margin: '1rem 0' }}>아직 댓글이 없습니다!</div>
             )}
             <div style={{
               width: '100%',
