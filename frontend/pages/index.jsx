@@ -22,7 +22,8 @@ import {
   CategorySelect,
   SortSelect,
   FilterBarLeft,
-  FilterCountBar
+  FilterCountBar,
+  TestCount
 } from '../components/StyledComponents';
 import Head from 'next/head';
 
@@ -681,12 +682,7 @@ const NoResults = styled.div`
   }
 `;
 
-const TestCount = styled.div`
-  text-align: center;
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-  opacity: 0.8;
-`;
+
 
 const TestCardContent = styled.div`
   display: flex;

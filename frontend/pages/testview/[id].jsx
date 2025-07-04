@@ -58,6 +58,7 @@ const CONTAINER_MINWIDTH = '500px';
 // 스타일 컴포넌트 추가 및 개선
 const TestContainer = styled.div`
   position: relative;
+  width: 100%;
   max-width: 500px;
   min-width: 500px;
   margin: 32px auto 0 auto;
@@ -112,7 +113,7 @@ const IframeRefreshButton = styled.button`
 `;
 
 const TestIframe = styled.iframe`
-  width: 500px;
+  width: 100%;
   min-width: 500px;
   max-width: 500px;
   height: 700px;
@@ -575,7 +576,7 @@ export default function TestPage() {
               </CommentButton>
             </CommentHeader>
             {showCommentForm && (
-              <CommentFormContainer style={{ width: '100%', maxWidth: '600px', margin: '0 auto 24px auto' }}>
+              <CommentFormContainer style={{ width: '100%', maxWidth: '100%', margin: '0 auto 24px auto' }}>
                 <CommentInput
                   type="text"
                   placeholder="닉네임"
