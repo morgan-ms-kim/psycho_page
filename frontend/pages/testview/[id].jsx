@@ -57,8 +57,6 @@ const CONTAINER_MINWIDTH = '500px';
 
 // 스타일 컴포넌트 추가 및 개선
 const TestContainer = styled.div`
-
-  
   alignItems: 'center';  
   justifyContent: 'center';
   position: relative;
@@ -493,7 +491,6 @@ export default function TestPage() {
             borderRadius: 24,
             boxShadow: '0 8px 40px rgba(80,80,120,0.12)',
             padding: '0 0 24px 0',
-            maxHeight: '600px',
             position: 'relative',
             width: '100%',
             boxSizing: 'border-box',
@@ -523,7 +520,7 @@ export default function TestPage() {
           >
             {iframeSection}
             <InfoCard as={TestContainer} style={{
-              maxWidth: '360px',
+              maxWidth: '500px',
               minWidth: 0,
               margin: '0 auto',
               background: '#fff',
