@@ -19,9 +19,10 @@ import {
   SearchBar,
   SearchInput,
   SearchButton,
-  FilterBar,
   CategorySelect,
   SortSelect,
+  FilterBarLeft,
+  FilterCountBar
 } from '../components/StyledComponents';
 import Head from 'next/head';
 
@@ -567,33 +568,33 @@ export default function Home() {
               <SearchButton>🔍</SearchButton>
             </SearchBar>
             
-            <FilterBar>
-              <CategorySelect 
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                <option value="">모든 카테고리</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </CategorySelect>
-              
-              <SortSelect value={sort} onChange={(e) => setSort(e.target.value)}>
-                <option value="latest">최신순</option>
-                <option value="views">조회순</option>
-                <option value="likes">좋아요순</option>
-                <option value="popular">인기순</option>
-              </SortSelect>
-
-            </FilterBar>
-        <TestCount>
-        {loading ? '테스트를 불러오는 중...'
-          : searching ? '검색 중...'
-          : showNoResults ? '검색 결과가 없습니다'
-          : `Total : ${sortedTests.length}`}
-      </TestCount>
+            <FilterCountBar>
+  <FilterBarLeft>
+    <CategorySelect 
+      value={selectedCategory}
+      onChange={(e) => setSelectedCategory(e.target.value)}
+    >
+      <option value="">모든 카테고리</option>
+      {categories.map(category => (
+        <option key={category.id} value={category.id}>
+          {category.name}
+        </option>
+      ))}
+    </CategorySelect>
+    <SortSelect value={sort} onChange={(e) => setSort(e.target.value)}>
+      <option value="latest">최신순</option>
+      <option value="views">조회순</option>
+      <option value="likes">좋아요순</option>
+      <option value="popular">인기순</option>
+    </SortSelect>
+  </FilterBarLeft>
+  <TestCount>
+    {loading ? '테스트를 불러오는 중...'
+      : searching ? '검색 중...'
+      : showNoResults ? '검색 결과가 없습니다'
+      : `Total : ${sortedTests.length}`}
+  </TestCount>
+</FilterCountBar>
           </SearchSection>
 
           {/* 에러 메시지 */}

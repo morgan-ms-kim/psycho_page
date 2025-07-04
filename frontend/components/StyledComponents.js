@@ -186,31 +186,60 @@ export const SocialButton = styled.button`
   }
 `;
 
+
+// 그리드 스타일들
+export const Grid = styled.div`
+   display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-content: center;
+  justify-items: center;
+  width: 100%;
+  max-width: 1200px;
+  min-width: 320px;
+  gap: 0.5rem 0.5rem; /* 카드 간격 더 좁게 */
+  margin: 0 auto;
+  padding: 0 8px; /* 바깥쪽 여백 넓힘 */
+  background: rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    max-width: 100vw;
+    gap: 2px;
+    padding: 0 2vw;
+  }
+`;
+
 // 카드 스타일들
 export const Card = styled.div`
-  background: rgba(255,255,255,0.1);
+   background: rgba(255,255,255,0.1);
   border-radius: 15px;
-  padding: 16px 8px;
+  padding: 20px 16px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   width: 100%;
-  max-width: 340px;
+  max-width: 380px;
   min-width: 0;
-  margin: 0 8px 24px 8px;
+  margin: 0 4px 18px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.28);
   }
-    @media (max-width: 600px) {
+  @media (max-width: 900px) {
     max-width: 98vw;
-    margin: 0 0 16px 0;
-    padding: 12px 4px;
+    margin: 0 0 14px 0;
+    padding: 14px 4px;
+  }
+  @media (max-width: 600px) {
+    max-width: 96vw;
+    min-width: 0;
+    margin: 0 0 10px 0;
+    padding: 10px 2px;
   }
 `;
 
@@ -293,26 +322,6 @@ export const Textarea = styled.textarea`
   }
 `;
 
-// 그리드 스타일들
-export const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  justify-content: center;
-  justify-items: center;   
-  width: 100%;
-  max-width: 1200px;
-  min-width: 320px;
-  gap: 0.8rem 0.8rem; /* 카드 사이 간격을 줄임 */
-  margin: 0 auto;
-  padding: 0 2px; /* 바깥쪽 여백을 넓힘 */
-  background: rgba(255, 255, 255, 0.1);
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    max-width: 100vw;
-    gap: 2px;
-    padding: 0 4px;
-  }
-`;
 
 
 
@@ -549,26 +558,50 @@ export const SearchButton = styled.button`
 `;
 export const FilterBar = styled.div`
   display: flex;
-  gap: 15px;
+  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   width: 100%;
-  box-sizing: border-box;
-  margin-top: 0.5rem;
-  justify-content: flex-end;
+  margin: 18px 0 18px 0;
+  gap: 12px;
   @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: stretch;
     gap: 8px;
-    padding: 0 2vw;
+    margin: 10px 0 10px 0;
   }
 `;
+// 필터/카운트 바: 좌우 정렬 및 바깥쪽 여백
+export const FilterCountBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 18px 0 18px 0;
+  gap: 12px;
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin: 10px 0 10px 0;
+  }
+`;
+
+// 왼쪽: 카테고리/정렬
+export const FilterBarLeft = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+`;
+
+// 오른쪽: 테스트 카운트
 export const TestCount = styled.div`
   text-align: right;
   font-size: 1.2rem;
-  margin-bottom: 2rem;
   opacity: 0.8;
   min-width: 100px;
   margin-left: 16px;
 `;
+
 // 완전 커스텀 셀렉트 스타일 (항상 동일하게 보이도록)
 const baseSelectStyle = `
   appearance: none;
