@@ -159,7 +159,7 @@ function RenderedCommentItem({ comment }) {
       flexDirection: 'row',
       alignItems: 'center',
       width: '100%',
-      maxWidth: '100%',
+      maxWidth: '500px',
       padding: '0 8px',
       borderRadius: 8,
       minHeight: 'auto',
