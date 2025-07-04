@@ -52,9 +52,8 @@ const isValidTestUrl = (id) => {
 };
 
 // TestContainer/로딩 스타일 공통 상수 선언
-const CONTAINER_WIDTH = '50vw';
-const CONTAINER_MAXWIDTH = '50vw';
-const CONTAINER_MINWIDTH = '40vw';
+const CONTAINER_MAXWIDTH = '500px';
+const CONTAINER_MINWIDTH = '500px';
 
 // 스타일 컴포넌트 추가 및 개선
 const TestContainer = styled.div`
@@ -291,7 +290,59 @@ export default function TestPage() {
       }
     })();
   }, [id]);
-
+  const getIframeContent = () => {
+  if (loading) {
+    return (
+      <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#888'}}>
+        테스트를 불러오는 중...
+      </div>
+    );
+  }
+  if (!checkedBuild && /^test\\d+$/.test(id)) {
+    return (
+      <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#888'}}>
+        테스트 앱 상태를 확인 중...
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#d00'}}>
+        🚫 {error}
+      </div>
+    );
+  }
+  if (!buildExists) {
+    return (
+      <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#d00'}}>
+        아직 빌드된 테스트 앱이 없습니다.
+      </div>
+    );
+  }
+  // 정상 iframe
+  return (
+    <TestIframe
+      src={testUrl}
+      title={test?.title || '테스트'}
+      loading="lazy"
+      scrolling="no"
+      style={{
+        width: '100%',
+        minWidth: '100%',
+        maxWidth: '100%',
+        height: 700,
+        minHeight: 600,
+        maxHeight: 700,
+        border: 'none',
+        background: '#fff',
+        borderRadius: '0 0 24px 24px',
+        flex: 1,
+        overflow: 'hidden',
+        display: 'block',
+      }}
+    />
+  );
+};
   const handleLike = async () => {
     try {
       const testId = getTestIdFromFolder(id);
@@ -393,28 +444,9 @@ export default function TestPage() {
     );
   } else if (buildExists) {
     iframeSection = (
-      <TestContainer>
-        <TestIframe
-          src={testUrl}
-          title={test?.title || '테스트'}
-          loading="lazy"
-          scrolling="no"
-          style={{
-            width: '100%',
-            minWidth: '100%',
-            maxWidth: '100%',
-            height: 700,
-            minHeight: 600,
-            maxHeight: 700,
-            border: 'none',
-            background: '#fff',
-            borderRadius: '0 0 24px 24px',
-            flex: 1,
-            overflow: 'hidden',
-            display: 'block',
-          }}
-        />
-      </TestContainer>
+      <TestContainer style={{minHeight:700,display:'flex',alignItems:'center',justifyContent:'center'}}>
+  {getIframeContent()}
+</TestContainer>
 
 
     );

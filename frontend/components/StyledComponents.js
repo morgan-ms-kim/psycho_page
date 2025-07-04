@@ -196,7 +196,7 @@ export const Grid = styled.div`
   width: 100%;
   max-width: 1200px;
   min-width: 320px;
-  gap: 0.5rem 0.5rem; /* 카드 간격 더 좁게 */
+  gap: 0.1rem 0.1rem; /* 카드 간격 더 좁게 */
   margin: 0 auto;
   padding: 0 8px; /* 바깥쪽 여백 넓힘 */
   background: rgba(255, 255, 255, 0.1);
