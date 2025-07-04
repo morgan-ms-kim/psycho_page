@@ -510,26 +510,18 @@ export default function TestPage() {
           )}
           {/* 광고+InfoCard 한 줄 배치 */}
           <div
-                        style={{
+            style={{
               display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
               gap: 16,
               width: '100%',
               margin: '0 auto',
-              maxWidth: '500px', 
-              maxHeight: '600px',
-              flexWrap: 'wrap',
-              // 추가: 브라우저가 넓을 때도 세로로 쌓이도록
-              ...(typeof window !== 'undefined' && window.innerWidth > 1000
-                ? { flexDirection: 'row' }
-                : { flexDirection: 'column' }), 
+              maxWidth: '500px',
             }}
           >
-            {/* 테스트 앱(iframe) */}
             {iframeSection}
-            {/* InfoCard(제목/설명/통계) */}
             <InfoCard as={TestContainer} style={{
               maxWidth: '360px',
               minWidth: 0,
