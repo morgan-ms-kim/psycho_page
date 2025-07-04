@@ -468,16 +468,19 @@ export const SearchSection = styled.div`
 `;
 
 export const SearchBar = styled.div`
-  ddisplay: flex;
+  display: flex;
   align-items: center;
   width: 100%;
   max-width: 400px;
   min-width: 0;
   margin: 0 auto 1rem auto;
   box-sizing: border-box;
+  flex-direction: row;
+  gap: 8px;
   @media (max-width: 600px) {
     max-width: 100vw;
     padding: 0 2vw;
+    gap: 4px;
   }
 `;
 
@@ -501,7 +504,23 @@ export const SearchInput = styled.input`
     opacity: 1;
   }
 `;
-
+export const KakaoAdContainer = styled.div`
+  width: 100%;
+  max-width: 728px;
+  min-width: 728px;
+  min-height: 90px;
+  margin: 0 auto;
+  text-align: center;
+  background: transparent;
+  box-sizing: border-box;
+  padding: 24px 0 0 0;
+  @media (max-width: 600px) {
+    max-width: 320px;
+    min-width: 320px;
+    minheight: 100px;
+    padding: 16px 0 0 0;
+  }
+`;
 export const SearchButton = styled.button`
   width: 40px;
   height: 40px;
@@ -536,10 +555,18 @@ export const FilterBar = styled.div`
   width: 100%;
   box-sizing: border-box;
   margin-top: 0.5rem;
+  justify-content: flex-end;
   @media (max-width: 600px) {
     gap: 8px;
     padding: 0 2vw;
   }
+`;
+export const TestCount = styled.div`
+  text-align: right;
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.8;
+  min-width: 100px;
 `;
 // 완전 커스텀 셀렉트 스타일 (항상 동일하게 보이도록)
 const baseSelectStyle = `
