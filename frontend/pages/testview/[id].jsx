@@ -57,7 +57,14 @@ const CONTAINER_MINWIDTH = '500px';
 
 // 스타일 컴포넌트 추가 및 개선
 const TestContainer = styled.div`
+
+  
+  alignItems: 'center';  
+  justifyContent: 'center';
   position: relative;
+  height: 500px;
+  min-height: 400px;
+  max-height: 500px;
   width: 100%;
   max-width: 500px;
   min-width: 500px;
@@ -445,13 +452,7 @@ export default function TestPage() {
     );
   } else if (buildExists) {
     iframeSection = (
-      <TestContainer style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        position: 'relative'
-      }}>
+      <TestContainer>
         {getIframeContent()}
       </TestContainer>
     );
