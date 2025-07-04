@@ -517,16 +517,38 @@ export default function Home() {
       </Head>
       <MainWrap style={{minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
         <Section style={sectionContainerStyle}>
-          <div id="kakao-ad-container"
+          <div
+          style={{
+            width: '100%',
+            minWidth: 320,
+            maxWidth: 728,
+            margin: '0 auto 24px auto',
+            textAlign: 'center',
+            minHeight: 90,
+            background: '#fff',
+            borderRadius: 12,
+            padding: 16,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            zIndex: 10,
+            display: 'block',
+          }}
+        >
+          <iframe
+            src="/kakao-ad.html"
             style={{
               width: '100%',
-              minHeight: 60,
-              textAlign: 'center',
+              minWidth: 320,
+              maxWidth: 728,
+              height: 90,
+              border: 'none',
+              margin: '0 auto',
+              display: 'block',
               background: 'transparent',
-              margin: 0,
-              padding: '24px 0 0 0'
             }}
+            scrolling="no"
+            title="카카오광고"
           />
+        </div>
           {/* 헤더 */}
           <Header>
             <Logo onClick={() => {
