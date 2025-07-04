@@ -470,6 +470,18 @@ const Main = styled.main`
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  width: 100vw;
+  box-sizing: border-box;
+  @media (max-width: 900px) {
+    padding: 1rem 0.5rem;
+    max-width: 100vw;
+    width: 100vw;
+  }
+  @media (max-width: 600px) {
+    padding: 0.5rem 0;
+    max-width: 100vw;
+    width: 100vw;
+  }
 `;
 
 const PageHeader = styled.div`
@@ -510,6 +522,18 @@ const ChartCard = styled.div`
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+  @media (max-width: 900px) {
+    padding: 1rem 0.5rem;
+    min-width: 0;
+    width: 100vw;
+  }
+  @media (max-width: 600px) {
+    padding: 0.5rem 0;
+    min-width: 0;
+    width: 100vw;
+  }
 `;
 
 const ChartTitle = styled.h2`
@@ -555,6 +579,18 @@ const StatCard = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  @media (max-width: 900px) {
+    padding: 1rem 0.5rem;
+    min-width: 0;
+    width: 100vw;
+  }
+  @media (max-width: 600px) {
+    padding: 0.5rem 0;
+    min-width: 0;
+    width: 100vw;
+  }
 `;
 
 const StatIcon = styled.div`
@@ -579,6 +615,19 @@ const DataTable = styled.div`
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  @media (max-width: 900px) {
+    padding: 1rem 0.5rem;
+    min-width: 0;
+    width: 100vw;
+  }
+  @media (max-width: 600px) {
+    padding: 0.5rem 0;
+    min-width: 0;
+    width: 100vw;
+  }
 `;
 
 const TableTitle = styled.h2`
@@ -590,19 +639,22 @@ const TableTitle = styled.h2`
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  
+  min-width: 400px;
+  @media (max-width: 600px) {
+    min-width: 320px;
+    font-size: 0.95rem;
+  }
   th, td {
     padding: 1rem;
     text-align: left;
     border-bottom: 1px solid #eee;
+    word-break: break-all;
   }
-  
   th {
     background: #f8f9fa;
     font-weight: 600;
     color: #333;
   }
-  
   tr:hover {
     background: #f8f9fa;
   }
