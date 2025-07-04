@@ -61,7 +61,9 @@ const TestContainer = styled.div`
   width: 100%;
   max-width: 500px;
   min-width: 500px;
-  margin: 32px auto 0 auto;
+  max-height: 700px;
+  min-height: 600px;
+  margin: auto 0 auto;
   background: white;
   border-radius: 24px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
@@ -157,23 +159,23 @@ function RenderedCommentItem({ comment }) {
       boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
       display: 'flex',
       flexDirection: 'row',
-      alignItems: 'center',
-      width: '100%',
-      maxWidth: '500px',
-      padding: '0 8px',
+      alignItems: 'flex-start',
+      width: 'calc(100% - 32px)',
+      maxWidth: 'calc(100% - 32px)',
+      padding: '12px 16px',
       borderRadius: 8,
       minHeight: 'auto',
       gap: 12,
       overflow: 'hidden',
       wordWrap: 'break-word',
       boxSizing: 'border-box',
+      margin: '0 16px 8px 16px',
     }}>
       {/* 제목 */}
       <span style={{ 
         fontWeight: 600, 
         color: '#6c63ff', 
         fontSize: '0.9rem',
-        marginLeft: 4,
         minWidth: 60,
         flexShrink: 0
       }}>
@@ -198,7 +200,6 @@ function RenderedCommentItem({ comment }) {
       <span style={{ 
         color: '#aaa', 
         fontSize: '0.8rem',
-        marginRight: 4,
         minWidth: 80,
         flexShrink: 0,
         textAlign: 'right'
@@ -444,7 +445,7 @@ export default function TestPage() {
     );
   } else if (buildExists) {
     iframeSection = (
-      <TestContainer style={{minHeight:700,display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <TestContainer style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
   {getIframeContent()}
 </TestContainer>
 
@@ -569,9 +570,9 @@ export default function TestPage() {
             alignItems: 'center',
             width: '100%'
           }}>
-            <CommentHeader style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, display: 'flex', padding: '0 24px' }}>
+            <CommentHeader style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, display: 'flex', padding: '0 24px', boxSizing: 'border-box' }}>
               <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
-              <CommentButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ marginLeft: 'auto' }}>
+              <CommentButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ marginLeft: 'auto', marginRight: 0 }}>
                 {showCommentForm ? '취소' : '댓글 작성'}
               </CommentButton>
             </CommentHeader>
@@ -609,7 +610,7 @@ export default function TestPage() {
               width: '100%',
               maxWidth: '100%',
               margin: '0 auto',
-              display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0,
               boxSizing: 'border-box',
               padding: 0
             }}>
