@@ -49,10 +49,20 @@ export const Header = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  min-width: 320px;
+  max-width: 1200px;
+  box-sizing: border-box;
   padding: 1rem 2rem;
+  margin: 0 auto;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  @media (max-width: 600px) {
+    padding: 0.7rem 0.5rem;
+    max-width: 100vw;
+    min-width: 0;
+  }
 `;
 
 export const BackButton = styled.button`
@@ -288,9 +298,11 @@ export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
+  justify-items: center;   
   width: 100%;
-  gap: 0.8rem 0.8rem; /* 카드 사이 간격을 줄임 */
   max-width: 1200px;
+  min-width: 320px;
+  gap: 0.8rem 0.8rem; /* 카드 사이 간격을 줄임 */
   margin: 0 auto;
   padding: 0 2px; /* 바깥쪽 여백을 넓힘 */
   background: rgba(255, 255, 255, 0.1);
@@ -317,7 +329,9 @@ export const FlexColumn = styled.div`
 
 // 섹션 스타일들
 export const Section = styled.div`
-  max-width: 800px;
+  max-width: 1200px;
+  min-width: 320px;
+
   margin: 0 auto 30px;
   padding: 0 20px;
   display: flex;
@@ -440,28 +454,48 @@ export const HistoryButton = styled(SecondaryButton)`
 `;
 
 export const SearchSection = styled.div`
+  width: 100%;
   max-width: 800px;
+  min-width: 0;
   margin: 0 auto 30px;
-  padding: 0 20px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  @media (max-width: 600px) {
+    max-width: 100vw;
+    padding: 0 2vw;
+    margin-bottom: 16px;
+  }
 `;
 
 export const SearchBar = styled.div`
-  display: flex;
+  ddisplay: flex;
   align-items: center;
   width: 100%;
-  margin: 0 auto 1rem auto;
   max-width: 400px;
+  min-width: 0;
+  margin: 0 auto 1rem auto;
+  box-sizing: border-box;
+  @media (max-width: 600px) {
+    max-width: 100vw;
+    padding: 0 2vw;
+  }
 `;
 
 export const SearchInput = styled.input`
   flex: 1;
   min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
   background: #fff;
   color: #222;
   border: 2px solid #764ba2;
   border-radius: 12px;
   font-size: 1.1rem;
   padding: 0.8rem 1.2rem;
+  @media (max-width: 600px) {
+    font-size: 1rem;
+    padding: 0.7rem 1rem;
+  }
   &::placeholder {
     color: #888;
     opacity: 1;
@@ -471,6 +505,7 @@ export const SearchInput = styled.input`
 export const SearchButton = styled.button`
   width: 40px;
   height: 40px;
+  min-width: 40px;
   margin-left: 8px;
   background: linear-gradient(45deg, #ff6b6b, #ffa500);
   border: none;
@@ -482,16 +517,29 @@ export const SearchButton = styled.button`
   justify-content: center;
   cursor: pointer;
   transition: background 0.2s;
+  @media (max-width: 600px) {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    font-size: 1.1rem;
+    margin-left: 6px;
+  }
   &:hover {
     background: linear-gradient(45deg, #ffa500, #ff6b6b);
   }
 `;
-
 export const FilterBar = styled.div`
   display: flex;
   gap: 15px;
   align-items: center;
   flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.5rem;
+  @media (max-width: 600px) {
+    gap: 8px;
+    padding: 0 2vw;
+  }
 `;
 // 완전 커스텀 셀렉트 스타일 (항상 동일하게 보이도록)
 const baseSelectStyle = `

@@ -538,7 +538,7 @@ export default function Home() {
               <span style={{ color: 'initial', filter: 'none' }}>🧠</span> PSYCHO
             </Logo>
             <Stats>
-              <StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>
+              {/*<StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>*/}
               <StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>
               {/*<StatItem>📈 Week: {visitorStats.week.toLocaleString()}</StatItem>*/}
               <StatItem style={{ 
@@ -591,7 +591,7 @@ export default function Home() {
         {loading ? '테스트를 불러오는 중...'
           : searching ? '검색 중...'
           : showNoResults ? '검색 결과가 없습니다'
-          : `총 ${sortedTests.length}개의 테스트`}
+          : `Total : ${sortedTests.length}`}
       </TestCount>
             </FilterBar>
           </SearchSection>
