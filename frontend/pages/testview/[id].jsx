@@ -465,30 +465,7 @@ export default function TestPage() {
             pointerEvents: 'none', // 버튼만 클릭 가능하게
           }}
         >
-          <BackButton
-            style={{
-              pointerEvents: 'auto',
-              background: 'rgba(255,255,255,0.9)',
-              borderRadius: 8,
-              fontWeight: 600,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            }}
-            onClick={() => router.back()}
-          >
-            ←
-          </BackButton>
-          <BackButton
-            style={{
-              pointerEvents: 'auto',
-              background: 'rgba(255,255,255,0.9)',
-              borderRadius: 8,
-              fontWeight: 600,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            }}
-            onClick={() => router.push('/')}
-          >
-            홈
-          </BackButton>
+       
         </div>
         {getIframeContent()}
       </TestContainer>
@@ -595,9 +572,6 @@ export default function TestPage() {
             boxSizing: 'border-box',
           }}
         >
-          <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
-            <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
-          </Header>
           {/* 에러 메시지(있을 때만) */}
           {error && (
             <ErrorMessage>
