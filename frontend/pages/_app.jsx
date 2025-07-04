@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import { ThemeProvider } from 'styled-components';
 import Head from 'next/head';
 import { useEffect } from 'react';
+import { createGlobalStyle, ServerStyleSheet } from 'styled-components';
 
 const theme = {
   colors: {
@@ -110,6 +111,7 @@ export default function App({ Component, pageProps }) {
   
   return (
     <ThemeProvider theme={theme}>
+      <GlobalStyle />
       <Head>
         <style jsx global>{`
           .kakao-ad-fixed {
@@ -130,25 +132,27 @@ export default function App({ Component, pageProps }) {
 }
 
 // styled-components SSR 설정
-if (typeof window !== 'undefined') {
-  const { createGlobalStyle } = require('styled-components');
+const GlobalStyle = createGlobalStyle`
+  * {
+    box-sizing: border-box;
+  }
   
-  const GlobalStyle = createGlobalStyle`
-    * {
-      box-sizing: border-box;
-    }
-    
-    html,
-    body {
-      padding: 0;
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-        Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-    }
-    
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-  `;
+  html,
+  body {
+    padding: 0;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+      Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  }
+  
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+`;
+
+// styled-components SSR 설정
+if (typeof window !== 'undefined') {
+  // 클라이언트 사이드에서만 실행
+  const { createGlobalStyle } = require('styled-components');
 } 
