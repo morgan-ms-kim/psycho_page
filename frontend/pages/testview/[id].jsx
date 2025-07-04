@@ -467,15 +467,15 @@ export default function TestPage() {
         paddingTop: 0,
         background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)',
         width: '100vw',
-        minWidth: 320,
-        maxWidth: 1400,
+        minWidth: '500px',
+        maxWidth: '500px',
         margin: '0 auto',
         boxSizing: 'border-box',
         overflowX: 'hidden',
       }}>
         
         <Section style={{
-          maxWidth: 1400,
+          maxWidth: '500px',
           margin: '40px auto 0 auto',
           background: '#fff',
           borderRadius: 24,
@@ -557,7 +557,7 @@ export default function TestPage() {
           </div>
           {/* 댓글 섹션 */}
           <CommentSection style={{
-            maxWidth: '900px',
+            maxWidth: '500px',
             minWidth: 0,
             margin: '32px auto',
             background: '#fff',
