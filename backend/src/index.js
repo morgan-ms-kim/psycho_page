@@ -477,14 +477,16 @@ app.post('/api/visitors', async (req, res, next) => {
       // 2. geoip-lite/regions.json (한국만)
       region = regionNames['KR'][region];
     }
-    const { testId, userAgent } = req.body;
+    const { testId, userAgent, page, duration } = req.body;
     const visitor = await Visitor.create({
       testId,
       ip: userKey,
       country,
       region,
       userAgent,
-      visitedAt: new Date()
+      visitedAt: new Date(),
+      page,
+      duration
     });
     res.json({ success: true, visitor });
   } catch (error) {
@@ -906,10 +908,12 @@ app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
       vObj.isBot = isBot(vObj.userAgent);
       return vObj;
     });
+    // ip가 UUID(x-user-key) 형식이면 제외
+    const filteredRows = visitorsWithBot.filter(v => !/^[0-9a-fA-F-]{8}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{12}$/.test(v.ip));
     res.json({
-      visitors: visitorsWithBot,
-      total: visitors.count,
-      pages: Math.ceil(visitors.count / safeLimit),
+      visitors: filteredRows,
+      total: filteredRows.length,
+      pages: Math.ceil(filteredRows.length / safeLimit),
       currentPage: safePage
     });
   } catch (error) {

@@ -27,7 +27,23 @@ const Visitor = sequelize.define('Visitor', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  page: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  duration: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
   visitedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  updatedAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
   },
