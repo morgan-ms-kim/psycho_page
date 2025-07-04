@@ -61,8 +61,8 @@ const TestContainer = styled.div`
   width: 100%;
   max-width: 500px;
   min-width: 500px;
-  max-height: 700px;
-  min-height: 600px;
+  max-height: 500px;
+  min-height: 400px;
   margin: auto 0 auto;
   background: white;
   border-radius: 24px;
@@ -118,15 +118,17 @@ const TestIframe = styled.iframe`
   width: 100%;
   min-width: 500px;
   max-width: 500px;
-  height: 700px;
-  min-height: 600px;
-  max-height: 700px;
+  height: 500px;
+  min-height: 400px;
+  max-height: 500px;
   border: none;
   background: #fff;
   border-radius: 0 0 24px 24px;
   flex: 1;
   overflow: hidden;
   display: block;
+  position: relative;
+  transform: translateZ(0);
 `;
 
 const LoadingOverlay = styled.div`
@@ -331,15 +333,17 @@ export default function TestPage() {
         width: '100%',
         minWidth: '100%',
         maxWidth: '100%',
-        height: '600px',
-        minHeight: '600px',
-        maxHeight: '800px',
+        height: '500px',
+        minHeight: '400px',
+        maxHeight: '500px',
         border: 'none',
         background: '#fff',
         borderRadius: '0 0 24px 24px',
         flex: 1,
         overflow: 'hidden',
         display: 'block',
+        position: 'relative',
+        transform: 'translateZ(0)',
       }}
     />
   );
@@ -445,11 +449,15 @@ export default function TestPage() {
     );
   } else if (buildExists) {
     iframeSection = (
-      <TestContainer style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
-  {getIframeContent()}
-</TestContainer>
-
-
+      <TestContainer style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        position: 'relative'
+      }}>
+        {getIframeContent()}
+      </TestContainer>
     );
   } else {
     iframeSection = (
@@ -477,12 +485,12 @@ export default function TestPage() {
         
         <Section style={{
           maxWidth: '500px',
-          margin: '40px auto 0 auto',
+          margin: '20px auto 0 auto',
           background: '#fff',
           borderRadius: 24,
           boxShadow: '0 8px 40px rgba(80,80,120,0.12)',
-          padding: '0 0 48px 0',
-          minHeight: 120,
+          padding: '0 0 24px 0',
+          maxHeight: '600px',
           position: 'relative',
           width: '100%', // 추가: Section도 MainWrap과 동일하게
           boxSizing: 'border-box',
@@ -498,16 +506,16 @@ export default function TestPage() {
           )}
           {/* 광고+InfoCard 한 줄 배치 */}
           <div
-            style={{
+                        style={{
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'flex-start',
               justifyContent: 'center',
-              gap: 32,
+              gap: 16,
               width: '100%',
               margin: '0 auto',
-              maxWidth: '500px',
-              maxHeight: '700px',
+              maxWidth: '500px', 
+              maxHeight: '600px',
               flexWrap: 'wrap',
               // 추가: 브라우저가 넓을 때도 세로로 쌓이도록
               ...(typeof window !== 'undefined' && window.innerWidth > 1000
@@ -525,12 +533,12 @@ export default function TestPage() {
               background: '#fff',
               borderRadius: 24,
               boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-              padding: '24px 0',
+              padding: '16px 0',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               width: '100%',
-              flex: '1 1 400px',
+              flex: '1 1 300px',
               // 추가: 항상 100%로
               maxWidth: '100%',
             }}>
