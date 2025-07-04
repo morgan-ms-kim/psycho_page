@@ -58,7 +58,6 @@ const CONTAINER_MINWIDTH = '500px';
 // 스타일 컴포넌트 추가 및 개선
 const TestContainer = styled.div`
   position: relative;
-  width: 800px;
   max-width: 500px;
   min-width: 500px;
   margin: 32px auto 0 auto;
@@ -505,7 +504,7 @@ export default function TestPage() {
               gap: 32,
               width: '100%',
               margin: '0 auto',
-              maxWidth: 1200, 
+              maxWidth: '500px', 
               flexWrap: 'wrap',
               // 추가: 브라우저가 넓을 때도 세로로 쌓이도록
               ...(typeof window !== 'undefined' && window.innerWidth > 1000
@@ -517,7 +516,7 @@ export default function TestPage() {
             {iframeSection}
             {/* InfoCard(제목/설명/통계) */}
             <InfoCard as={TestContainer} style={{
-              maxWidth: '900px',
+              maxWidth: '500px',
               minWidth: 0,
               margin: '0',
               background: '#fff',

@@ -354,7 +354,7 @@ export const Section = styled.div`
 `;
 
 export const CommentSection = styled.div`
-  max-width: 800px;
+  max-width: 500px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
