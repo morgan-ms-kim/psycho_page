@@ -141,6 +141,14 @@ const Visitor = sequelize.define('Visitor', {
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW,
   },
+  createdAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+  },
+  updatedAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+  },
 });
 
 // 관계 정의
