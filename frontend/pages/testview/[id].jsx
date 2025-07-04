@@ -59,8 +59,8 @@ const CONTAINER_MINWIDTH = '500px';
 const TestContainer = styled.div`
   position: relative;
   width: 800px;
-  max-width: 800px;
-  min-width: 800px;
+  max-width: 500px;
+  min-width: 500px;
   margin: 32px auto 0 auto;
   background: white;
   border-radius: 24px;
