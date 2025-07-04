@@ -70,7 +70,7 @@ const TestContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 0;
+  padding: 0 0;
   overflow: hidden;
   box-sizing: border-box;
   @media (max-width: 1000px) {
@@ -506,7 +506,8 @@ export default function TestPage() {
               gap: 32,
               width: '100%',
               margin: '0 auto',
-              maxWidth: '500px', 
+              maxWidth: '500px',
+              maxHeight: '700px',
               flexWrap: 'wrap',
               // 추가: 브라우저가 넓을 때도 세로로 쌓이도록
               ...(typeof window !== 'undefined' && window.innerWidth > 1000
