@@ -450,7 +450,46 @@ export default function TestPage() {
     );
   } else if (buildExists) {
     iframeSection = (
-      <TestContainer>
+      <TestContainer style={{ position: 'relative', ...loadingContainerStyle }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '10px 16px',
+            zIndex: 20,
+            pointerEvents: 'none', // 버튼만 클릭 가능하게
+          }}
+        >
+          <BackButton
+            style={{
+              pointerEvents: 'auto',
+              background: 'rgba(255,255,255,0.9)',
+              borderRadius: 8,
+              fontWeight: 600,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            }}
+            onClick={() => router.back()}
+          >
+            ←
+          </BackButton>
+          <BackButton
+            style={{
+              pointerEvents: 'auto',
+              background: 'rgba(255,255,255,0.9)',
+              borderRadius: 8,
+              fontWeight: 600,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            }}
+            onClick={() => router.push('/')}
+          >
+            홈
+          </BackButton>
+        </div>
         {getIframeContent()}
       </TestContainer>
     );
@@ -482,6 +521,66 @@ export default function TestPage() {
           overflowX: 'hidden',
         }}
       >
+        <div
+          style={{
+            position: 'fixed',
+            left: '50%',
+            bottom: 0,
+            transform: 'translateX(-50%)',
+            width: '500px',
+            maxWidth: '98vw',
+            height: 0,
+            zIndex: 200,
+            pointerEvents: 'none',
+          }}
+        >
+          <button
+            onClick={() => router.back()}
+            style={{
+              position: 'absolute',
+              left: 16,
+              bottom: 24,
+              background: 'rgba(255,255,255,0.85)',
+              border: 'none',
+              borderRadius: 24,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+              padding: '12px 18px',
+              fontSize: '1.3rem',
+              color: '#6c63ff',
+              zIndex: 201,
+              cursor: 'pointer',
+              fontWeight: 700,
+              transition: 'background 0.2s',
+              pointerEvents: 'auto',
+            }}
+            aria-label="뒤로가기"
+          >
+            ←
+          </button>
+          <button
+            onClick={() => router.push('/')}
+            style={{
+              position: 'absolute',
+              right: 16,
+              bottom: 24,
+              background: 'rgba(255,255,255,0.85)',
+              border: 'none',
+              borderRadius: 24,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+              padding: '12px 18px',
+              fontSize: '1.3rem',
+              color: '#6c63ff',
+              zIndex: 201,
+              cursor: 'pointer',
+              fontWeight: 700,
+              transition: 'background 0.2s',
+              pointerEvents: 'auto',
+            }}
+            aria-label="홈으로"
+          >
+            🏠
+          </button>
+        </div>
         <Section
           style={{
             flex: 1,
