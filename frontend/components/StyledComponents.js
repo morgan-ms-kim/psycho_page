@@ -441,6 +441,9 @@ export const Stats = styled.div`
 `;
 export const StatItem = styled.span`
   font-size: 0.9rem;
+  color: #4a4a4a;  
+  font-weight: 600;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
   opacity: 0.9;
   @media (max-width: 768px) {
     font-size: 0.85rem;
@@ -597,8 +600,12 @@ export const FilterBarLeft = styled.div`
 export const TestCount = styled.div`
   text-align: right;
   font-size: 1.2rem;
+  font-weight: 600;
+  color: #4a4a4a;
   opacity: 0.8;
   min-width: 100px;
+  letter-spacing: 0.02em;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
   margin-left: 16px;
 `;
 

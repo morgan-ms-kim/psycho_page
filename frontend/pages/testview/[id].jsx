@@ -417,7 +417,7 @@ export default function TestPage() {
     alignItems: 'center',
     padding: '24px 0',
   };
-
+/*
   if (loading) {
     return (
       <MainWrap>
@@ -430,7 +430,7 @@ export default function TestPage() {
       </MainWrap>
     );
   }
-
+*/
   const commentCount = comments.length;
   const testUrl = `/tests/${id}/`;
 
