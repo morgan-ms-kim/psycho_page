@@ -469,29 +469,36 @@ export default function TestPage() {
       <Head>
         <title>{test?.title ? `${test.title} - PSYCHO` : '테스트 상세 - PSYCHO'}</title>
       </Head>
-      <MainWrap style={{
-        paddingTop: 0,
-        background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)',
-        width: '100vw',
-        minWidth: '500px',
-        maxWidth: '500px',
-        margin: '0 auto',
-        boxSizing: 'border-box',
-        overflowX: 'hidden',
-      }}>
-        
-        <Section style={{
+      <MainWrap
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          paddingTop: 0,
+          background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)',
+          width: '100vw',
+          minWidth: '500px',
           maxWidth: '500px',
-          margin: '20px auto 0 auto',
-          background: '#fff',
-          borderRadius: 24,
-          boxShadow: '0 8px 40px rgba(80,80,120,0.12)',
-          padding: '0 0 24px 0',
-          maxHeight: '600px',
-          position: 'relative',
-          width: '100%', // 추가: Section도 MainWrap과 동일하게
+          margin: '0 auto',
           boxSizing: 'border-box',
-        }}>
+          overflowX: 'hidden',
+        }}
+      >
+        <Section
+          style={{
+            flex: 1,
+            maxWidth: '500px',
+            margin: '20px auto 0 auto',
+            background: '#fff',
+            borderRadius: 24,
+            boxShadow: '0 8px 40px rgba(80,80,120,0.12)',
+            padding: '0 0 24px 0',
+            maxHeight: '600px',
+            position: 'relative',
+            width: '100%',
+            boxSizing: 'border-box',
+          }}
+        >
           <Header style={{ marginBottom: 0, padding: '0.5rem 2rem 0.5rem 2rem', background: 'rgba(255,255,255,0.05)' }}>
             <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
           </Header>
@@ -524,26 +531,27 @@ export default function TestPage() {
             {iframeSection}
             {/* InfoCard(제목/설명/통계) */}
             <InfoCard as={TestContainer} style={{
-              maxWidth: '500px',
+              maxWidth: '360px',
               minWidth: 0,
-              margin: '0',
+              margin: '0 auto',
               background: '#fff',
-              borderRadius: 24,
-              boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-              padding: '16px 0',
+              borderRadius: 10,
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+              padding: '8px 10px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              width: '100%',
-              flex: '1 1 300px',
-              // 추가: 항상 100%로
-              maxWidth: '100%',
+              width: 'auto',
+              flex: 'none',
+              height: 'auto',
+              minHeight: 0,
+              maxHeight: 'none',
+              overflow: 'visible'
             }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%', textAlign: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%', textAlign: 'center', padding: 0, margin: 0 }}>
                 <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
                 <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다!'}</SubTitle>
                 <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center', width: '100%' }}>
-                  
                   <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={handleLike}>
                     <StatLabel style={{ color: liked ? '#ff5e5e' : '#bbb', fontSize: '1.2rem', transition: 'color 0.2s' }}>
                       {liked ? '❤️' : '🤍'}
