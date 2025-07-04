@@ -2,34 +2,20 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
+import dynamic from 'next/dynamic';
 import {
   MainWrap,
   Header,
   BackButton,
   LoadingWrap,
-  LoadingSpinner,
   ErrorMessage,
   Footer,
-  PrimaryButton,
-  SecondaryButton,
-  QuestionCard,
-  ResultCard,
   InfoCard,
   CommentItem,
-  Input,
-  Textarea,
-  Grid,
-  FlexRow,
   Section,
   CommentSection,
   Title,
   SubTitle,
-  SectionTitle,
-  ProgressBar,
-  ProgressFill,
-  ProgressText,
-  SocialButton,
-  StatItem,
   StatLabel,
   StatValue,
   CommentHeader,
@@ -128,9 +114,9 @@ const IframeRefreshButton = styled.button`
 `;
 
 const TestIframe = styled.iframe`
-  width: 100%;
-  min-width: 100%;
-  max-width: 100%;
+  width: 500px;
+  min-width: 500px;
+  max-width: 500px;
   height: 700px;
   min-height: 600px;
   max-height: 700px;
@@ -399,6 +385,7 @@ export default function TestPage() {
 
   // iframe 렌더링 부분 (단순 고정형 + loading="lazy"만 적용)
   let iframeSection = null;
+  const TestApp = dynamic(() => import(`../../testsources/${id}/TestApp.jsx`), { ssr: false });
   if (!checkedBuild && /^test\d+$/.test(id)) {
     iframeSection = (
       <LoadingWrap style={loadingContainerStyle}>
@@ -429,6 +416,8 @@ export default function TestPage() {
           }}
         />
       </TestContainer>
+
+
     );
   } else {
     iframeSection = (
@@ -453,39 +442,7 @@ export default function TestPage() {
         boxSizing: 'border-box',
         overflowX: 'hidden',
       }}>
-        {/* 광고 컨테이너 - 그대로 */}
-        <div
-          style={{
-            width: '100%',
-            minWidth: 320,
-            maxWidth: 728,
-            margin: '0 auto 24px auto',
-            textAlign: 'center',
-            minHeight: 90,
-            background: '#fff',
-            borderRadius: 12,
-            padding: 16,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            zIndex: 10,
-            display: 'block',
-          }}
-        >
-          <iframe
-            src="/kakao-ad.html"
-            style={{
-              width: '100%',
-              minWidth: 320,
-              maxWidth: 728,
-              height: 90,
-              border: 'none',
-              margin: '0 auto',
-              display: 'block',
-              background: 'transparent',
-            }}
-            scrolling="no"
-            title="카카오광고"
-          />
-        </div>
+        
         <Section style={{
           maxWidth: 1400,
           margin: '40px auto 0 auto',
@@ -630,6 +587,39 @@ export default function TestPage() {
               ))}
             </div>
           </CommentSection>
+          {/* 광고 컨테이너 - 그대로 */}
+        <div
+          style={{
+            width: '100%',
+            minWidth: 320,
+            maxWidth: 728,
+            margin: '0 auto 24px auto',
+            textAlign: 'center',
+            minHeight: 90,
+            background: '#fff',
+            borderRadius: 12,
+            padding: 16,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            zIndex: 10,
+            display: 'block',
+          }}
+        >
+          <iframe
+            src="/kakao-ad.html"
+            style={{
+              width: '100%',
+              minWidth: 320,
+              maxWidth: 728,
+              height: 90,
+              border: 'none',
+              margin: '0 auto',
+              display: 'block',
+              background: 'transparent',
+            }}
+            scrolling="no"
+            title="카카오광고"
+          />
+        </div>
         </Section>
         <Footer style={{ marginTop: '0.5rem' }} />
       </MainWrap>
