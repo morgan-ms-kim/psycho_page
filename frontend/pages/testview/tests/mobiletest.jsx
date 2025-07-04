@@ -453,54 +453,10 @@ export default function MobileTestFrame({ TestComponent, testId }) {
           <IconButton onClick={() => window.history.back()}>←</IconButton>
         </TopBar>
         <div style={{ flex: 1, width: '100%', maxWidth: '500px', marginTop: 56, marginBottom: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 16px' }}>
-          {/* 메인 컨텐츠 영역 */}
-          <div style={{ fontWeight: 'bold', fontSize: '1.2rem', margin: '24px 0 8px 0', textAlign: 'center' }}>모바일 전용 테스트</div>
+          {/* <div style={{ fontWeight: 'bold', fontSize: '1.2rem', margin: '24px 0 8px 0', textAlign: 'center' }}>모바일 전용 테스트</div>
           <div style={{ color: '#888', fontSize: '0.95rem', marginBottom: 16, textAlign: 'center' }}>조회수: {viewCount}</div>
-         {/* 랜덤 코드 생성 섹션 */}
-         <div style={{ marginBottom: 20, padding: '16px', background: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '12px', color: '#fff' }}>랜덤 코드 생성</div>
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                <button 
-                  onClick={handleRandomCode}
-                  style={{ 
-                    padding: '8px 16px', 
-                    borderRadius: '8px', 
-                    background: '#fff', 
-                    color: '#6a5acd', 
-                    border: 'none', 
-                    fontWeight: '500',
-                    cursor: 'pointer'
-                  }}
-                >
-                  랜덤 코드 생성
-                </button>
-                <button 
-                  onClick={handleGenerateResult}
-                  style={{ 
-                    padding: '8px 16px', 
-                    borderRadius: '8px', 
-                    background: '#6c63ff', 
-                    color: '#fff', 
-                    border: 'none', 
-                    fontWeight: '500',
-                    cursor: 'pointer'
-                  }}
-                >
-                  결과 생성
-                </button>
-              </div>
-              {randomCode && (
-                <div style={{ color: '#000', fontSize: '1.2rem', fontWeight: 'bold', textAlign: 'center' }}>
-                  생성된 코드: {randomCode}
-                </div>
-              )}
-              {testResult && (
-                <div style={{ marginTop: '12px', padding: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}>
-                  <div style={{ color: '#fff', fontWeight: 'bold', marginBottom: '8px' }}>테스트 결과:</div>
-                  <div style={{ color: '#e6e6fa' }}>{testResult}</div>
-                </div>
-              )}
-            </div>
+          <div style={{ marginBottom: 20, padding: '16px', background: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}>...</div> */}
+          <TestComponent />
         </div>
         
         <BottomBar>

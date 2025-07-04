@@ -1177,6 +1177,119 @@ app.post('/api/admin/update-all-folder-names', authenticateAdmin, async (req, re
   }
 });
 
+// 템플릿 테스트 등록 (git clone + css 제외 복사)
+app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
+  let steps = {
+    directoryCreated: false,
+    gitCloned: false,
+    filesCopied: false,
+    packageJsonModified: false,
+    npmInstalled: false,
+    buildCompleted: false,
+    databaseSaved: false,
+    thumbnailReady: false
+  };
+  let test = null;
+  try {
+    const { gitUrl, title, description, category } = req.body;
+    if (!gitUrl || !title) {
+      return res.status(400).json({ error: 'Git URL과 제목은 필수입니다.', steps });
+    }
+    let url = gitUrl.endsWith('.git') ? gitUrl : gitUrl + '.git';
+    let thumbnailPath = '/uploads/thumbnails/default-thumb.png';
+    // 1. DB에 insert (임시 folder: null)
+    try {
+      test = await Test.create({
+        title,
+        description: description || '',
+        category: category || '기타',
+        thumbnail: thumbnailPath,
+        folder: null
+      });
+      steps.databaseSaved = true;
+    } catch (error) {
+      return res.status(500).json({ error: 'DB 저장 실패', steps, detail: error.message });
+    }
+    // 2. 실제 id로 폴더명 생성
+    const folderName = `test${test.id}`;
+    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
+    const testPath = path.join(testsDir, folderName);
+    const tmpDir = path.join(process.cwd(), '..', 'tmp-template-' + Date.now());
+    // 기존 폴더가 있으면 삭제
+    if (fs.existsSync(testPath)) {
+      try { fs.rmSync(testPath, { recursive: true, force: true }); } catch {}
+    }
+    if (fs.existsSync(tmpDir)) {
+      try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+    }
+    // 3. git clone (임시 폴더)
+    try {
+      await execAsync(`git clone ${url} ${tmpDir}`, { timeout: 300000 });
+      steps.gitCloned = true;
+    } catch (error) {
+      if (test) await test.destroy();
+      return res.status(400).json({ error: 'Git 클론 실패', steps, detail: error.message });
+    }
+    // 4. css 파일 제외 전체 복사 함수
+    function copyExceptCss(src, dest) {
+      if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+      const items = fs.readdirSync(src, { withFileTypes: true });
+      for (const item of items) {
+        const srcPath = path.join(src, item.name);
+        const destPath = path.join(dest, item.name);
+        if (item.isDirectory()) {
+          copyExceptCss(srcPath, destPath);
+        } else if (!item.name.endsWith('.css')) {
+          fs.copyFileSync(srcPath, destPath);
+        }
+      }
+    }
+    // 5. 복사 실행 (임시폴더 전체 → test폴더, css 제외)
+    try {
+      copyExceptCss(tmpDir, testPath);
+      steps.filesCopied = true;
+    } catch (error) {
+      if (test) await test.destroy();
+      return res.status(500).json({ error: '파일 복사 실패', steps, detail: error.message });
+    }
+    // 6. package.json 수정 (기존 로직과 동일)
+    const packageJsonPath = path.join(testPath, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      try {
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+        packageJson.homepage = `/tests/${folderName}/`;
+        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+        steps.packageJsonModified = true;
+      } catch (error) {
+        if (test) await test.destroy();
+        return res.status(500).json({ error: 'package.json 수정 실패', steps, detail: error.message });
+      }
+    } else {
+      if (test) await test.destroy();
+      return res.status(400).json({ error: 'package.json 없음', steps, path: packageJsonPath });
+    }
+    // 7. test_deploy.sh 실행
+    try {
+      const scriptPath = path.join(process.cwd(), '..', 'test_deploy.sh');
+      await execAsync(`bash ${scriptPath} ${folderName}`, { cwd: testsDir });
+      steps.npmInstalled = true;
+      steps.buildCompleted = true;
+    } catch (error) {
+      if (test) await test.destroy();
+      return res.status(400).json({ error: '테스트 배포 스크립트 실패', steps, detail: error.message });
+    }
+    // 8. folder 컬럼 업데이트
+    test.folder = folderName;
+    await test.save();
+    // 9. 임시폴더 삭제
+    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+    return res.json({ success: true, test, steps, folderName });
+  } catch (error) {
+    if (test) await test.destroy();
+    return res.status(500).json({ error: '서버 오류', steps, detail: error.message });
+  }
+});
+
 app.use('/api/sitemap', sitemapRouter);
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

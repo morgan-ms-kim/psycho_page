@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
 import Link from 'next/link';
+import React from 'react';
 
 const apiClient = axios.create({
   baseURL: 'https://smartpick.website/api',
@@ -74,6 +75,12 @@ export default function TestManagement() {
   const [modalType, setModalType] = useState('info');
   const [cleanupLoading, setCleanupLoading] = useState(false);
   const [cleanupResult, setCleanupResult] = useState(null);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [templateGitUrl, setTemplateGitUrl] = useState('');
+  const [templateTitle, setTemplateTitle] = useState('');
+  const [templateDesc, setTemplateDesc] = useState('');
+  const [templateCategory, setTemplateCategory] = useState('기타');
+  const [templateLoading, setTemplateLoading] = useState(false);
 
   useEffect(() => {
     // 로그인 확인
@@ -142,6 +149,33 @@ export default function TestManagement() {
     setCleanupLoading(false);
   };
 
+  // 템플릿 테스트 추가 핸들러
+  const handleAddTemplateTest = async () => {
+    if (!templateGitUrl || !templateTitle) {
+      showMessage('Git 주소와 제목을 입력하세요.', 'error');
+      return;
+    }
+    setTemplateLoading(true);
+    try {
+      const res = await apiClient.post('/admin/tests/template', {
+        gitUrl: templateGitUrl,
+        title: templateTitle,
+        description: templateDesc,
+        category: templateCategory
+      });
+      showMessage('템플릿 테스트가 추가되었습니다.', 'success');
+      setShowTemplateModal(false);
+      setTemplateGitUrl('');
+      setTemplateTitle('');
+      setTemplateDesc('');
+      setTemplateCategory('기타');
+      loadTests();
+    } catch (e) {
+      showMessage('추가 실패: ' + (e.response?.data?.error || e.message), 'error');
+    }
+    setTemplateLoading(false);
+  };
+
   if (loading) {
     return (
       <Container>
@@ -182,7 +216,12 @@ export default function TestManagement() {
       <Main>
         <PageHeader>
           <PageTitle>테스트 관리</PageTitle>
-          <AddButton href="/tests/add">➕ 새 테스트 추가</AddButton>
+          <div style={{display:'flex',gap:'8px'}}>
+            <AddButton href="/tests/add">➕ 새 테스트 추가</AddButton>
+            <TemplateButton type="button" onClick={()=>setShowTemplateModal(true)}>
+              🧩 새 테스트 추가(템플릿)
+            </TemplateButton>
+          </div>
           <button onClick={handleCleanupOrphanFolders} disabled={cleanupLoading} style={{marginLeft: 16}}>
             {cleanupLoading ? '정리 중...' : '등록되지 않은 폴더 정리'}
           </button>
@@ -194,6 +233,28 @@ export default function TestManagement() {
             </div>
           )}
         </PageHeader>
+
+        {/* 템플릿 테스트 추가 모달 */}
+        {showTemplateModal && (
+          <Modal type="info">
+            <ModalContent>
+              <ModalIcon>🧩</ModalIcon>
+              <ModalMessage>새 테스트(템플릿) 추가</ModalMessage>
+              <div style={{margin:'16px 0',display:'flex',flexDirection:'column',gap:'8px'}}>
+                <input type="text" placeholder="Git 저장소 주소" value={templateGitUrl} onChange={e=>setTemplateGitUrl(e.target.value)} style={{padding:'8px',borderRadius:'4px',border:'1px solid #ccc'}} />
+                <input type="text" placeholder="테스트 제목" value={templateTitle} onChange={e=>setTemplateTitle(e.target.value)} style={{padding:'8px',borderRadius:'4px',border:'1px solid #ccc'}} />
+                <input type="text" placeholder="설명(선택)" value={templateDesc} onChange={e=>setTemplateDesc(e.target.value)} style={{padding:'8px',borderRadius:'4px',border:'1px solid #ccc'}} />
+                <input type="text" placeholder="카테고리(선택)" value={templateCategory} onChange={e=>setTemplateCategory(e.target.value)} style={{padding:'8px',borderRadius:'4px',border:'1px solid #ccc'}} />
+              </div>
+              <div style={{display:'flex',gap:'8px',marginTop:'8px'}}>
+                <button onClick={handleAddTemplateTest} disabled={templateLoading} style={{background:'#667eea',color:'#fff',padding:'8px 16px',border:'none',borderRadius:'4px',fontWeight:'bold',cursor:'pointer'}}>
+                  {templateLoading ? '추가 중...' : '추가'}
+                </button>
+                <button onClick={()=>setShowTemplateModal(false)} style={{background:'#eee',color:'#333',padding:'8px 16px',border:'none',borderRadius:'4px',fontWeight:'bold',cursor:'pointer'}}>취소</button>
+              </div>
+            </ModalContent>
+          </Modal>
+        )}
 
         <TestsGrid>
           {tests.map(test => (
@@ -346,6 +407,23 @@ const PageTitle = styled.h1`
 `;
 
 const AddButton = styled(Link)`
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+`;
+
+const TemplateButton = styled.button`
   background: linear-gradient(45deg, #667eea, #764ba2);
   color: white;
   border: none;

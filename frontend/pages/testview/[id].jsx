@@ -295,60 +295,73 @@ export default function TestPage() {
       }
     })();
   }, [id]);
+
+  // 템플릿 테스트 분기 렌더링
+  const isTemplateTest = test && test.folder && !/^test\d+$/.test(test.folder);
+  let TemplateComponent = null;
+  if (isTemplateTest) {
+    // 예시: src/App.jsx를 동적 import (폴더 구조에 따라 경로 조정)
+    TemplateComponent = dynamic(() => import(`../testview/tests/${test.folder}/src/App.jsx`).catch(() => () => <div>템플릿 컴포넌트 로드 실패</div>), { ssr: false, loading: () => <div>로딩 중...</div> });
+  }
+
   const getIframeContent = () => {
-  if (loading) {
+    if (isTemplateTest && TemplateComponent) {
+      return <TemplateComponent testId={id} />;
+    }
+    if (loading) {
+      return (
+        <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#888'}}>
+          테스트를 불러오는 중...
+        </div>
+      );
+    }
+    if (!checkedBuild && /^test\\d+$/.test(id)) {
+      return (
+        <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#888'}}>
+          테스트 앱 상태를 확인 중...
+        </div>
+      );
+    }
+    if (error) {
+      return (
+        <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#d00'}}>
+          �� {error}
+        </div>
+      );
+    }
+    if (!buildExists) {
+      return (
+        <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#d00'}}>
+          아직 빌드된 테스트 앱이 없습니다.
+        </div>
+      );
+    }
+    // 정상 iframe
     return (
-      <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#888'}}>
-        테스트를 불러오는 중...
-      </div>
+      <TestIframe
+        src={testUrl}
+        title={test?.title || '테스트'}
+        loading="lazy"
+        scrolling="no"
+        style={{
+          width: '100%',
+          minWidth: '100%',
+          maxWidth: '100%',
+          height: '500px',
+          maxHeight: '700px',
+          border: 'none',
+          background: '#fff',
+          borderRadius: '0 0 24px 24px',
+          flex: 1,
+          overflow: 'hidden',
+          display: 'block',
+          position: 'relative',
+          transform: 'translateZ(0)',
+        }}
+      />
     );
-  }
-  if (!checkedBuild && /^test\\d+$/.test(id)) {
-    return (
-      <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#888'}}>
-        테스트 앱 상태를 확인 중...
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#d00'}}>
-        🚫 {error}
-      </div>
-    );
-  }
-  if (!buildExists) {
-    return (
-      <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',color:'#d00'}}>
-        아직 빌드된 테스트 앱이 없습니다.
-      </div>
-    );
-  }
-  // 정상 iframe
-  return (
-    <TestIframe
-      src={testUrl}
-      title={test?.title || '테스트'}
-      loading="lazy"
-      scrolling="no"
-      style={{
-        width: '100%',
-        minWidth: '100%',
-        maxWidth: '100%',
-        height: '500px',
-        maxHeight: '700px',
-        border: 'none',
-        background: '#fff',
-        borderRadius: '0 0 24px 24px',
-        flex: 1,
-        overflow: 'hidden',
-        display: 'block',
-        position: 'relative',
-        transform: 'translateZ(0)',
-      }}
-    />
-  );
-};
+  };
+
   const handleLike = async () => {
     try {
       const testId = getTestIdFromFolder(id);
