@@ -567,6 +567,7 @@ export const TestCount = styled.div`
   margin-bottom: 2rem;
   opacity: 0.8;
   min-width: 100px;
+  margin-left: 16px;
 `;
 // 완전 커스텀 셀렉트 스타일 (항상 동일하게 보이도록)
 const baseSelectStyle = `

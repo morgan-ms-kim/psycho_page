@@ -587,13 +587,13 @@ export default function Home() {
                 <option value="popular">인기순</option>
               </SortSelect>
 
+            </FilterBar>
         <TestCount>
         {loading ? '테스트를 불러오는 중...'
           : searching ? '검색 중...'
           : showNoResults ? '검색 결과가 없습니다'
           : `Total : ${sortedTests.length}`}
       </TestCount>
-            </FilterBar>
           </SearchSection>
 
           {/* 에러 메시지 */}
