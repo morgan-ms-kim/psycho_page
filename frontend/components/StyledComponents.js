@@ -289,16 +289,16 @@ export const Grid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
   width: 100%;
-  gap: 1rem 1rem; /* 카드 사이 간격을 줄임 */
+  gap: 0.8rem 0.8rem; /* 카드 사이 간격을 줄임 */
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 40px; /* 바깥쪽 여백을 넓힘 */
+  padding: 0 2px; /* 바깥쪽 여백을 넓힘 */
   background: rgba(255, 255, 255, 0.1);
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     max-width: 100vw;
-    gap: 15px;
-    padding: 0 15px;
+    gap: 2px;
+    padding: 0 4px;
   }
 `;
 
