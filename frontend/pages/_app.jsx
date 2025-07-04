@@ -26,6 +26,11 @@ export default function App({ Component, pageProps }) {
     // 카카오 광고 로드 함수
     const loadKakaoAd = () => {
       try {
+        // 이미 광고가 로드 중이면 중복 실행 방지
+        if (document.querySelector('.kakao_ad_area')) {
+          return;
+        }
+        
         const isPC = window.matchMedia('(min-width: 728px)').matches;
         const adUnit = isPC ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK';
         const adWidth = isPC ? '728' : '320';
@@ -65,11 +70,14 @@ export default function App({ Component, pageProps }) {
         adElement.setAttribute('data-ad-width', adWidth);
         adElement.setAttribute('data-ad-height', adHeight);
         
-        // 광고 스크립트 생성
+        // 광고 스크립트 생성 (에러 처리 추가)
         const scriptElement = document.createElement('script');
         scriptElement.type = 'text/javascript';
         scriptElement.src = '//t1.daumcdn.net/kas/static/ba.min.js';
         scriptElement.async = true;
+        scriptElement.onerror = () => {
+          console.warn('카카오 광고 스크립트 로드 실패');
+        };
         
         // DOM에 추가
         container.appendChild(adElement);
@@ -88,24 +96,40 @@ export default function App({ Component, pageProps }) {
       loadKakaoAd();
     }
     
-    // 화면 크기 변경 시 광고 다시 로드
+    // 화면 크기 변경 시 광고 다시 로드 (디바운싱 적용)
+    let resizeTimeout;
     const handleResize = () => {
-      setTimeout(loadKakaoAd, 100);
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const adElement = document.querySelector('.kakao_ad_area');
+        if (!adElement || adElement.style.display === 'none') {
+          loadKakaoAd();
+        }
+      }, 500); // 500ms 디바운싱
     };
     window.addEventListener('resize', handleResize);
     
-    // 3초 후에도 광고가 로드되지 않으면 다시 시도
-    setTimeout(() => {
-      const adElement = document.querySelector('.kakao_ad_area');
-      if (!adElement || adElement.style.display === 'none') {
-        console.log('광고 재로드 시도');
-        loadKakaoAd();
-      }
-    }, 3000);
+    // 광고 로드 실패 시 재시도 (최대 2회, 5초 간격)
+    let retryCount = 0;
+    const maxRetries = 2;
+    
+    const retryLoadAd = () => {
+      setTimeout(() => {
+        const adElement = document.querySelector('.kakao_ad_area');
+        if ((!adElement || adElement.style.display === 'none') && retryCount < maxRetries) {
+          retryCount++;
+          console.log(`광고 재로드 시도 ${retryCount}/${maxRetries}`);
+          loadKakaoAd();
+        }
+      }, 5000); // 5초 간격
+    };
+    
+    retryLoadAd();
     
     // 클린업 함수
     return () => {
       window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimeout);
     };
   }, []);
   

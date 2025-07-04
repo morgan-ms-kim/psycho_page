@@ -255,29 +255,30 @@ export const ResultCard = styled(Card)`
 `;
 
 export const InfoCard = styled(Card)`
-  max-width: 500px;
-  min-width: 500px;
-  margin: 2rem auto 0 auto;
-  border-radius: 24px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  padding: 32px 16px;
+  max-width: 400px;
+  min-width: auto;
+  margin: 0.5rem auto 0 auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 12px 16px;
   background: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: fit-content;
 
   @media (max-width: 1200px) {
-    max-width: 98vw;
-    border-radius: 16px;
-    padding: 24px 4px;
+    max-width: 90vw;
+    border-radius: 10px;
+    padding: 10px 12px;
   }
   @media (max-width: 600px) {
-    max-width: 96vw;
-    min-width: 96vw;
+    max-width: 85vw;
+    min-width: auto;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    margin: 0.5rem 0 1.5rem 0;
-    padding: 8px 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    margin: 0.3rem auto 0.8rem auto;
+    padding: 8px 8px;
   }
 `;
 
