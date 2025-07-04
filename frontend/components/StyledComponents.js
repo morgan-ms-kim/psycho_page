@@ -255,8 +255,8 @@ export const ResultCard = styled(Card)`
 `;
 
 export const InfoCard = styled(Card)`
-  max-width: 360px;
-  min-width: 0;
+  max-width: 500px;
+  min-width: 500px;
   margin: 0.2rem auto 0 auto;
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);

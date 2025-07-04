@@ -62,7 +62,7 @@ const TestContainer = styled.div`
   position: relative;
   height: 500px;
   min-height: 400px;
-  max-height: 500px;
+  max-height: 700px;
   width: 100%;
   max-width: 500px;
   min-width: 500px;
