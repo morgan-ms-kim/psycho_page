@@ -385,7 +385,6 @@ export default function TestPage() {
 
   // iframe 렌더링 부분 (단순 고정형 + loading="lazy"만 적용)
   let iframeSection = null;
-  const TestApp = dynamic(() => import(`../../testsources/${id}/TestApp.jsx`), { ssr: false });
   if (!checkedBuild && /^test\d+$/.test(id)) {
     iframeSection = (
       <LoadingWrap style={loadingContainerStyle}>
