@@ -300,13 +300,13 @@ export default function TestPage() {
   const isTemplateTest = test && test.folder && !/^test\d+$/.test(test.folder);
   let TemplateComponent = null;
   if (isTemplateTest) {
-    // 예시: src/App.jsx를 동적 import (폴더 구조에 따라 경로 조정)
-    TemplateComponent = dynamic(() => import(`../testview/tests/${test.folder}/src/App.jsx`).catch(() => () => <div>템플릿 컴포넌트 로드 실패</div>), { ssr: false, loading: () => <div>로딩 중...</div> });
+    // 템플릿 테스트는 index.jsx를 동적 import
+    TemplateComponent = dynamic(() => import(`./tests/${test.folder}/index.jsx`).catch(() => () => <div>템플릿 컴포넌트 로드 실패</div>), { ssr: false, loading: () => <div>로딩 중...</div> });
   }
 
   const getIframeContent = () => {
     if (isTemplateTest && TemplateComponent) {
-      return <TemplateComponent testId={id} />;
+      return <TemplateComponent />;
     }
     if (loading) {
       return (

@@ -1211,8 +1211,8 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
     } catch (error) {
       return res.status(500).json({ error: 'DB 저장 실패', steps, detail: error.message });
     }
-    // 2. 실제 id로 폴더명 생성
-    const folderName = `test${test.id}`;
+    // 2. 실제 id로 폴더명 생성 (템플릿 테스트는 다른 폴더명 사용)
+    const folderName = `template${test.id}`;
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
     const testPath = path.join(testsDir, folderName);
     const tmpDir = path.join(process.cwd(), '..', 'tmp-template-' + Date.now());
