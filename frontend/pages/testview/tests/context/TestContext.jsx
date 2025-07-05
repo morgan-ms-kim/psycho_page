@@ -1,12 +1,12 @@
-// contexts/TestContext.js
-
 import React, { createContext, useContext, useState } from 'react';
 
+// TestContext 생성
 const TestContext = createContext();
 
+// TestProvider 컴포넌트
 export const TestProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  
+  const [user, setUser] = useState(null); // 사용자 상태 관리
+
   const value = {
     user,
     setUser,
@@ -19,6 +19,7 @@ export const TestProvider = ({ children }) => {
   );
 };
 
+// useTestContext 훅
 export const useTestContext = () => {
   const context = useContext(TestContext);
   if (context === undefined) {
