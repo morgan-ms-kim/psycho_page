@@ -1,3 +1,5 @@
+// contexts/TestContext.js
+
 import React, { createContext, useContext, useState } from 'react';
 
 const TestContext = createContext();
@@ -23,4 +25,4 @@ export const useTestContext = () => {
     throw new Error('useTestContext must be used within a TestProvider');
   }
   return context;
-}; 
+};
