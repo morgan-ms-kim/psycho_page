@@ -1,18 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { TestProvider, useTestContext } from './context/TestContext';
 // import axios from 'axios';
 
-// 공통 Context 생성
-const TestContext = createContext();
-export function useTestContext() {
-  return useContext(TestContext);
-}
-
-  // const apiClient = axios.create({
-  //   baseURL: 'https://smartpick.website/api',
-  //   timeout: 10000,
-  //   headers: { 'Content-Type': 'application/json' },
-  // });
+// const apiClient = axios.create({
+//   baseURL: 'https://smartpick.website/api',
+//   timeout: 10000,
+//   headers: { 'Content-Type': 'application/json' },
+// });
 
 const MainFrame = styled.div`
   width: 100%;
@@ -169,7 +164,6 @@ const RecommendCard = styled.div`
 
 // 프레임 컴포넌트
 export default function MobileTestFrame({ TestComponent, testId }) {
-  const [user, setUser] = useState({ name: '테스트유저' }); // 더미 유저
   const [comments, setComments] = useState([{ text: '샘플 댓글입니다.' }]); // 더미 댓글
   const [likes, setLikes] = useState(0);
   const [viewCount, setViewCount] = useState(0);
@@ -206,13 +200,9 @@ export default function MobileTestFrame({ TestComponent, testId }) {
 
   // 결과 저장
   const saveResult = async (result) => {
-    if (!user) return alert('로그인 필요');
     // await axios.post(`/api/tests/${testId}/result`, { userId: user.id, result });
     alert('결과 저장(더미)!');
   };
-
-  // Context로 하위에 전달
-  const value = { user, comments, likes, addComment, like, saveResult };
 
   useEffect(() => {
     // URL 파라미터에서 모달 상태 확인
@@ -446,7 +436,7 @@ export default function MobileTestFrame({ TestComponent, testId }) {
   };
 
   return (
-    <TestContext.Provider value={value}>
+    <TestProvider>
       <MainFrame>
         <TopBar style={{ background: '#6a5acd' }}>
           <IconButton onClick={() => window.location.href = '/'}>🏠</IconButton>
@@ -537,6 +527,6 @@ export default function MobileTestFrame({ TestComponent, testId }) {
           </ModalBody>
         </ModalSheet>
       </MainFrame>
-    </TestContext.Provider>
+    </TestProvider>
   );
 }
