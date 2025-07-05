@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { TestProvider} from '../../../components/context/TestContext';
 // import axios from 'axios';
 
 // const apiClient = axios.create({
@@ -436,7 +435,6 @@ export default function MobileTestFrame({ TestComponent, testId }) {
   };
 
   return (
-    <TestProvider>
       <MainFrame>
         <TopBar style={{ background: '#6a5acd' }}>
           <IconButton onClick={() => window.location.href = '/'}>🏠</IconButton>
@@ -527,6 +525,5 @@ export default function MobileTestFrame({ TestComponent, testId }) {
           </ModalBody>
         </ModalSheet>
       </MainFrame>
-    </TestProvider>
   );
 }
