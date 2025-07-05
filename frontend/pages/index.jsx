@@ -515,6 +515,9 @@ export default function Home() {
     <>
       <Head>
         <title>PSYCHO - 심리테스트</title>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-848040041408559"
+          crossOrigin="anonymous"
+        />  
       </Head>
       <MainWrap style={{minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
         <Section style={sectionContainerStyle}>
