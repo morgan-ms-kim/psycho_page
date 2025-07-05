@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useTestContext } from '/components/context/TestContext';
 
+import { TestProvider } from '/context/TestContext'; // TestProvider 임포트
 export default function TestSample() {
   const { user } = useTestContext(); // TestContext에서 user 정보를 가져옴
   const [result, setResult] = useState('');
