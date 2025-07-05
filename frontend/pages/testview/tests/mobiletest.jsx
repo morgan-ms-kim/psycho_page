@@ -444,7 +444,7 @@ export default function MobileTestFrame({ TestComponent, testId }) {
           {/* <div style={{ fontWeight: 'bold', fontSize: '1.2rem', margin: '24px 0 8px 0', textAlign: 'center' }}>모바일 전용 테스트</div>
           <div style={{ color: '#888', fontSize: '0.95rem', marginBottom: 16, textAlign: 'center' }}>조회수: {viewCount}</div>
           <div style={{ marginBottom: 20, padding: '16px', background: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}>...</div> */}
-          <TestComponent />
+          
         </div>
         
         <BottomBar>
