@@ -1,6 +1,6 @@
 // pages/testview/tests/TestSample.js
 import React, { useState } from 'react';
-import { TestProvider, useTestContext } from '../../../../components/context/TestContext'; // TestProvider 임포트
+import { TestProvider, useTestContext } from '../../../components/context/TestContext'; // TestProvider 임포트
 export default function TestSample() {
   const { user } = useTestContext(); // TestContext에서 user 정보를 가져옴
   const [result, setResult] = useState('');

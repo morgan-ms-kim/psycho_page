@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { TestProvider} from '../../../../components/context/TestContext';
+import { TestProvider} from '../../../components/context/TestContext';
 // import axios from 'axios';
 
 // const apiClient = axios.create({
