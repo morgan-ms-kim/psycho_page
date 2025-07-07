@@ -14,6 +14,7 @@ import {
   Logo,
   Stats,
   StatItem,
+  PageButton,
   HistoryButton,
   SearchSection,
   SearchBar,
@@ -60,7 +61,7 @@ const getApiBase = () => {
 const sectionContainerStyle = {
   maxWidth: 1200,
   //minWidth: 1200,
-  margin: '32px auto 0 auto',
+  margin: '15px auto 0 auto',
   background: '#fff',
   borderRadius: 18,
   boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
@@ -419,10 +420,14 @@ export default function Home() {
     }
   };
 
+
+  
+  
   // 더 많은 테스트 로드 (무한 스크롤)
   const loadMore = () => {
-    if (!loadingMore && hasMore) {
+    if (!loadingMore && hasMore && !loading && !searching && !showNoResults ) {
       setPage(prev => prev + 1);
+      //setLoadingMore(false);
     }
   };
 
@@ -564,19 +569,11 @@ export default function Home() {
             }} style={{ cursor: 'pointer' }}>
               <span style={{ color: 'initial', filter: 'none' }}>🧠</span> PSYCHO
             </Logo>
-            <Stats>
-              {/*<StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>*/}
-              <StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>
-              {/*<StatItem>📈 Week: {visitorStats.week.toLocaleString()}</StatItem>*/}
-              <StatItem style={{ 
-                color: apiStatus === 'connected' ? '#4CAF50' : 
-                       apiStatus === 'failed' ? '#f44336' : '#ff9800',
-                fontWeight: 'bold'
-              }}>
-                {apiStatus === 'connected' ? '🟢' : 
-                 apiStatus === 'failed' ? '🔴' : '🟡'}
-              </StatItem>
-            </Stats>
+
+            <PageButton onClick={() => router.push('/lotto/page')}>
+              로또
+            </PageButton>
+
             <HistoryButton onClick={() => router.push('/history')}>
               📋 기록보기
             </HistoryButton>
@@ -592,6 +589,21 @@ export default function Home() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               <SearchButton>🔍</SearchButton>
+
+              
+            <Stats>
+              {/*<StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>*/}
+              <StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>
+              {/*<StatItem>📈 Week: {visitorStats.week.toLocaleString()}</StatItem>*/}
+              <StatItem style={{ 
+                color: apiStatus === 'connected' ? '#4CAF50' : 
+                       apiStatus === 'failed' ? '#f44336' : '#ff9800',
+                fontWeight: 'bold'
+              }}>
+                {apiStatus === 'connected' ? '🟢' : 
+                 apiStatus === 'failed' ? '🔴' : '🟡'}
+              </StatItem>
+            </Stats>
             </SearchBar>
             
             <FilterCountBar>

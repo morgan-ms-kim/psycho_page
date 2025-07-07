@@ -158,6 +158,8 @@ export const PrimaryButton = styled.button`
   }
 `;
 
+
+
 export const SecondaryButton = styled.button`
   background: rgba(255,255,255,0.2);
   border: 1px solid rgba(255,255,255,0.3);
@@ -196,9 +198,13 @@ export const Grid = styled.div`
   width: 100%;
   max-width: 1200px;
   min-width: 320px;
-  gap: 0.1rem 0.1rem; /* 카드 간격 더 좁게 */
   margin: 0 auto;
-  padding: 0 8px; /* 바깥쪽 여백 넓힘 */
+  /* 바깥쪽 여백 넓힘 */
+  padding-left: 100px;
+  padding-right: 100px;
+  padding-top: 25px;
+  grid-row-gap: 50px;
+
   background: rgba(255, 255, 255, 0.1);
   box-sizing: border-box;
   @media (max-width: 900px) {
@@ -343,7 +349,7 @@ export const Section = styled.div`
   max-width: 1200px;
   min-width: 320px;
 
-  margin: 0 auto 30px;
+  margin: 0 1px;
   padding: 0 20px;
   display: flex;
   flex-direction: column;
@@ -453,6 +459,21 @@ export const StatItem = styled.span`
   }
 `;
 
+export const PageButton = styled(SecondaryButton)`
+  font-size: 0.9rem;
+  padding: 10px 15px;
+  
+  color: #000 !important;
+  border: none;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(127,127,213,0.08);
+  &:hover {
+    background: #b3aaff !important;
+    color: #222 !important;
+  }
+`;
+
+
 export const HistoryButton = styled(SecondaryButton)`
   font-size: 0.9rem;
   padding: 10px 15px;
@@ -471,7 +492,7 @@ export const SearchSection = styled.div`
   width: 100%;
   max-width: 800px;
   min-width: 0;
-  margin: 0 auto 30px;
+  margin: 0 auto 00px;
   padding: 0 8px;
   box-sizing: border-box;
   @media (max-width: 600px) {
@@ -581,7 +602,7 @@ export const FilterCountBar = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin: 18px 0 18px 0;
+  margin: 18px 0 0 0;
   gap: 12px;
   @media (max-width: 600px) {
     flex-direction: column;

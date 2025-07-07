@@ -903,7 +903,7 @@ app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
     // userAgent로 봇 여부 판별
     const isBot = (ua) => {
       if (!ua) return false;
-      const botKeywords = ['bot', 'spider', 'crawl', 'slurp', 'baidu', 'bing', 'duckduck', 'yeti', 'naver', 'daum'];
+      const botKeywords = ['bot', 'spider', 'crawl', 'slurp', 'baidu', 'bing', 'duckduck', 'yeti', 'naver', 'daum', 'googlebot'];
       return botKeywords.some(k => ua.toLowerCase().includes(k));
     };
     const visitorsWithBot = visitors.rows.map(v => {
