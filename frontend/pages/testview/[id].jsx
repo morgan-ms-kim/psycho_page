@@ -73,7 +73,8 @@ const TestContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 0;
+  padding: 0;
+  margin: 0;
   overflow: hidden;
   box-sizing: border-box;
   @media (max-width: 1000px) {

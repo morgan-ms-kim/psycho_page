@@ -159,9 +159,28 @@ export const PrimaryButton = styled.button`
 `;
 
 
+export const PageButton = styled.button`
+  background: rgba(255, 255, 255);
+  border: none;
+  padding: 0;
+
+  width: 120px;
+  height: 50px;
+  border-radius: 10px;
+  box-shadow: none;
+  color: black;
+  cursor: pointer;
+  font-size: 1rem;
+  
+  &:hover {
+  
+    font-size: 1.1rem;
+    background: rgba(255,255,255);
+  }
+`;
 
 export const SecondaryButton = styled.button`
-  background: rgba(255,255,255,0.2);
+  background: rgba(3, 3, 3, 0.2);
   border: 1px solid rgba(255,255,255,0.3);
   color: white;
   padding: 15px 25px;
@@ -449,6 +468,7 @@ export const Stats = styled.div`
 `;
 export const StatItem = styled.span`
   font-size: 0.9rem;
+  min-width: 70px;
   color: #4a4a4a;  
   font-weight: 600;
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
@@ -456,20 +476,6 @@ export const StatItem = styled.span`
   @media (max-width: 768px) {
     font-size: 0.85rem;
     padding: 0 2px;
-  }
-`;
-
-export const PageButton = styled(SecondaryButton)`
-  font-size: 0.9rem;
-  padding: 10px 15px;
-  
-  color: #000 !important;
-  border: none;
-  font-weight: bold;
-  box-shadow: 0 2px 8px rgba(127,127,213,0.08);
-  &:hover {
-    background: #b3aaff !important;
-    color: #222 !important;
   }
 `;
 
@@ -521,7 +527,7 @@ export const SearchBar = styled.div`
 
 export const SearchInput = styled.input`
   flex: 1;
-  min-width: 0;
+  min-width: 320px;
   width: 100%;
   box-sizing: border-box;
   background: #fff;
@@ -556,12 +562,13 @@ export const KakaoAdContainer = styled.div`
     padding: 16px 0 0 0;
   }
 `;
+
 export const SearchButton = styled.button`
   width: 40px;
   height: 40px;
   min-width: 40px;
   margin-left: 8px;
-  background: linear-gradient(45deg, #ff6b6b, #ffa500);
+  background: linear-gradient(45deg, #7f7fd5, #b3aaff);
   border: none;
   border-radius: 50%;
   color: #fff;
@@ -579,7 +586,8 @@ export const SearchButton = styled.button`
     margin-left: 6px;
   }
   &:hover {
-    background: linear-gradient(45deg, #ffa500, #ff6b6b);
+  
+    background: linear-gradient(90deg, #b3aaff, #7f7fd5);
   }
 `;
 export const FilterBar = styled.div`

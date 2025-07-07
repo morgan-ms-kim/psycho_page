@@ -571,7 +571,7 @@ export default function Home() {
             </Logo>
 
             <PageButton onClick={() => router.push('/lotto/page')}>
-              로또
+              로또 번호<br></br>생성기
             </PageButton>
 
             <HistoryButton onClick={() => router.push('/history')}>
@@ -709,6 +709,7 @@ const TestThumbnailContainer = styled.div`
   position: relative;
   margin-bottom: 15px;
   width: 100%;
+  min-width: 320px;
   height: 180px;
   display: flex;
   align-items: center;
