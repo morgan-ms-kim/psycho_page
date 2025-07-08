@@ -1423,11 +1423,9 @@ app.post('/api/lotto/update', async (req, res) => {
     // 최초에는 1회차부터 최신까지 모두 저장
     while (true) {
       const apiUrl = `https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${n}`;
-      const fetch = (await import('node-fetch')).default;
       const resApi = await fetch(apiUrl);
       const data = await resApi.json();
       if (data.returnValue !== 'success') break;
-      console.log('data.drwNo : ' + data.drwNo);
       // 이미 DB에 있으면 저장하지 않음
       const exists = await LottoDraw.findOne({ where: { drawNo: data.drwNo } });
       if (!exists) {
