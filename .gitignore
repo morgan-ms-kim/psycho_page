@@ -11,4 +11,5 @@
 /admin/package-lock.json
 /admin/.next/
 /frontend/pages/testview/tests/elite-quiz2/
-frontend/pages/testview/tests/elite-quiz2
+/frontend/pages/testview/tests/elite-quiz2
+/frontend/pages/testview/tests/template*

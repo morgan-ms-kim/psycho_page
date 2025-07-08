@@ -818,9 +818,10 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
     // 2. 실제 id로 폴더명 생성 (템플릿 테스트는 다른 폴더명 사용)
     const folderName = `template${test.id}`;
     test.folder = folderName;
-    const testsDir = path.join(process.cwd(), '..', 'frontend', 'pages','testview', 'tests');
+    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
     const testPath = path.join(testsDir, folderName);
     const tmpDir = path.join(process.cwd(), '..', 'tmp-template-' + Date.now());
+    console.log(testsDir ,testPath, tmpDir);
     // 기존 폴더가 있으면 삭제
     if (fs.existsSync(testPath)) {
       try { fs.rmSync(testPath, { recursive: true, force: true }); } catch {}

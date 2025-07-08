@@ -6,8 +6,8 @@ import Link from 'next/link';
 import ThumbnailUploader from '../../components/ThumbnailUploader';
 
 const apiClient = axios.create({
-  //baseURL: 'https://smartpick.website/api',
-  baseURL: 'http://localhost:4000/api',
+  baseURL: 'https://smartpick.website/api',
+  //baseURL: 'http://localhost:4000/api',
   headers: {
     'Content-Type': 'application/json',
   }
