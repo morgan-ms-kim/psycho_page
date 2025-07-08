@@ -165,30 +165,30 @@ const Visitor = sequelize.define('Visitor', {
 
 const LottoDraw = sequelize.define('LottoDraw', {
   drawNo: {
-    type: DataTypes.INTEGER,
+    type: Sequelize.INTEGER,
     primaryKey: true,
     allowNull: false,
     unique: true,
   },
   numbers: {
-    type: DataTypes.STRING, // 예: '1,2,3,4,5,6'
+    type: Sequelize.STRING, // 예: '1,2,3,4,5,6'
     allowNull: false,
   },
   bonus: {
-    type: DataTypes.INTEGER,
+    type: Sequelize.INTEGER,
     allowNull: false,
   },
   drawDate: {
-    type: DataTypes.DATE,
+    type: Sequelize.DATE,
     allowNull: true,
   },
   createdAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
   },
   updatedAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
   },
 });
 
