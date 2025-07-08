@@ -14,8 +14,7 @@ router.get('/sitemap.xml', async (req, res) => {
     let urls = [
       "",
       "/history",
-      ...testIds.map(id => `/testview/${id}`),
-      ...testIds.map(id => `/tests/${id}/`)
+      ...testIds.map(id => `/testview/${id}`)
     ];
     const uniqueUrls = [...new Set(urls)];
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
