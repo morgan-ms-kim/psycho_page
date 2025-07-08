@@ -24,7 +24,7 @@ cp -r out/* /var/www/html/psycho_page/
 # PM2 완전 재시작
 echo "🔄 PM2 완전 재시작 중..."
 #pm2 delete psycho-frontend
-pm2 restart all
+pm2 restart main-frontend
 #start npm --name "psycho-frontend" -- start
 
 echo "✅ 배포 완료!"

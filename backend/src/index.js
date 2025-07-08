@@ -1013,7 +1013,7 @@ app.get('/api/admin/tests/:repo/log', authenticateAdmin, (req, res) => {
 // 방문자 통계 (상세)
 app.get('/api/admin/analytics', authenticateAdmin, async (req, res, next) => {
   try {
-    const { period = 'day', start, end } = req.query;
+    const { period = 'day', limit = 30, start, end } = req.query;
     let startDate = new Date();
     let groupBy = 'DATE(CONVERT_TZ(visitedAt, "+00:00", "+09:00"))';
     let endDate = null;

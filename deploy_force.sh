@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 강력한 배포 스크립트
-echo "🚀 약한 배포 시작..."
+echo "🚀 강력한 배포 시작..."
 
 # 프로젝트 디렉토리로 이동
 cd /var/www/html/psycho_page
@@ -14,6 +14,15 @@ git pull
 echo "📁 프론트엔드 디렉토리로 이동..."
 cd frontend
 
+# 완전한 캐시 삭제
+echo "🗑️ 캐시 삭제 중..."
+rm -rf .next
+rm -rf node_modules/.cache
+
+# 의존성 재설치 
+echo "📦 의존성 재설치 중.."
+rm -rf node_modules package-lock.json
+npm install
 
 # 빌드
 echo "🔨 빌드 중..."
@@ -23,6 +32,16 @@ npm run build
 # 관리자 디렉토리로 이동
 echo "📁 관리자 디렉토리로 이동..."
 cd /var/www/html/psycho_page/admin
+
+# 완전한 캐시 삭제
+echo "🗑️ 캐시 삭제 중..."
+rm -rf .next
+rm -rf node_modules/.cache
+
+# 의존성 재설치
+echo "📦 의존성 재설치 중..."
+rm -rf node_modules package-lock.json
+npm install
 
 # 빌드
 echo "🔨 빌드 중..."
