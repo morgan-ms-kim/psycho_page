@@ -164,6 +164,35 @@ const Visitor = sequelize.define('Visitor', {
   },
 });
 
+const LottoDraw = sequelize.define('LottoDraw', {
+  drawNo: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    allowNull: false,
+    unique: true,
+  },
+  numbers: {
+    type: DataTypes.STRING, // 예: '1,2,3,4,5,6'
+    allowNull: false,
+  },
+  bonus: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  drawDate: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+});
+
 // 관계 정의
 Test.hasMany(Comment, { foreignKey: 'testId' });
 Comment.belongsTo(Test, { foreignKey: 'testId' });
