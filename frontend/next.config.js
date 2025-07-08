@@ -7,15 +7,7 @@ const nextConfig = {
   },
   experimental: {
     forceSwcTransforms: true,
-  },
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.js$|\.jsx$|\.ts$|\.tsx$|\.css$/,
-      exclude: [
-        path.resolve(__dirname, 'tests'),
-      ],
-    });
-    return config;
+    excludeFiles: ['tests/**/*'], // tests 폴더 전체 제외
   },
 };
 
