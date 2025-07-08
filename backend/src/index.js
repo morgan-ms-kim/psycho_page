@@ -894,7 +894,7 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
     }
     // 8. folder 컬럼 업데이트
     test.folder = folderName;
-    console.log('DB 폴더:'+test.folder+'입력 폴더:'+folderName);
+    console.log('DB 폴더:'+test.folder+' | 입력 폴더:'+folderName);
     await test.save();
     // 9. 임시폴더 삭제
     try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
