@@ -10,8 +10,9 @@
 /admin/node_modules/
 /admin/package-lock.json
 /admin/.next/
+/frontend/tests/
+\frontend\tests\
 /frontend/pages/testview/tests/elite-quiz2/
 /frontend/pages/testview/tests/elite-quiz2
 /frontend/pages/testview/tests/template88/
 /frontend/pages/testview/tests/template89/
-/frontend/tests/template74/
