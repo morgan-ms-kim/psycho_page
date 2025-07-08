@@ -233,7 +233,7 @@ export default function TestPage() {
               //test.txt
               console.log(e2);
               const importPath = `../../tests/${test.folder}/src/App.tsx`;
-              tried.push(importPath);
+              tried.push(importPath); 
               console.log('import 시도:', importPath);
               const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.tsx`), {
               loading: () => <p>로딩 중...</p>,
