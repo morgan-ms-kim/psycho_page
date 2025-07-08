@@ -8,6 +8,17 @@ const nextConfig = {
   /*experimental: {
     forceSwcTransforms: true,
   },*/
+  webpack(config, options) {
+    config.plugins.push(
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^\.\/tests\//, // 또는 /tests\//
+      })
+    );
+  },
+
+
+
+
 };
 
 module.exports = nextConfig;

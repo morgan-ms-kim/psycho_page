@@ -28,7 +28,7 @@ import {
 } from '../../components/StyledComponents';
 import Image from 'next/image';
 import Head from 'next/head';
-import MobileTestFrame from './tests/mobiletest.jsx';
+import MobileTestFrame from './mobiletest.jsx';
 
 const apiClient = axios.create({
   baseURL: 'https://smartpick.website/api',
