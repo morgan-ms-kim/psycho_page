@@ -203,7 +203,7 @@ export default function TestPage() {
       const tryImport = async () => {
         let tried = [];
         try {
-          const importPath = `../../tests/${test.folder}/src/App.js`;
+          const importPath = `../../tests/${test.folder}/src/App.jsx`;
           tried.push(importPath);
           console.log('import 시도:', importPath);
           const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.js`), {
@@ -218,7 +218,7 @@ export default function TestPage() {
         } catch (e1) {
           try {
             console.log(e1);
-            const importPath = `../../tests/${test.folder}/src/App.jsx`;
+            const importPath = `../../tests/${test.folder}/src/App.js`;
             tried.push(importPath);
             console.log('import 시도:', importPath);
             const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.jsx`), {
