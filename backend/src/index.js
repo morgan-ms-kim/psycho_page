@@ -1419,21 +1419,28 @@ app.post('/api/lotto/update', async (req, res) => {
     let startNo = latest ? latest.drawNo + 1 : 1;
     let n = startNo;
     let inserted = 0;
+    let empty = !latest;
+    // 최초에는 1회차부터 최신까지 모두 저장
     while (true) {
       const apiUrl = `https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${n}`;
       const fetch = (await import('node-fetch')).default;
       const resApi = await fetch(apiUrl);
       const data = await resApi.json();
       if (data.returnValue !== 'success') break;
-      await LottoDraw.create({
-        drawNo: data.drwNo,
-        numbers: [data.drwtNo1, data.drwtNo2, data.drwtNo3, data.drwtNo4, data.drwtNo5, data.drwtNo6].join(','),
-        bonus: data.bnusNo,
-        drawDate: data.drwNoDate
-      });
-      inserted++;
+      // 이미 DB에 있으면 저장하지 않음
+      const exists = await LottoDraw.findOne({ where: { drawNo: data.drwNo } });
+      if (!exists) {
+        await LottoDraw.create({
+          drawNo: data.drwNo,
+          numbers: [data.drwtNo1, data.drwtNo2, data.drwtNo3, data.drwtNo4, data.drwtNo5, data.drwtNo6].join(','),
+          bonus: data.bnusNo,
+          drawDate: data.drwNoDate
+        });
+        inserted++;
+      }
       n++;
-      if (n > startNo + 100) break; // 안전장치
+      // 최초에는 1회차부터 1000회 이상 반복 허용, 이후에는 100회 제한
+      if ((empty && n > 2000) || (!empty && n > startNo + 100)) break;
     }
     res.json({ success: true, inserted });
   } catch (e) {
