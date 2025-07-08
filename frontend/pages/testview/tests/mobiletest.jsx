@@ -587,8 +587,8 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
   >✕</button>
         </ModalHeader>
         <ModalBody>
-          <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 8, color: '#fff' }}>{test.title}</div>
-          <div style={{ color: '#e6e6fa', marginBottom: 16 }}>{test.description}</div>
+          <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 8, color: '#fff' }}>{test?.title || '테스트'}</div>
+          <div style={{ color: '#e6e6fa', marginBottom: 16 }}>{test?.description || '테스트 설명'}</div>
           
          
           
