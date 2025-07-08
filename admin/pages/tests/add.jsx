@@ -6,7 +6,8 @@ import Link from 'next/link';
 import ThumbnailUploader from '../../components/ThumbnailUploader';
 
 const apiClient = axios.create({
-  baseURL: 'https://smartpick.website/api',
+  //baseURL: 'https://smartpick.website/api',
+  baseURL: 'http://localhost:4000/api',
   headers: {
     'Content-Type': 'application/json',
   }
@@ -185,8 +186,20 @@ export default function AddTest() {
       addLog('제목: ' + formData.title);
       console.log('🔄 테스트 추가 시작:', formData);
       setCurrentStep('테스트 추가 중...');
+      let response
+      if(selected === '1'){
+        addLog('일반 테스트 제목: ' + formData.title);
+        console.log('일반 테스트 제목: ' + formData.title);
+        console.log(apiClient.url);
+        response = await apiClient.post('/admin/tests/add', { ...formData, gitUrl }, { timeout: 300000 });
+      }
+      else if(selected === '2'){
+        addLog('템플릿 테스트 제목: ' + formData.title);
+        console.log('템플릿 테스트 제목: ' + formData.title);
+        console.log(apiClient.url);
+        response = await apiClient.post('/admin/tests/template', { ...formData, gitUrl }, { timeout: 300000 });
+      }
       
-      const response = await apiClient.post('/admin/tests/add', { ...formData, gitUrl }, { timeout: 300000 });
       addLog('API 응답: ' + JSON.stringify(response.data));
       
       console.log('✅ 테스트 추가 성공:', response.data);
@@ -261,7 +274,14 @@ export default function AddTest() {
       showMessage('테스트가 성공적으로 추가되었습니다!', 'success');
       
       // 테스트 등록 완료 후 해당 테스트 페이지로 이동
-      const testUrl = `/tests/test${response.data.test.id}/`;
+      let testUrl = null;
+      let templateString = 'template';
+      if(response.data.test.folder === templateString){
+        testUrl = `/test/${templateString+response.data.test.id}/`;
+      }else {
+        testUrl = `/tests/test${response.data.test.id}/`;
+      }
+      
       addLog('🔗 테스트 페이지: ' + testUrl);
       
       // 3초 후 테스트 페이지로 이동
@@ -303,7 +323,9 @@ export default function AddTest() {
     // 히스토리를 완전히 초기화하고 로그인 페이지로 강제 이동
     window.location.href = '/admin';
   };
-
+  
+  const [selected, setSelected] = useState('2');
+     
   return (
     <Container>
       <Header>
@@ -368,6 +390,22 @@ export default function AddTest() {
           
           <Form onSubmit={handleSubmit}>
             <FormGroup>
+            <RadioLabel>
+              <RadioOption
+                label="일반 테스트"
+                name="example"
+                value="1"
+                checked={selected === '1'}
+                onChange={() => setSelected('1')}
+              />
+              <RadioOption
+                label="템플릿 테스트"
+                name="example"
+                value="2"
+                checked={selected === '2'}
+                onChange={() => setSelected('2')}
+              />
+              </RadioLabel>
               <Label>Git 저장소 URL *</Label>
               <Input
                 type="url"
@@ -441,7 +479,7 @@ export default function AddTest() {
                 취소
               </CancelButton>
               <SubmitButton type="submit" disabled={loading}>
-                {loading ? '추가 중...' : '테스트 추가'}
+                {loading ? '추가 중...' : '테스트 추가'+ selected}
               </SubmitButton>
             </ButtonGroup>
           </Form>
@@ -574,7 +612,58 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  
 `;
+
+const HiddenRadio = styled.input.attrs({ type: 'radio' })`
+  opacity: 0;
+  position: absolute;
+`;
+
+const CustomRadio = styled.span`
+  width: 16px;
+  height: 16px;
+  border: 2px solid #333;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 3px;
+  position: relative;
+
+  ${HiddenRadio}:checked + &::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background:rgb(164, 39, 223);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+  }
+`;
+
+const RadioLabel = styled.label`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: 1px;
+  padding-right : 10px;
+`;
+
+
+
+const RadioOption = ({ label, name, value, checked, onChange }) => (
+  <RadioLabel>
+    <HiddenRadio
+      name={name}
+      value={value}
+      checked={checked}
+      onChange={onChange}  
+    />
+    <CustomRadio />
+    {label}
+  </RadioLabel>
+);
 
 const FormGroup = styled.div`
   display: flex;

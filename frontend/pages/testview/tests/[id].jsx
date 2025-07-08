@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { router } from 'next/router';
 import styled from 'styled-components';
-import axios from 'axios';
 
-const apiClient = axios.create({
-  //우분투용
-  baseURL: 'https://smartpick.website/api', // 실제 API 주소로 변경 필요
-  //윈도우용
-  baseURL: 'http://localhost:4000/api', // 실제 API 주소로 변경 필요
-  timeout: 10000,
-  headers: { 'Content-Type': 'application/json' },
-});
+import dynamic from 'next/dynamic';
+// import axios from 'axios';
+
+// const apiClient = axios.create({
+//   baseURL: 'https://smartpick.website/api',
+//   timeout: 10000,
+//   headers: { 'Content-Type': 'application/json' },
+// });
 
 const MainFrame = styled.div`
   width: 100%;
   max-width: 500px;
-  height
   min-height: 100vh;
   margin: 0 auto;
   background: #f8f9fa;
@@ -36,10 +35,20 @@ const TopBar = styled.div`
   padding: 12px 16px 0 16px;
   position: fixed;
   top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 `;
 
+const IconButton = styled.button`
+  background: none;
+  border: none;
+  padding: 8px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: 8px;
+`;
 
 const BottomBar = styled.div`
   width: 100%;
@@ -47,6 +56,8 @@ const BottomBar = styled.div`
   margin: 0 auto;
   position: fixed;
   bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   background: #6a5acd;
   display: flex;
   align-items: center;
@@ -54,17 +65,6 @@ const BottomBar = styled.div`
   padding: 8px 0;
   box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
   z-index: 10;
-`;
-
-const IconButton = styled.button`
-
-  max-Width:50px;
-  background: none;
-  border: none;
-  padding: 8px;
-  font-size: 1.5rem;
-  cursor: pointer;
-  margin-right: 8px;
 `;
 
 const ActionWrap = styled.span`
@@ -91,6 +91,8 @@ const ModalOverlay = styled.div`
 
 const ModalSheet = styled.div`
   position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 0;
   width: 100%;
   max-width: 500px;
@@ -120,23 +122,14 @@ const ModalBody = styled.div`
 `;
 
 const CommentInputRow = styled.div`
-text-Align: left; 
-left:100%; 
-gap: 30px;
+  display: flex;
+  gap: 8px;
   margin-bottom: 8px;
-`;
-const InfoInput = styled.input`
-  padding: 8px;
-  max-width:200px;
-  margin-right: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
 `;
 
 const CommentInput = styled.input`
+  flex: 1;
   padding: 8px;
-  width: 100%;
   border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 1rem;
@@ -172,10 +165,14 @@ const RecommendCard = styled.div`
 `;
 
 // 프레임 컴포넌트
-export default function MobileTestFrame({ TestComponent, id, test }) {
-  const [comments, setComments] = useState([]);
-  const [likeCount, setLikeCount] = useState(0);
+export default function MobileTestFrame({ TestComponent, testId }) {
+  const [comments, setComments] = useState([{ text: '샘플 댓글입니다.' }]); // 더미 댓글
+  const [likes, setLikes] = useState(0);
   const [viewCount, setViewCount] = useState(0);
+  const [id, setId] = useState(0);
+  
+  const [test, setTest] = useState(null);
+  const [likeCount, setLikeCount] = useState(0);
   const [commentCount, setCommentCount] = useState(0);
   const [shareCount, setShareCount] = useState(0);
   const [showComment, setShowComment] = useState(false);
@@ -184,39 +181,89 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
   const [recommendTests, setRecommendTests] = useState([]);
   const [randomCode, setRandomCode] = useState('');
   const [testResult, setTestResult] = useState(null);
+  const [TemplateComponent, setTemplateComponent] = useState(null);
 
-  // 테스트 ID를 폴더명으로 변환하는 함수
-  const getTestIdFromFolder = (folderName) => {
-    if (folderName.startsWith('test')) {
-      return folderName.replace('test', '');
-    }
-    else if (folderName.startsWith('template')) {
-      return folderName.replace('template', '');
-    }
-    return folderName;
-  };
-  // testId로 테스트 정보, 댓글, 추천 테스트 불러오기
   useEffect(() => {
-    
-    const testId = getTestIdFromFolder(id);
-    if (!testId) return;
-    console.log(test);
-    setLikeCount(test.likes);
-    setViewCount(test.views);
-    //setCommentCount(test.comments);
-    //setShareCount(test.shares);
-      console.log('recommend');
-      apiClient.get(`/tests/${testId}/recommends`)
-      .then(res => setRecommendTests(res.data|| []))
-      .catch(() => setRecommendTests([]));
-      console.log('recommendTests : ' , recommendTests)
-      // 댓글
-      console.log('comments');
-      apiClient.get(`/tests/${testId}/comments`)
-      .then(res => setComments(res.data.comments || []))
-      .catch(() => setComments([]));
-    
-  }, [id, test]);
+    if (id && typeof id === 'string') {
+      // testtest1 -> test1로 정규화
+      if (id.startsWith('template')) {
+        const normalizedId = id.replace('template', 'template');
+        console.log('URL 정규화:', id, '->', normalizedId);
+        router.replace(`/testview/${normalizedId}`);
+        return;
+      }
+    }
+  }, [id, router]);
+
+  // DB에서 테스트 정보 받아오기 (예시)
+  useEffect(() => {
+    // 실제 API 호출로 대체
+    async function fetchTest() {
+      // 예시: /api/tests/:id
+      const res = await fetch(`/api/tests/${testId}`);
+      const data = await res.json();
+      setTest(data);
+    }
+    if (testId) fetchTest();
+  }, [testId]);
+
+  // template로 시작하는 경우에만 dynamic import
+  useEffect(() => {
+    if (test && /^template\d+$/.test(test.folder)) {
+      // 상대경로는 반드시 정확히 맞춰야 함!
+      const DynamicComponent = dynamic(
+        () => import(`../../tests/${test.folder}/src/App.js`).catch(() => () => <div>템플릿 컴포넌트 로드 실패</div>),
+        { ssr: false, loading: () => <div>로딩 중...</div> }
+      );
+      setTemplateComponent(() => DynamicComponent);
+    } else {
+      setTemplateComponent(null);
+    }
+  }, [test]);
+
+  // 댓글/좋아요 불러오기 (DB/API 호출 주석처리)
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    Promise.all([
+      (async () => {
+        const testId = getTestIdFromFolder(id);
+        const userKey = getUserKey();
+        return apiClient.get(`/tests/${testId}`, { headers: { 'x-user-key': userKey } });
+      })(),
+      (async () => {
+        const testId = getTestIdFromFolder(id);
+        return apiClient.get(`/tests/${testId}/comments`);
+      })(),
+      (async () => {
+        if (/^test\d+$/.test(id)) {
+          const res = await fetch(`/tests/${id}/index.html`, { method: 'HEAD' });
+          return res.ok;
+        }
+        return false;
+      })()
+    ]).then(([testRes, commentsRes, buildOk]) => {
+      setTest(testRes.data);
+      setLiked(Boolean(testRes.data.userLiked));
+      setComments(commentsRes.data.comments);
+      setBuildExists(buildOk);
+      setCheckedBuild(true);
+      setLoading(false);
+    }).catch(() => {
+      setError('테스트를 불러오는데 실패했습니다. 서버 연결을 확인해주세요.');
+      setLoading(false);
+      setCheckedBuild(true);
+    });
+    // 방문 기록
+    (async () => {
+      try {
+        const testId = getTestIdFromFolder(id);
+        await apiClient.post(`/visitors`, { testId });
+      } catch (error) {
+        // 무시
+      }
+    })();
+  }, [id]);
 
   // 댓글 추가
   const addComment = async (comment) => {
@@ -229,7 +276,7 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
   const like = async () => {
     // const res = await axios.post(`/api/tests/${testId}/like`);
     // setLikes(res.data.count);
-    setLikeCount(prev => prev + 1);
+    setLikes(prev => prev + 1);
   };
 
   // 결과 저장
@@ -272,19 +319,19 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
       setRecommendTests(res.data.recommendList || []);
     });
     */
-    // // 더미 데이터로 UI 테스트 가능하도록 기본값 설정
-    // setViewCount(1234);
-    // setLikeCount(56);
-    // setCommentCount(7);
-    // setShareCount(3);
-    // setComments([
-    //   { id: 'user1', content: '좋은 테스트네요!', date: new Date().toISOString() },
-    //   { id: 'user2', content: '재미있었어요.', date: new Date().toISOString() }
-    // ]);
-    // setRecommendTests([
-    //   { id: 1, title: '심리 테스트 A', desc: '당신의 성격을 알아보세요' },
-    //   { id: 2, title: 'MBTI 테스트 B', desc: '당신의 유형은?' }
-    // ]);
+    // 더미 데이터로 UI 테스트 가능하도록 기본값 설정
+    setViewCount(1234);
+    setLikeCount(56);
+    setCommentCount(7);
+    setShareCount(3);
+    setComments([
+      { id: 'user1', content: '좋은 테스트네요!', date: new Date().toISOString() },
+      { id: 'user2', content: '재미있었어요.', date: new Date().toISOString() }
+    ]);
+    setRecommendTests([
+      { id: 1, title: '심리 테스트 A', desc: '당신의 성격을 알아보세요' },
+      { id: 2, title: 'MBTI 테스트 B', desc: '당신의 유형은?' }
+    ]);
   }, []);
 
   const handleLike = () => {
@@ -470,156 +517,98 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
   };
 
   return (
-    <MainFrame>
-      <TopBar style={{ background: '#6a5acd' }}>
-        <IconButton onClick={() => window.location.href = '/'}>🏠</IconButton>
-        <IconButton onClick={() => window.history.back()}>←</IconButton>
-      </TopBar>
-      <div style={{ flex: 1, width: '100%', maxWidth: '500px', marginTop: 56, marginBottom: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 1px' }}>
-        {/* 테스트 제목, 설명, 조회수, 좋아요, 댓글 수 */}
-        
-        
-        {/* 동적 템플릿 컴포넌트 */}
-        {TestComponent && <TestComponent />}
-        {test && (
-          <div style={{ width: '100%', textAlign: 'center', marginBottom: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 8 }}>
-              <span> 참여횟수 | {viewCount}번</span>
-            </div>
-          </div>
-        )}
-        
-      </div>
-      
-      <BottomBar>
-        <ActionWrap>
-          <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleLike}>❤️</button>
-          <ActionCount>{likeCount}</ActionCount>
-        </ActionWrap>
-        <ActionWrap>
-          <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleComment}>💬</button>
-          <ActionCount>{commentCount}</ActionCount>
-        </ActionWrap>
-        <ActionWrap>
-          <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleShare}>📤</button>
-          <ActionCount>{shareCount}</ActionCount>
-        </ActionWrap>
-        <ActionWrap>
-          <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleDetail}>ℹ️</button>
-        </ActionWrap>
-      </BottomBar>
-      {/* 댓글 모달 */}
-      <ModalOverlay open={showComment} onClick={closeCommentModal} />
-      <ModalSheet open={showComment}>
-        
-      <ModalHeader style={{
-    position: 'relative',
-    padding: '12px 16px',
-    width:'100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: '1.2rem',
-  }}>
-        댓글 ({commentCount})
-        <button
-    onClick={closeCommentModal}
-    style={{
-      position: 'absolute',
-      width:'50px',
-      right:'1%',
-      
-      background: 'none',
-      border: 'none',
-      fontSize: '1.2rem',
-      color: '#fff',
-      cursor: 'pointer',
-    }}
-  >✕</button>
-        </ModalHeader>
-        <ModalBody>
-          <CommentInputRow>
-            <InfoInput placeholder="ID" value={newComment.id} onChange={e => setNewComment({ ...newComment, id: e.target.value })} />
-            <InfoInput placeholder="PW" type="password" value={newComment.password} onChange={e => setNewComment({ ...newComment, password: e.target.value })} />
-          </CommentInputRow>
-          <CommentInput as="textarea" rows={3} placeholder="댓글을 입력하세요" value={newComment.content} onChange={e => setNewComment({ ...newComment, content: e.target.value })} />
-          <CommentButton style={{ marginTop: 8 }} onClick={submitComment}>댓글 작성</CommentButton>
-          <div style={{ marginTop: 16 }}>
-            {comments.map((c, i) => (
-              <div key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.2)', padding: '8px 0' }}>
-                <b style={{ color: '#fff' }}>{c.id}</b> <span style={{ color: '#e6e6fa', fontSize: '0.85rem' }}>{c.date ? new Date(c.date).toLocaleString() : ''}</span>
-                <div style={{ whiteSpace: 'pre-line', marginTop: 4, color: '#fff' }}>{c.content}</div>
-              </div>
-            ))}
-          </div>
-        </ModalBody>
-      </ModalSheet>
-      {/* 상세 모달 */}
-      <ModalOverlay open={showDetail} onClick={closeDetailModal}  />
-      <ModalSheet open={showDetail} >
-        <ModalHeader style={{
-    position: 'relative',
-    padding: '12px 16px',
-    width:'100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: '1.2rem',
-  }}>
-        상세 정보
-        <button
-    onClick={closeDetailModal}
-    style={{
-      position: 'absolute',
-      width:'50px',
-      right:'1%',
-      
-      background: 'none',
-      border: 'none',
-      fontSize: '1.2rem',
-      color: '#fff',
-      cursor: 'pointer',
-    }}
-  >✕</button>
-        </ModalHeader>
-        <ModalBody>
-          <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 8, color: '#fff' }}>{test.title}</div>
-          <div style={{ color: '#e6e6fa', marginBottom: 16 }}>{test.description}</div>
+      <MainFrame>
+        <TopBar style={{ background: '#6a5acd' }}>
+          <IconButton onClick={() => window.location.href = '/'}>🏠</IconButton>
+          <IconButton onClick={() => window.history.back()}>←</IconButton>
+        </TopBar>
+        <div style={{ flex: 1, width: '100%', maxWidth: '500px', marginTop: 56, marginBottom: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 16px' }}>
+          {/* <div style={{ fontWeight: 'bold', fontSize: '1.2rem', margin: '24px 0 8px 0', textAlign: 'center' }}>모바일 전용 테스트</div>
+          <div style={{ color: '#888', fontSize: '0.95rem', marginBottom: 16, textAlign: 'center' }}>조회수: {viewCount}</div>
+          <div style={{ marginBottom: 20, padding: '16px', background: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}>...</div> */}
           
-         
-          
-          {/**<div style={{ display: 'flex', gap: 16, marginBottom: 12 }}>
-            <span style={{ color: '#fff' }}>❤️ {likeCount}</span>
-            <span style={{ color: '#fff' }}>💬 {commentCount}</span>
-            <span style={{ color: '#fff' }}>🔗 {shareCount}</span>
-          </div>**/}
-          <RecommendList>
-            
-            {/* 추천 테스트 카드 */}
-        {recommendTests.length > 0 && (
-          <div style={{ width: '100%', margin: '16px 0' }}>
-            <div style={{ fontWeight: 'bold', marginBottom: 8 }}>추천 테스트</div>
-            <div style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '8px 0' }}>
-              {recommendTests.map((t, i) => (
-                <div key={t.id || i} style={{ minWidth: 140, maxWidth: 180, background: '#f5f5f5', borderRadius: 12, padding: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }} onClick={() => window.location.href = `/testview/${t.id}`}>
-                  
-                  <div style={{ color: '#888', fontSize: '0.9rem' }}>👁️ {t.views || 0}</div>
-                  {t.thumbnail && <img src={t.thumbnail} alt={t.title} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, marginBottom: 8 }} />}
-                  <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{t.title}</div>
-                  <div style={{ color: '#888', fontSize: '0.9rem', marginBottom: 8 }}>{t.desc}</div>
-                  {/**<button style={{ padding: '6px 12px', borderRadius: 8, background: '#6c63ff', color: '#fff', border: 'none', fontWeight: 500, fontSize: '0.95rem', marginTop: 8 }} onClick={() => window.location.href = `/testview/${t.id}`}>바로가기</button>**/}
+        </div>
+        
+        <BottomBar>
+          <ActionWrap>
+            <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleLike}>👍</button>
+            <ActionCount>{likeCount}</ActionCount>
+          </ActionWrap>
+          <ActionWrap>
+            <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleComment}>💬</button>
+            <ActionCount>{commentCount}</ActionCount>
+          </ActionWrap>
+          <ActionWrap>
+            <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleShare}>📤</button>
+            <ActionCount>{shareCount}</ActionCount>
+          </ActionWrap>
+          <ActionWrap>
+            <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleDetail}>ℹ️</button>
+          </ActionWrap>
+        </BottomBar>
+        {/* 댓글 모달 */}
+        <ModalOverlay open={showComment} onClick={closeCommentModal} />
+        <ModalSheet open={showComment}>
+          <ModalHeader>
+            댓글 ({commentCount})
+            <span style={{ float: 'right' }}>
+              <button onClick={closeCommentModal} style={{ background: 'none', border: 'none', fontSize: '1.2rem', color: '#fff' }}>✕</button>
+            </span>
+          </ModalHeader>
+          <ModalBody>
+            <CommentInputRow>
+              <CommentInput placeholder="ID" value={newComment.id} onChange={e => setNewComment({ ...newComment, id: e.target.value })} />
+              <CommentInput placeholder="PW" type="password" value={newComment.password} onChange={e => setNewComment({ ...newComment, password: e.target.value })} />
+              <CommentButton onClick={() => localStorage.setItem('comment_id', newComment.id)}>ID저장</CommentButton>
+              <CommentButton onClick={() => localStorage.setItem('comment_pw', newComment.password)}>PW저장</CommentButton>
+            </CommentInputRow>
+            <CommentInput as="textarea" rows={3} placeholder="댓글을 입력하세요" value={newComment.content} onChange={e => setNewComment({ ...newComment, content: e.target.value })} />
+            <CommentButton style={{ marginTop: 8 }} onClick={submitComment}>댓글 작성</CommentButton>
+            <div style={{ marginTop: 16 }}>
+              {comments.map((c, i) => (
+                <div key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.2)', padding: '8px 0' }}>
+                  <b style={{ color: '#fff' }}>{c.id}</b> <span style={{ color: '#e6e6fa', fontSize: '0.85rem' }}>{c.date ? new Date(c.date).toLocaleString() : ''}</span>
+                  <div style={{ whiteSpace: 'pre-line', marginTop: 4, color: '#fff' }}>{c.content}</div>
                 </div>
               ))}
             </div>
-          </div>
+          </ModalBody>
+        </ModalSheet>
+        {/* 상세 모달 */}
+        <ModalOverlay open={showDetail} onClick={closeDetailModal} />
+        <ModalSheet open={showDetail}>
+          <ModalHeader>
+            상세 정보
+            <span style={{ float: 'right' }}>
+              <button onClick={closeDetailModal} style={{ background: 'none', border: 'none', fontSize: '1.2rem', color: '#fff' }}>✕</button>
+            </span>
+          </ModalHeader>
+          <ModalBody>
+            <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 8, color: '#fff' }}>모바일 전용 테스트 제목</div>
+            <div style={{ color: '#e6e6fa', marginBottom: 16 }}>이곳에 상세 설명이 들어갑니다. 테스트의 목적, 방법, 특징 등을 안내합니다.</div>
+            
+           
+            
+            <div style={{ display: 'flex', gap: 16, marginBottom: 12 }}>
+              <span style={{ color: '#fff' }}>❤️ {likeCount}</span>
+              <span style={{ color: '#fff' }}>💬 {commentCount}</span>
+              <span style={{ color: '#fff' }}>🔗 {shareCount}</span>
+            </div>
+            <div style={{ fontWeight: 'bold', margin: '16px 0 8px 0', color: '#fff' }}>추천 테스트</div>
+            <RecommendList>
+              {recommendTests.map((t, i) => (
+                <RecommendCard key={i}>
+                  <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{t.title}</div>
+                  <div style={{ color: '#888', fontSize: '0.9rem', marginBottom: 8 }}>{t.desc}</div>
+                  <button style={{ padding: '6px 12px', borderRadius: 8, background: '#6c63ff', color: '#fff', border: 'none', fontWeight: 500, fontSize: '0.95rem' }} onClick={() => window.location.href = `/testview/${t.id}`}>바로가기</button>
+                </RecommendCard>
+              ))}
+            </RecommendList>
+          </ModalBody>
+        </ModalSheet>
+        {TemplateComponent && (
+          <TemplateComponent />
         )}
-          </RecommendList>
-        </ModalBody>
-      </ModalSheet>
-    </MainFrame>
+      </MainFrame>
   );
 }

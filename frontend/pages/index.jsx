@@ -43,7 +43,10 @@ const loadingContainerStyle = {
 };
 // axios 인스턴스 생성
 const apiClient = axios.create({
+  //우분투용
   baseURL: 'https://smartpick.website/api',
+  //윈도우용
+  //baseURL: 'http://localhost:4000/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -126,7 +129,14 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                       console.error('테스트 ID가 없습니다:', test);
                       return;
                     }
-                    const testPath = `/testview/${getTestFolderName(test.id)}`;
+                    let testPath = null;
+                    console.log(test.folder);
+                    let stringTemplate = 'template'
+                    if(/^template\d+$/.test(test.folder))
+                     {
+                      testPath = `/testview/${stringTemplate+test.id}/`;
+                     }
+                    else testPath = `/testview/${getTestFolderName(test.id)}`;
                     console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
                     router.push(testPath);
                   } catch (error) {
@@ -173,11 +183,11 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
           })}
         </Grid>
       )}
-      {loadingMore && !loading && !searching && !showNoResults && (
-        <LoadingMore>
+      {/**{loadingMore && !loading && !searching && !showNoResults && (
+         <LoadingMore>
           <span style={{ color: '#888', fontSize: '1.1rem' }}>더 많은 테스트를 불러오는 중...</span>
-        </LoadingMore>
-      )}
+        </LoadingMore> <blank></blank>
+      )}**/}
     </Section>
   );
 }
@@ -426,8 +436,9 @@ export default function Home() {
   // 더 많은 테스트 로드 (무한 스크롤)
   const loadMore = () => {
     if (!loadingMore && hasMore && !loading && !searching && !showNoResults ) {
+      setLoadingMore(true)
       setPage(prev => prev + 1);
-      //setLoadingMore(false);
+      // 데이터를 다 불러온 후 setLoadingMore(false) 호출
     }
   };
 
@@ -476,18 +487,6 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [searchTerm, selectedCategory, sort]);
 
-  // 스크롤 이벤트 리스너
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 1000) {
-        loadMore();
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [loadingMore, hasMore]);
-
   // 중복 제거 및 정렬된 테스트 목록
   const uniqueTests = tests.reduce((acc, test) => {
     const existingTest = acc.find(t => t.id === test.id);
@@ -496,13 +495,29 @@ export default function Home() {
     }
     return acc;
   }, []);
-
   const sortedTests = [...uniqueTests].sort((a, b) => {
     if (sort === 'views') return b.views - a.views;
     if (sort === 'likes') return b.likes - a.likes;
     if (sort === 'popular') return (b.views + b.likes) - (a.views + a.likes);
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
+
+  const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
+  // 스크롤 이벤트 리스너
+  useEffect(() => {
+    if (!hasMore || loadingMore) return;
+    const handleScroll = () => {
+      const scrollY = window.scrollY || window.pageYOffset;
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      if (scrollY + windowHeight >= docHeight - 10) {
+        loadMore();
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, loadingMore, loading, searching, showNoResults]);
+
 
   // 배너 자동 슬라이드
   useEffect(() => {
@@ -514,7 +529,6 @@ export default function Home() {
     }
   }, [sortedTests]);
 
-    const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
   // 항상 MainWrap을 최상위로 렌더링하고, 내부에서 상태별로 Section을 분기 처리
   return (
     <>

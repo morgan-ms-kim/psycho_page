@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body { 
+        margin: 0; 
+        background: transparent; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90px;
+      }
+      .ad-pc { display: block; }
+      .ad-mobile { display: none; }
+      @media (max-width: 600px) {
+        .ad-pc { display: none !important; }
+        .ad-mobile { display: block !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- PC 광고 -->
+    <ins class="kakao_ad_area ad-pc"
+      style="display:block;width:100%;min-width:728px;max-width:728px;height:90px;margin:0 auto;text-align:center;"
+      data-ad-unit="DAN-NOAbzxQGMUQ8Mke7"
+      data-ad-width="728"
+      data-ad-height="90"></ins>
+    <!-- 모바일 광고 -->
+    <ins class="kakao_ad_area ad-mobile"
+      style="display:block;width:100%;min-width:320px;max-width:320px;height:100px;margin:0 auto;text-align:center;"
+      data-ad-unit="DAN-gNGXA6EnAXz8usSK"
+      data-ad-width="320"
+      data-ad-height="100"></ins>
+    <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+  </body>
+</html>

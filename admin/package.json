@@ -10,15 +10,16 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "^14.2.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "styled-components": "^6.1.1",
     "axios": "^1.6.7",
-    "react-chartjs-2": "^5.2.0",
     "chart.js": "^4.4.0",
     "date-fns": "^2.30.0",
-    "react-dropzone": "^14.2.3"
+    "dayjs": "^1.11.13",
+    "next": "^14.2.3",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "styled-components": "^6.1.1"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
@@ -26,4 +27,4 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.3"
   }
-} 
+}

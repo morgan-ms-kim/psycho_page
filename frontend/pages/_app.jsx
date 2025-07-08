@@ -30,7 +30,7 @@ export default function App({ Component, pageProps }) {
         if (document.querySelector('.kakao_ad_area')) {
           return;
         }
-        
+        return;
         const isPC = window.matchMedia('(min-width: 728px)').matches;
         const adUnit = isPC ? 'DAN-NOAbzxQGMUQ8Mke7' : 'DAN-gNGXA6EnAXz8usSK';
         const adWidth = isPC ? '728' : '320';
@@ -137,17 +137,6 @@ export default function App({ Component, pageProps }) {
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <Head>
-        <style jsx global>{`
-          .kakao-ad-fixed {
-            position: relative;
-            display: block !important;
-          }
-          @media (max-width: 727px) {
-            #kakao-ad-container {
-              min-height: 100px;
-            }
-          }
-        `}</style>
         <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E" />
       </Head>
       <Component {...pageProps} />

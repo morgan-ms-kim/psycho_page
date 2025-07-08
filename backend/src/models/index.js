@@ -25,6 +25,10 @@ const Test = sequelize.define('Test', {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  folder: {
+    type: Sequelize.STRING,
+    allowNull: true
+  },
   description: {
     type: Sequelize.TEXT,
     allowNull: false,

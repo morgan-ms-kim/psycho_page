@@ -27,8 +27,8 @@ ${uniqueUrls.map(path => `
 `).join("")}
 </urlset>`;
 
-console.log('사이트맵 생성 완료')
-console.log(sitemap)
+    console.log('사이트맵 생성 완료')
+
     res.header('Content-Type', 'application/xml');
     res.send(sitemap);
   } catch (e) {

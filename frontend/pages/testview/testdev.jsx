@@ -5,7 +5,7 @@ import MobileTestFrame from './tests/mobiletest';
 
 // 테스트 목록(자동화 가능, 일단 수동 배열)
 const TEST_LIST = [
-  { id: 'tests/testsample', name: '샘플 심리테스트' },
+  { id: '../../../public/tests/template78/src/App.js', name: '샘플 심리테스트' },
   { id: 'tests/elite-quiz2/src/App', name: '엘리트 퀴즈2' },
   // { id: 'tests/test1', name: '테스트1' },
   // { id: 'tests/test2', name: '테스트2' },
@@ -17,9 +17,8 @@ export default function TestDevPage() {
   const [selected, setSelected] = useState(testId || '');
 
   // 동적 import (SSR 비활성화)
-  const TestComponent = selected
-    ? dynamic(() => import(`./${selected}`), { ssr: false, loading: () => <div>로딩 중...</div> })
-    : null;
+  const TestComponent =  dynamic(() => import(`./${selected}`), { ssr: false, loading: () => <div>로딩 중...</div> })
+
 
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', padding: 32 }}>

@@ -1,6 +1,47 @@
-import styled from 'styled-components';
+import styled, {keyframes} from 'styled-components';
 
 // 공통 스타일 컴포넌트들
+
+// 흔들리는 애니메이션 정의
+export const wiggle = keyframes`
+   0% {
+    transform: rotate(0deg);
+    color: #333;
+    text-shadow: none;
+  }
+  10% {
+    transform: rotate(1deg);
+    color:rgb(118, 196, 18);
+    text-shadow: 0 0 5px rgba(0, 102, 255, 0.5);
+  }
+  20% {
+    transform: rotate(-1deg);
+    color:rgb(245, 14, 14);
+    text-shadow: 0 0 6px rgba(0, 153, 255, 0.6);
+  }
+  30% {
+    transform: rotate(1deg);
+    color: #3399ff;
+    text-shadow: 0 0 5px rgba(51, 153, 255, 0.5);
+  }
+  40% {
+    transform: rotate(-1deg);
+    color:rgb(240, 29, 159);
+    text-shadow: 0 0 4px rgba(0, 102, 255, 0.4);
+  }
+  50% {
+    transform: rotate(0deg);
+    color: #333;
+    text-shadow: none;
+  }
+  100% {
+    transform: rotate(0deg);
+    color: #333;
+    text-shadow: none;
+  }
+`;
+
+
 export const MainWrap = styled.div`
 max-width: 96vw;
 min-width: 96vw;  
@@ -160,22 +201,34 @@ export const PrimaryButton = styled.button`
 
 
 export const PageButton = styled.button`
-  background: rgba(255, 255, 255);
-  border: none;
-  padding: 0;
-
-  width: 120px;
-  height: 50px;
-  border-radius: 10px;
-  box-shadow: none;
-  color: black;
+  all: unset; /* 버튼 기본 스타일 제거 */
   cursor: pointer;
-  font-size: 1rem;
-  
+  font-size: 1.1rem;
+  color: #333;
+  position: relative;
+  transition: text-shadow 0.3s ease;
+
+  /* 가끔씩 자동으로 흔들리는 효과 */
+  animation: ${wiggle} 1s ease-in-out infinite;
+  animation-delay: 5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+  animation-direction: alternate;
+  animation-play-state: running;
+
   &:hover {
-  
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: #333;
+    background: #fff;
     font-size: 1.1rem;
-    background: rgba(255,255,255);
+    outline: none;
+  }
+  &:focus {
+    outline: none;
+    
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    animation-play-state: paused; /* 호버 중엔 흔들리지 않음 */
   }
 `;
 
@@ -565,12 +618,12 @@ export const KakaoAdContainer = styled.div`
 
 export const SearchButton = styled.button`
   width: 40px;
-  height: 40px;
+  height: 50px;
   min-width: 40px;
-  margin-left: 8px;
+  margin-left: 1px;
   background: linear-gradient(45deg, #7f7fd5, #b3aaff);
   border: none;
-  border-radius: 50%;
+  border-radius: 20%;
   color: #fff;
   font-size: 1.3rem;
   display: flex;
