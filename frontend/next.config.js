@@ -1,14 +1,26 @@
-/** @type {import('next').NextConfig} */
 const path = require('path');
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   compiler: {
     styledComponents: true,
   },
   experimental: {
     forceSwcTransforms: true,
-    excludeFiles: ['tests/**/*'], // tests 폴더 전체 제외
+  },
+  webpack(config, { isServer }) {
+    config.module.rules.push({
+      test: /\.(js|ts|jsx|tsx|css)$/,
+      include: path.resolve(__dirname, 'tests'),
+      use: [
+        {
+          loader: require.resolve('null-loader'),
+        },
+      ],
+    });
+
+    return config;
   },
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;
