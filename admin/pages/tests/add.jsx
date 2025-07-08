@@ -277,17 +277,19 @@ export default function AddTest() {
       let testUrl = null;
       let templateString = 'template';
       if(response.data.test.folder === templateString){
-        testUrl = `/test/${templateString+response.data.test.id}/`;
+        //testUrl = `/tests/${templateString+response.data.test.id}/`;
+        testUrl = `/tests`;
       }else {
-        testUrl = `/tests/test${response.data.test.id}/`;
+        //testUrl = `/tests/test${response.data.test.id}/`;
+        testUrl = `/tests`;
       }
       
       addLog('🔗 테스트 페이지: ' + testUrl);
       
       // 3초 후 테스트 페이지로 이동
       setTimeout(() => {
-        window.open(testUrl, '_blank'); // 새 탭에서 테스트 상세 열기
-        router.push('/tests'); // 기존 창은 항상 목록으로 이동
+      //  window.open(testUrl, '_blank'); // 새 탭에서 테스트 상세 열기
+        router.push('/'); // 기존 창은 항상 목록으로 이동
       }, 3000);
       
     } catch (error) {

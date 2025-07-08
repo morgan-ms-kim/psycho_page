@@ -818,7 +818,7 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
     // 2. 실제 id로 폴더명 생성 (템플릿 테스트는 다른 폴더명 사용)
     const folderName = `template${test.id}`;
     test.folder = folderName;
-    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
+    const testsDir = path.join(process.cwd(), '..', 'frontend', 'tests');
     const testPath = path.join(testsDir, folderName);
     const tmpDir = path.join(process.cwd(), '..', 'tmp-template-' + Date.now());
     console.log(testsDir ,testPath, tmpDir);
@@ -849,7 +849,7 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
         const destPath = path.join(dest, item.name);
         if (item.isDirectory()) {
           copyExceptCss(srcPath, destPath);
-        } else if (!item.name.endsWith('.abc')) {
+        } else if (!item.name.endsWith('.abc')) { //css 지울때 여기에 추가
           fs.copyFileSync(srcPath, destPath);
         }
       }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-
 const apiClient = axios.create({
   //우분투용
   baseURL: 'https://smartpick.website/api', // 실제 API 주소로 변경 필요
