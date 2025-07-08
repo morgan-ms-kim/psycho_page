@@ -311,26 +311,29 @@ export default function TestPage() {
     console.log("템플릿 테스트 분기 렌더링 : "+id)
     if (id && /^template\d+$/.test(id)) {
       setIsTemplateTest(true);
+      let appPath = null; 
       const tryImport = async () => {
         try {
-          console.log(`/frontend/public/tests/${test.folder}/src/App.js`)
-          const mod = await import(`/frontend/public/tests/${test.folder}/src/App.js`);
+          let appPath = `../../public/tests/${test.folder}/src/App.js`
+          console.log(appPath)
+          const mod = await import(appPath);
           console.log(mod)
           setTemplateComponent(() => mod.default);
 
         } catch {
           try {
-            console.log(`/frontend/public/tests/${test.folder}/src/App.jsx`)
-            const mod = await import(`/frontend/public/tests/${test.folder}/src/App.jsx`);
+            appPath = `../../public/tests/${test.folder}/src/App.jsx`
+            console.log(appPath)
+            const mod = await import(appPath);
             setTemplateComponent(() => mod.default);
           } catch {
             try {
-              console.log(`/frontend/public/tests/${test.folder}/src/App.tsx`)
-              const mod = await import(`/frontend/public/tests/${test.folder}/src/App.tsx`);
+              appPath = `../../public/tests/${test.folder}/src/App.tsx`
+              console.log(appPath)
+              const mod = await import(appPath);
               setTemplateComponent(() => mod.default);
-            } catch {
-              
-              console.log(`./tests/${test.folder}/src/App.tsx`)
+            } catch {              
+              console.log(appPath)
               setTemplateComponent(() => () => <div>템플릿 컴포넌트 로드 실패</div>);
             }
           }
