@@ -138,7 +138,7 @@ export default function LottoPage() {
     }
   };
 
-  // DB에서 로또 번호 리스트 불러오기
+  // DB에서 로또 번호 리스트 전체 불러오기
   async function fetchLottoList() {
     const res = await fetch('/api/lotto/list');
     return await res.json();

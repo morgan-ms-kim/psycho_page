@@ -1427,6 +1427,7 @@ app.post('/api/lotto/update', async (req, res) => {
       const resApi = await fetch(apiUrl);
       const data = await resApi.json();
       if (data.returnValue !== 'success') break;
+      console.log('data.drwNo : ' + data.drwNo);
       // 이미 DB에 있으면 저장하지 않음
       const exists = await LottoDraw.findOne({ where: { drawNo: data.drwNo } });
       if (!exists) {
