@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
+import LottoDraw from './LottoDraw.js';
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -176,5 +177,8 @@ Like.belongsTo(Comment, { foreignKey: 'commentId' });
 Test.hasMany(Visitor, { foreignKey: 'testId' });
 Visitor.belongsTo(Test, { foreignKey: 'testId' });
 
-export { Test, Comment, Like, Visitor };
+// 서버 시작 시 DB 테이블 자동 생성/동기화
+sequelize.sync();
+
+export { Test, Comment, Like, Visitor, LottoDraw };
 export default sequelize; 

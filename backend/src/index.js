@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { Op } from 'sequelize';
-import sequelize, { Test, Comment, Like, Visitor } from './models/index.js';
+import sequelize, { Test, Comment, Like, Visitor, LottoDraw } from './models/index.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs';
@@ -1391,6 +1391,55 @@ app.post('/api/admin/update-all-folder-names', authenticateAdmin, async (req, re
   }
 });
 
+// 로또 전체 리스트 조회
+app.get('/api/lotto/list', async (req, res) => {
+  try {
+    const draws = await LottoDraw.findAll({ order: [['drawNo', 'DESC']] });
+    res.json(draws);
+  } catch (e) {
+    res.status(500).json({ error: 'DB 조회 실패', detail: e.message });
+  }
+});
+
+// 최신 회차 번호 조회
+app.get('/api/lotto/latest', async (req, res) => {
+  try {
+    const latest = await LottoDraw.findOne({ order: [['drawNo', 'DESC']] });
+    res.json({ latestNo: latest ? latest.drawNo : null });
+  } catch (e) {
+    res.status(500).json({ error: 'DB 조회 실패', detail: e.message });
+  }
+});
+
+// 외부 API에서 최신 회차까지 DB에 저장 (최신 회차 갱신)
+app.post('/api/lotto/update', async (req, res) => {
+  try {
+    // 1. DB에서 최신 회차 확인
+    const latest = await LottoDraw.findOne({ order: [['drawNo', 'DESC']] });
+    let startNo = latest ? latest.drawNo + 1 : 1;
+    let n = startNo;
+    let inserted = 0;
+    while (true) {
+      const apiUrl = `https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${n}`;
+      const fetch = (await import('node-fetch')).default;
+      const resApi = await fetch(apiUrl);
+      const data = await resApi.json();
+      if (data.returnValue !== 'success') break;
+      await LottoDraw.create({
+        drawNo: data.drwNo,
+        numbers: [data.drwtNo1, data.drwtNo2, data.drwtNo3, data.drwtNo4, data.drwtNo5, data.drwtNo6].join(','),
+        bonus: data.bnusNo,
+        drawDate: data.drwNoDate
+      });
+      inserted++;
+      n++;
+      if (n > startNo + 100) break; // 안전장치
+    }
+    res.json({ success: true, inserted });
+  } catch (e) {
+    res.status(500).json({ error: '로또 데이터 갱신 실패', detail: e.message });
+  }
+});
 
 
 app.use('/api/sitemap', sitemapRouter);

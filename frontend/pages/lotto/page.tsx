@@ -138,27 +138,49 @@ export default function LottoPage() {
     }
   };
 
-  // 최신 회차를 찾는 함수
-  async function getLatestDrawNo(start = 1178) {
-    let n = start;
-    while (true) {
-      const res = await fetch(`https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${n}`);
-      const data = await res.json();
-      if (data.returnValue !== 'success') {
-        // 직전 회차가 최신 회차
-        return n - 1;
-      }
-      n++;
-      // 안전장치: 너무 많이 반복하지 않도록
-      if (n > start + 100) break;
-    }
-    return null;
+  // DB에서 로또 번호 리스트 불러오기
+  async function fetchLottoList() {
+    const res = await fetch('/api/lotto/list');
+    return await res.json();
   }
 
-  const latestNo = async () => {
-    const latestNo = await getLatestDrawNo(1178);
-    // 이후 latestNo부터 drawCount만큼 반복 fetch
-  };
+  // DB에서 최신 회차 불러오기
+  async function fetchLatestNo() {
+    const res = await fetch('/api/lotto/latest');
+    const data = await res.json();
+    return data.latestNo;
+  }
+
+  // DB에 최신 회차 갱신 요청
+  async function updateLottoDraws() {
+    const res = await fetch('/api/lotto/update', { method: 'POST' });
+    return await res.json();
+  }
+
+  // 페이지 컴포넌트 내부
+  const [lottoList, setLottoList] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      // 1. DB에서 로또 리스트 불러오기
+      let list = await fetchLottoList();
+      setLottoList(list);
+      // 2. 최신 회차 확인 및 필요시 갱신
+      const latestNo = list.length > 0 ? list[0].drawNo : null;
+      // 외부 최신 회차가 더 있으면 백엔드에 갱신 요청
+      const res = await fetch(`https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${latestNo + 1}`);
+      const data = await res.json();
+      if (data.returnValue === 'success') {
+        await updateLottoDraws();
+        // 갱신 후 다시 리스트 불러오기
+        list = await fetchLottoList();
+        setLottoList(list);
+      }
+      setLoading(false);
+    })();
+  }, []);
 
   // 페이지 진입 시 기본적으로 랭킹 자동 조회
   useEffect(() => {
