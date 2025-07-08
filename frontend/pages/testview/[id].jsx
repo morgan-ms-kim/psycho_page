@@ -313,17 +313,26 @@ export default function TestPage() {
       setIsTemplateTest(true);
       const tryImport = async () => {
         try {
-          console.log(`./tests/${test.folder}/src/App.js`)
-          const mod = await import(`./tests/${test.folder}/src/App.js`);
+          console.log(`/frontend/public/tests/${test.folder}/src/App.js`)
+          const mod = await import(`/frontend/public/tests/${test.folder}/src/App.js`);
           console.log(mod)
           setTemplateComponent(() => mod.default);
 
         } catch {
           try {
-            const mod = await import(`./tests/${test.folder}/src/App.jsx`);
+            console.log(`/frontend/public/tests/${test.folder}/src/App.jsx`)
+            const mod = await import(`/frontend/public/tests/${test.folder}/src/App.jsx`);
             setTemplateComponent(() => mod.default);
           } catch {
-            setTemplateComponent(() => () => <div>템플릿 컴포넌트 로드 실패</div>);
+            try {
+              console.log(`/frontend/public/tests/${test.folder}/src/App.tsx`)
+              const mod = await import(`/frontend/public/tests/${test.folder}/src/App.tsx`);
+              setTemplateComponent(() => mod.default);
+            } catch {
+              
+              console.log(`./tests/${test.folder}/src/App.tsx`)
+              setTemplateComponent(() => () => <div>템플릿 컴포넌트 로드 실패</div>);
+            }
           }
         }
       };
