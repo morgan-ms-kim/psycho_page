@@ -187,7 +187,7 @@ export default function TestPage() {
     (async () => {
       try {
         const testId = getTestIdFromFolder(id);
-        await apiClient.post(`/visitors`, { testId, userAgent: navigator.userAgent });
+        await apiClient.post(`/visitors`, { testId });
       } catch (error) {
         // 무시
       }
@@ -203,10 +203,10 @@ export default function TestPage() {
       const tryImport = async () => {
         let tried = [];
         try {
-          const importPath = `../../_tests/${test.folder}/src/App.jsx`;
+          const importPath = `../../tests/${test.folder}/src/App.jsx`;
           tried.push(importPath);
           console.log('import 시도:', importPath);
-          const mod = dynamic(() => import(`../../_tests/${test.folder}/src/App.js`), {
+          const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.js`), {
           //const mod = dynamic(() => import(importPath), {
             loading: () => <p>로딩 중...</p>,
             ssr: false,
@@ -218,10 +218,10 @@ export default function TestPage() {
         } catch (e1) {
           try {
             console.log(e1);
-            const importPath = `../../_tests/${test.folder}/src/App.js`;
+            const importPath = `../../tests/${test.folder}/src/App.js`;
             tried.push(importPath);
             console.log('import 시도:', importPath);
-            const mod = dynamic(() => import(`../../_tests/${test.folder}/src/App.jsx`), {
+            const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.jsx`), {
               loading: () => <p>로딩 중...</p>,
               ssr: false,
             });
@@ -232,10 +232,10 @@ export default function TestPage() {
             try {
               //test.txt
               console.log(e2);
-              const importPath = `../../_tests/${test.folder}/src/App.tsx`;
+              const importPath = `../../tests/${test.folder}/src/App.tsx`;
               tried.push(importPath); 
               console.log('import 시도:', importPath);
-              const mod = dynamic(() => import(`../../_tests/${test.folder}/src/App.tsx`), {
+              const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.tsx`), {
               loading: () => <p>로딩 중...</p>,
               ssr: false,
             });
