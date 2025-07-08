@@ -1,7 +1,6 @@
 const path = require('path');
-const webpack = require('webpack'); // ✅ 이 줄이 반드시 필요
+const webpack = require('webpack');
 
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   compiler: {
     styledComponents: true,
@@ -10,20 +9,22 @@ const nextConfig = {
     forceSwcTransforms: true,
   },
   webpack(config) {
+    // tests 폴더 무시 (필요에 따라)
     config.plugins.push(
       new webpack.IgnorePlugin({
-        resourceRegExp: /tests[\/\\]/, // ✅ tests/ 폴더 무시
+        resourceRegExp: /tests[\/\\]/,
       })
     );
-     // tests 폴더 내 .css 파일은 null-loader로 무시
-     config.module.rules.push({
+
+    // tests 폴더 내 css는 null-loader 처리
+    config.module.rules.push({
       test: /\.css$/,
       include: path.resolve(__dirname, 'tests'),
       use: 'null-loader',
     });
+
     return config;
   },
-
 };
 
 module.exports = nextConfig;
