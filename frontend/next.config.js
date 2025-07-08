@@ -4,9 +4,9 @@ const nextConfig = {
   compiler: {
     styledComponents: true,
   },
-  experimental: {
+  /*experimental: {
     forceSwcTransforms: true,
-  },
+  },*/
 };
 
 module.exports = nextConfig;

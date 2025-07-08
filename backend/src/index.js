@@ -1449,6 +1449,39 @@ app.post('/api/lotto/update', async (req, res) => {
   }
 });
 
+// 로또 번호 랭킹 API
+app.get('/api/lotto-rank', async (req, res) => {
+  try {
+    const { count = 30 } = req.query;
+    const limit = parseInt(count);
+    
+    // DB에서 로또 번호 데이터 조회
+    const draws = await LottoDraw.findAll({
+      order: [['drawNo', 'DESC']],
+      limit: limit
+    });
+    
+    // 번호별 출현 빈도 계산
+    const numberCount = {};
+    draws.forEach(draw => {
+      const numbers = draw.numbers.split(',').map(n => parseInt(n));
+      numbers.forEach(num => {
+        numberCount[num] = (numberCount[num] || 0) + 1;
+      });
+    });
+    
+    // 출현 빈도별로 정렬하여 top30 반환
+    const top30 = Object.entries(numberCount)
+      .map(([num, cnt]) => ({ num: parseInt(num), cnt }))
+      .sort((a, b) => b.cnt - a.cnt || a.num - b.num)
+      .slice(0, 30);
+    
+    res.json({ top30 });
+  } catch (e) {
+    res.status(500).json({ error: '로또 랭킹 조회 실패', detail: e.message });
+  }
+});
+
 
 app.use('/api/sitemap', sitemapRouter);
 const PORT = process.env.PORT || 4000;
