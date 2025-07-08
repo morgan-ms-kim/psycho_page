@@ -6,7 +6,7 @@ const apiClient = axios.create({
   //우분투용
   baseURL: 'https://smartpick.website/api', // 실제 API 주소로 변경 필요
   //윈도우용
-  baseURL: 'http://localhost:4000/api', // 실제 API 주소로 변경 필요
+  //baseURL: 'http://localhost:4000/api', // 실제 API 주소로 변경 필요
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
