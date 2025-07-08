@@ -244,6 +244,7 @@ export default function Home() {
       loadCategories()
     ]);
     loadTests();
+    apiClient.post('/visitors', { page: 'index', userAgent: navigator.userAgent });
   }, []);
 
   // 페이지 변경 시 추가 데이터 로드

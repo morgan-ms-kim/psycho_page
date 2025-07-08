@@ -1095,12 +1095,7 @@ app.get('/api/admin/analytics-country', authenticateAdmin, async (req, res, next
 // 방문자 상세 로그 (isBot 필드 추가)
 app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
   try {
-    const { page = 1, limit = 50, start, end } = req.query;
-    const parsedPage = parseInt(page);
-    const parsedLimit = parseInt(limit);
-    const safePage = Math.max(1, Number.isNaN(parsedPage) ? 1 : parsedPage);
-    const safeLimit = Math.max(1, Number.isNaN(parsedLimit) ? 50 : parsedLimit);
-    const offset = (safePage - 1) * safeLimit;
+    const { start, end } = req.query;
     let where = {};
     if (start) where.visitedAt = { [Op.gte]: new Date(start) };
     if (end) {
@@ -1111,16 +1106,14 @@ app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
       where.visitedAt = where.visitedAt || {};
       where.visitedAt[Op.lte] = endDate;
     }
-    const visitors = await Visitor.findAndCountAll({
+    const visitors = await Visitor.findAll({
       attributes: ['id', 'country', 'region', 'ip', 'userAgent', 'visitedAt', 'testId'],
       include: [{
         model: Test,
         attributes: ['title']
       }],
       where,
-      order: [['visitedAt', 'DESC']],
-      limit: safeLimit,
-      offset: offset
+      order: [['visitedAt', 'DESC']]
     });
     // userAgent로 봇 여부 판별
     const isBot = (ua) => {
@@ -1128,7 +1121,7 @@ app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
       const botKeywords = ['bot', 'spider', 'crawl', 'slurp', 'baidu', 'bing', 'duckduck', 'yeti', 'naver', 'daum', 'googlebot'];
       return botKeywords.some(k => ua.toLowerCase().includes(k));
     };
-    const visitorsWithBot = visitors.rows.map(v => {
+    const visitorsWithBot = visitors.map(v => {
       const vObj = v.toJSON();
       vObj.isBot = isBot(vObj.userAgent);
       return vObj;
@@ -1137,9 +1130,7 @@ app.get('/api/admin/visitors', authenticateAdmin, async (req, res, next) => {
     const filteredRows = visitorsWithBot.filter(v => !/^[0-9a-fA-F-]{8}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{12}$/.test(v.ip));
     res.json({
       visitors: filteredRows,
-      total: filteredRows.length,
-      pages: Math.ceil(filteredRows.length / safeLimit),
-      currentPage: safePage
+      total: filteredRows.length
     });
   } catch (error) {
     next(error);

@@ -187,7 +187,7 @@ export default function TestPage() {
     (async () => {
       try {
         const testId = getTestIdFromFolder(id);
-        await apiClient.post(`/visitors`, { testId });
+        await apiClient.post(`/visitors`, { testId, userAgent: navigator.userAgent });
       } catch (error) {
         // 무시
       }

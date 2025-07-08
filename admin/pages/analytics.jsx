@@ -227,11 +227,7 @@ export default function Analytics() {
   }, []);
 
   // visitorPage, startDate, endDate 변경 시 방문자 리스트 재요청 → 페이지 변경 시에는 전체 데이터에서 slice만
-  useEffect(() => {
-    if (visitorPage === 1) {
-      fetchVisitors(startDate, endDate);
-    }
-  }, [startDate, endDate]);
+  // 페이지네이션, slice, visitorPage 등 관련 코드 제거
 
   // visitorList에서 50개씩 잘라서 보여줄 데이터
   const pagedVisitors = useMemo(() => {
