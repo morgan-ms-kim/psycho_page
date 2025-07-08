@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -15,6 +15,7 @@ import {
   Legend
 } from 'chart.js';
 import dayjs from 'dayjs';
+import React from 'react'; // Added for React.Fragment
 
 ChartJS.register(
   CategoryScale,
@@ -182,16 +183,16 @@ export default function Analytics() {
     },
   };
 
-  // 방문자 상세 리스트 로드 함수
-  const fetchVisitors = async (page = 1, customStart, customEnd) => {
+  // 방문자 상세 리스트 로드 함수 (limit 없이 전체 불러오기)
+  const fetchVisitors = async (customStart, customEnd) => {
     try {
       setVisitorLoading(true);
-      let url = `/admin/visitors?page=${page}&limit=50`;
-      if (customStart) url += `&start=${customStart}`;
-      if (customEnd) url += `&end=${customEnd}`;
+      let url = `/admin/visitors`;
+      if (customStart) url += `?start=${customStart}`;
+      if (customEnd) url += (customStart ? `&end=${customEnd}` : `?end=${customEnd}`);
       const res = await apiClient.get(url);
       setVisitorList(res.data.visitors || []);
-      setVisitorTotal(res.data.total || 0);
+      setVisitorTotal((res.data.visitors || []).length);
     } catch (e) {
       setVisitorList([]);
       setVisitorTotal(0);
@@ -209,7 +210,7 @@ export default function Analytics() {
   // 기간 적용 버튼
   const handleApplyPeriod = () => {
     loadAnalytics(startDate, endDate);
-    fetchVisitors(visitorPage, startDate, endDate);
+    fetchVisitors(startDate, endDate);
   };
 
   // 전체 기간 버튼
@@ -225,10 +226,37 @@ export default function Analytics() {
     fetchVisitors('', '');
   }, []);
 
-  // visitorPage, startDate, endDate 변경 시 방문자 리스트 재요청
+  // visitorPage, startDate, endDate 변경 시 방문자 리스트 재요청 → 페이지 변경 시에는 전체 데이터에서 slice만
   useEffect(() => {
-    fetchVisitors(visitorPage, startDate, endDate);
-  }, [visitorPage, startDate, endDate]);
+    if (visitorPage === 1) {
+      fetchVisitors(startDate, endDate);
+    }
+  }, [startDate, endDate]);
+
+  // visitorList에서 50개씩 잘라서 보여줄 데이터
+  const pagedVisitors = useMemo(() => {
+    const start = (visitorPage - 1) * 50;
+    return visitorList.slice(start, start + 50);
+  }, [visitorList, visitorPage]);
+
+  // IP별로 그룹핑 (페이지별 데이터만)
+  const groupedVisitors = useMemo(() => {
+    const map = {};
+    pagedVisitors.forEach(v => {
+      if (!map[v.ip]) map[v.ip] = [];
+      map[v.ip].push(v);
+    });
+    return map;
+  }, [pagedVisitors]);
+
+  const [openedIps, setOpenedIps] = useState([]);
+
+  // IP 접기/펼치기 토글
+  const toggleIp = (ip) => {
+    setOpenedIps(prev =>
+      prev.includes(ip) ? prev.filter(i => i !== ip) : [...prev, ip]
+    );
+  };
 
   if (loading) {
     return (
@@ -387,13 +415,29 @@ export default function Analytics() {
                 <tr><td colSpan={4} style={{ textAlign: 'center' }}>로딩 중...</td></tr>
               ) : visitorList.length === 0 ? (
                 <tr><td colSpan={4} style={{ textAlign: 'center' }}>방문자 데이터가 없습니다.</td></tr>
-              ) : visitorList.map((v, i) => (
-                <tr key={v.id || i}>
-                  <td>{v.country}{v.region ? ' / ' + v.region : ''}</td>
-                  <td>{v.ip || '-'}</td>
-                  <td>{v.isBot ? '🤖 봇' : '🧑 인간'}</td>
-                  <td>{v.visitedAt ? new Date(v.visitedAt).toLocaleString('ko-KR') : '-'}</td>
-                </tr>
+              ) : Object.entries(groupedVisitors).map(([ip, records]) => (
+                <React.Fragment key={ip}>
+                  <tr onClick={() => toggleIp(ip)} style={{ cursor: records.length > 1 ? 'pointer' : 'default', background: '#f5f5f5' }}>
+                    <td>{records[0].country}{records[0].region ? ' / ' + records[0].region : ''}</td>
+                    <td>{ip}</td>
+                    <td>{records[0].isBot ? '🤖 봇' : '🧑 인간'}</td>
+                    <td>{records[0].visitedAt ? new Date(records[0].visitedAt).toLocaleString('ko-KR') : '-'}</td>
+                    {records.length > 1 ? (
+                      <td style={{ color: '#667eea', fontWeight: 700 }}>
+                        {openedIps.includes(ip) ? '▲' : `+${records.length - 1}`}
+                      </td>
+                    ) : <td></td>}
+                  </tr>
+                  {openedIps.includes(ip) && records.slice(1).map((v, i) => (
+                    <tr key={v.id || i} style={{ background: '#fafafa' }}>
+                      <td>{v.country}{v.region ? ' / ' + v.region : ''}</td>
+                      <td>{v.ip}</td>
+                      <td>{v.isBot ? '🤖 봇' : '🧑 인간'}</td>
+                      <td>{v.visitedAt ? new Date(v.visitedAt).toLocaleString('ko-KR') : '-'}</td>
+                      <td></td>
+                    </tr>
+                  ))}
+                </React.Fragment>
               ))}
             </tbody>
           </Table>

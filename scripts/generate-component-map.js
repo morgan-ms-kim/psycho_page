@@ -27,7 +27,7 @@ const fileContent =
   Object.entries(map)
     .map(
       ([key, relPath]) =>
-        `  "${key}": require("${relPath}").default,`
+        `  "${key}": () => require("${relPath}").default,`
     )
     .join('\n') +
   '\n};\n\nexport default componentMap;\n';
