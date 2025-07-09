@@ -1,6 +1,20 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import styles from './lotto.module.css';
+import axios from 'axios';
+
+
+const apiClient = axios.create({
+  //우분투용
+  baseURL: 'https://smartpick.website/api',
+  //윈도우용
+  //baseURL: 'http://localhost:4000/api',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
+
 
 const digitOptions = [
   { label: '1의 자리', min: 0, max: 9, countMax: 10 },
@@ -128,7 +142,7 @@ export default function LottoPage() {
     setRealLoading(true);
     setRealError('');
     try {
-      const res = await fetch(`/api/lotto-rank?count=${drawCount}`);
+      const res = await fetch(`http://localhost:4000/api/lotto-rank?count=${drawCount}`);
       const data = await res.json();
       setRealRank(data.top30);
       setRealLoading(false);
@@ -140,13 +154,13 @@ export default function LottoPage() {
 
   // DB에서 로또 번호 리스트 전체 불러오기
   async function fetchLottoList() {
-    const res = await fetch('/api/lotto/list');
+    const res = await fetch('http://localhost:4000/api/lotto/list');
     return await res.json();
   }
 
   // DB에서 최신 회차 불러오기
   async function fetchLatestNo() {
-    const res = await fetch('/api/lotto/latest');
+    const res = await fetch('localhost:4000/api/lotto/latest');
     const data = await res.json();
     return data.latestNo;
   }
@@ -164,11 +178,17 @@ export default function LottoPage() {
   useEffect(() => {
     (async () => {
       setLoading(true);
+      
+      apiClient.post('/lotto/update', { });
+      console.log('updateLottoDraws');
+      let ret = await updateLottoDraws();
+      console.log(ret.json());
+
       // 1. DB에서 로또 리스트 불러오기
       let list = await fetchLottoList();
       setLottoList(list);
       // 2. 최신 회차 확인 및 필요시 갱신
-      const latestNo = list.length > 0 ? list[0].drawNo : null;
+      const latestNo = list.length > 0 ? list[0].drawNo : 10;
       // 외부 최신 회차가 더 있으면 백엔드에 갱신 요청
       const res = await fetch(`https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${latestNo + 1}`);
       const data = await res.json();
@@ -185,6 +205,8 @@ export default function LottoPage() {
   // 페이지 진입 시 기본적으로 랭킹 자동 조회
   useEffect(() => {
     fetchLottoRank();
+    
+    apiClient.post('/visitors', { page: 'lotto', userAgent: navigator.userAgent });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drawCount]);
 

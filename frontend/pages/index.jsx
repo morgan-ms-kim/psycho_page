@@ -685,7 +685,7 @@ export default function Home() {
 
           {/* 푸터 */}
           <Footer>
-            <p>© 2025 PSYCHO - 재미있는 심리테스트 모음</p>
+            <p>© Smartpick.website - 재미있는 심리테스트 모음</p>
           </Footer>
         </Section>
       </MainWrap>
