@@ -202,6 +202,7 @@ export default function TestPage() {
   // 템플릿 테스트 여부
   const isTemplateTest = test && test.folder && /^template\d+$/.test(test.folder);
 
+  /*
   // 템플릿 동적 import (Next.js dynamic)
   useEffect(() => {
     if (!isTemplateTest) {
@@ -219,7 +220,7 @@ export default function TestPage() {
 
         try {
           const mod = await import(
-            /* webpackInclude: /(App\.js|App\.jsx|App\.tsx)$/ */
+            // webpackInclude: /(App\.js|App\.jsx|App\.tsx)$/ 
             `../../tests/${test.folder}/src/App.${ext}`
           );
           setTemplateComponent(() => mod.default);
@@ -237,7 +238,8 @@ export default function TestPage() {
 
     tryImport();
   }, [isTemplateTest, test?.folder]);
-  /*
+  */
+ 
    useEffect(() => {
     if (isTemplateTest) {
       const tryImport = async () => {
@@ -297,7 +299,6 @@ export default function TestPage() {
     }
   }, [isTemplateTest, test?.folder]);
   
-  */
 
   // 광고 스크립트 중복 삽입 방지
   useEffect(() => {
