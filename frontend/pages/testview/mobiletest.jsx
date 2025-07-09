@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+// axios 인스턴스 생성
+//'http://localhost:4000/api'
 const apiClient = axios.create({
-  //우분투용
-  baseURL: 'https://smartpick.website/api', // 실제 API 주소로 변경 필요
-  //윈도우용
-  //baseURL: 'http://localhost:4000/api', // 실제 API 주소로 변경 필요
+  baseURL: 'https://smartpick.website/api',
   timeout: 10000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
 const MainFrame = styled.div`
@@ -482,7 +483,7 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
         {TestComponent && <TestComponent />}
         {test && (
           <div style={{ width: '100%', textAlign: 'center', marginBottom: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 8 , background:'transparent'}}>
               <span> 참여횟수 | {viewCount}번</span>
             </div>
           </div>

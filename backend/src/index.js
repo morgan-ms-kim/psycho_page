@@ -75,7 +75,7 @@ const app = express();
 
 // CORS 설정
 app.use(cors({
-  origin: ['https://smartpick.website', 'http://localhost:3000', 'http://localhost:3001'],
+  origin: ['https://smartpick.website', 'http://localhost:3000', 'http://localhost:3001', 'http://localhost:4000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'x-user-key'
@@ -190,7 +190,7 @@ async function runTestDeployScript(clonePath) {
 // 모든 테스트 목록 가져오기
 app.get('/api/tests', async (req, res, next) => {
   try {
-    const { search, category, sort = 'latest', limit = 20 } = req.query;
+    const { search, category, sort = 'latest', limit = 20, offset = 2 } = req.query;
     
     let whereClause = {};
     if (search) {
@@ -215,10 +215,12 @@ app.get('/api/tests', async (req, res, next) => {
       where: whereClause,
       order: orderClause,
       limit: parseInt(limit),
+      offset: parseInt(offset),
       distinct: true, // 중복 제거
       attributes: { exclude: ['password'] } // 불필요한 필드 제외
     });
     
+    console.log(`📊 테스트 목록 조회: ${tests.length}개 `);
     // 이미지 경로 수정 및 중복 제거
     const testsWithCorrectPaths = tests.map(test => {
       const testData = test.toJSON();
@@ -494,28 +496,43 @@ app.get('/api/tests/:id/recommends/', async (req, res, next) => {
   }
 });
 // 댓글 작성
-app.post('/api/tests/recommends', async (req, res, next) => {
+app.get('/api/recommends', async (req, res, next) => {
   try {
-
-   // if (sort === 'views') orderClause = [['views', 'DESC']];
-   // if (sort === 'likes') orderClause = [['likes', 'DESC']];
-   // if (sort === 'popular') orderClause = [['views', 'DESC'], ['likes', 'DESC']];
-    let orderClause = [['views', 'DESC']];
+    const { search, category, sort = 'latest', limit = 10 } = req.query;
     
-    console.log('/api/tests/recommends');
+    let whereClause = {};
+    if (search) {
+      whereClause = {
+        [Op.or]: [
+          { title: { [Op.like]: `%${search}%` } },
+          { description: { [Op.like]: `%${search}%` } }
+        ]
+      };
+    }
+    
+    if (category) {
+      whereClause.category = category;
+    }
+    
+    let orderClause = [['views', 'DESC'], ['likes', 'DESC']];
+    //if (sort === 'views') orderClause = [['views', 'DESC']];
+    //if (sort === 'likes') orderClause = [['likes', 'DESC']];
+    //if (sort === 'popular') orderClause = [['views', 'DESC'], ['likes', 'DESC']];
+    
     const tests = await Test.findAll({
+      where: whereClause,
       order: orderClause,
-      limit: 10,
+      limit: parseInt(limit),
       distinct: true, // 중복 제거
       attributes: { exclude: ['password'] } // 불필요한 필드 제외
     });
-    console.log('이미지 경로 수정 및 중복 제거');
+    
     // 이미지 경로 수정 및 중복 제거
     const testsWithCorrectPaths = tests.map(test => {
       const testData = test.toJSON();
       return testData;
     });
-    console.log('중복 제거 (id 기준) - 더 강화된 로직');
+    
     // 중복 제거 (id 기준) - 더 강화된 로직
     const uniqueTests = testsWithCorrectPaths.reduce((acc, test) => {
       const existingTest = acc.find(t => t.id === test.id);
@@ -1450,7 +1467,7 @@ app.post('/api/lotto/update', async (req, res) => {
 // 로또 번호 랭킹 API
 app.get('/api/lotto-rank', async (req, res) => {
   try {
-    const { count = 30 } = req.query;
+    const { count = 45 } = req.query;
     const limit = parseInt(count);
     
     // DB에서 로또 번호 데이터 조회

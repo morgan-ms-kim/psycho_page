@@ -6,6 +6,7 @@ import Link from 'next/link';
 import React from 'react';
 
 const apiClient = axios.create({
+  //baseURL: 'http://localhost:4000/api',
   baseURL: 'https://smartpick.website/api',
   timeout: 10000,
   headers: {

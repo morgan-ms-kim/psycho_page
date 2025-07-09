@@ -30,10 +30,15 @@ import Image from 'next/image';
 import Head from 'next/head';
 import MobileTestFrame from './mobiletest.jsx';
 
+
+// axios 인스턴스 생성
+//baseURL: 'http://localhost:4000/api',
 const apiClient = axios.create({
   baseURL: 'https://smartpick.website/api',
   timeout: 10000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
 const getTestIdFromFolder = (folderName) => {
@@ -187,7 +192,7 @@ export default function TestPage() {
     (async () => {
       try {
         const testId = getTestIdFromFolder(id);
-        await apiClient.post(`/visitors`, { testId, page: 'lotto', userAgent: navigator.userAgent  });      
+        await apiClient.post(`/visitors`, { testId, page: testId, userAgent: navigator.userAgent  });      
       } catch (error) {
         // 무시
       }
@@ -199,11 +204,46 @@ export default function TestPage() {
 
   // 템플릿 동적 import (Next.js dynamic)
   useEffect(() => {
+    if (!isTemplateTest) {
+      setTemplateComponent(null);
+      return;
+    }
+
+    const tryImport = async () => {
+      const tried = [];
+      const extensions = ['js', 'jsx', 'tsx'];
+
+      for (const ext of extensions) {
+        const importPath = `../../tests/${test.folder}/src/App.${ext}`;
+        tried.push(importPath);
+
+        try {
+          const mod = await import(
+            /* webpackInclude: /(App\.js|App\.jsx|App\.tsx)$/ */
+            `../../tests/${test.folder}/src/App.${ext}`
+          );
+          setTemplateComponent(() => mod.default);
+          console.log('성공:', importPath);
+          return;
+        } catch (error) {
+          console.warn('실패:', importPath, error);
+        }
+      }
+
+      console.error('모든 import 실패:', tried);
+       
+      setTemplateComponent(() => () =>'템플릿 컴포넌트 로드 실패');
+    };
+
+    tryImport();
+  }, [isTemplateTest, test?.folder]);
+  /*
+   useEffect(() => {
     if (isTemplateTest) {
       const tryImport = async () => {
         let tried = [];
         try {
-          const importPath = `../../tests/${test.folder}/src/App.jsx`;
+          const importPath = `../../tests/${test.folder}/src/App.js`;
           tried.push(importPath);
           console.log('import 시도:', importPath);
           const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.js`), {
@@ -218,7 +258,7 @@ export default function TestPage() {
         } catch (e1) {
           try {
             console.log(e1);
-            const importPath = `../../tests/${test.folder}/src/App.js`;
+            const importPath = `../../tests/${test.folder}/src/App.jsx`;
             tried.push(importPath);
             console.log('import 시도:', importPath);
             const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.jsx`), {
@@ -256,6 +296,8 @@ export default function TestPage() {
       setTemplateComponent(null);
     }
   }, [isTemplateTest, test?.folder]);
+  
+  */
 
   // 광고 스크립트 중복 삽입 방지
   useEffect(() => {

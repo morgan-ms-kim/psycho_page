@@ -28,6 +28,143 @@ import {
 } from '../components/StyledComponents';
 import Head from 'next/head';
 
+// 추천 슬라이드 스타일 컴포넌트
+const RecommendSection = styled.div`
+  margin: 20px auto;
+  max-width: 1200px;
+  width:100%;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px rgba(80,80,120,0.10);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+`;
+
+const RecommendTitle = styled.h2`
+  font-size: 1.5rem;
+  margin: 0 0 20px 0;
+  color: #333;
+  text-align: center;
+  font-weight: 600;
+`;
+
+const RecommendSlider = styled.div`
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+`;
+
+const RecommendSlide = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: ${props => (props.active ? 1 : 0)};
+  transform: ${props => {
+    if (props.active) {
+      return 'translateX(0%) scale(1)';
+    }
+    if (props.direction === 'out') {
+      return 'translateX(100%) scale(0.95)'; // 왼쪽으로 나감
+    }
+    if (props.direction === 'in') {
+      return 'translateX(-100%) scale(1.05)'; // 오른쪽에서 들어옴
+    }
+    return 'translateX(0%) scale(1)';
+  }};
+
+  transition: transform 0.6s cubic-bezier(0.45, 0, 0.55, 1),
+              opacity 0.4s ease-in-out;
+
+  pointer-events: ${props => (props.active ? 'auto' : 'none')};
+  z-index: ${props => (props.active ? 2 : 1)};
+`;
+
+const RecommendCard = styled.div`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+const RecommendTitleText = styled.h3`
+  font-size: 1.3rem;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+`;
+
+const RecommendDesc = styled.p`
+  font-size: 0.9rem;
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.4;
+`;
+
+const RecommendStats = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 15px;
+  font-size: 0.8rem;
+  opacity: 0.8;
+`;
+
+const RecommendStat = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
+
+const SlideDots = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+  
+`;
+
+const SlideDot = styled.div`
+  width: 10px;
+  height: 10px;
+  border-radius: 40%;
+  background: ${props => props.active ? '#667eea' : '#ddd'};
+  cursor: pointer;
+  transition: background 1s ease;
+`;
+
+const SlideProgressBar = styled.div`
+  width: 400px;
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  margin: 20px auto 0 auto;
+  overflow: hidden;
+`;
+
+const SlideProgress = styled.div`
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.45, 0, 0.55, 1);
+`;
+
+
 // 스타일 상수 정의 (공통 사용)
 const CONTAINER_WIDTH = '100%';
 const CONTAINER_MAXWIDTH = 1200;
@@ -42,11 +179,9 @@ const loadingContainerStyle = {
   minHeight: 300
 };
 // axios 인스턴스 생성
+//'http://localhost:4000/api',
 const apiClient = axios.create({
-  //우분투용
   baseURL: 'https://smartpick.website/api',
-  //윈도우용
-  //baseURL: 'http://localhost:4000/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -86,8 +221,140 @@ const sectionBlockStyle = {
   display: 'block',
 };
 
+// 추천 슬라이드 컴포넌트
+function RecommendSliderSection({ router, getTestFolderName }) {
+  const [recommendTests, setRecommendTests] = useState([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadRecommendTests = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.get('/recommends');
+        if (response.data && response.data.length > 0) {
+          setRecommendTests(response.data);
+        }
+      } catch (error) {
+        console.error('추천 테스트 로딩 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRecommendTests();
+  }, []);
+
+  useEffect(() => {
+    if (recommendTests.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % recommendTests.length);
+      }, 2000);
+
+      return () => clearInterval(interval);
+    }
+  }, [recommendTests.length]);
+
+  const handleSlideClick = (index) => {
+    setCurrentSlide(index);
+  };
+
+  const handleTestClick = (test) => {
+    try {
+      if (!test.id) {
+        console.error('테스트 ID가 없습니다:', test);
+        return;
+      }
+      let testPath = null;
+      let stringTemplate = 'template';
+      if (/^template\d+$/.test(test.folder)) {
+        testPath = `/testview/${stringTemplate + test.id}/`;
+      } else {
+        testPath = `/testview/${getTestFolderName(test.id)}`;
+      }
+      console.log('추천 테스트 클릭:', testPath, '원본 ID:', test.id);
+      router.push(testPath);
+    } catch (error) {
+      console.error('추천 테스트 클릭 에러:', error, '테스트 데이터:', test);
+    }
+  };
+
+  if (loading) {
+    return (
+      <RecommendSection>
+        <RecommendTitle>고민하는 당신을 위한 추천 테스트</RecommendTitle>
+        <RecommendSlider>
+          <RecommendSlide active={true}>
+            <RecommendCard>
+              <RecommendTitleText>추천 테스트를 불러오는 중...</RecommendTitleText>
+            </RecommendCard>
+          </RecommendSlide>
+        </RecommendSlider>
+      </RecommendSection>
+    );
+  }
+
+  if (recommendTests.length === 0) {
+    return null;
+  }
+
+  return (
+    <RecommendSection>
+      <RecommendTitle>고민하는 당신을 위한 추천 테스트</RecommendTitle>
+      <RecommendSlider>
+        {recommendTests.map((test, index) => {
+          const isActive = currentSlide === index;
+          const total = recommendTests.length;
+          const direction = isActive
+                            ? 'in'
+                            : currentSlide === total - 1 && index === 0
+                            ? 'in'
+                            : currentSlide === 0 && index === total - 1
+                            ? 'out'
+                            : index < currentSlide
+                            ? 'out'
+                            : 'in';
+          return (
+            <RecommendSlide key={test.id} active={isActive} direction={direction}>
+              <RecommendCard onClick={() => handleTestClick(test)}>
+                <RecommendTitleText>{test.title}</RecommendTitleText>
+                <RecommendDesc>{test.description}</RecommendDesc>
+                <RecommendStats>
+                  <RecommendStat>👁️ {test.views}</RecommendStat>
+                  <RecommendStat>💖 {test.likes}</RecommendStat>
+                  <RecommendStat>💬 {typeof test.comments === 'number' ? test.comments : 0}</RecommendStat>
+                </RecommendStats>
+              </RecommendCard>
+            </RecommendSlide>
+          );
+        })}
+      </RecommendSlider>
+      {recommendTests.length > 1 && (
+        
+        <SlideDots>
+          {recommendTests.map((_, index) => (
+            <SlideDot
+              key={index}
+              active={index === currentSlide}
+              onClick={() => handleSlideClick(index)}
+            />
+          ))}
+        </SlideDots>
+        
+        /*<SlideProgressBar>
+          <SlideProgress style={{ width: `${((currentSlide + 1) / recommendTests.length) * 100}%` }} />
+        </SlideProgressBar>
+        */
+
+
+      )}
+    </RecommendSection>
+  );
+}
+
 // 리스트 영역 분리 컴포넌트
 function TestListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath, loading }) {
+  
   // 항상 Section/TestCount 구조 유지, Grid는 리스트 있을 때만
   const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
   
@@ -194,6 +461,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
 
 export default function Home() {
   const [tests, setTests] = useState([]);
+  const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [sort, setSort] = useState('latest');
@@ -207,6 +475,7 @@ export default function Home() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [apiStatus, setApiStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
+  
   const router = useRouter();
 
   // URL 경로 정규화 - 중복 test 제거
@@ -349,12 +618,14 @@ export default function Home() {
       const params = new URLSearchParams({
         page: reset ? 1 : page,
         limit: 10,
-        sort: sort
+        offset:offset,
+        sort: sort,
       });
 
       if (searchTerm && searchTerm.trim()) {
         params.append('search', searchTerm.trim());
         console.log('검색 파라미터 추가:', searchTerm.trim());
+        params.delete('limit');
       }
       if (selectedCategory) params.append('category', selectedCategory);
 
@@ -373,7 +644,7 @@ export default function Home() {
         };
       });
       
-      if (reset) {
+      if (reset || searchTerm && searchTerm.trim()) {
         setTests(validatedTests);
       } else {
         // 중복 제거 로직 추가
@@ -436,9 +707,12 @@ export default function Home() {
   
   // 더 많은 테스트 로드 (무한 스크롤)
   const loadMore = () => {
+      console.log('loadMore');
     if (!loadingMore && hasMore && !loading && !searching && !showNoResults ) {
       setLoadingMore(true)
       setPage(prev => prev + 1);
+      setOffset(offset+8);
+      console.log('setOffset', offset);
       // 데이터를 다 불러온 후 setLoadingMore(false) 호출
     }
   };
@@ -448,10 +722,10 @@ export default function Home() {
     try {
       console.log('검색 실행:', { searchTerm, selectedCategory, sort });
       setSearching(true);
-      
+      setOffset(0);
       const params = new URLSearchParams({
         page: 1,
-        limit: 10,
+        limit: 6,
         sort: sort
       });
 
@@ -482,8 +756,12 @@ export default function Home() {
   // 검색어가 변경되면 검색 실행 (디바운스 적용)
   useEffect(() => {
     const timer = setTimeout(() => {
-      searchTests();
-    }, 300);
+      setTests([]);
+      setOffset(0);
+      setPage(1);
+      setHasMore(true);
+      loadTests();
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [searchTerm, selectedCategory, sort]);
@@ -608,15 +886,15 @@ export default function Home() {
               
             <Stats>
               {/*<StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>*/}
-              <StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>
+              {/*<StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>*/}
               {/*<StatItem>📈 Week: {visitorStats.week.toLocaleString()}</StatItem>*/}
               <StatItem style={{ 
                 color: apiStatus === 'connected' ? '#4CAF50' : 
                        apiStatus === 'failed' ? '#f44336' : '#ff9800',
                 fontWeight: 'bold'
               }}>
-                {apiStatus === 'connected' ? '🟢' : 
-                 apiStatus === 'failed' ? '🔴' : '🟡'}
+               {/* {apiStatus === 'connected' ? '🟢' : 
+                 apiStatus === 'failed' ? '🔴' : '🟡'}*/}
               </StatItem>
             </Stats>
             </SearchBar>
@@ -665,6 +943,12 @@ export default function Home() {
               }}>🔄 다시 시도</button>
             </ErrorMessage>
           )}
+
+          {/* 추천 슬라이드 */}
+          <RecommendSliderSection 
+            router={router}
+            getTestFolderName={getTestFolderName}
+          />
 
           {/* 리스트/검색/로딩 영역 */}
           {
@@ -779,7 +1063,11 @@ const TestItemStats = styled.div`
   margin-bottom: 8px;
 `;
 
-const Stat = styled.span``;
+const Stat = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
 
 const TestItemImage = styled.img.attrs({ loading: 'lazy' })`
   width: 100%;
@@ -823,6 +1111,6 @@ const Badge = styled.span`
   font-size: 0.85rem;
   font-weight: bold;
   color: #fff;
-  background: ${props => props.type === 'hot' ? '#ff5e5e' : '#7f7fd5'};
+  background: ${props => props.type === 'hot' ? '#ff5e5e' : props.type === 'new' ? '#7f7fd5' : '#4CAF50'};
 `;
 
