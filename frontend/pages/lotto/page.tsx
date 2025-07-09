@@ -154,13 +154,13 @@ export default function LottoPage() {
 
   // DB에서 로또 번호 리스트 전체 불러오기
   async function fetchLottoList() {
-    const res = await fetch('https://smartpick.website:4000/api/lotto/list');
+    const res = await fetch('https://smartpick.website/api/lotto/list');
     return await res.json();
   }
 
   // DB에서 최신 회차 불러오기
   async function fetchLatestNo() {
-    const res = await fetch('https://smartpick.website:4000/api/lotto/latest');
+    const res = await fetch('https://smartpick.website/api/lotto/latest');
     const data = await res.json();
     return data.latestNo;
   }
@@ -190,8 +190,21 @@ export default function LottoPage() {
       // 2. 최신 회차 확인 및 필요시 갱신
       const latestNo = list.length > 0 ? list[0].drawNo : 10;
       // 외부 최신 회차가 더 있으면 백엔드에 갱신 요청
-      const res = await fetch(`https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${latestNo + 1}`);
-      const data = await res.json();
+
+
+
+      
+      //const res = await fetch(`https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${latestNo + 1}`);
+
+      const params = new URLSearchParams({
+        drwNo: latestNo,
+      });
+
+      
+      const res = await fetch(`https://smartpick.website/api/lotto/req?${params}`);
+      const data = await res.json();   
+
+      
       if (data.returnValue === 'success') {
         await updateLottoDraws();
         // 갱신 후 다시 리스트 불러오기
