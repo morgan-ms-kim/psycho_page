@@ -17,11 +17,11 @@ const apiClient = axios.create({
 
 
 const digitOptions = [
-  { label: '1의 자리', min: 0, max: 9, countMax: 10 },
-  { label: '10의 자리', min: 10, max: 19, countMax: 10 },
-  { label: '20의 자리', min: 20, max: 29, countMax: 10 },
-  { label: '30의 자리', min: 30, max: 39, countMax: 10 },
-  { label: '40의 자리', min: 40, max: 45, countMax: 6 },
+  { label: '1', min: 0, max: 9, countMax: 10 },
+  { label: '10', min: 10, max: 19, countMax: 10 },
+  { label: '20', min: 20, max: 29, countMax: 10 },
+  { label: '30', min: 30, max: 39, countMax: 10 },
+  { label: '40', min: 40, max: 45, countMax: 6 },
 ];
 
 export default function LottoPage() {
@@ -134,15 +134,15 @@ export default function LottoPage() {
 
   // 랭킹 계산
   const statsArr = Object.entries(numberStats).map(([num, cnt]) => ({ num: Number(num), cnt }));
-  const top6 = statsArr.sort((a, b) => b.cnt - a.cnt || a.num - b.num).slice(0, 6);
-  const bottom6 = statsArr.sort((a, b) => a.cnt - b.cnt || a.num - b.num).slice(0, 6);
+  const top6 = statsArr.sort((a, b) => b.cnt - a.cnt || a.num - b.num).slice(0, 45);
+  const bottom6 = statsArr.sort((a, b) => a.cnt - b.cnt || a.num - b.num).slice(0, 45);
 
   // 실제 로또 랭킹 조회
   const fetchLottoRank = async () => {
     setRealLoading(true);
     setRealError('');
     try {
-      const res = await fetch(`http://localhost:4000/api/lotto-rank?count=${drawCount}`);
+      const res = await fetch(`https://smartpick.website/api/lotto-rank?count=${drawCount}`);
       const data = await res.json();
       setRealRank(data.top30);
       setRealLoading(false);
@@ -154,20 +154,20 @@ export default function LottoPage() {
 
   // DB에서 로또 번호 리스트 전체 불러오기
   async function fetchLottoList() {
-    const res = await fetch('http://localhost:4000/api/lotto/list');
+    const res = await fetch('https://smartpick.website:4000/api/lotto/list');
     return await res.json();
   }
 
   // DB에서 최신 회차 불러오기
   async function fetchLatestNo() {
-    const res = await fetch('localhost:4000/api/lotto/latest');
+    const res = await fetch('https://smartpick.website:4000/api/lotto/latest');
     const data = await res.json();
     return data.latestNo;
   }
 
   // DB에 최신 회차 갱신 요청
   async function updateLottoDraws() {
-    const res = await fetch('/api/lotto/update', { method: 'POST' });
+    const res = await fetch('https://smartpick.website/api/lotto/update', { method: 'POST' });
     return await res.json();
   }
 
@@ -182,7 +182,7 @@ export default function LottoPage() {
       apiClient.post('/lotto/update', { });
       console.log('updateLottoDraws');
       let ret = await updateLottoDraws();
-      console.log(ret.json());
+      console.log(ret);
 
       // 1. DB에서 로또 리스트 불러오기
       let list = await fetchLottoList();
@@ -210,47 +210,53 @@ export default function LottoPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drawCount]);
 
+  const getColorClass = (num) => {
+    if (num < 10) return styles.yellow;
+    if (num < 20) return styles.blue;
+    if (num < 30) return styles.red;
+    if (num < 40) return styles.gray;
+    return styles.green;
+  };
+
   return (
     <main className={styles.main}>
       <div className={styles.lottoLayout}>
-        {/* 많이 나온 번호 TOP 30 (왼쪽) */}
-        <aside className={styles.rankSide}>
-          <div className={styles.realRankBox}>
-            <div style={{marginBottom:8}}>
-              <label>조회 회차(최신 기준): </label>
-              <input type="number" min={10} max={1000} value={drawCount} onChange={e => setDrawCount(Number(e.target.value))} className={styles.input} style={{width:80}} />
-              <button className={styles.btn} style={{marginLeft:8}} onClick={fetchLottoRank}>조회</button>
-            </div>
-            {realLoading ? <div>로딩 중...</div> : realError ? <div style={{color:'red'}}>{realError}</div> : null}
-          </div>
-          <h3 className={styles.rankTitle}>많이 나온 번호 TOP 30</h3>
-          <ol className={styles.rankList}>
-            {realRank.map((x) => (
-              <li key={x.num}>{x.num}번 ({x.cnt}회)</li>
-            ))}
-          </ol>
-        </aside>
         {/* 메인 생성기/결과 */}
         <section className={styles.lottoMain}>
           <h1 className={styles.title}>로또번호 생성기</h1>
-          <div className={styles.formBox}>
-            {digitOptions.map((opt, idx) => (
-              <div key={opt.label} className={styles.inputRow}>
-                <label className={styles.label}>{opt.label}</label>
-                <input
-                  type="number"
-                  min={0}
-                  max={opt.countMax}
-                  value={counts[idx]}
-                  onChange={e => handleCountChange(idx, Number(e.target.value))}
-                  className={styles.input}
-                />
-                <span className={styles.unit}>개</span>
-              </div>
-            ))}
-            <button className={styles.btn} onClick={handleGenerate}>생성</button>
-            <button className={styles.btn} style={{marginTop:8, background:'#5a4fff'}} onClick={handleRandomLotto}>랜덤 로또번호 생성</button>
-          </div>
+          
+              <h2 className={styles.resultTitle}>자릿수 조합 결과</h2>
+              <div className={styles.formBox}>
+  {digitOptions.map((opt, idx) => {
+    const isRight = idx === 3 || idx === 4; // 4번, 5번 항목은 오른쪽 열
+    const col = isRight ? 2 : 1;
+    const row = isRight ? idx - 2 : idx + 1;
+
+    return (
+      <div
+        key={opt.label}
+        className={styles.inputRow}
+        style={{ gridColumn: col, gridRow: row }}
+      >
+        <label className={styles.label}>{opt.label}</label>
+        <input
+          type="number"
+          min={0}
+          max={opt.countMax}
+          value={counts[idx]}
+          onChange={e => handleCountChange(idx, Number(e.target.value))}
+          className={styles.input}
+        />
+        <span className={styles.unit}>개</span>
+      </div>
+    );
+  })}
+
+  {/* 버튼은 마지막 줄 가운데 정렬 */}
+  <div style={{ gridColumn: '1 / span 2', gridRow: 4, textAlign: 'center' }}>
+    <button className={styles.btn} onClick={handleGenerate}>생성</button>
+  </div>
+</div>
           <div className={styles.resultRow}>
             {/* 자릿수 조합 결과 */}
             <div className={styles.resultBox}>
@@ -275,36 +281,73 @@ export default function LottoPage() {
                   )}
                 </ul>
               )}
-              {/* 랭킹 표시 */}
-              <div className={styles.rankBox}>
-                <div><b>자주 나오는 숫자 TOP 6:</b> {top6.map(x => `${x.num}(${x.cnt})`).join(', ')}</div>
-                <div style={{marginTop:4}}><b>안 나오는 숫자 TOP 6:</b> {bottom6.map(x => `${x.num}(${x.cnt})`).join(', ')}</div>
-              </div>
-            </div>
-            {/* 랜덤 로또번호 결과 */}
-            <div className={styles.resultBox}>
-              <h2 className={styles.resultTitle}>랜덤 로또번호</h2>
-              {randomLotto.length > 0 ? (
-                <div style={{marginBottom:12}}>
-                  <b>랜덤 번호:</b> {randomLotto.join(', ')}
-                  <button className={styles.copyBtn} onClick={handleCopyRandom} style={{marginLeft:8}}>복사</button>
-                </div>
-              ) : (
-                <div className={styles.empty}>랜덤 번호를 생성해 주세요.</div>
-              )}
-              {copyMsg && randomLotto.length > 0 && <div style={{color:'#5a4fff',marginBottom:8}}>{copyMsg}</div>}
             </div>
           </div>
         </section>
-        {/* 적게 나온 번호 TOP 30 (오른쪽) */}
+        <section className={styles.lottoSub}>
+          
+        {/* 많이 나온 번호 TOP 30 (왼쪽) */}
         <aside className={styles.rankSide}>
-          <h3 className={styles.rankTitle}>적게 나온 번호 TOP 30</h3>
-          <ol className={styles.rankList}>
-            {[...realRank].sort((a, b) => a.cnt - b.cnt || a.num - b.num).slice(0, 30).map((x) => (
-              <li key={x.num}>{x.num}번 ({x.cnt}회)</li>
-            ))}
-          </ol>
+          <div className={styles.realRankBox}>
+            <div style={{marginBottom:8}}>
+              <label>조회 회차(최신 기준): </label>
+              <input type="number" min={10} max={1000} value={drawCount} onChange={e => setDrawCount(Number(e.target.value))} className={styles.input} style={{width:80}} />
+              <button className={styles.btn} style={{marginLeft:8}} onClick={fetchLottoRank}>조회</button>
+            </div>
+            {realLoading ? <div>로딩 중...</div> : realError ? <div style={{color:'red'}}>{realError}</div> : null}
+          </div>
+          <h3 className={styles.rankTitle}>많이 나온 랭킹</h3>
+          <div className={styles.rankColumns}>
+  <ol className={styles.rankList}>
+    {realRank.slice(0, 23).map((x) => (
+      <li key={x.num}>
+        <span className={`${styles.circle} ${getColorClass(x.num)}`}>
+          {x.num}
+        </span> - ({x.cnt}회)
+      </li>
+    ))}
+  </ol>
+  <ol className={styles.rankList}>
+    {realRank.slice(23).map((x) => (
+      <li key={x.num}>
+        <span className={`${styles.circle} ${getColorClass(x.num)}`}>
+          {x.num}
+        </span> - ({x.cnt}회)
+      </li>
+    ))}
+  </ol>
+</div>
         </aside>
+        {/* 많이 나온 번호 TOP 30 (오른쪽) */}
+        <aside className={styles.rankSide}>
+          <div className={styles.realRankBox}>
+            <div style={{marginBottom:8}}>
+            </div>
+            {realLoading ? <div>로딩 중...</div> : realError ? <div style={{color:'red'}}>{realError}</div> : null}
+          </div>
+          <h3 className={styles.rankTitle}>직접 생성한 번호 랭킹</h3>
+          <div className={styles.rankColumns}>
+  <ol className={styles.rankList}>
+    {top6.slice(0, 23).map((x) => (
+      <li key={x.num}>
+        <span className={`${styles.circle} ${getColorClass(x.num)}`}>
+          {x.num}
+        </span> - ({x.cnt}회)
+      </li>
+    ))}
+  </ol>
+  <ol className={styles.rankList}>
+    {top6.slice(23).map((x) => (
+      <li key={x.num}>
+        <span className={`${styles.circle} ${getColorClass(x.num)}`}>
+          {x.num}
+        </span> - ({x.cnt}회)
+      </li>
+    ))}
+  </ol>
+</div>
+        </aside>
+        </section>
       </div>
     </main>
   );

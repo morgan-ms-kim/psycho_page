@@ -1467,7 +1467,7 @@ app.post('/api/lotto/update', async (req, res) => {
 // 로또 번호 랭킹 API
 app.get('/api/lotto-rank', async (req, res) => {
   try {
-    const { count = 45 } = req.query;
+    const { count = 10 } = req.query;
     const limit = parseInt(count);
     
     // DB에서 로또 번호 데이터 조회
@@ -1485,11 +1485,17 @@ app.get('/api/lotto-rank', async (req, res) => {
       });
     });
     
+    // 1~45까지 모든 번호에 대해 빈도가 없는 번호는 0으로 설정
+    const allNumbers = [];
+    for (let i = 1; i <= 45; i++) {
+      const cnt = numberCount[i] || 0;
+      allNumbers.push({ num: i, cnt });
+    }
+    
     // 출현 빈도별로 정렬하여 top30 반환
-    const top30 = Object.entries(numberCount)
-      .map(([num, cnt]) => ({ num: parseInt(num), cnt }))
+    const top30 = allNumbers
       .sort((a, b) => b.cnt - a.cnt || a.num - b.num)
-      .slice(0, 30);
+      .slice(0, 45);
     
     res.json({ top30 });
   } catch (e) {
