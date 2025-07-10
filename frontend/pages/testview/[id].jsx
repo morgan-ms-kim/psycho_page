@@ -247,7 +247,7 @@ export default function TestPage() {
           const importPath = `../../tests/${test.folder}/src/App.js`;
           tried.push(importPath);
           console.log('import 시도:  ', importPath);
-          const mod = dynamic(() => import(`../../${test.folder}/src/App.js`), {
+          const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.js`), {
           //const mod = dynamic(() => import(importPath), {
             loading: () => <p>로딩 중...</p>,
             ssr: false,
@@ -262,7 +262,7 @@ export default function TestPage() {
             const importPath = `../../tests/${test.folder}/src/App.jsx`;
             tried.push(importPath);
             console.log('import 시도:', importPath);
-            const mod = dynamic(() => import(`../../${test.folder}/src/App.jsx`), {
+            const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.jsx`), {
               loading: () => <p>로딩 중...</p>,
               ssr: false,
             });
