@@ -556,15 +556,19 @@ app.get('/api/visitors/count', async (req, res, next) => {
     const today = new Date();
     today.setHours(0,0,0,0);
     
-    const total = await Visitor.count();
+    const total = await Visitor.count({ distinct: true, col: 'ip' });
     const todayCount = await Visitor.count({ 
-      where: { visitedAt: { [Op.gte]: today } } 
+      where: { visitedAt: { [Op.gte]: today } },
+      distinct: true,
+      col: 'ip'
     });
-    
+
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
     const weekCount = await Visitor.count({
-      where: { visitedAt: { [Op.gte]: weekAgo } }
+    where: { visitedAt: { [Op.gte]: weekAgo } },
+    distinct: true,
+    col: 'ip'
     });
     
     res.json({ 
