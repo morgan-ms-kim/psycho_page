@@ -350,7 +350,10 @@ export default function Analytics() {
           <StatCard>
             <StatIcon>📈</StatIcon>
             <StatContent>
-              <StatValue>
+              <StatValue>{
+                
+                
+                }
                 {analyticsData.length > 0 
                   ? Math.round(analyticsData.reduce((sum, item) => sum + item.count, 0) / analyticsData.length)
                   : 0
@@ -397,6 +400,11 @@ export default function Analytics() {
         {/* 방문자 상세 리스트 */}
         <DataTable style={{ marginTop: '2rem' }}>
           <TableTitle>방문자 상세 리스트</TableTitle>
+          <div style={{ textAlign: 'center', margin: '1rem 0' }}>
+            <button onClick={() => setVisitorPage(p => Math.max(1, p - 1))} disabled={visitorPage === 1}>이전</button>
+            <span style={{ margin: '0 1rem' }}>{visitorPage} / {Math.max(1, Math.ceil(visitorTotal / 50))}</span>
+            <button onClick={() => setVisitorPage(p => p + 1)} disabled={visitorPage >= Math.ceil(visitorTotal / 50)}>다음</button>
+          </div>
           <Table>
             <thead>
               <tr>
@@ -437,11 +445,6 @@ export default function Analytics() {
               ))}
             </tbody>
           </Table>
-          <div style={{ textAlign: 'center', margin: '1rem 0' }}>
-            <button onClick={() => setVisitorPage(p => Math.max(1, p - 1))} disabled={visitorPage === 1}>이전</button>
-            <span style={{ margin: '0 1rem' }}>{visitorPage} / {Math.max(1, Math.ceil(visitorTotal / 50))}</span>
-            <button onClick={() => setVisitorPage(p => p + 1)} disabled={visitorPage >= Math.ceil(visitorTotal / 50)}>다음</button>
-          </div>
         </DataTable>
       </Main>
     </Container>

@@ -43,8 +43,8 @@ export const wiggle = keyframes`
 
 
 export const MainWrap = styled.div`
-max-width: 96vw;
-min-width: 96vw;  
+max-width: 500px;
+min-width: 500px;  
 min-height: 100vh;
   
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -53,34 +53,18 @@ min-height: 100vh;
   overflow-y: auto;
 
    @media (max-width: 1200px) {
-    max-width: 98vw;
-    border-radius: 16px;
-    padding: 24px 4px;
+    max-width: 500px;
+    min-width: 500px;
+    border-radius: 1px;
+    
   }
   @media (max-width: 600px) {
-    max-width: 96vw;
-    min-width: 96vw;
-    border-radius: 8px;
+    max-width: 500px;
+    min-width: 500px;
+    border-radius: 1px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    margin: 0.5rem 0 1.5rem 0;
-    padding: 8px 0;
-  }
-  @media (max-width: 400px) {
-    max-width: 94vw;
-    min-width: 94vw;
-    border-radius: 4px;
-    box-shadow: 0 1px 4px rgba(0,0,0
-,0.05);
-    margin: 0.5rem 0 1rem 0;    
-    padding: 4px 0;
-  }
-  @media (max-width: 320px) { 
-    max-width: 92vw;
-    min-width: 92vw;
-    border-radius: 2px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    margin: 0.5rem 0 1rem 0;    
-    padding: 2px 0;
+    
+    
   }
 
 
@@ -418,7 +402,7 @@ export const Section = styled.div`
   min-width: 320px;
 
   margin: 0 1px;
-  padding: 0 20px;
+  padding: 0 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
