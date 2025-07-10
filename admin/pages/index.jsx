@@ -64,7 +64,6 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       const response = await apiClient.post('/admin/login', credentials);
       localStorage.setItem('adminToken', response.data.token);

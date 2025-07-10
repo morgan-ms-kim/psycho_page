@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -30,82 +30,162 @@ import Head from 'next/head';
 
 // 추천 슬라이드 스타일 컴포넌트
 const RecommendSection = styled.div`
-  margin: 20px auto;
+  margin: 5px auto;
   max-width: 1200px;
   width:100%;
+  height: 350px;
   background: #fff;
-  border-radius: 18px;
+  border-radius: 1px;
   box-shadow: 0 6px 32px rgba(80,80,120,0.10);
-  padding: 20px;
+  padding: 1px;
   position: relative;
   overflow: hidden;
 `;
 
 const RecommendTitle = styled.h2`
-  font-size: 1.5rem;
-  margin: 0 0 20px 0;
+
+  position: relative;
+  width: 100%;  
+  height: 100%;
+  font-size: 1rem;
+  margin: 0 0 5px 5px;
+  text-align: left;
   color: #333;
-  text-align: center;
+  margin: 0 0 5px 10px;
   font-weight: 600;
 `;
-
+const RecommendItemImage = styled.img.attrs({ loading: 'lazy' })`
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: #fff;
+  transition: transform 0.3s ease;
+  &:hover { transform: scale(1.05); }
+`;
 const RecommendSlider = styled.div`
   position: relative;
-  height: 200px;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  
+  /* 드래그 이동을 transform으로 처리 (실시간 반영) */
+  transform: translateX(${props => props.dragOffsetX}px);
+  transition: ${props => (props.isDragging ? 'none' : 'transform 0.5s ease')};
 `;
 
 const RecommendSlide = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
   height: 100%;
-
   display: flex;
-  align-items: center;
+  flex: 0 0 100%;
   justify-content: center;
-
-  opacity: ${props => (props.active ? 1 : 0)};
-  transform: ${props => {
-    if (props.active) {
-      return 'translateX(0%) scale(1)';
-    }
-    if (props.direction === 'out') {
-      return 'translateX(100%) scale(0.95)'; // 왼쪽으로 나감
-    }
-    if (props.direction === 'in') {
-      return 'translateX(-100%) scale(1.05)'; // 오른쪽에서 들어옴
-    }
-    return 'translateX(0%) scale(1)';
-  }};
-
-  transition: transform 0.6s cubic-bezier(0.45, 0, 0.55, 1),
-              opacity 0.4s ease-in-out;
-
-  pointer-events: ${props => (props.active ? 'auto' : 'none')};
-  z-index: ${props => (props.active ? 2 : 1)};
+  align-items: center;
+  pointer-events: auto;
+  z-index: ${props => (props.style?.zIndex ? props.style.zIndex : 11)};
 `;
-
 const RecommendCard = styled.div`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 15px;
-  padding: 20px;
+  padding: 2px;
   color: white;
   text-align: center;
   width: 100%;
-  max-width: 400px;
+  height: 100%;
   cursor: pointer;
   transition: transform 0.3s ease;
-  
+  pointer-events: none;
   &:hover {
     transform: scale(1.05);
   }
 `;
 
+const RecommendThumbnailContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const RecommendStats = styled.div`
+  position: absolute;
+  display: flex;
+  gap: 10px;
+  left: 0px;
+  font-size: 0.8rem;
+  opacity: 0.8;
+  bottom: 0px;
+  padding: 10px;
+  border-radius: 2px;
+  font-weight:600;
+  background: rgba(255, 248, 248, 0.9); 
+`;
+
+const RecommendStat = styled.span`
+  display: flex;
+  color :  rgba(3, 12, 24, 0.9); 
+  align-items: center;
+  gap: 0.5px;
+`;
+
+
+const SlidePageText = styled.div`
+  position: absolute;
+  bottom: 10px;  
+  right : 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 12px;
+  z-index: 50;
+  color: #333;
+`;
+
+const CurrentPage = styled.span`
+  color: #fff; /* 흰색 */
+`;
+
+const TotalPages = styled.span`
+  color: #aaa; /* 짙은 회색 */
+`;
+const SlideDots = styled.div`
+  position: absolute;
+  display: flex;
+  transform: translateX(-50%);  /* 정중앙 정렬 */
+  text-align:center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+  left: 50%;
+  
+z-index: 50; /* 카드 위로 올라오도록 */
+bottom: 10px;  /* 카드 위에 고정되는 위치 */
+`;
+
+const SlideDot = styled.div`
+  gap: 5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 40%;
+  background: ${props => props.active ? '#667eea' : '#ddd'};
+  cursor: pointer;
+  transition: background 0.5s ease;
+z-index: 50; /* 카드 위로 올라오도록 */
+bottom: 10px;  /* 카드 위에 고정되는 위치 */
+`;
 const RecommendTitleText = styled.h3`
   font-size: 1.3rem;
-  margin: 0 0 10px 0;
+  margin: 0 0 5px 0;
   font-weight: 600;
 `;
 
@@ -116,37 +196,8 @@ const RecommendDesc = styled.p`
   line-height: 1.4;
 `;
 
-const RecommendStats = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 15px;
-  font-size: 0.8rem;
-  opacity: 0.8;
-`;
 
-const RecommendStat = styled.span`
-  display: flex;
-  align-items: center;
-  gap: 5px;
-`;
 
-const SlideDots = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 15px;
-  
-`;
-
-const SlideDot = styled.div`
-  width: 10px;
-  height: 10px;
-  border-radius: 40%;
-  background: ${props => props.active ? '#667eea' : '#ddd'};
-  cursor: pointer;
-  transition: background 1s ease;
-`;
 
 const SlideProgressBar = styled.div`
   width: 400px;
@@ -197,11 +248,11 @@ const getApiBase = () => {
 
 // Section 스타일 상수 (흰색 컨테이너 공통)
 const sectionContainerStyle = {
-  maxWidth: 1200,
+  maxWidth: 500,
   //minWidth: 1200,
   margin: '15px auto 0 auto',
   background: '#fff',
-  borderRadius: 18,
+  borderRadius: 3,
   boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
   padding: '0 0 32px 0',
   minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
@@ -224,9 +275,81 @@ const sectionBlockStyle = {
 // 추천 슬라이드 컴포넌트
 function RecommendSliderSection({ router, getTestFolderName }) {
   const [recommendTests, setRecommendTests] = useState([]);
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  const [isHovered, setIsHovered] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [dragOffsetX, setDragOffsetX] = useState(0);
+  const [pendingSlide, setPendingSlide] = useState(null); // 'next' | 'prev' | null
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  useEffect(() => {
+    if (!isDragging) return;
+    const handleMouseMove = (e) => handleDragging(e);
+  const handleMouseUp = (e) => handleDragEnd(e);
+  const handleTouchMove = (e) => handleDragging(e);
+  const handleTouchEnd = (e) => handleDragEnd(e);
+
+  window.addEventListener('mousemove', handleMouseMove);
+  window.addEventListener('mouseup', handleMouseUp);
+  window.addEventListener('touchmove', handleTouchMove);
+  window.addEventListener('touchend', handleTouchEnd);
+
+  return () => {
+    window.removeEventListener('mousemove', handleMouseMove);
+    window.removeEventListener('mouseup', handleMouseUp);
+    window.removeEventListener('touchmove', handleTouchMove);
+    window.removeEventListener('touchend', handleTouchEnd);
+  };
+}, [isDragging, dragStartX, dragOffsetX]);
+  const handleDragStart = (e) => {
+    const x = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+  setDragStartX(x);
+  setIsDragging(true);
+  };
+  const sliderRef = useRef(null);
+  const handleDragging = (e) => {
+      if (!isDragging) return;
+    const x = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+    let offset = x - dragStartX;
+    const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
+    // clamp
+    if (offset > slideWidth) offset = slideWidth;
+    if (offset < -slideWidth) offset = -slideWidth;
+    setDragOffsetX(offset);
+  };
+  
+  const handleDragEnd = () => {
+    if (!isDragging) return;
+    const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
+    const threshold = slideWidth / 4;
+    if (dragOffsetX < -threshold) {
+      setPendingSlide('next');
+      setIsTransitioning(true);
+      setDragOffsetX(-slideWidth);
+    } else if (dragOffsetX > threshold) {
+      setPendingSlide('prev');
+      setIsTransitioning(true);
+      setDragOffsetX(slideWidth);
+    } else {
+      setPendingSlide(null);
+      setIsTransitioning(true);
+      setDragOffsetX(0);
+    }
+    setIsDragging(false);
+  };
+  const handleTransitionEnd = () => {
+    if (pendingSlide === 'next') {
+      setCurrentSlide((prev) => (prev + 1) % recommendTests.length);
+    } else if (pendingSlide === 'prev') {
+      setCurrentSlide((prev) => (prev - 1 + recommendTests.length) % recommendTests.length);
+    }
+    setPendingSlide(null);
+    setIsTransitioning(false);
+    setDragOffsetX(0); // 트랙을 -100%로 순간이동
+  };
   useEffect(() => {
     const loadRecommendTests = async () => {
       try {
@@ -246,14 +369,18 @@ function RecommendSliderSection({ router, getTestFolderName }) {
   }, []);
 
   useEffect(() => {
-    if (recommendTests.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentSlide((prev) => (prev + 1) % recommendTests.length);
-      }, 2000);
-
-      return () => clearInterval(interval);
-    }
-  }, [recommendTests.length]);
+    
+    
+    if (isHovered || isDragging || isTransitioning) return;
+    const timer = setInterval(() => {
+      setPendingSlide('next');
+      setIsTransitioning(true);
+      if (sliderRef.current) {
+        setDragOffsetX(-sliderRef.current.offsetWidth);
+      }
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [isHovered, isDragging, isTransitioning, recommendTests.length]);
 
   const handleSlideClick = (index) => {
     setCurrentSlide(index);
@@ -280,9 +407,10 @@ function RecommendSliderSection({ router, getTestFolderName }) {
   };
 
   if (loading) {
-    return (
-      <RecommendSection>
-        <RecommendTitle>고민하는 당신을 위한 추천 테스트</RecommendTitle>
+        return (
+          <>
+      <RecommendTitle>고민하기에 시간은 아까워!</RecommendTitle>
+          <RecommendSection>
         <RecommendSlider>
           <RecommendSlide active={true}>
             <RecommendCard>
@@ -291,6 +419,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
           </RecommendSlide>
         </RecommendSlider>
       </RecommendSection>
+      </>
     );
   }
 
@@ -298,39 +427,89 @@ function RecommendSliderSection({ router, getTestFolderName }) {
     return null;
   }
 
+  // 캐러셀용 인덱스 계산 (recommendTests 3개 미만 예외처리)
+  const total = recommendTests.length;
+  const prevIndex = (currentSlide - 1 + total) % total;
+  const nextIndex = (currentSlide + 1) % total;
+  const visibleSlides = [
+    recommendTests[prevIndex],
+    recommendTests[currentSlide],
+    recommendTests[nextIndex],
+  ];
+// 트랙 transform
+let baseTranslate = -100;
+if (pendingSlide === 'next') baseTranslate = -100;
+if (pendingSlide === 'prev') baseTranslate = -100;
   return (
-    <RecommendSection>
-      <RecommendTitle>고민하는 당신을 위한 추천 테스트</RecommendTitle>
-      <RecommendSlider>
-        {recommendTests.map((test, index) => {
-          const isActive = currentSlide === index;
-          const total = recommendTests.length;
-          const direction = isActive
-                            ? 'in'
-                            : currentSlide === total - 1 && index === 0
-                            ? 'in'
-                            : currentSlide === 0 && index === total - 1
-                            ? 'out'
-                            : index < currentSlide
-                            ? 'out'
-                            : 'in';
-          return (
-            <RecommendSlide key={test.id} active={isActive} direction={direction}>
-              <RecommendCard onClick={() => handleTestClick(test)}>
-                <RecommendTitleText>{test.title}</RecommendTitleText>
-                <RecommendDesc>{test.description}</RecommendDesc>
+    <>
+<RecommendTitle>고민하기에 시간은 마이 아까워!</RecommendTitle>
+      <RecommendSection
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+      <RecommendSlider
+        ref={sliderRef}
+        onMouseDown={handleDragStart}
+        onTouchStart={handleDragStart}
+      >
+        
+        <div
+           style={{
+            display: 'flex',
+            width: '100%',
+            height: '100%',
+            transform: `translateX(calc(${baseTranslate}% + ${dragOffsetX}px))`,
+            transition: isDragging || !isTransitioning ? 'none' : 'transform 0.5s cubic-bezier(.4,0,.2,1)',
+          }}
+          
+        onTransitionEnd={handleTransitionEnd}
+        >
+          {visibleSlides.map((test, idx) => (
+            <RecommendSlide
+              key={test?.id || idx}
+              style={{
+                width: '100%',
+                height: '100%',
+                flex: '0 0 100%',
+                position: 'relative',
+                zIndex: idx === 1 ? 12 : 11,
+              }}
+            >
+              <RecommendCard>
+                <RecommendThumbnailContainer>
+                  {test?.thumbnail && (
+                    <RecommendItemImage
+                      src={getImagePath(test.thumbnail)}
+                      alt={test.title}
+                      draggable={false}
+                      onContextMenu={e => e.preventDefault()}
+                      onTouchStart={e => e.preventDefault()}
+                      onError={e => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                  )}
+                  <TestItemPlaceholder style={{ display: test?.thumbnail ? 'none' : 'flex' }}>
+                    🧠
+                  </TestItemPlaceholder>
                 <RecommendStats>
-                  <RecommendStat>👁️ {test.views}</RecommendStat>
-                  <RecommendStat>💖 {test.likes}</RecommendStat>
-                  <RecommendStat>💬 {typeof test.comments === 'number' ? test.comments : 0}</RecommendStat>
+                  <RecommendStat>👁️ {test?.views}</RecommendStat>
+                  <RecommendStat>💖 {test?.likes}</RecommendStat>
+                  <RecommendStat>💬 {typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
                 </RecommendStats>
+                </RecommendThumbnailContainer>
               </RecommendCard>
             </RecommendSlide>
-          );
-        })}
+          ))}
+        </div>
       </RecommendSlider>
       {recommendTests.length > 1 && (
-        
+  <>
+        <SlidePageText>
+          <CurrentPage>{currentSlide + 1}</CurrentPage>          
+          <TotalPages>/{recommendTests.length}</TotalPages>
+        </SlidePageText>
         <SlideDots>
           {recommendTests.map((_, index) => (
             <SlideDot
@@ -340,15 +519,10 @@ function RecommendSliderSection({ router, getTestFolderName }) {
             />
           ))}
         </SlideDots>
-        
-        /*<SlideProgressBar>
-          <SlideProgress style={{ width: `${((currentSlide + 1) / recommendTests.length) * 100}%` }} />
-        </SlideProgressBar>
-        */
-
-
+        </>          
       )}
     </RecommendSection>
+    </>
   );
 }
 
@@ -426,14 +600,9 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                     <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
                       🧠
                     </TestItemPlaceholder>
-                  </TestThumbnailContainer>
-                  <TestContent>
-                    <TestItemTitle>
-                      {test.title}
-                    </TestItemTitle>
-                    <TestItemDesc>{test.description}</TestItemDesc>
+                    
                     {(isNew || isHot) && (
-                      <div style={{ margin: '4px 0 8px 0', minHeight: 24 }}>
+                      <div style={{position:'absolute', left: '5px',top:'5px', minHeight: 24 }}>
                         {isNew && <Badge type="new">NEW</Badge>}
                         {isHot && <Badge type="hot">HOT</Badge>}
                       </div>
@@ -443,6 +612,12 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                       <Stat>💖 {test.likes}</Stat>
                       <Stat>💬 {typeof test.comments === 'number' ? test.comments : 0}</Stat>
                     </TestItemStats>
+                  </TestThumbnailContainer>
+                  <TestContent>
+                    <TestItemTitle>
+                      {test.title}
+                      <TestItemDesc>{test.description}</TestItemDesc>
+                    </TestItemTitle>
                   </TestContent>
                 </TestCardContent>
               </Card>
@@ -458,7 +633,11 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
     </Section>
   );
 }
-
+// 이미지 경로를 올바르게 처리하는 함수
+const getImagePath = (path) => {
+  if (!path) return null;
+  return path;
+};
 export default function Home() {
   const [tests, setTests] = useState([]);
   const [offset, setOffset] = useState(0);
@@ -475,9 +654,8 @@ export default function Home() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [apiStatus, setApiStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
-  
   const router = useRouter();
-
+  
   // URL 경로 정규화 - 중복 test 제거
   useEffect(() => {
     const currentPath = router.asPath;
@@ -488,11 +666,7 @@ export default function Home() {
     }
   }, [router.asPath, router]);
 
-  // 이미지 경로를 올바르게 처리하는 함수
-  const getImagePath = (path) => {
-    if (!path) return null;
-    return path;
-  };
+
 
   // 테스트 ID를 폴더명으로 변환하는 함수
   const getTestFolderName = (testId) => {
@@ -859,21 +1033,20 @@ export default function Home() {
               setPage(1);
               setError(null);
               router.push('/');
-            }} style={{ cursor: 'pointer' }}>
-              <span style={{ color: 'initial', filter: 'none' }}>🧠</span> PSYCHO
-            </Logo>
+            }} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
+              
 
             <PageButton onClick={() => router.push('/lotto/page')}>
               로또 번호<br></br>생성기
             </PageButton>
 
-            <HistoryButton onClick={() => router.push('/history')}>
+            {/*<HistoryButton onClick={() => router.push('/history')}>
               📋 기록보기
-            </HistoryButton>
+            </HistoryButton>*/}
           </Header>
 
           {/* 검색 및 필터 섹션 */}
-          <SearchSection>
+       {/*    <SearchSection>
             <SearchBar>
               <SearchInput
                 type="text"
@@ -888,14 +1061,14 @@ export default function Home() {
               {/*<StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>*/}
               {/*<StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>*/}
               {/*<StatItem>📈 Week: {visitorStats.week.toLocaleString()}</StatItem>*/}
-              <StatItem style={{ 
+    {/*           <StatItem style={{ 
                 color: apiStatus === 'connected' ? '#4CAF50' : 
                        apiStatus === 'failed' ? '#f44336' : '#ff9800',
                 fontWeight: 'bold'
               }}>
                {/* {apiStatus === 'connected' ? '🟢' : 
                  apiStatus === 'failed' ? '🔴' : '🟡'}*/}
-              </StatItem>
+{/*               </StatItem>
             </Stats>
             </SearchBar>
             
@@ -925,8 +1098,8 @@ export default function Home() {
       : showNoResults ? '검색 결과가 없습니다'
       : `Total : ${sortedTests.length}`}
   </TestCount>
-</FilterCountBar>
-          </SearchSection>
+</FilterCountBar> */}{/* 
+          </SearchSection> */}
 
           {/* 에러 메시지 */}
           {error && (
@@ -1001,15 +1174,17 @@ const NoResults = styled.div`
 const TestCardContent = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
   height: 100%;
 `;
+
 
 const TestThumbnailContainer = styled.div`
   position: relative;
   margin-bottom: 15px;
+  padding: 5px 5px 5px 5px;
   width: 100%;
-  min-width: 320px;
-  height: 180px;
+  height:100%
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1049,18 +1224,10 @@ const TestItemTitle = styled.h3`
 
 const TestItemDesc = styled.p`
   font-size: 0.9rem;
-  margin: 0 0 12px 0;
+  margin: 0 0 2px 0;
   opacity: 0.8;
   line-height: 1.4;
   flex: 1;
-`;
-
-const TestItemStats = styled.div`
-  display: flex;
-  gap: 12px;
-  font-size: 0.8rem;
-  opacity: 0.7;
-  margin-bottom: 8px;
 `;
 
 const Stat = styled.span`
@@ -1071,12 +1238,13 @@ const Stat = styled.span`
 
 const TestItemImage = styled.img.attrs({ loading: 'lazy' })`
   width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 10px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 2px;
   transition: transform 0.3s ease;
   &:hover { transform: scale(1.05); }
 `;
+
 
 const TestContainer = styled.div`
   width: 100%;
@@ -1102,15 +1270,31 @@ const TestIframe = styled.iframe`
   display: block;
 `;
 
+const TestItemStats = styled.div`
+  position: absolute;
+  
+  left: 0px;
+  display: flex;
+  gap: 12px;
+  font-size: 0.8rem;
+  opacity: 0.7;
+  width:50px
+  font-size: 0.8rem;
+  opacity: 0.8;
+  bottom: 0px;
+  padding: 10px 10px 10px 10px;
+  border-radius: 2px;
+  font-weight:600;
+  background: rgba(255, 248, 248, 0.9); 
+`;
+
 // 뱃지 스타일 추가
 const Badge = styled.span`
   display: inline-block;
-  margin-left: 8px;
-  padding: 2px 8px;
-  border-radius: 8px;
+  padding: 5px 5px 5px 5px;
+  border-radius: 1px;
   font-size: 0.85rem;
   font-weight: bold;
-  color: #fff;
-  background: ${props => props.type === 'hot' ? '#ff5e5e' : props.type === 'new' ? '#7f7fd5' : '#4CAF50'};
+  color: #fff; ;
+  background: ${props => props.type === 'hot' ? '#ff5e5e' : props.type === 'new' ? '#ff9500' : '#4CAF50'};
 `;
-

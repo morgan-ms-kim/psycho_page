@@ -87,14 +87,14 @@ min-height: 100vh;
 `;
 
 export const Header = styled.header`
+  padding: 8px 16px 8px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  min-width: 320px;
-  max-width: 1200px;
+  min-width: 500px;
+  max-width: 500px;
   box-sizing: border-box;
-  padding: 1rem 2rem;
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -264,18 +264,18 @@ export const SocialButton = styled.button`
 // 그리드 스타일들
 export const Grid = styled.div`
    display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   justify-content: center;
   justify-items: center;
   width: 100%;
-  max-width: 1200px;
-  min-width: 320px;
+  max-width: 500px;
+  min-width: 500px;
   margin: 0 auto;
   /* 바깥쪽 여백 넓힘 */
-  padding-left: 100px;
-  padding-right: 100px;
-  padding-top: 25px;
-  grid-row-gap: 50px;
+  padding-left: 2px;
+  padding-right: 2px;
+  padding-top: 2px;
+  grid-row-gap: 5px;
 
   background: rgba(255, 255, 255, 0.1);
   box-sizing: border-box;
@@ -291,15 +291,13 @@ export const Grid = styled.div`
 export const Card = styled.div`
    background: rgba(255,255,255,0.1);
   border-radius: 15px;
-  padding: 20px 16px;
+  padding: 2px 2px;
   backdrop-filter: blur(10px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.18);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   width: 100%;
-  max-width: 380px;
-  min-width: 0;
-  margin: 0 4px 18px 4px;
+  min-width: 0;  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -309,12 +307,10 @@ export const Card = styled.div`
     box-shadow: 0 15px 40px rgba(0,0,0,0.28);
   }
   @media (max-width: 900px) {
-    max-width: 98vw;
     margin: 0 0 14px 0;
     padding: 14px 4px;
   }
   @media (max-width: 600px) {
-    max-width: 96vw;
     min-width: 0;
     margin: 0 0 10px 0;
     padding: 10px 2px;
@@ -418,7 +414,7 @@ export const FlexColumn = styled.div`
 
 // 섹션 스타일들
 export const Section = styled.div`
-  max-width: 1200px;
+  max-width: 500px;
   min-width: 320px;
 
   margin: 0 1px;
@@ -496,14 +492,14 @@ export const ProgressText = styled.div`
 `;
 
 // 메인 페이지 전용 스타일 컴포넌트들
-export const Logo = styled.h1`
-  font-size: 2rem;
-  margin: 0;
-  background: linear-gradient(45deg, #ff6b6b, #ffa500);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+
+
+export const Logo = styled.div`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #667eea;
 `;
+
 
 export const Stats = styled.div`
   display: flex;

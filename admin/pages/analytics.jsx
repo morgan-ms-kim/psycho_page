@@ -269,7 +269,7 @@ export default function Analytics() {
           <Logo onClick={() => {
             if (router.pathname !== '/dashboard') {
               if (validateAndFixPath('/dashboard', router)) {
-                router.push('/dashboard');
+                router.push('/');
               }
             }
           }} style={{ cursor: 'pointer' }}>🧠 PSYCHO 관리자</Logo>
