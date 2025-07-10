@@ -101,7 +101,7 @@ const RecommendCard = styled.div`
   height: 100%;
   cursor: pointer;
   transition: transform 0.3s ease;
-  pointer-events: none;
+  pointer-events: auto;
   &:hover {
     transform: scale(1.05);
   }

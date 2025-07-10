@@ -296,7 +296,7 @@ export const Card = styled.div`
   box-shadow: 0 10px 30px rgba(0,0,0,0.18);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
-  width: 100%;
+  max-width: 500px;
   min-width: 0;  
   display: flex;
   flex-direction: column;
