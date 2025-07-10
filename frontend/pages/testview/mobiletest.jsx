@@ -540,6 +540,68 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
   >✕</button>
         </ModalHeader>
         <ModalBody>
+
+          
+
+//////////////////////
+
+            {/* 댓글 섹션 */}
+            <CommentSection style={{
+            }}>
+              <CommentHeader style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, display: 'flex', padding: '0 24px', boxSizing: 'border-box' }}>
+                <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
+                <CommentButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ marginLeft: 'auto', marginRight: 0 }}>
+                  {showCommentForm ? '취소' : '댓글 작성'}
+                </CommentButton>
+              </CommentHeader>
+              {showCommentForm && (
+                <CommentFormContainer style={{ width: '100%', maxWidth: '100%', margin: '0 auto 24px auto' }}>
+                  <CommentInput
+                    type="text"
+                    placeholder="닉네임"
+                    value={newComment.nickname}
+                    onChange={(e) => setNewComment({...newComment, nickname: e.target.value})}
+                    maxLength={20}
+                  />
+                  <CommentInput
+                    type="password"
+                    placeholder="비밀번호 (4자 이상)"
+                    value={newComment.password}
+                    onChange={(e) => setNewComment({...newComment, password: e.target.value})}
+                    minLength={4}
+                  />
+                  <CommentTextarea
+                    placeholder="댓글을 작성해주세요..."
+                    value={newComment.content}
+                    onChange={(e) => setNewComment({...newComment, content: e.target.value})}
+                    maxLength={500}
+                  />
+                  <CommentSubmitButton onClick={submitComment}>
+                    댓글 작성
+                  </CommentSubmitButton>
+                </CommentFormContainer>
+              )}
+              {comments.length === 0 && (
+                <div style={{ color: '#aaa', textAlign: 'center', margin: '1rem 0' }}>아직 댓글이 없습니다!</div>
+              )}
+              <div style={{
+                width: '100%',
+                maxWidth: '100%',
+                margin: '0 auto',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0,
+                boxSizing: 'border-box',
+                padding: 0
+              }}>
+                {comments.map((comment) => (
+                  <RenderedCommentItem key={comment.id} comment={comment} />
+                ))}
+              </div>
+            </CommentSection>
+/////////////////////
+
+
+
+
           <CommentInputRow>
             <InfoInput placeholder="ID" value={newComment.id} onChange={e => setNewComment({ ...newComment, id: e.target.value })} />
             <InfoInput placeholder="PW" type="password" value={newComment.password} onChange={e => setNewComment({ ...newComment, password: e.target.value })} />
@@ -554,6 +616,11 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
               </div>
             ))}
           </div>
+
+
+
+
+
         </ModalBody>
       </ModalSheet>
       {/* 상세 모달 */}

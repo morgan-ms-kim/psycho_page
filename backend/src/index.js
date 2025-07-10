@@ -1410,11 +1410,8 @@ app.post('/api/admin/update-all-folder-names', authenticateAdmin, async (req, re
 
 app.get('/api/lotto/req', async (req, res) => {
   const drwNo = req.query.drwNo;
-  console.log('drwNo', drwNo)
   const result = await fetch(`https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${drwNo}+1`);
-  console.log('result', result)
   const data = await result.json();
-  console.log('data', data)
   res.json(data);
 });
 
