@@ -218,12 +218,12 @@ const SlideProgress = styled.div`
 
 // 스타일 상수 정의 (공통 사용)
 const CONTAINER_WIDTH = '100%';
-const CONTAINER_MAXWIDTH = 1200;
+const CONTAINER_MAXWIDTH = 500;
 const CONTAINER_MINWIDTH = 600;
 const loadingContainerStyle = {
   width: CONTAINER_WIDTH,
-  maxWidth: CONTAINER_MAXWIDTH,
-  minWidth: CONTAINER_MINWIDTH,
+  maxWidth: 500,
+  minWidth: 500,
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -248,7 +248,7 @@ const getApiBase = () => {
 
 // Section 스타일 상수 (흰색 컨테이너 공통)
 const sectionContainerStyle = {
-  maxWidth: 500,
+  
   //minWidth: 1200,
   margin: '15px auto 0 auto',
   background: '#fff',
@@ -258,7 +258,8 @@ const sectionContainerStyle = {
   minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
   position: 'relative',
   // 모바일 중앙정렬 보정
-  width: '100%',
+  width: '500px',
+  maxWidth: '500px',
   boxSizing: 'border-box',
 };
 const sectionCenterStyle = {
@@ -488,16 +489,21 @@ if (pendingSlide === 'prev') baseTranslate = -100;
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'flex';
                       }}
+                      onClick={() => handleTestClick(test)}
+                      style={{ cursor: 'pointer' }}
                     />
                   )}
-                  <TestItemPlaceholder style={{ display: test?.thumbnail ? 'none' : 'flex' }}>
+                  <TestItemPlaceholder 
+                    style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
+                    onClick={() => handleTestClick(test)}
+                  >
                     🧠
                   </TestItemPlaceholder>
-                <RecommendStats>
-                  <RecommendStat>👁️ {test?.views}</RecommendStat>
-                  <RecommendStat>💖 {test?.likes}</RecommendStat>
-                  <RecommendStat>💬 {typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
-                </RecommendStats>
+                  <RecommendStats>
+                    <RecommendStat>👁️ {test?.views}</RecommendStat>
+                    <RecommendStat>💖 {test?.likes}</RecommendStat>
+                    <RecommendStat>💬 {typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
+                  </RecommendStats>
                 </RecommendThumbnailContainer>
               </RecommendCard>
             </RecommendSlide>
@@ -986,7 +992,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>PSYCHO - 심리테스트</title>
+        <title>씸풀 - 심심풀이에 좋은 심리테스트</title>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-848040041408559"
           crossOrigin="anonymous"
         />  
@@ -1033,7 +1039,7 @@ export default function Home() {
               setPage(1);
               setError(null);
               router.push('/');
-            }} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
+            }} style={{ cursor: 'pointer' }}>🧠씸풀</Logo>
               
 
             <PageButton onClick={() => router.push('/lotto/page')}>
@@ -1174,6 +1180,7 @@ const NoResults = styled.div`
 const TestCardContent = styled.div`
   display: flex;
   flex-direction: column;
+  max-width:500px;
   width: 100%;
   height: 100%;
 `;
@@ -1183,6 +1190,7 @@ const TestThumbnailContainer = styled.div`
   position: relative;
   margin-bottom: 15px;
   padding: 5px 5px 5px 5px;
+  max-width:500px;
   width: 100%;
   height:100%
   display: flex;
@@ -1248,8 +1256,8 @@ const TestItemImage = styled.img.attrs({ loading: 'lazy' })`
 
 const TestContainer = styled.div`
   width: 100%;
-  max-width: 1800px;
-  min-width: 600px;
+  max-width: 500px;
+  min-width: 500px;
   margin: 2rem auto;
   background: #fff;
   border-radius: 24px;
@@ -1261,7 +1269,7 @@ const TestContainer = styled.div`
 
 const TestIframe = styled.iframe`
   width: 100%;
-  min-width: 600px;
+  min-width: 500px;
   min-height: 800px;
   border: none;
   background: #fff;

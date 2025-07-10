@@ -428,7 +428,7 @@ export default function TestPage() {
     return (
       <>
         <Head>
-          <title>{test?.title ? `${test.title} - PSYCHO` : '테스트 상세 - PSYCHO'}</title>
+          <title>{test?.title ? `${test.title} - 씸풀` : '씸풀 - 심심풀이에 좋은 심리테스트'}</title>
         </Head>
         <MainWrap
           style={{

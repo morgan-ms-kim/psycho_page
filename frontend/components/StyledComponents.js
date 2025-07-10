@@ -267,7 +267,7 @@ export const Grid = styled.div`
   grid-template-columns: 1fr;
   justify-content: center;
   justify-items: center;
-  width: 100%;
+  width: 500px;
   max-width: 500px;
   min-width: 500px;
   margin: 0 auto;
@@ -281,7 +281,7 @@ export const Grid = styled.div`
   box-sizing: border-box;
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    max-width: 100vw;
+    max-width: 500px;
     gap: 2px;
     padding: 0 2vw;
   }
