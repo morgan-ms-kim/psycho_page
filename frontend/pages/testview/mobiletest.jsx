@@ -546,7 +546,7 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
 //////////////////////
 
             {/* 댓글 섹션 */}
-            <CommentSection style={{
+            {/* <CommentSection style={{
             }}>
               <CommentHeader style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, display: 'flex', padding: '0 24px', boxSizing: 'border-box' }}>
                 <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
@@ -596,7 +596,7 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
                   <RenderedCommentItem key={comment.id} comment={comment} />
                 ))}
               </div>
-            </CommentSection>
+            </CommentSection> */}
 /////////////////////
 
 
