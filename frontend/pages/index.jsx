@@ -1395,10 +1395,11 @@ export default function Home() {
           )}
 
           {/* 추천 슬라이드 */}
-          <RecommendSliderSection 
+         {/* <RecommendSliderSection 
             router={router}
             getTestFolderName={getTestFolderName}
           />
+         */}
 
           {/* 새로운 슬라이더 */}
           <NewSliderSection 
