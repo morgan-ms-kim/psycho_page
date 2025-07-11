@@ -6,7 +6,7 @@
   
   "scripts": {
     "dev": "next dev -p 3000",
-    "prebuild": "node ../scripts/generate-app-module-map.js",
+    "prebuild": "node scripts/generate-app-module-map.js",
     "build": "next build",
     "start": "next start"
   },
