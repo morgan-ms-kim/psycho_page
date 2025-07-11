@@ -13,7 +13,7 @@ git pull
 # 프론트엔드 디렉토리로 이동
 echo "📁 프론트엔드 디렉토리로 이동..."
 cd frontend
-node scripts/generate-app-module-map.js
+node frontend/scripts/generate-app-module-map.js
 # 빌드
 echo "🔨 빌드 중..."
 npm run build
