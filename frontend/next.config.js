@@ -7,6 +7,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  swcMinify: true,
+
   /*experimental: {
     forceSwcTransforms: true,
   },*/

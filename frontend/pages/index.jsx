@@ -15,6 +15,7 @@ import {
   Stats,
   StatItem,
   PageButton,
+  PageLink,
   HistoryButton,
   SearchSection,
   SearchBar,
@@ -285,34 +286,42 @@ function RecommendSliderSection({ router, getTestFolderName }) {
   const [dragOffsetX, setDragOffsetX] = useState(0);
   const [pendingSlide, setPendingSlide] = useState(null); // 'next' | 'prev' | null
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [lastInteractionTime, setLastInteractionTime] = useState(Date.now()); // 자동 슬라이드 타이머 초기화용
 
   useEffect(() => {
     if (!isDragging) return;
+    
     const handleMouseMove = (e) => handleDragging(e);
-  const handleMouseUp = (e) => handleDragEnd(e);
-  const handleTouchMove = (e) => handleDragging(e);
-  const handleTouchEnd = (e) => handleDragEnd(e);
+    const handleMouseUp = (e) => handleDragEnd(e);
+    const handleTouchMove = (e) => handleDragging(e);
+    const handleTouchEnd = (e) => handleDragEnd(e);
 
-  window.addEventListener('mousemove', handleMouseMove);
-  window.addEventListener('mouseup', handleMouseUp);
-  window.addEventListener('touchmove', handleTouchMove);
-  window.addEventListener('touchend', handleTouchEnd);
+    // 전역 이벤트 리스너 추가
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
 
-  return () => {
-    window.removeEventListener('mousemove', handleMouseMove);
-    window.removeEventListener('mouseup', handleMouseUp);
-    window.removeEventListener('touchmove', handleTouchMove);
-    window.removeEventListener('touchend', handleTouchEnd);
-  };
-}, [isDragging, dragStartX, dragOffsetX]);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isDragging, dragStartX, dragOffsetX]);
+
   const handleDragStart = (e) => {
+    e.preventDefault(); // 기본 동작 방지
     const x = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-  setDragStartX(x);
-  setIsDragging(true);
+    setDragStartX(x);
+    setIsDragging(true);
+    setLastInteractionTime(Date.now()); // 드래그 시작 시 타이머 초기화
   };
+
   const sliderRef = useRef(null);
   const handleDragging = (e) => {
-      if (!isDragging) return;
+    if (!isDragging) return;
+    e.preventDefault(); // 기본 동작 방지
     const x = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
     let offset = x - dragStartX;
     const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
@@ -322,25 +331,34 @@ function RecommendSliderSection({ router, getTestFolderName }) {
     setDragOffsetX(offset);
   };
   
-  const handleDragEnd = () => {
+  const handleDragEnd = (e) => {
     if (!isDragging) return;
+    e.preventDefault(); // 기본 동작 방지
+    
     const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
     const threshold = slideWidth / 4;
+    
     if (dragOffsetX < -threshold) {
+      // 다음 슬라이드로 이동
       setPendingSlide('next');
       setIsTransitioning(true);
       setDragOffsetX(-slideWidth);
     } else if (dragOffsetX > threshold) {
+      // 이전 슬라이드로 이동
       setPendingSlide('prev');
       setIsTransitioning(true);
       setDragOffsetX(slideWidth);
     } else {
+      // 원래 위치로 복귀
       setPendingSlide(null);
       setIsTransitioning(true);
       setDragOffsetX(0);
     }
+    
     setIsDragging(false);
+    setLastInteractionTime(Date.now()); // 드래그 종료 시 타이머 초기화
   };
+
   const handleTransitionEnd = () => {
     if (pendingSlide === 'next') {
       setCurrentSlide((prev) => (prev + 1) % recommendTests.length);
@@ -349,8 +367,9 @@ function RecommendSliderSection({ router, getTestFolderName }) {
     }
     setPendingSlide(null);
     setIsTransitioning(false);
-    setDragOffsetX(0); // 트랙을 -100%로 순간이동
+    setDragOffsetX(0);
   };
+
   useEffect(() => {
     const loadRecommendTests = async () => {
       try {
@@ -370,21 +389,22 @@ function RecommendSliderSection({ router, getTestFolderName }) {
   }, []);
 
   useEffect(() => {
-    
-    
     if (isHovered || isDragging || isTransitioning) return;
+    
     const timer = setInterval(() => {
       setPendingSlide('next');
       setIsTransitioning(true);
       if (sliderRef.current) {
         setDragOffsetX(-sliderRef.current.offsetWidth);
       }
-    }, 3000);
+    }, 1000);
+    
     return () => clearInterval(timer);
-  }, [isHovered, isDragging, isTransitioning, recommendTests.length]);
+  }, [isHovered, isDragging, isTransitioning, recommendTests.length, lastInteractionTime]); // lastInteractionTime 추가
 
   const handleSlideClick = (index) => {
     setCurrentSlide(index);
+    setLastInteractionTime(Date.now()); // 클릭 시 타이머 초기화
   };
 
   const handleTestClick = (test) => {
@@ -430,11 +450,15 @@ function RecommendSliderSection({ router, getTestFolderName }) {
 
   // 캐러셀용 인덱스 계산 (recommendTests 3개 미만 예외처리)
   const total = recommendTests.length;
-  const prevIndex = (currentSlide - 1 + total) % total;
-  const nextIndex = (currentSlide + 1) % total;
+  
+  // 애니메이션 중에는 currentSlide를 고정, 완료 후에만 업데이트
+  const displaySlide = isTransitioning ? currentSlide : currentSlide;
+  const prevIndex = (displaySlide - 1 + total) % total;
+  const nextIndex = (displaySlide + 1) % total;
+  
   const visibleSlides = [
     recommendTests[prevIndex],
-    recommendTests[currentSlide],
+    recommendTests[displaySlide],
     recommendTests[nextIndex],
   ];
 // 트랙 transform
@@ -443,10 +467,10 @@ if (pendingSlide === 'next') baseTranslate = -100;
 if (pendingSlide === 'prev') baseTranslate = -100;
   return (
     <>
-<RecommendTitle>고민하기에 시간은 마이 아까워!</RecommendTitle>
+<RecommendTitle>추천해요</RecommendTitle>
       <RecommendSection
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={() => !isDragging && setIsHovered(true)}
+        onMouseLeave={() => !isDragging && setIsHovered(false)}
       >
       <RecommendSlider
         ref={sliderRef}
@@ -528,6 +552,253 @@ if (pendingSlide === 'prev') baseTranslate = -100;
         </>          
       )}
     </RecommendSection>
+    </>
+  );
+}
+
+// 새로운 슬라이더 컴포넌트
+function NewSliderSection({ router, getTestFolderName }) {
+  const [recommendTests, setRecommendTests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragOffsetX, setDragOffsetX] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
+  const sliderRef = useRef(null);
+
+  // 추천 테스트 로딩
+  useEffect(() => {
+    const loadRecommendTests = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.get('/recommends');
+        if (response.data && response.data.length > 0) {
+          setRecommendTests(response.data);
+        }
+      } catch (error) {
+        console.error('추천 테스트 로딩 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRecommendTests();
+  }, []);
+
+  // 전역 마우스 이벤트
+  useEffect(() => {
+    if (!isDragging) return;
+    
+    const handleMouseMove = (e) => handleDragging(e);
+    const handleMouseUp = (e) => handleDragEnd(e);
+    const handleTouchMove = (e) => handleDragging(e);
+    const handleTouchEnd = (e) => handleDragEnd(e);
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isDragging, dragStartX, dragOffsetX]);
+
+  // 자동 슬라이드 타이머
+  useEffect(() => {
+    if (isHovered || isDragging || isTransitioning || recommendTests.length === 0) return;
+    
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % recommendTests.length);
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [isHovered, isDragging, isTransitioning, recommendTests.length, lastInteractionTime]); // lastInteractionTime 다시 추가
+
+  const handleDragStart = (e) => {
+    e.preventDefault();
+    const x = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+    setDragStartX(x);
+    setIsDragging(true);
+  };
+
+  const handleDragging = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+    let offset = x - dragStartX;
+    const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
+    
+    // 드래그 범위 제한 (양 옆 슬라이드까지만)
+    if (offset > slideWidth) offset = slideWidth;
+    if (offset < -slideWidth) offset = -slideWidth;
+    
+    setDragOffsetX(offset);
+  };
+
+  const handleDragEnd = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    
+    const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
+    const threshold = slideWidth / 3; // 33% 이상 드래그해야 이동
+    
+    if (dragOffsetX < -threshold) {
+      // 다음 슬라이드로 이동
+      setCurrentSlide((prev) => (prev + 1) % recommendTests.length);
+    } else if (dragOffsetX > threshold) {
+      // 이전 슬라이드로 이동
+      setCurrentSlide((prev) => (prev - 1 + recommendTests.length) % recommendTests.length);
+    }
+    
+    setIsDragging(false);
+    setDragOffsetX(0);
+    
+    // 드래그 종료 시 hover 상태 초기화 및 타이머 강제 재시작
+    setIsHovered(false);
+    setLastInteractionTime(Date.now());
+  };
+
+  const handleTestClick = (test) => {
+    try {
+      if (!test.id) {
+        console.error('테스트 ID가 없습니다:', test);
+        return;
+      }
+      let testPath = null;
+      let stringTemplate = 'template';
+      if (/^template\d+$/.test(test.folder)) {
+        testPath = `/testview/${stringTemplate + test.id}/`;
+      } else {
+        testPath = `/testview/${getTestFolderName(test.id)}`;
+      }
+      console.log('새 슬라이더 테스트 클릭:', testPath, '원본 ID:', test.id);
+      router.push(testPath);
+    } catch (error) {
+      console.error('새 슬라이더 테스트 클릭 에러:', error, '테스트 데이터:', test);
+    }
+  };
+
+  if (loading) {
+    return (
+      <>
+        <RecommendTitle>새로운 슬라이더</RecommendTitle>
+        <RecommendSection>
+          <RecommendSlider>
+            <RecommendSlide active={true}>
+              <RecommendCard>
+                <RecommendTitleText>추천 테스트를 불러오는 중...</RecommendTitleText>
+              </RecommendCard>
+            </RecommendSlide>
+          </RecommendSlider>
+        </RecommendSection>
+      </>
+    );
+  }
+
+  if (recommendTests.length === 0) {
+    return null;
+  }
+
+  // 무한 루프를 위한 슬라이드 배열 복제
+  const infiniteSlides = [...recommendTests, ...recommendTests, ...recommendTests];
+  const total = recommendTests.length;
+  
+  // 실제 슬라이드 인덱스 (무한 루프용)
+  const actualSlideIndex = currentSlide + total;
+
+  return (
+    <>
+      <RecommendTitle>새로운 슬라이더</RecommendTitle>
+      <RecommendSection
+        onMouseEnter={() => !isDragging && setIsHovered(true)}
+        onMouseLeave={() => !isDragging && setIsHovered(false)}
+      >
+        <RecommendSlider
+          ref={sliderRef}
+          onMouseDown={handleDragStart}
+          onTouchStart={handleDragStart}
+        >
+          <div
+            style={{
+              display: 'flex',
+              width: '100%',
+              height: '100%',
+              transform: `translateX(calc(-${actualSlideIndex * 100}% + ${dragOffsetX}px))`,
+              transition: isDragging ? 'none' : 'transform 0.3s ease',
+            }}
+          >
+            {infiniteSlides.map((test, idx) => (
+              <RecommendSlide
+                key={`${test?.id || idx}-${Math.floor(idx / total)}`}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  flex: '0 0 100%',
+                  position: 'relative',
+                }}
+              >
+                <RecommendCard>
+                  <RecommendThumbnailContainer>
+                    {test?.thumbnail && (
+                      <RecommendItemImage
+                        src={getImagePath(test.thumbnail)}
+                        alt={test.title}
+                        draggable={false}
+                        onContextMenu={e => e.preventDefault()}
+                        onTouchStart={e => e.preventDefault()}
+                        onError={e => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                        onClick={() => handleTestClick(test)}
+                        style={{ cursor: 'pointer' }}
+                      />
+                    )}
+                    <TestItemPlaceholder 
+                      style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
+                      onClick={() => handleTestClick(test)}
+                    >
+                      🧠
+                    </TestItemPlaceholder>
+                    <RecommendStats>
+                      <RecommendStat>👁️ {test?.views}</RecommendStat>
+                      <RecommendStat>💖 {test?.likes}</RecommendStat>
+                      <RecommendStat>💬 {typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
+                    </RecommendStats>
+                  </RecommendThumbnailContainer>
+                </RecommendCard>
+              </RecommendSlide>
+            ))}
+          </div>
+        </RecommendSlider>
+        {recommendTests.length > 1 && (
+          <>
+            <SlidePageText>
+              <CurrentPage>{currentSlide + 1}</CurrentPage>          
+              <TotalPages>/{recommendTests.length}</TotalPages>
+            </SlidePageText>
+            <SlideDots>
+              {recommendTests.map((_, index) => (
+                <SlideDot
+                  key={index}
+                  active={index === currentSlide}
+                  onClick={() => {
+                    setCurrentSlide(index);
+                    setLastInteractionTime(Date.now());
+                  }}
+                />
+              ))}
+            </SlideDots>
+          </>          
+        )}
+      </RecommendSection>
     </>
   );
 }
@@ -1004,7 +1275,7 @@ export default function Home() {
             width: '100%',
             minWidth: 320,
             maxWidth: 728,
-            margin: '0 auto 24px auto',
+            margin: '0 auto auto auto',
             textAlign: 'center',
             minHeight: 90,
             background: '#fff',
@@ -1042,9 +1313,9 @@ export default function Home() {
             }} style={{ cursor: 'pointer' }}>🧠씸풀</Logo>
               
 
-            <PageButton onClick={() => router.push('/lotto/page')}>
+            <PageLink href="/lotto/page" >
               로또 번호<br></br>생성기
-            </PageButton>
+            </PageLink>
 
             {/*<HistoryButton onClick={() => router.push('/history')}>
               📋 기록보기
@@ -1125,6 +1396,12 @@ export default function Home() {
 
           {/* 추천 슬라이드 */}
           <RecommendSliderSection 
+            router={router}
+            getTestFolderName={getTestFolderName}
+          />
+
+          {/* 새로운 슬라이더 */}
+          <NewSliderSection 
             router={router}
             getTestFolderName={getTestFolderName}
           />

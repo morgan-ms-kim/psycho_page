@@ -126,7 +126,7 @@ export default function Dashboard() {
                 router.push('/dashboard');
               }
             }
-          }} style={{ cursor: 'pointer' }}>🧠 PSYCHO 관리자</Logo>
+          }} style={{ cursor: 'pointer' }}>🧠씸풀 관리자</Logo>
           <Nav>
             <NavLink 
               href="/dashboard" 

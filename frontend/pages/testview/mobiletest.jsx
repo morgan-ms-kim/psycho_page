@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import  appModuleMap from '../../appModuleMap';
+import dynamic from 'next/dynamic';
 // axios 인스턴스 생성
 //'http://localhost:4000/api'
 const apiClient = axios.create({
@@ -172,7 +174,7 @@ const RecommendCard = styled.div`
 `;
 
 // 프레임 컴포넌트
-export default function MobileTestFrame({ TestComponent, id, test }) {
+export default function MobileTestFrame({ id, test }) {
   const [comments, setComments] = useState([]);
   const [likeCount, setLikeCount] = useState(0);
   const [viewCount, setViewCount] = useState(0);
@@ -184,6 +186,8 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
   const [recommendTests, setRecommendTests] = useState([]);
   const [randomCode, setRandomCode] = useState('');
   const [testResult, setTestResult] = useState(null);
+  const [TemplateComponent, setTemplateComponent] = useState(null);
+  const [isTemplateLoading, setIsTemplateLoading] = useState(false);
 
   // 테스트 ID를 폴더명으로 변환하는 함수
   const getTestIdFromFolder = (folderName) => {
@@ -197,44 +201,82 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
   };
   // testId로 테스트 정보, 댓글, 추천 테스트 불러오기
   useEffect(() => {
-    
     const testId = getTestIdFromFolder(id);
-    if (!testId) return;
-    console.log(test);
-    setLikeCount(test.likes);
-    setViewCount(test.views);
-    //setCommentCount(test.comments);
-    //setShareCount(test.shares);
-      console.log('recommend');
-      apiClient.get(`/tests/${testId}/recommends`)
-      .then(res => setRecommendTests(res.data|| []))
+    if (!testId || !test) return;
+    
+    setLikeCount(test.likes || 0);
+    setViewCount(test.views || 0);
+    setCommentCount(test.comments || 0);
+    
+    // 추천 테스트 불러오기
+    apiClient.get(`/tests/${testId}/recommends`)
+      .then(res => setRecommendTests(res.data || []))
       .catch(() => setRecommendTests([]));
-      console.log('recommendTests : ' , recommendTests)
-      // 댓글
-      console.log('comments');
-      apiClient.get(`/tests/${testId}/comments`)
+    
+    // 댓글 불러오기
+    apiClient.get(`/tests/${testId}/comments`)
       .then(res => setComments(res.data.comments || []))
       .catch(() => setComments([]));
     
   }, [id, test]);
 
+  // Dynamic import 로직
+  useEffect(() => {
+    if (test && test.folder && /^template\d+$/.test(test.folder)) {
+      setIsTemplateLoading(true);
+      const tryImport = async () => {
+        console.log(test.folder);
+        if (!appModuleMap) {
+          console.error(`모듈 정보 없음: ${test.folder}`);
+          return;
+        }
+        const importModule = appModuleMap[test.folder];
+        test.folder.replace('./','../../');
+        console.log(test.folder);
+        console.log(test.folder.replace('./','../../'));
+        if (!importModule) {
+          console.log(`❌ ${test.folder}: 모듈 정보를 찾을 수 없음`);
+          setTemplateComponent(() => null);
+          setIsTemplateLoading(false);
+          return;
+        }
+
+        try {
+          console.log(`📦 ${test.folder} 모듈 로딩 중...`);
+          setIsTemplateLoading(true);
+          // 함수를 호출하여 모듈 import
+          const DynamicComponent = dynamic(() =>
+            appModuleMap[test.folder](), // 함수 호출해서 import 실행
+            { loading: () => <p>로딩 중...</p>, ssr: false }
+          );
+          setTemplateComponent(DynamicComponent);
+          setIsTemplateLoading(false);
+          console.log(`✅ ${test.folder} 모듈 로딩 완료`);
+        } catch (error) {
+          console.error(`❌ ${test.folder} 모듈 로딩 실패:`, error);
+          setTemplateComponent(() => null);
+          setIsTemplateLoading(false);
+        }
+      };
+      tryImport();
+    } else {
+      setTemplateComponent(null);
+      setIsTemplateLoading(false);
+    }
+  }, [test?.folder]);
+
   // 댓글 추가
   const addComment = async (comment) => {
-    // const res = await axios.post(`/api/tests/${testId}/comments`, { comment });
-    // setComments(res.data);
     setComments(prev => [...prev, comment]);
   };
 
   // 좋아요
   const like = async () => {
-    // const res = await axios.post(`/api/tests/${testId}/like`);
-    // setLikes(res.data.count);
     setLikeCount(prev => prev + 1);
   };
 
   // 결과 저장
   const saveResult = async (result) => {
-    // await axios.post(`/api/tests/${testId}/result`, { userId: user.id, result });
     alert('결과 저장(더미)!');
   };
 
@@ -260,56 +302,20 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
     if (resultCode) {
       loadTestResult(resultCode);
     }
-
-    // [API 요청 비활성화] 조회수, 좋아요, 댓글, 공유, 추천 테스트 목록 불러오기
-    /*
-    apiClient.get('/tests/mobiletest').then(res => {
-      setViewCount(res.data.views || 0);
-      setLikeCount(res.data.likes || 0);
-      setCommentCount(res.data.comments || 0);
-      setShareCount(res.data.shares || 0);
-      setComments(res.data.commentList || []);
-      setRecommendTests(res.data.recommendList || []);
-    });
-    */
-    // // 더미 데이터로 UI 테스트 가능하도록 기본값 설정
-    // setViewCount(1234);
-    // setLikeCount(56);
-    // setCommentCount(7);
-    // setShareCount(3);
-    // setComments([
-    //   { id: 'user1', content: '좋은 테스트네요!', date: new Date().toISOString() },
-    //   { id: 'user2', content: '재미있었어요.', date: new Date().toISOString() }
-    // ]);
-    // setRecommendTests([
-    //   { id: 1, title: '심리 테스트 A', desc: '당신의 성격을 알아보세요' },
-    //   { id: 2, title: 'MBTI 테스트 B', desc: '당신의 유형은?' }
-    // ]);
   }, []);
 
   const handleLike = () => {
-    // [API 요청 비활성화] 좋아요 증가
-    // apiClient.post('/tests/mobiletest/like').then(() => setLikeCount(likeCount + 1));
-    setLikeCount(likeCount + 1); // 임시 로컬 증가
+    setLikeCount(likeCount + 1);
   };
 
   const handleShare = () => {
-    // [API 요청 비활성화] 공유수 증가
-    // apiClient.post('/tests/mobiletest/share').then(() => setShareCount(shareCount + 1));
-    setShareCount(shareCount + 1); // 임시 로컬 증가
+    setShareCount(shareCount + 1);
   };
 
   const submitComment = () => {
     if (!newComment.id || !newComment.password || !newComment.content) return;
     
-    // [API 요청 비활성화] 댓글 등록
-    /*
-    apiClient.post('/tests/mobiletest/comments', newComment).then(() => {
-      setComments([...comments, { ...newComment, date: new Date().toISOString() }]);
-      setNewComment({ id: '', password: '', content: '' });
-    });
-    */
-    setComments([...comments, { ...newComment, date: new Date().toISOString() }]); // 임시 추가
+    setComments([...comments, { ...newComment, date: new Date().toISOString() }]);
     setNewComment({ id: '', password: '', content: '' });
   };
 
@@ -480,7 +486,8 @@ export default function MobileTestFrame({ TestComponent, id, test }) {
         
         
         {/* 동적 템플릿 컴포넌트 */}
-        {TestComponent && <TestComponent />}
+        {isTemplateLoading && <p>로딩 중...</p>}
+        {TemplateComponent && !isTemplateLoading && <TemplateComponent />}
         {test && (
           <div style={{ width: '100%', textAlign: 'center', marginBottom: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 8 , background:'transparent'}}>

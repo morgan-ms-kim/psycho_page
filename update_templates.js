@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // 템플릿 폴더들 찾기
-const templatesDir = './frontend/public/tests';
+const templatesDir = './frontend/tests';
 const templateFolders = fs.readdirSync(templatesDir)
   .filter(folder => folder.startsWith('template'))
   .sort();

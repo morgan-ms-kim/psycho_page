@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Psycho Test Admin Panel",
   "main": "index.js",
+  "sideEffects": false,
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",

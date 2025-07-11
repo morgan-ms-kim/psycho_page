@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
-import dynamic from 'next/dynamic';
 import {
   MainWrap,
   Header,
@@ -142,7 +141,6 @@ export default function TestPage() {
   const [newComment, setNewComment] = useState({ nickname: '', content: '', password: '' });
   const [buildExists, setBuildExists] = useState(false);
   const [checkedBuild, setCheckedBuild] = useState(false);
-  const [TemplateComponent, setTemplateComponent] = useState(null);
 
   // URL 정규화
   useEffect(() => {
@@ -202,104 +200,8 @@ export default function TestPage() {
   // 템플릿 테스트 여부
   const isTemplateTest = test && test.folder && /^template\d+$/.test(test.folder);
   console.log('isTemplateTest: ', isTemplateTest)
-  /*
-  // 템플릿 동적 import (Next.js dynamic)
-  useEffect(() => {
-    if (!isTemplateTest) {
-      setTemplateComponent(null);
-      return;
-    }
-
-    const tryImport = async () => {
-      const tried = [];
-      const extensions = ['js', 'jsx', 'tsx'];
-
-      for (const ext of extensions) {
-        const importPath = `../../tests/${test.folder}/src/App.${ext}`;
-        tried.push(importPath);
-
-        try {
-          const mod = await import(
-            // webpackInclude: /(App\.js|App\.jsx|App\.tsx)$/ 
-            `../../tests/${test.folder}/src/App.${ext}`
-          );
-          setTemplateComponent(() => mod.default);
-          console.log('성공:', importPath);
-          return;
-        } catch (error) {
-          console.warn('실패:', importPath, error);
-        }
-      }
-
-      console.error('모든 import 실패:', tried);
-       
-      setTemplateComponent(() => () =>'템플릿 컴포넌트 로드 실패');
-    };
-
-    tryImport();
-  }, [isTemplateTest, test?.folder]);
-  */
  
-   useEffect(() => {
-    if (isTemplateTest) {
-      const tryImport = async () => {
-        let tried = [];
-        try {
-          const importPath = `../../tests/${test.folder}/src/App.js`;
-          tried.push(importPath);
-          console.log('import 시도:  ', importPath);
-          const mod = dynamic(() => import(`../../tests//${test.folder}/src/App.js`), {
-          //const mod = dynamic(() => import(importPath), {
-            loading: () => <p>로딩 중...</p>,
-            ssr: false,
-          });
-          //setTemplateComponent(() => mod.default);
-          setTemplateComponent(mod);
-          return;
-          
-        } catch (e1) {
-          try {
-            console.log(e1);
-            const importPath = `../../tests/${test.folder}/src/App.jsx`;
-            tried.push(importPath);
-            console.log('import 시도:', importPath);
-            const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.jsx`), {
-              loading: () => <p>로딩 중...</p>,
-              ssr: false,
-            });
-            //setTemplateComponent(() => mod.default);
-            setTemplateComponent(mod);
-            return;
-          } catch (e2) {
-            try {
-              //test.txt
-              console.log(e2);
-              const importPath = `../../tests/${test.folder}/src/App.tsx`;
-              tried.push(importPath); 
-              console.log('import 시도:', importPath);
-              const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.tsx`), {
-              loading: () => <p>로딩 중...</p>,
-              ssr: false,
-            });
-            //setTemplateComponent(() => mod.default);
-            setTemplateComponent(mod);
-            return;
-            } catch (e3) {
-              console.log(e3);
-              console.log('모든 import 실패:', tried);
-              //setTemplateComponent(() => () => <div>템플릿 컴포넌트 로드 실패</div>);
-              setTemplateComponent(() => null)
-            }
-          }
-        }
-      };
-      tryImport();
-    } else {
-      setTemplateComponent(null);
-    }
-  }, [isTemplateTest, test?.folder]);
   
-
   // 광고 스크립트 중복 삽입 방지
   useEffect(() => {
     if (!window.kakao || !window.kakao.adfit) {
@@ -323,22 +225,23 @@ export default function TestPage() {
       }, 500);
     }
   }, []);
-  if (loading && isTemplateTest && !TemplateComponent) {
+  // dynamic import 및 setTemplateComponent 관련 코드 완전 제거
+  // MobileTestFrame에 test, id만 넘김
+  if (loading && isTemplateTest) {
     return (
       <MobileTestFrame
-      id={id}
-      test={test}
-    />
-  )
+        id={id}
+        test={test}
+      />
+    )
   }
-  else if (isTemplateTest && TemplateComponent) {
+  else if (isTemplateTest) {
     return (
       <MobileTestFrame
-      TestComponent={TemplateComponent}
-      id={id}
-      test={test}
-    />
-  )
+        id={id}
+        test={test}
+      />
+    )
   }
   else{
     

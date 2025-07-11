@@ -919,6 +919,12 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
     await test.save();
     // 9. 임시폴더 삭제
     try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+    try {
+      // frontend/scripts/generate-app-module-map.js 실행
+      exec('node ../frontend/scripts/generate-app-module-map.js', { stdio: 'inherit' });
+    } catch (e) {
+      console.error('generate-app-module-map 생성 스크립트 실행 실패:', e);
+    }
     return res.json({ success: true, test, steps, folderName });
   } catch (error) {
     if (test) await test.destroy();

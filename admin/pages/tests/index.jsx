@@ -168,7 +168,7 @@ export default function TestManagement() {
                 router.push('/dashboard');
               }
             }
-          }} style={{ cursor: 'pointer' }}>🧠 PSYCHO</Logo>
+          }} style={{ cursor: 'pointer' }}>🧠씸풀</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
             <NavLink 

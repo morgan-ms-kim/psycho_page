@@ -13,7 +13,7 @@ git pull
 # 프론트엔드 디렉토리로 이동
 echo "📁 프론트엔드 디렉토리로 이동..."
 cd frontend
-
+node scripts/generate-app-module-map.js
 # 완전한 캐시 삭제
 echo "🗑️ 캐시 삭제 중..."
 rm -rf .next

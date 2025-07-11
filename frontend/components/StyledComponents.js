@@ -182,7 +182,37 @@ export const PrimaryButton = styled.button`
     opacity: 0.9;
   }
 `;
+export const PageLink = styled.a`
+  all: unset; /* 버튼 기본 스타일 제거 */
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: #333;
+  position: relative;
+  transition: text-shadow 0.3s ease;
 
+  /* 가끔씩 자동으로 흔들리는 효과 */
+  animation: ${wiggle} 1s ease-in-out infinite;
+  animation-delay: 5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+  animation-direction: alternate;
+  animation-play-state: running;
+
+  &:hover {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: #333;
+    background: #fff;
+    font-size: 1.1rem;
+    outline: none;
+  }
+  &:focus {
+    outline: none;
+    
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    animation-play-state: paused; /* 호버 중엔 흔들리지 않음 */
+  }
+`;
 
 export const PageButton = styled.button`
   all: unset; /* 버튼 기본 스타일 제거 */

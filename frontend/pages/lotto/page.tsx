@@ -233,6 +233,7 @@ export default function LottoPage() {
 
   return (
     <main className={styles.main}>
+      <title>로또 번호 생성기 - 씸풀</title>
       <div className={styles.lottoLayout}>
         {/* 메인 생성기/결과 */}
         <section className={styles.lottoMain}>
