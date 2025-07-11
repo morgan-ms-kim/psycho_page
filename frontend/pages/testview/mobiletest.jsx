@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import  appModuleMap from '../../appModuleMap';
 import dynamic from 'next/dynamic';
 // axios 인스턴스 생성
 //'http://localhost:4000/api'
@@ -223,7 +222,8 @@ export default function MobileTestFrame({ id, test }) {
   // Dynamic import 로직
   useEffect(() => {
     if (test && test.folder && /^template\d+$/.test(test.folder)) {
-      setIsTemplateLoading(true);
+    ////////////
+    /*  setIsTemplateLoading(true);
       const tryImport = async () => {
         console.log(test.folder);
         if (!appModuleMap) {
@@ -259,7 +259,50 @@ export default function MobileTestFrame({ id, test }) {
         }
       };
       tryImport();
-    } else {
+   */
+    // /////////////
+    // 
+    // 
+    setIsTemplateLoading(true);
+    const tryImport = async () => {
+      console.log(test.folder);
+      const extensions = ['.js', '.jsx', '.tsx'];
+      let found = false;
+      setIsTemplateLoading(true);
+     
+        for (const ext of extensions) {
+          try {
+           const DynamicComponent = dynamic(() => import(`../../tests/${test.folder}/src/App${ext}`), { 
+              
+              loading: () => <p>로딩 중...</p>
+              ,ssr: false });
+            if(DynamicComponent){
+            console.log(`../../tests/${test.folder}/src/App${ext}`);
+            setTemplateComponent(()=>DynamicComponent);
+            found = true;
+            console.log(`✅ ${test.folder} 모듈 로딩 완료`);
+            break;
+            }
+          } catch (e) {
+            // 이 catch는 실행되지 않음 (빌드 타임 에러)
+              console.error(`❌ ${test.folder} 모듈 로딩 실패:`, error);
+              setTemplateComponent(() => null);
+              setIsTemplateLoading(false);
+          }
+        }
+          setIsTemplateLoading(false);
+          if (!found) {
+            
+            console.error(`❌ ${test.folder} !found 모듈 로딩 실패:`, error);
+            setTemplateComponent(() => null);
+          }
+    };
+    tryImport();
+ 
+
+
+
+     } else {
       setTemplateComponent(null);
       setIsTemplateLoading(false);
     }
