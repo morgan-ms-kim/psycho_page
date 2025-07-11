@@ -870,6 +870,12 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
         '.css', '.txt', '.md', '.html',
         'App.test.js', 'index.css', 'setupTests.js', 'README.md', 'index.html', 'MobileTestApp.jsx'
       ];
+
+      // App.js, App.tsx, App.jsx 파일 존재 여부 확인
+      const hasAppJs = items.some(item => item.name === 'App.js');
+      const hasAppTsx = items.some(item => item.name === 'App.tsx');
+      const hasAppJsx = items.some(item => item.name === 'App.jsx');
+
       for (const item of items) {
         const srcPath = path.join(src, item.name);
         const destPath = path.join(dest, item.name);
@@ -881,6 +887,23 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
           // 파일 이름이 제외 패턴에 포함되면 복사하지 않음
           if (excludePatterns.some(pattern => item.name.includes(pattern))) continue;
           fs.copyFileSync(srcPath, destPath);
+        }
+      }
+
+      // App.jsx가 없고 App.js가 있으면 App.js를 App.jsx로 복사
+      if (!hasAppJsx && hasAppJs) {
+        const appJsPath = path.join(src, 'App.js');
+        const appJsxPath = path.join(dest, 'App.jsx');
+        if (fs.existsSync(appJsPath)) {
+          fs.copyFileSync(appJsPath, appJsxPath);
+        }
+      }
+      // App.jsx가 없고 App.tsx가 있으면 App.tsx를 App.jsx로 복사
+      if (!hasAppJsx && hasAppTsx) {
+        const appTsxPath = path.join(src, 'App.tsx');
+        const appJsxPath = path.join(dest, 'App.jsx');
+        if (fs.existsSync(appTsxPath)) {
+          fs.copyFileSync(appTsxPath, appJsxPath);
         }
       }
     }
