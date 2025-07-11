@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 // 설정
-const TESTS_DIR = '../tests';
-const OUTPUT_FILE = '../appModuleMap.js';
+const TESTS_DIR = 'tests';
+const OUTPUT_FILE = 'appModuleMap.js';
 
 console.log('🔍 tests/ 디렉토리 스캔 중...');
 
