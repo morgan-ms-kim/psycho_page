@@ -270,26 +270,90 @@ export default function MobileTestFrame({ id, test }) {
       let found = false;
       setIsTemplateLoading(true);
      
-        for (const ext of extensions) {
-          try {
-           const DynamicComponent = dynamic(() => import(`../../tests/${test.folder}/src/App${ext}`), { 
+        // for (const ext of extensions) {
+        //   try {
+        //    const DynamicComponent = dynamic(() => import(`../../tests/${test.folder}/src/App${ext}`), { 
               
-              loading: () => <p>로딩 중...</p>
-              ,ssr: false });
-            if(DynamicComponent){
-            console.log(`../../tests/${test.folder}/src/App${ext}`);
-            setTemplateComponent(()=>DynamicComponent);
-            found = true;
-            console.log(`✅ ${test.folder} 모듈 로딩 완료`);
-            break;
+        //       loading: () => <p>로딩 중...</p>
+        //       ,ssr: false });
+        //     if(DynamicComponent){
+        //     console.log(`../../tests/${test.folder}/src/App${ext}`);
+        //     setTemplateComponent(()=>DynamicComponent);
+        //     found = true;
+        //     console.log(`✅ ${test.folder} 모듈 로딩 완료`, DynamicComponent);
+        //     console.log(DynamicComponent); // 함수(컴포넌트) 정보 출력
+        //     console.log(DynamicComponent.name); // 함수 이름
+        //     console.log(DynamicComponent.displayName); // displayName 속성
+        //     break;
+           
+        //     }
+        //   } catch (e) {
+        //     // 이 catch는 실행되지 않음 (빌드 타임 에러)
+        //       console.error(`❌ ${test.folder} 모듈 로딩 실패:`, error);
+        //       setTemplateComponent(() => null);
+        //       setIsTemplateLoading(false);
+        //   }
+        // }
+        
+        let tried = [];
+        try {
+          //const importPath = `../../tests/${test.folder}/src/App.jsx`;
+          const importPath = `../../tests/${test.folder}/src/App.jsx`;
+          tried.push(importPath);
+          console.log('import 시도:', importPath);
+          const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.jsx`), {
+          //const mod = dynamic(() => import(importPath), {
+            loading: () => <p>로딩 중...</p>,
+            ssr: false,
+          });
+          //setTemplateComponent(() => mod.default);
+          setTemplateComponent(()=>mod);
+          
+          setIsTemplateLoading(false);
+          return;
+          
+        } catch (e1) {
+          try {
+            console.log(e1);
+           // const importPath = `../../tests/${test.folder}/src/App.js`;
+            const importPath = `../../tests/${test.folder}/src/App.js`;
+            tried.push(importPath);
+            console.log('import 시도:', importPath);
+            const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.js`), {
+              loading: () => <p>로딩 중...</p>,
+              ssr: false,
+            });
+            //setTemplateComponent(() => mod.default);
+            setTemplateComponent(()=>mod);
+            
+          setIsTemplateLoading(false);
+            return;
+          } catch (e2) {
+            try {
+              //test.txt
+              console.log(e2);
+              const importPath = `../../tests/${test.folder}/src/App.tsx`;
+              tried.push(importPath); 
+              console.log('import 시도:', importPath);
+              const mod = dynamic(() => import(`../../tests/${test.folder}/src/App.tsx`), {
+              loading: () => <p>로딩 중...</p>,
+              ssr: false,
+            });
+            //setTemplateComponent(() => mod.default);
+            setTemplateComponent(()=>mod);
+            
+          setIsTemplateLoading(false);
+            return;
+            } catch (e3) {
+              console.log(e3);
+              console.log('모든 import 실패:', tried);
+              //setTemplateComponent(() => () => <div>템플릿 컴포넌트 로드 실패</div>);
+              setTemplateComponent(() => null)
             }
-          } catch (e) {
-            // 이 catch는 실행되지 않음 (빌드 타임 에러)
-              console.error(`❌ ${test.folder} 모듈 로딩 실패:`, error);
-              setTemplateComponent(() => null);
-              setIsTemplateLoading(false);
           }
         }
+        
+        console.log('모든 import 실패:', tried);
           setIsTemplateLoading(false);
           if (!found) {
             

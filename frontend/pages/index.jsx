@@ -397,7 +397,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
       if (sliderRef.current) {
         setDragOffsetX(-sliderRef.current.offsetWidth);
       }
-    }, 1000);
+    }, 3000);
     
     return () => clearInterval(timer);
   }, [isHovered, isDragging, isTransitioning, recommendTests.length, lastInteractionTime]); // lastInteractionTime 추가
@@ -616,7 +616,7 @@ function NewSliderSection({ router, getTestFolderName }) {
     
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % recommendTests.length);
-    }, 1000);
+    }, 3000);
     
     return () => clearInterval(timer);
   }, [isHovered, isDragging, isTransitioning, recommendTests.length, lastInteractionTime]); // lastInteractionTime 다시 추가

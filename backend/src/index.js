@@ -865,12 +865,21 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
     function copyExceptCss(src, dest) {
       if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
       const items = fs.readdirSync(src, { withFileTypes: true });
+      // 제외할 확장자/파일명/패턴 목록
+      const excludePatterns = [
+        '.css', '.txt', '.md', '.html',
+        'App.test.js', 'index.css', 'setupTests.js', 'README.md', 'index.html', 'MobileTestApp.jsx'
+      ];
       for (const item of items) {
         const srcPath = path.join(src, item.name);
         const destPath = path.join(dest, item.name);
         if (item.isDirectory()) {
+          // 디렉토리 이름이 제외 패턴에 포함되면 건너뜀
+          if (excludePatterns.some(pattern => item.name.includes(pattern))) continue;
           copyExceptCss(srcPath, destPath);
-        } else if (!item.name.endsWith('.abc')) { //css 지울때 여기에 추가
+        } else {
+          // 파일 이름이 제외 패턴에 포함되면 복사하지 않음
+          if (excludePatterns.some(pattern => item.name.includes(pattern))) continue;
           fs.copyFileSync(srcPath, destPath);
         }
       }
