@@ -868,7 +868,7 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
       // 제외할 확장자/파일명/패턴 목록
       const excludePatterns = [
         '.css', '.txt', '.md', '.html',
-        'App.test.js', 'index.css', 'setupTests.js', 'README.md', 'index.html', 'MobileTestApp.jsx'
+        'App.test.js', 'index', 'setupTests.js', 'README.md', 'index.html', 'MobileTestApp.jsx'
       ];
 
       // App.js, App.tsx, App.jsx 파일 존재 여부 확인
