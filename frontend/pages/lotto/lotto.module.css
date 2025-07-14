@@ -216,4 +216,175 @@
     max-width: 100vw;
     min-width: 0;
   }
+}
+
+/* 탭 스타일 */
+.tabContainer {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.tabButtons {
+  display: flex;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px 0 #e6e6f0;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.tabButton.active {
+  background: linear-gradient(90deg, #5a4fff 60%, #ffb347 100%);
+  color: #fff;
+  border-bottom-color: #5a4fff;
+}
+
+.tabButton:hover:not(.active) {
+  background: #f7f7fa;
+  color: #5a4fff;
+}
+
+.tabContent {
+  display: none;
+}
+
+.tabContent.active {
+  display: block;
+}
+
+/* 자릿수 조합 랭킹 스타일 */
+.digitRankContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.digitRankSection {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px 0 #e6e6f0;
+  padding: 1.2rem;
+}
+
+.digitRankTitle {
+  font-size: 1.1rem;
+  color: #5a4fff;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.digitRankList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.digitRankItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #f7f7fa;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  border-left: 4px solid #5a4fff;
+  transition: all 0.2s ease;
+}
+
+.digitRankItem:hover {
+  background: #f0f0f5;
+  transform: translateX(2px);
+}
+
+.digitRankNumber {
+  font-weight: 600;
+  color: #5a4fff;
+  flex: 1;
+  line-height: 1.4;
+}
+
+.digitRankCount {
+  color: #666;
+  font-size: 0.8rem;
+  background: #e8e8f0;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+/* 자릿수 조합 시각화 */
+.digitCombination {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.digitGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: #fff;
+  padding: 0.3rem 0.4rem;
+  border-radius: 6px;
+  border: 1px solid #e0e0e7;
+  font-size: 0.75rem;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.digitLabel {
+  color: #666;
+  font-weight: 500;
+}
+
+.digitCount {
+  background: #5a4fff;
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.digitCount.zero {
+  background: #ccc;
+  color: #666;
+}
+
+.rankNumber {
+  background: #ffb347;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-right: 0.8rem;
 } 

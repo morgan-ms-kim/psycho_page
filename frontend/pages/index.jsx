@@ -688,7 +688,7 @@ function NewSliderSection({ router, getTestFolderName }) {
   if (loading) {
     return (
       <>
-        <RecommendTitle>새로운 슬라이더</RecommendTitle>
+        <RecommendTitle>추천해요.</RecommendTitle>
         <RecommendSection>
           <RecommendSlider>
             <RecommendSlide active={true}>
@@ -715,7 +715,7 @@ function NewSliderSection({ router, getTestFolderName }) {
 
   return (
     <>
-      <RecommendTitle>새로운 슬라이더</RecommendTitle>
+      <RecommendTitle>추천해요.</RecommendTitle>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}
@@ -932,7 +932,6 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [apiStatus, setApiStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
   const router = useRouter();
-  
   // URL 경로 정규화 - 중복 test 제거
   useEffect(() => {
     const currentPath = router.asPath;
@@ -1469,6 +1468,7 @@ const TestThumbnailContainer = styled.div`
   margin-bottom: 15px;
   padding: 5px 5px 5px 5px;
   max-width:500px;
+  min-height:350px;
   width: 100%;
   height:100%
   display: flex;

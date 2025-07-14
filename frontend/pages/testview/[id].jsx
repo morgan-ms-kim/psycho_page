@@ -28,6 +28,7 @@ import {
 import Image from 'next/image';
 import Head from 'next/head';
 import MobileTestFrame from './mobiletest.jsx';
+import MobileTestFrame_ from './iframeTemplate.jsx';
 
 
 // axios 인스턴스 생성
@@ -41,7 +42,7 @@ const apiClient = axios.create({
 });
 
 const getTestIdFromFolder = (folderName) => {
-  if (folderName.startsWith('test') || folderName.startsWith('template') ) {
+  if (folderName.startsWith('test') || folderName.startsWith('template')) {
     return folderName.replace('test', '').replace('template', '');
   }
   return folderName;
@@ -190,7 +191,7 @@ export default function TestPage() {
     (async () => {
       try {
         const testId = getTestIdFromFolder(id);
-        await apiClient.post(`/visitors`, { testId, page: testId, userAgent: navigator.userAgent  });      
+        await apiClient.post(`/visitors`, { testId, page: testId, userAgent: navigator.userAgent });
       } catch (error) {
         // 무시
       }
@@ -200,8 +201,8 @@ export default function TestPage() {
   // 템플릿 테스트 여부
   const isTemplateTest = test && test.folder && /^template\d+$/.test(test.folder);
   console.log('isTemplateTest: ', isTemplateTest)
- 
-  
+
+
   // 광고 스크립트 중복 삽입 방지
   useEffect(() => {
     if (!window.kakao || !window.kakao.adfit) {
@@ -243,11 +244,11 @@ export default function TestPage() {
       />
     )
   }
-  else{
-    
-  // 렌더링 분기
+  else {
+
+    // 렌더링 분기
     if (loading) {
-       return (
+      return (
         <MainWrap>
           <Header>
             <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
@@ -264,11 +265,11 @@ export default function TestPage() {
     if (!test) {
       return <ErrorMessage>테스트 정보 없음</ErrorMessage>;
     }
-    
+
 
     // 이하 기존 일반 test형(iframe) 분기 및 댓글, 광고 등 렌더링
     const commentCount = comments.length;
-    const testUrl = `/tests/${id}/`;
+    const testUrl = `../../public/tests/${id}/`;
 
     // iframe 렌더링 부분 (단순 고정형 + loading="lazy"만 적용)
     let iframeSection = null;
@@ -280,45 +281,11 @@ export default function TestPage() {
       );
     } else if (buildExists) {
       iframeSection = (
-        <TestContainer style={{ position: 'relative', width: '100%', maxWidth: CONTAINER_MAXWIDTH, minWidth: CONTAINER_MINWIDTH, margin: '32px auto 0 auto', background: 'white', borderRadius: 24, boxShadow: '0 4px 24px rgba(0,0,0,0.10)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 0' }}>
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '10px 16px',
-              zIndex: 20,
-              pointerEvents: 'none', // 버튼만 클릭 가능하게
-            }}
-          >
-        
-          </div>
-          <iframe
-            src={testUrl}
-            title={test?.title || '테스트'}
-            loading="lazy"
-            scrolling="no"
-            style={{
-              width: '100%',
-              minWidth: '100%',
-              maxWidth: '100%',
-              height: '500px',
-              maxHeight: '700px',
-              border: 'none',
-              background: '#fff',
-              borderRadius: '0 0 24px 24px',
-              flex: 1,
-              overflow: 'hidden',
-              display: 'block',
-              position: 'relative',
-              transform: 'translateZ(0)',
-            }}
-          />
-        </TestContainer>
+          <MobileTestFrame_
+            id={id}
+            test={test}>
+          </MobileTestFrame_>
+
       );
     } else {
       iframeSection = (
@@ -333,256 +300,15 @@ export default function TestPage() {
         <Head>
           <title>{test?.title ? `${test.title} - 씸풀` : '씸풀 - 심심풀이에 좋은 심리테스트'}</title>
         </Head>
-        <MainWrap
-          style={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            paddingTop: 0,
-            background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)',
-            width: '100vw',
-            minWidth: '500px',
-            maxWidth: '500px',
-            margin: '0 auto',
-            boxSizing: 'border-box',
-            overflowX: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              position: 'fixed',
-              left: '50%',
-              bottom: 0,
-              transform: 'translateX(-50%)',
-              width: '500px',
-              maxWidth: '98vw',
-              height: 0,
-              zIndex: 200,
-              pointerEvents: 'none',
-            }}
-          >
-            <button
-              onClick={() => router.back()}
-              style={{
-                position: 'absolute',
-                left: 16,
-                bottom: 24,
-                background: 'rgba(255,255,255,0.85)',
-                border: 'none',
-                borderRadius: 24,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-                padding: '12px 18px',
-                fontSize: '1.3rem',
-                color: '#6c63ff',
-                zIndex: 201,
-                cursor: 'pointer',
-                fontWeight: 700,
-                transition: 'background 0.2s',
-                pointerEvents: 'auto',
-              }}
-              aria-label="뒤로가기"
-            >
-              ←
-            </button>
-            <button
-              onClick={() => router.push('/')}
-              style={{
-                position: 'absolute',
-                right: 16,
-                bottom: 24,
-                background: 'rgba(255,255,255,0.85)',
-                border: 'none',
-                borderRadius: 24,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-                padding: '12px 18px',
-                fontSize: '1.3rem',
-                color: '#6c63ff',
-                zIndex: 201,
-                cursor: 'pointer',
-                fontWeight: 700,
-                transition: 'background 0.2s',
-                pointerEvents: 'auto',
-              }}
-              aria-label="홈으로"
-            >
-              🏠
-            </button>
-          </div>
-          <Section
-            style={{
-              flex: 1,
-              maxWidth: '500px',
-              margin: '20px auto 0 auto',
-              background: '#fff',
-              borderRadius: 24,
-              boxShadow: '0 8px 40px rgba(80,80,120,0.12)',
-              padding: '0 0 24px 0',
-              position: 'relative',
-              width: '100%',
-              boxSizing: 'border-box',
-            }}
-          >
-            {/* 에러 메시지(있을 때만) */}
-            {error && (
-              <ErrorMessage>
-                <p>🚫 {error}</p>
-              </ErrorMessage>
-            )}
-            {/* 광고+InfoCard 한 줄 배치 */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                gap: 16,
-                width: '100%',
-                margin: '0 auto',
-                maxWidth: '500px',
-              }}
-            >
-              {iframeSection}
-              <InfoCard as={TestContainer} style={{
-                maxWidth: '500px',
-                minWidth: 0,
-                margin: '0 auto',
-                background: '#fff',
-                borderRadius: 10,
-                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                padding: '8px 10px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                width: 'auto',
-                flex: 'none',
-                height: 'auto',
-                minHeight: 0,
-                maxHeight: 'none',
-                overflow: 'visible'
-              }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%', textAlign: 'center', padding: 0, margin: 0 }}>
-                  <Title style={{ color: '#222', fontSize: '1.3rem', marginBottom: 4 }}>{test?.title || '테스트'}</Title>
-                  <SubTitle style={{ color: '#555', fontSize: '1rem', marginBottom: 8 }}>{test?.description || '테스트 설명이 없습니다!'}</SubTitle>
-                  <div style={{ display: 'flex', gap: 24, margin: '8px 0', justifyContent: 'center', width: '100%' }}>
-                    <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => handleLike()}>
-                      <StatLabel style={{ color: liked ? '#ff5e5e' : '#bbb', fontSize: '1.2rem', transition: 'color 0.2s' }}>
-                        {liked ? '❤️' : '🤍'}
-                      </StatLabel>
-                      <StatValue style={{ color: '#ff5e5e', fontSize: '1.1rem' }}>{test?.likes || 0}</StatValue>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <StatLabel style={{ color: '#888', fontSize: '1.2rem' }}>👁️</StatLabel>
-                      <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{test?.views || 0}</StatValue>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <StatLabel style={{ color: '#888', fontSize: '1.2rem' }}>💬</StatLabel>
-                      <StatValue style={{ color: '#222', fontSize: '1.1rem' }}>{commentCount}</StatValue>
-                    </div>
-                  </div>
-                </div>
-              </InfoCard>
-            </div>
-            {/* 댓글 섹션 */}
-            <CommentSection style={{
-              maxWidth: '500px',
-              minWidth: 0,
-              margin: '32px auto',
-              background: '#fff',
-              borderRadius: 24,
-              boxShadow: '0 4px 24px rgba(80,80,120,0.10)',
-              padding: '24px 0',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              width: '100%'
-            }}>
-              <CommentHeader style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, display: 'flex', padding: '0 24px', boxSizing: 'border-box' }}>
-                <CommentTitle>💬 댓글 ({commentCount})</CommentTitle>
-                <CommentButton onClick={() => setShowCommentForm(!showCommentForm)} style={{ marginLeft: 'auto', marginRight: 0 }}>
-                  {showCommentForm ? '취소' : '댓글 작성'}
-                </CommentButton>
-              </CommentHeader>
-              {showCommentForm && (
-                <CommentFormContainer style={{ width: '100%', maxWidth: '100%', margin: '0 auto 24px auto' }}>
-                  <CommentInput
-                    type="text"
-                    placeholder="닉네임"
-                    value={newComment.nickname}
-                    onChange={(e) => setNewComment({...newComment, nickname: e.target.value})}
-                    maxLength={20}
-                  />
-                  <CommentInput
-                    type="password"
-                    placeholder="비밀번호 (4자 이상)"
-                    value={newComment.password}
-                    onChange={(e) => setNewComment({...newComment, password: e.target.value})}
-                    minLength={4}
-                  />
-                  <CommentTextarea
-                    placeholder="댓글을 작성해주세요..."
-                    value={newComment.content}
-                    onChange={(e) => setNewComment({...newComment, content: e.target.value})}
-                    maxLength={500}
-                  />
-                  <CommentSubmitButton onClick={submitComment}>
-                    댓글 작성
-                  </CommentSubmitButton>
-                </CommentFormContainer>
-              )}
-              {comments.length === 0 && (
-                <div style={{ color: '#aaa', textAlign: 'center', margin: '1rem 0' }}>아직 댓글이 없습니다!</div>
-              )}
-              <div style={{
-                width: '100%',
-                maxWidth: '100%',
-                margin: '0 auto',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0,
-                boxSizing: 'border-box',
-                padding: 0
-              }}>
-                {comments.map((comment) => (
-                  <RenderedCommentItem key={comment.id} comment={comment} />
-                ))}
-              </div>
-            </CommentSection>
+         {iframeSection}
+
             {/* 광고 컨테이너 - 그대로 */}
-          <div
-            style={{
-              width: '100%',
-              minWidth: 320,
-              maxWidth: 728,
-              margin: '0 auto 24px auto',
-              textAlign: 'center',
-              minHeight: 90,
-              background: '#fff',
-              borderRadius: 12,
-              padding: 16,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-              zIndex: 10,
-              display: 'block',
-            }}
-          >
-            <iframe
-              src="/kakao-ad.html"
-              style={{
-                width: '100%',
-                minWidth: 320,
-                maxWidth: 728,
-                height: 90,
-                border: 'none',
-                margin: '0 auto',
-                display: 'block',
-                background: 'transparent',
-              }}
-              scrolling="no"
-              title="카카오광고"
-            />
-          </div>
-          </Section>
+           
+         
           <Footer style={{ marginTop: '0.5rem' }} />
-        </MainWrap>
+         
       </>
     );
- }
+  }
 }
 

@@ -1552,6 +1552,65 @@ app.get('/api/lotto-rank', async (req, res) => {
   }
 });
 
+// 자릿수 조합 랭킹 API
+app.get('/api/lotto-digit-rank', async (req, res) => {
+  try {
+    const { count = 10 } = req.query;
+    const limit = parseInt(count);
+    
+    // DB에서 로또 번호 데이터 조회
+    const draws = await LottoDraw.findAll({
+      order: [['drawNo', 'DESC']],
+      limit: limit
+    });
+    
+    // 자릿수 조합별 출현 빈도 계산
+    const combinationCount = {};
+    
+    draws.forEach(draw => {
+      const numbers = draw.numbers.split(',').map(n => parseInt(n));
+      
+      // 각 자릿수별 개수 계산
+      const digitCounts = {
+        '1': 0,   // 1~9
+        '10': 0,  // 10~19
+        '20': 0,  // 20~29
+        '30': 0,  // 30~39
+        '40': 0   // 40~45
+      };
+      
+      numbers.forEach(num => {
+        if (num >= 1 && num <= 9) {
+          digitCounts['1']++;
+        } else if (num >= 10 && num <= 19) {
+          digitCounts['10']++;
+        } else if (num >= 20 && num <= 29) {
+          digitCounts['20']++;
+        } else if (num >= 30 && num <= 39) {
+          digitCounts['30']++;
+        } else if (num >= 40 && num <= 45) {
+          digitCounts['40']++;
+        }
+      });
+      
+      // 조합 문자열 생성 (예: "1-2-1-1-1")
+      const combination = `${digitCounts['1']}-${digitCounts['10']}-${digitCounts['20']}-${digitCounts['30']}-${digitCounts['40']}`;
+      
+      // 조합별 출현 빈도 누적
+      combinationCount[combination] = (combinationCount[combination] || 0) + 1;
+    });
+    
+    // 조합별 랭킹 정렬
+    const combinationRank = Object.entries(combinationCount)
+      .map(([combination, count]) => ({ combination, count }))
+      .sort((a, b) => b.count - a.count || a.combination.localeCompare(b.combination));
+    
+    res.json({ digitRank: combinationRank });
+  } catch (e) {
+    res.status(500).json({ error: '자릿수 조합 랭킹 조회 실패', detail: e.message });
+  }
+});
+
 
 app.use('/api/sitemap', sitemapRouter);
 const PORT = process.env.PORT || 4000;

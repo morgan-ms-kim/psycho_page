@@ -311,7 +311,8 @@ export const Card = styled.div`
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   max-width: 500px;
-  min-width: 0;  
+  min-width: 500px;
+  min-height: 350px;  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -428,7 +429,7 @@ export const FlexColumn = styled.div`
 
 // 섹션 스타일들
 export const Section = styled.div`
-  max-width: 500px;
+  max-width: 550px;
   min-width: 320px;
 
   margin: 0 1px;
