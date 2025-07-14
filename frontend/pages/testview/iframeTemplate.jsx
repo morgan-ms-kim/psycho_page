@@ -656,8 +656,8 @@ export default function MobileTestFrame_({ id, test }) {
       <div class='kakao-adcontainer'
               style={{
                 width: '100%',
-                minWidth: 320,
-                maxWidth: 728,
+                minWidth: '320px',
+                maxWidth: '500px',
                 margin: '0 auto 24px auto',
                 textAlign: 'center',
                 minHeight: 90,
@@ -673,8 +673,8 @@ export default function MobileTestFrame_({ id, test }) {
                 src="/kakao-ad.html"
                 style={{
                   width: '100%',
-                  minWidth: 320,
-                  maxWidth: 728,
+                  minWidth: '320px',
+                  maxWidth: '500px',
                   height: 90,
                   border: 'none',
                   margin: '0 auto',

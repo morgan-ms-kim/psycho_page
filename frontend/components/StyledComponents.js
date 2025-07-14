@@ -429,8 +429,8 @@ export const FlexColumn = styled.div`
 
 // 섹션 스타일들
 export const Section = styled.div`
-  max-width: 550px;
-  min-width: 320px;
+  max-width: 500px;
+  min-width: 500px;
 
   margin: 0 1px;
   padding: 0 2px;
@@ -438,7 +438,7 @@ export const Section = styled.div`
   flex-direction: column;
   align-items: center;
   @media (max-width: 600px) {
-    max-width: 100vw;
+    max-width: 500px;
     padding: 0 2vw;
     margin-bottom: 16px;
   }

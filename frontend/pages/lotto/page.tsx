@@ -146,8 +146,8 @@ export default function LottoPage() {
   const bottom6 = statsArr.sort((a, b) => a.cnt - b.cnt || a.num - b.num).slice(0, 45);
 
   
-  let urlpath='http://localhost:4000/api';
-  //let urlpath='https://smartpick.website/api';
+  //let urlpath='http://localhost:4000/api';
+  let urlpath='https://smartpick.website/api';
   // 실제 로또 랭킹 조회
   const fetchLottoRank = async () => {
     setRealLoading(true);

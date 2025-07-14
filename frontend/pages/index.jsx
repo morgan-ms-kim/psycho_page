@@ -525,7 +525,7 @@ if (pendingSlide === 'prev') baseTranslate = -100;
                   </TestItemPlaceholder>
                   <RecommendStats>
                     <RecommendStat>👁️ {test?.views}</RecommendStat>
-                    <RecommendStat>💖 {test?.likes}</RecommendStat>
+                    <RecommendStat>❤️ {test?.likes}</RecommendStat>
                     <RecommendStat>💬 {typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
                   </RecommendStats>
                 </RecommendThumbnailContainer>
@@ -769,7 +769,7 @@ function NewSliderSection({ router, getTestFolderName }) {
                     </TestItemPlaceholder>
                     <RecommendStats>
                       <RecommendStat>👁️ {test?.views}</RecommendStat>
-                      <RecommendStat>💖 {test?.likes}</RecommendStat>
+                      <RecommendStat>❤️ {test?.likes}</RecommendStat>
                       <RecommendStat>💬 {typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
                     </RecommendStats>
                   </RecommendThumbnailContainer>
@@ -886,7 +886,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                     )}
                     <TestItemStats>
                       <Stat>👁️ {test.views}</Stat>
-                      <Stat>💖 {test.likes}</Stat>
+                      <Stat>❤️ {test.likes}</Stat>
                       <Stat>💬 {typeof test.comments === 'number' ? test.comments : 0}</Stat>
                     </TestItemStats>
                   </TestThumbnailContainer>
@@ -1267,19 +1267,19 @@ export default function Home() {
           crossOrigin="anonymous"
         />  
       </Head>
-      <MainWrap style={{minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
+      <MainWrap style={{maxWidth:'500px',minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
         <Section style={sectionContainerStyle}>
           <div
           style={{
-            width: '100%',
-            minWidth: 320,
-            maxWidth: 728,
+            width: '500px',
+            minWidth: '320px',
+            maxWidth: '500px',
             margin: '0 auto auto auto',
             textAlign: 'center',
-            minHeight: 90,
+            minHeight: '90px',
             background: '#fff',
             borderRadius: 12,
-            padding: 16,
+            padding: 2,
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
             zIndex: 10,
             display: 'block',
@@ -1288,10 +1288,10 @@ export default function Home() {
           <iframe
             src="/kakao-ad.html"
             style={{
-              width: '100%',
-              minWidth: 320,
-              maxWidth: 728,
-              height: 90,
+              width: '500px',
+              minWidth: '320px',
+              maxWidth: '500px',
+              height: '90px',
               border: 'none',
               margin: '0 auto',
               display: 'block',
