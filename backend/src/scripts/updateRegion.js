@@ -9,7 +9,8 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 console.log('DB_USER:', process.env.DB_USER); // 값이 제대로 찍히는지 확인
-
+console.log('DB_NAME:', process.env.DB_NAME);
+console.log('DB_HOST:', process.env.DB_HOST);
 import sequelize, { Visitor } from '../models/index.js';
 
 
