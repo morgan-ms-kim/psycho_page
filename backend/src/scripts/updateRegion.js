@@ -14,7 +14,7 @@ import sequelize, { Visitor } from '../models/index.js';
 
 
 console.log(process.env.DB_USER);
-console.log(sequelize.config.username);
+console.log('sequelize.config.username:', sequelize.config.username); // mongsik41이 나와야 정상
 // region-map.json 불러오기
 let REGION_MAP = {};
 try {
