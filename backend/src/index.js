@@ -733,7 +733,8 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     // 2. 실제 id로 폴더명 생성
     const folderName = `test${test.id}`;
     test.folder = folderName;
-    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
+    // testGroup 경로로 변경
+    const testsDir = path.join(process.cwd(), '..', 'testGroup', 'public', 'tests');
     const testPath = path.join(testsDir, folderName);
     // 기존 폴더가 있으면 삭제
     if (fs.existsSync(testPath)) {
@@ -784,15 +785,42 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
       if (test) await test.destroy();
       return res.status(400).json({ error: 'package.json 없음', steps, path: packageJsonPath });
     }
-    // test_deploy.sh 실행
+    // 빌드 작업을 nice로 실행하고, 빌드가 끝난 후에만 결과물 복사
     try {
-      const scriptPath = path.join(process.cwd(), '..', 'test_deploy.sh');
-      const deployResult = await execAsync(`bash ${scriptPath} ${folderName}`, { cwd: testsDir });
+      // 빌드 명령어를 nice로 실행
+      await execAsync(`nice -n 19 npm install`, { cwd: testPath, timeout: 300000 });
+      await execAsync(`nice -n 19 npm run build`, { cwd: testPath, timeout: 300000 });
       steps.npmInstalled = true;
       steps.buildCompleted = true;
+      // 빌드 결과물을 testGroup/public/tests/폴더명/에 복사
+      const buildPath = path.join(testPath, 'build');
+      if (fs.existsSync(buildPath)) {
+        // 복사 대상 폴더 생성
+        if (!fs.existsSync(testPath)) fs.mkdirSync(testPath, { recursive: true });
+        // 기존 내용 삭제 후 복사
+        fs.rmSync(testPath, { recursive: true, force: true });
+        fs.mkdirSync(testPath, { recursive: true });
+        // 빌드 결과물 복사
+        const copyRecursiveSync = (src, dest) => {
+          const entries = fs.readdirSync(src, { withFileTypes: true });
+          for (const entry of entries) {
+            const srcPath = path.join(src, entry.name);
+            const destPath = path.join(dest, entry.name);
+            if (entry.isDirectory()) {
+              if (!fs.existsSync(destPath)) fs.mkdirSync(destPath);
+              copyRecursiveSync(srcPath, destPath);
+            } else {
+              fs.copyFileSync(srcPath, destPath);
+            }
+          }
+        };
+        copyRecursiveSync(buildPath, testPath);
+      } else {
+        throw new Error('빌드 결과물(build 폴더)이 없습니다.');
+      }
     } catch (error) {
       if (test) await test.destroy();
-      return res.status(400).json({ error: '테스트 배포 스크립트 실패', steps, detail: error.message });
+      return res.status(400).json({ error: '테스트 빌드/복사 실패', steps, detail: error.message });
     }
     // 3. folder 컬럼 업데이트
     test.folder = folderName;

@@ -239,7 +239,7 @@ export default function MobileTestFrame_({ id, test }) {
 
           const IframeComponent = () => (
             <iframe
-              src={testUrl}
+              src={`http://localhost:3002/tests/${id}/index.html`}
               title={test?.title || '테스트'}
               loading="lazy"
               scrolling="no"
