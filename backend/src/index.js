@@ -904,7 +904,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
       }
     } catch (error) {
       
-      log(`에러 발생: ${error.message}`);
+      console.log(`에러 발생: ${error.message}`);
       if (test) await test.destroy();
       return res.status(400).json({ error: '테스트 빌드/복사 실패', steps, detail: error.message });
     }
@@ -914,7 +914,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     return res.json({ success: true, test, steps, folderName });
   } catch (error) {
     
-    log(`에러 발생: ${error.message}`);
+    console.log(`에러 발생: ${error.message}`);
     if (test) await test.destroy();
     return res.status(500).json({ error: '서버 오류', steps, detail: error.message });
   }
