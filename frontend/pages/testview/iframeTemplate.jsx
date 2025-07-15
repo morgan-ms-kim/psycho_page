@@ -231,7 +231,7 @@ export default function MobileTestFrame_({ id, test }) {
         
         let tried = [];
         try {
-          const testUrl = `/tests/${id}/index.html`;
+          const testUrl = `http://localhost:3002/tests/${id}/index.html`;
 
           tried.push(testUrl);
           console.log('import 시도:', testUrl);
