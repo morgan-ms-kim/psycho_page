@@ -169,15 +169,18 @@ export default function TestPage() {
         return apiClient.get(`/tests/${testId}/comments`);
       })(),
       (async () => {
-        // 외부 링크 테스트면 무조건 true 반환 (buildExists처럼 처리)
-        if (test && test.externalUrl) {
-          return true;
-        }
-        if (test&&/^test\d+$/.test(id)) {
-          const res = await fetch(`/tests/${id}/index.html`, { method: 'HEAD' });
-          return res.ok;
-        }
-        return false;
+        const isExternal = test && test.externalUrl;
+
+        const buildExistsPromise = isExternal
+          ? Promise.resolve(false) // 외부 링크면 빌드 존재 false로 고정
+          : (async () => {
+              if (test && /^test\d+$/.test(id)) {
+                const res = await fetch(`/tests/${id}/index.html`, { method: 'HEAD' });
+                return res.ok;
+              }
+              return false;
+            })();
+        return buildExistsPromise;
       })()
     ]).then(([testRes, commentsRes, buildOk]) => {
       setTest(testRes.data);
@@ -277,30 +280,21 @@ export default function TestPage() {
 
     // iframe 렌더링 부분 (단순 고정형 + loading="lazy"만 적용)
     let iframeSection = null;
-    if (!checkedBuild && /^test\d+$/.test(id)) {
+    if (test && test.externalUrl) {
+      console.log(test.externalUrl);
+      // 외부 링크 테스트
       iframeSection = (
-        <LoadingWrap style={{ width: '100%', maxWidth: CONTAINER_MAXWIDTH, minWidth: CONTAINER_MINWIDTH, margin: '32px auto 0 auto', background: 'white', borderRadius: 24, boxShadow: '0 4px 24px rgba(0,0,0,0.10)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 0' }}>
-          <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트 앱 상태를 확인 중...</span>
-        </LoadingWrap>
+        <MobileTestFrame_ src={test.externalUrl} test={test} id={test.id}/>
       );
     } else if (buildExists) {
-      const src = test.externalUrl
-        ? test.externalUrl
-        : `/tests/${test.id}/index.html`;
-      console.log(buildExists);
+      console.log(test.id);
+      // 로컬 빌드 테스트
       iframeSection = (
-          <MobileTestFrame_
-            id={id}
-            test={test}>
-          </MobileTestFrame_>
-
+        <MobileTestFrame_ src={`/tests/${test.id}/index.html`} test={test} id={test.id}/>
       );
     } else {
-      iframeSection = (
-        <ErrorMessage>
-          <p>아직 빌드된 테스트 앱이 없습니다.</p>
-        </ErrorMessage>
-      );
+      // 빌드 결과 없음
+      iframeSection = <div>테스트 파일이 존재하지 않습니다.</div>;
     }
 
     return (

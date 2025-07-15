@@ -171,7 +171,7 @@ const RecommendCard = styled.div`
 `;
 
 // 프레임 컴포넌트
-export default function MobileTestFrame_({ id, test }) {
+export default function MobileTestFrame_({ id, test, src }) {
   const [comments, setComments] = useState([]);
   const [likeCount, setLikeCount] = useState(0);
   const [viewCount, setViewCount] = useState(0);
@@ -188,18 +188,18 @@ export default function MobileTestFrame_({ id, test }) {
 
   // 테스트 ID를 폴더명으로 변환하는 함수
   const getTestIdFromFolder = (folderName) => {
-    if (folderName.startsWith('test')) {
-      return folderName.replace('test', '');
+    if (typeof folderName === 'string') {
+      if (folderName.startsWith('test')) {
+        return folderName.replace('test', '');
+      } else if (folderName.startsWith('template')) {
+        return folderName.replace('template', '');
+      }
     }
-    else if (folderName.startsWith('template')) {
-      return folderName.replace('template', '');
-    }
-    return folderName;
+    return '';
   };
   // testId로 테스트 정보, 댓글, 추천 테스트 불러오기
   useEffect(() => {
     
-    console.log(test.folder);
     const testId = getTestIdFromFolder(id);
     if (!testId || !test) return;
     
@@ -235,11 +235,12 @@ export default function MobileTestFrame_({ id, test }) {
 
           tried.push(testUrl);
           console.log('import 시도:', testUrl);
+          console.log('test.externalUrl:', test.externalUrl);
 
 
           const IframeComponent = () => (
             <iframe
-              src={test?.externalUrl ? test.externalUrl : `http://localhost:3002/tests/${id}/`}
+              src={src}
               title={test?.title || '테스트'}
               loading="lazy"
               scrolling="no"
