@@ -11,6 +11,10 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 console.log('DB_USER:', process.env.DB_USER); // 값이 제대로 찍히는지 확인
 
 import sequelize, { Visitor } from '../models/index.js';
+
+
+console.log(process.env.DB_USER);
+console.log(sequelize.config.username);
 // region-map.json 불러오기
 let REGION_MAP = {};
 try {
