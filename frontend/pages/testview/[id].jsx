@@ -158,44 +158,46 @@ export default function TestPage() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    Promise.all([
-      (async () => {
+
+    // 1. 테스트 정보 먼저 가져오기
+    (async () => {
+      try {
         const testId = getTestIdFromFolder(id);
         const userKey = getUserKey();
-        return apiClient.get(`/tests/${testId}`, { headers: { 'x-user-key': userKey } });
-      })(),
-      (async () => {
-        const testId = getTestIdFromFolder(id);
-        return apiClient.get(`/tests/${testId}/comments`);
-      })(),
-      (async () => {
-        const isExternal = test && test.externalUrl;
+        const testRes = await apiClient.get(`/tests/${testId}`, { headers: { 'x-user-key': userKey } });
+        const testData = testRes.data;
+        // 2. 댓글 가져오기
+        const commentsRes = await apiClient.get(`/tests/${testId}/comments`);
+        // 3. 빌드 존재 여부 확인
+        let buildOk = false;
+        console.log('id:',id);
+        if (testData.externalUrl) {
+          buildOk = false; // 외부 링크면 빌드 없음
+        } else if (/^test\d+$/.test(id)) {
+          const res = await fetch(`https://smartpick.website/tests/${id}`, { method: 'HEAD' });
+          console.log('res:',res);
+          buildOk = res.ok;
+        }
 
-        const buildExistsPromise = isExternal
-          ? Promise.resolve(false) // 외부 링크면 빌드 존재 false로 고정
-          : (async () => {
-              if (test && /^test\d+$/.test(id)) {
-                const res = await fetch(`/tests/${id}/index.html`, { method: 'HEAD' });
-                return res.ok;
-              }
-              return false;
-            })();
-        return buildExistsPromise;
-      })()
-    ]).then(([testRes, commentsRes, buildOk]) => {
-      setTest(testRes.data);
-      setLiked(Boolean(testRes.data.userLiked));
-      setComments(commentsRes.data.comments);
-      setBuildExists(buildOk);
-      setCheckedBuild(true);
-      setLoading(false);
-    }).catch(() => {
-      setError('테스트를 불러오는데 실패했습니다. 서버 연결을 확인해주세요.');
-      setLoading(false);
-      setCheckedBuild(true);
-    });
-    // 방문 기록
-    (async () => {
+        console.log('testRes:',testRes);
+        console.log('buildOk:',buildOk);
+        console.log('testData.externalUrl:',testData.externalUrl);
+        console.log(' res.ok:', buildOk);
+        setTest(testData);
+        setLiked(Boolean(testData.userLiked));
+        setComments(commentsRes.data.comments);
+        setBuildExists(buildOk);
+        setCheckedBuild(true);
+        setLoading(false);
+        console.log('setLoading(false)');
+      } catch (e) {
+        console.log(e);
+        setError('테스트를 불러오는데 실패했습니다. 서버 연결을 확인해주세요.');
+        setLoading(false);
+        setCheckedBuild(true);
+      }
+
+      // 방문 기록
       try {
         const testId = getTestIdFromFolder(id);
         await apiClient.post(`/visitors`, { testId, page: testId, userAgent: navigator.userAgent });
@@ -280,17 +282,18 @@ export default function TestPage() {
 
     // iframe 렌더링 부분 (단순 고정형 + loading="lazy"만 적용)
     let iframeSection = null;
-    if (test && test.externalUrl) {
-      console.log(test.externalUrl);
+    console.log(test.externalUrl);
+    console.log(test.id);
+    console.log(buildExists);
+    if (test.externalUrl) {
       // 외부 링크 테스트
       iframeSection = (
         <MobileTestFrame_ src={test.externalUrl} test={test} id={test.id}/>
       );
     } else if (buildExists) {
-      console.log(test.id);
       // 로컬 빌드 테스트
       iframeSection = (
-        <MobileTestFrame_ src={`/tests/${test.id}/index.html`} test={test} id={test.id}/>
+        <MobileTestFrame_ src={`/tests/test${test.id}/index.html`} test={test} id={test.id}/>
       );
     } else {
       // 빌드 결과 없음
