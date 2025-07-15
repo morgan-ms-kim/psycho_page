@@ -8,7 +8,7 @@ let REGION_MAP = {};
 try {
   REGION_MAP = JSON.parse(fs.readFileSync(path.join(__dirname, '../utils/region-map.json'), 'utf8'));
 } catch (e) {
-  console.error('region-map.json 파일을 불러올 수 없습니다.');
+  console.error('region-map.json 파일을 불러올 수 없습니다.',e);
   process.exit(1);
 }
 // geoip-lite/regions.json (한국 fallback)
