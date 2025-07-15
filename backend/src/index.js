@@ -769,7 +769,6 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
       const tmpBuildPath = path.join(tmpBase, `psycho_build_${folderName}_${timestamp}`);
       //fs.mkdirSync(tmpBuildPath, { recursive: true });
       const logFile = path.join(tmpBuildPath, 'psycho_build.log');
-      const logTargetFile = path.join(tmpBase, 'psycho_build.log');
       function log(msg) {
         const time = new Date().toISOString();
         fs.appendFileSync(logFile, `[${time}] ${msg}\n`);
@@ -854,7 +853,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
           outputPath = distPath;
         }
         
-        log('outputPath: ', outputPath);
+        log('outputPath: ' + outputPath);
 
         if (outputPath) {
           if (!fs.existsSync(testPath)) fs.mkdirSync(testPath, { recursive: true });
@@ -875,6 +874,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
             }
           };
           copyRecursiveSync(outputPath, testPath);
+          const logTargetFile = path.join(testPath, 'psycho_build.log');
           fs.copyFileSync(logFile, logTargetFile);
           log('빌드 결과물 복사 완료');
         } else {
