@@ -776,9 +776,9 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
       }
       try {
         // 2. git clone
-        log(`git clone ${gitUrl} ${tmpBuildPath}`);
+       
         await execAsync(`git clone ${gitUrl} ${tmpBuildPath}`, { timeout: 300000 });
-
+        log(`git clone ${gitUrl} ${tmpBuildPath}`);
         // 3. package.json homepage 수정
         const packageJsonPath = path.join(tmpBuildPath, 'package.json');
         if (fs.existsSync(packageJsonPath)) {
