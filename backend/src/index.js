@@ -586,12 +586,12 @@ app.get('/api/visitors/count', async (req, res, next) => {
 app.post('/api/visitors', async (req, res, next) => {
   try {
     const userKey = getUserKeyOrIP(req);
-    console.log('Visitor:', userKey,'country:', country, 'region:', region); // userKey 값 로그
     if (!userKey) return res.status(400).json({ error: 'IP를 확인할 수 없습니다.' });
     const geo = geoip.lookup(userKey);
     const country = geo ? geo.country : null;
     let region = geo ? geo.region : null;
-    console.log('country:region', country, region); // userKey 값 로그
+    
+    console.log('Visitor:', userKey,'country:', country, 'region:', region); // userKey 값 로그
     // 1. region-map.json 우선 적용
     if (country && region && REGION_MAP[country] && REGION_MAP[country][region]) {
       region = REGION_MAP[country][region];
