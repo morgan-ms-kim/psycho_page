@@ -45,25 +45,25 @@ const storage = multer.diskStorage({
     // 파일명: testID_타임스탬프_안전한파일명
     const testId = req.params.id || 'temp';
     const timestamp = Date.now();
-    
+
     // 원본 파일명에서 확장자 추출
     const ext = path.extname(file.originalname).toLowerCase();
-    
+
     // 안전한 파일명 생성 (한글, 특수문자 제거)
     const safeName = `test${testId}_${timestamp}${ext}`;
-    
+
     console.log('📁 파일명 생성:', {
       original: file.originalname,
       safe: safeName,
       testId,
       timestamp
     });
-    
+
     cb(null, safeName);
   }
 });
 
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB
@@ -93,8 +93,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // 서버 상태 확인 라우트
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     timestamp: new Date().toISOString(),
     adminToken: process.env.ADMIN_TOKEN ? '설정됨' : '설정되지 않음',
     nodeVersion: process.version,
@@ -112,9 +112,9 @@ app.get('/api/db-status', async (req, res) => {
     const tests = await Test.findAll({
       order: [['createdAt', 'DESC']]
     });
-    
+
     const os = await import('os');
-    
+
     res.json({
       dbConnection: 'ok',
       testCount: tests.length,
@@ -147,7 +147,7 @@ app.get('/api/db-status', async (req, res) => {
 const authenticateAdmin = (req, res, next) => {
   console.log('🔐 관리자 인증 시도');
   const token = req.headers.authorization?.replace('Bearer ', '');
-  
+
   if (token === process.env.ADMIN_TOKEN) {
     console.log('✅ 관리자 인증 성공');
     next();
@@ -159,11 +159,11 @@ const authenticateAdmin = (req, res, next) => {
 
 // IP 주소 추출 미들웨어
 const getClientIP = (req) => {
-  return req.headers['x-forwarded-for'] || 
-         req.connection.remoteAddress || 
-         req.socket.remoteAddress ||
-         (req.connection.socket ? req.connection.socket.remoteAddress : null) ||
-         req.ip;
+  return req.headers['x-forwarded-for'] ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    (req.connection.socket ? req.connection.socket.remoteAddress : null) ||
+    req.ip;
 };
 
 // 기존 getClientIP 함수 위에 추가 또는 대체
@@ -192,7 +192,7 @@ async function runTestDeployScript(clonePath) {
 app.get('/api/tests', async (req, res, next) => {
   try {
     const { search, category, sort = 'latest', limit = 20, offset = 2 } = req.query;
-    
+
     let whereClause = {};
     if (search) {
       whereClause = {
@@ -202,16 +202,16 @@ app.get('/api/tests', async (req, res, next) => {
         ]
       };
     }
-    
+
     if (category) {
       whereClause.category = category;
     }
-    
+
     let orderClause = [['createdAt', 'DESC']];
     if (sort === 'views') orderClause = [['views', 'DESC']];
     if (sort === 'likes') orderClause = [['likes', 'DESC']];
     if (sort === 'popular') orderClause = [['views', 'DESC'], ['likes', 'DESC']];
-    
+
     const tests = await Test.findAll({
       where: whereClause,
       order: orderClause,
@@ -220,14 +220,14 @@ app.get('/api/tests', async (req, res, next) => {
       distinct: true, // 중복 제거
       attributes: { exclude: ['password'] } // 불필요한 필드 제외
     });
-    
+
     console.log(`📊 테스트 목록 조회: ${tests.length}개 `);
     // 이미지 경로 수정 및 중복 제거
     const testsWithCorrectPaths = tests.map(test => {
       const testData = test.toJSON();
       return testData;
     });
-    
+
     // 중복 제거 (id 기준) - 더 강화된 로직
     const uniqueTests = testsWithCorrectPaths.reduce((acc, test) => {
       const existingTest = acc.find(t => t.id === test.id);
@@ -236,7 +236,7 @@ app.get('/api/tests', async (req, res, next) => {
       }
       return acc;
     }, []);
-    
+
     console.log(`📊 테스트 목록 조회: ${uniqueTests.length}개 (중복 제거 후)`);
     res.json(uniqueTests);
   } catch (error) {
@@ -251,12 +251,12 @@ app.get('/api/tests/:id', async (req, res, next) => {
     if (!test) {
       return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
     }
-    
+
     // 조회수 증가 (IP 기반 중복 방지)
     const userKey = getUserKeyOrIP(req);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const existingView = await Visitor.findOne({
       where: {
         testId: req.params.id,
@@ -264,7 +264,7 @@ app.get('/api/tests/:id', async (req, res, next) => {
         visitedAt: { [Op.gte]: today }
       }
     });
-    
+
     if (!existingView) {
       await test.increment('views');
       await Visitor.create({
@@ -273,15 +273,15 @@ app.get('/api/tests/:id', async (req, res, next) => {
         userAgent: req.headers['user-agent']
       });
     }
-    
+
     // 댓글 수 계산
     const commentCount = await Comment.count({ where: { testId: req.params.id } });
-    
+
     // 사용자의 좋아요 상태 확인
     const userLike = await Like.findOne({
       where: { testId: req.params.id, ip: userKey, commentId: null }
     });
-    
+
     // 이미지 경로 수정
     const testData = test.toJSON();
     testData.userLiked = !!userLike;
@@ -296,11 +296,11 @@ app.post('/api/tests/:id/like', async (req, res, next) => {
   try {
     const userKey = getUserKeyOrIP(req);
     const testId = req.params.id;
-    
+
     const existingLike = await Like.findOne({
       where: { testId, ip: userKey, commentId: null }
     });
-    
+
     if (existingLike) {
       await existingLike.destroy();
       await Test.decrement('likes', { where: { id: testId } });
@@ -324,30 +324,30 @@ app.get('/api/tests/:id/comments', async (req, res, next) => {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
     const userKey = getUserKeyOrIP(req);
-    
+
     const comments = await Comment.findAndCountAll({
       where: { testId: req.params.id },
       order: [['createdAt', 'DESC']],
       limit: parseInt(limit),
       offset: parseInt(offset)
     });
-    
+
     const commentsWithStatus = await Promise.all(
       comments.rows.map(async (comment) => {
         const commentData = comment.toJSON();
         delete commentData.password;
-        
+
         const userLike = await Like.findOne({
           where: { commentId: comment.id, ip: userKey }
         });
-        
+
         return {
           ...commentData,
           userLiked: !!userLike
         };
       })
     );
-    
+
     res.json({
       comments: commentsWithStatus,
       total: comments.count,
@@ -363,19 +363,19 @@ app.get('/api/tests/:id/comments', async (req, res, next) => {
 app.post('/api/tests/:id/comments', async (req, res, next) => {
   try {
     const { nickname, content, password } = req.body;
-    
+
     if (!nickname || !content || !password) {
       return res.status(400).json({ error: '닉네임, 내용, 비밀번호를 모두 입력해주세요.' });
     }
-    
+
     if (content.length > 500) {
       return res.status(400).json({ error: '댓글은 500자 이내로 작성해주세요.' });
     }
-    
+
     if (password.length < 4) {
       return res.status(400).json({ error: '비밀번호는 4자 이상 입력해주세요.' });
     }
-    
+
     const userKey = getUserKeyOrIP(req);
     const comment = await Comment.create({
       testId: req.params.id,
@@ -384,7 +384,7 @@ app.post('/api/tests/:id/comments', async (req, res, next) => {
       password: password,
       ip: userKey
     });
-    
+
     res.json(comment);
   } catch (error) {
     next(error);
@@ -396,22 +396,22 @@ app.post('/api/comments/:id/like', async (req, res, next) => {
   try {
     const userKey = getUserKeyOrIP(req);
     const commentId = req.params.id;
-    
+
     const comment = await Comment.findByPk(commentId);
     if (!comment) {
       return res.status(404).json({ error: '댓글을 찾을 수 없습니다.' });
     }
-    
+
     const existingLike = await Like.findOne({
       where: { commentId, ip: userKey }
     });
-    
+
     if (existingLike) {
       await existingLike.destroy();
       res.json({ liked: false });
     } else {
-      await Like.create({ 
-        commentId, 
+      await Like.create({
+        commentId,
         ip: userKey,
         testId: comment.testId
       });
@@ -433,7 +433,7 @@ app.get('/api/categories', async (req, res, next) => {
       },
       raw: true
     });
-    
+
     const uniqueCategories = [...new Set(tests.map(test => test.category).filter(Boolean))];
     res.json(uniqueCategories);
   } catch (error) {
@@ -447,7 +447,7 @@ app.get('/api/categories', async (req, res, next) => {
 app.get('/api/tests/:id/recommends/', async (req, res, next) => {
   try {
     const { search, category, sort = 'latest', limit = 10 } = req.query;
-    
+
     let whereClause = {};
     if (search) {
       whereClause = {
@@ -457,16 +457,16 @@ app.get('/api/tests/:id/recommends/', async (req, res, next) => {
         ]
       };
     }
-    
+
     if (category) {
       whereClause.category = category;
     }
-    
+
     let orderClause = [['views', 'DESC'], ['likes', 'DESC']];
     //if (sort === 'views') orderClause = [['views', 'DESC']];
     //if (sort === 'likes') orderClause = [['likes', 'DESC']];
     //if (sort === 'popular') orderClause = [['views', 'DESC'], ['likes', 'DESC']];
-    
+
     const tests = await Test.findAll({
       where: whereClause,
       order: orderClause,
@@ -474,13 +474,13 @@ app.get('/api/tests/:id/recommends/', async (req, res, next) => {
       distinct: true, // 중복 제거
       attributes: { exclude: ['password'] } // 불필요한 필드 제외
     });
-    
+
     // 이미지 경로 수정 및 중복 제거
     const testsWithCorrectPaths = tests.map(test => {
       const testData = test.toJSON();
       return testData;
     });
-    
+
     // 중복 제거 (id 기준) - 더 강화된 로직
     const uniqueTests = testsWithCorrectPaths.reduce((acc, test) => {
       const existingTest = acc.find(t => t.id === test.id);
@@ -489,7 +489,7 @@ app.get('/api/tests/:id/recommends/', async (req, res, next) => {
       }
       return acc;
     }, []);
-    
+
     console.log(`📊 추천 테스트 목록 조회: ${uniqueTests.length}개 (중복 제거 후)`);
     res.json(uniqueTests);
   } catch (error) {
@@ -500,7 +500,7 @@ app.get('/api/tests/:id/recommends/', async (req, res, next) => {
 app.get('/api/recommends', async (req, res, next) => {
   try {
     const { search, category, sort = 'latest', limit = 10 } = req.query;
-    
+
     let whereClause = {};
     if (search) {
       whereClause = {
@@ -510,16 +510,16 @@ app.get('/api/recommends', async (req, res, next) => {
         ]
       };
     }
-    
+
     if (category) {
       whereClause.category = category;
     }
-    
+
     let orderClause = [['views', 'DESC'], ['likes', 'DESC']];
     //if (sort === 'views') orderClause = [['views', 'DESC']];
     //if (sort === 'likes') orderClause = [['likes', 'DESC']];
     //if (sort === 'popular') orderClause = [['views', 'DESC'], ['likes', 'DESC']];
-    
+
     const tests = await Test.findAll({
       where: whereClause,
       order: orderClause,
@@ -527,13 +527,13 @@ app.get('/api/recommends', async (req, res, next) => {
       distinct: true, // 중복 제거
       attributes: { exclude: ['password'] } // 불필요한 필드 제외
     });
-    
+
     // 이미지 경로 수정 및 중복 제거
     const testsWithCorrectPaths = tests.map(test => {
       const testData = test.toJSON();
       return testData;
     });
-    
+
     // 중복 제거 (id 기준) - 더 강화된 로직
     const uniqueTests = testsWithCorrectPaths.reduce((acc, test) => {
       const existingTest = acc.find(t => t.id === test.id);
@@ -542,7 +542,7 @@ app.get('/api/recommends', async (req, res, next) => {
       }
       return acc;
     }, []);
-    
+
     console.log(`📊 추천 테스트 목록 조회: ${uniqueTests.length}개 (중복 제거 후)`);
     res.json(uniqueTests);
   } catch (error) {
@@ -555,10 +555,10 @@ app.get('/api/recommends', async (req, res, next) => {
 app.get('/api/visitors/count', async (req, res, next) => {
   try {
     const today = new Date();
-    today.setHours(0,0,0,0);
-    
+    today.setHours(0, 0, 0, 0);
+
     const total = await Visitor.count({ distinct: true, col: 'ip' });
-    const todayCount = await Visitor.count({ 
+    const todayCount = await Visitor.count({
       where: { visitedAt: { [Op.gte]: today } },
       distinct: true,
       col: 'ip'
@@ -567,13 +567,13 @@ app.get('/api/visitors/count', async (req, res, next) => {
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
     const weekCount = await Visitor.count({
-    where: { visitedAt: { [Op.gte]: weekAgo } },
-    distinct: true,
-    col: 'ip'
+      where: { visitedAt: { [Op.gte]: weekAgo } },
+      distinct: true,
+      col: 'ip'
     });
-    
-    res.json({ 
-      total, 
+
+    res.json({
+      total,
       today: todayCount,
       week: weekCount
     });
@@ -590,8 +590,8 @@ app.post('/api/visitors', async (req, res, next) => {
     const geo = geoip.lookup(userKey);
     const country = geo ? geo.country : null;
     let region = geo ? geo.region : null;
-    
-    console.log('Visitor:', userKey,'country:', country, 'region:', region); // userKey 값 로그
+
+    console.log('Visitor:', userKey, 'country:', country, 'region:', region); // userKey 값 로그
     // 1. region-map.json 우선 적용
     if (country && region && REGION_MAP[country] && REGION_MAP[country][region]) {
       region = REGION_MAP[country][region];
@@ -625,7 +625,7 @@ app.get('/api/stats', async (req, res, next) => {
     const totalViews = await Test.sum('views') || 0;
     const totalLikes = await Test.sum('likes') || 0;
     const totalComments = await Comment.count();
-    
+
     res.json({
       totalTests,
       totalViews,
@@ -643,12 +643,12 @@ app.delete('/api/comments/:id', async (req, res, next) => {
   try {
     const { password } = req.body;
     const commentId = req.params.id;
-    
+
     const comment = await Comment.findByPk(commentId);
     if (!comment) {
       return res.status(404).json({ error: '댓글을 찾을 수 없습니다.' });
     }
-    
+
     if (!comment.password) {
       const userKey = getUserKeyOrIP(req);
       if (comment.ip !== userKey) {
@@ -658,15 +658,15 @@ app.delete('/api/comments/:id', async (req, res, next) => {
       if (!password) {
         return res.status(400).json({ error: '비밀번호를 입력해주세요.' });
       }
-      
+
       if (comment.password !== password) {
         return res.status(403).json({ error: '비밀번호가 일치하지 않습니다.' });
       }
     }
-    
+
     await Like.destroy({ where: { commentId } });
     await comment.destroy();
-    
+
     res.json({ success: true, message: '댓글이 삭제되었습니다.' });
   } catch (error) {
     next(error);
@@ -678,10 +678,10 @@ app.post('/api/admin/login', async (req, res, next) => {
   try {
     console.log('🔐 관리자 로그인 시도');
     const { username, password } = req.body;
-    
+
     if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
       console.log('✅ 로그인 성공');
-      res.json({ 
+      res.json({
         token: process.env.ADMIN_TOKEN,
         message: '로그인 성공'
       });
@@ -763,7 +763,6 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     // git clone
     try {
       // 1. 임시 폴더 생성 (예: /tmp/psycho_build_{folderName}_{timestamp})
-      const os = require('os');
       const tmpBase = testsDir;
       const timestamp = Date.now();
       const tmpBuildPath = path.join(tmpBase, `psycho_build_${folderName}_${timestamp}`);
@@ -776,7 +775,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
       }
       try {
         // 2. git clone
-       
+
         await execAsync(`git clone ${gitUrl} ${tmpBuildPath}`, { timeout: 300000 });
         log(`git clone ${gitUrl} ${tmpBuildPath}`);
         // 3. package.json homepage 수정
@@ -798,7 +797,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
           let viteConfig = fs.readFileSync(viteConfigPath, 'utf8');
           if (!viteConfig.includes('base:')) {
             viteConfig = viteConfig.replace(
-              /defineConfig\s*\(\s*{/, 
+              /defineConfig\s*\(\s*{/,
               `defineConfig({\n  base: '/tests/${folderName}/',`
             );
             fs.writeFileSync(viteConfigPath, viteConfig);
@@ -852,8 +851,8 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
         } else if (fs.existsSync(distPath)) {
           outputPath = distPath;
         }
-        
-        log('outputPath: ' + outputPath);
+
+        log(`outputPath:  ${outputPath}`);
 
         if (outputPath) {
           if (!fs.existsSync(testPath)) fs.mkdirSync(testPath, { recursive: true });
@@ -874,8 +873,12 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
             }
           };
           copyRecursiveSync(outputPath, testPath);
-          const logTargetFile = path.join(testPath, 'psycho_build.log');
-          fs.copyFileSync(logFile, logTargetFile);
+          log(logTargetFile);
+          // 로그파일 복사 (존재할 때만)
+          if (fs.existsSync(logFile)) {
+            const logTargetFile = path.join(testPath, 'psycho_build.log');
+            fs.copyFileSync(logFile, logTargetFile);
+          }
           log('빌드 결과물 복사 완료');
         } else {
           log('빌드 결과물(build/dist 폴더)이 없습니다.');
@@ -950,17 +953,17 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'tests');
     const testPath = path.join(testsDir, folderName);
     const tmpDir = path.join(process.cwd(), '..', 'tmp-template-' + Date.now());
-    console.log(testsDir ,testPath, tmpDir);
+    console.log(testsDir, testPath, tmpDir);
     // 기존 폴더가 있으면 삭제
     if (fs.existsSync(testPath)) {
-      try { fs.rmSync(testPath, { recursive: true, force: true }); } catch {}
+      try { fs.rmSync(testPath, { recursive: true, force: true }); } catch { }
     }
     if (fs.existsSync(tmpDir)) {
-      try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+      try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch { }
     }
     // 3. git clone (임시 폴더)
     try {
-      
+
       console.log(`git clone ${url} ${tmpDir}`);
       await execAsync(`git clone ${url} ${tmpDir}`, { timeout: 300000 });
       steps.gitCloned = true;
@@ -1021,7 +1024,7 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
       steps.filesCopied = true;
     } catch (error) {
       if (test) await test.destroy();
-      
+
       console.log(`파일 복사 실패`);
       return res.status(500).json({ error: '파일 복사 실패', steps, detail: error.message });
     }
@@ -1035,8 +1038,8 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
         steps.packageJsonModified = true;
       } catch (error) {
         if (test) await test.destroy();
-        
-       console.log(`package.json 수정 실패`);
+
+        console.log(`package.json 수정 실패`);
         return res.status(500).json({ error: 'package.json 수정 실패', steps, detail: error.message });
       }
     } else {
@@ -1055,10 +1058,10 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
     }
     // 8. folder 컬럼 업데이트
     test.folder = folderName;
-    console.log('DB 폴더:'+test.folder+' | 입력 폴더:'+folderName);
+    console.log('DB 폴더:' + test.folder + ' | 입력 폴더:' + folderName);
     await test.save();
     // 9. 임시폴더 삭제
-    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch { }
     try {
       // frontend/scripts/generate-app-module-map.js 실행
       exec('node ../frontend/scripts/generate-app-module-map.js', { stdio: 'inherit' });
@@ -1074,17 +1077,17 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
 // 테스트 목록 (관리자용)
 app.get('/api/admin/tests', authenticateAdmin, async (req, res, next) => {
   console.log('🎯 GET /api/admin/tests 핸들러 실행됨');
-  
+
   try {
     console.log('=== 관리자 테스트 목록 요청 ===');
-    
+
     const tests = await Test.findAll({
       order: [['createdAt', 'DESC']]
     });
-    
+
     console.log('✅ 테스트 목록 조회 성공:', tests.length, '개');
     console.log('테스트 목록:', tests.map(t => ({ id: t.id, title: t.title })));
-    
+
     res.json(tests);
   } catch (error) {
     console.error('❌ 테스트 목록 조회 실패:', error);
@@ -1099,7 +1102,7 @@ app.get('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => {
     if (!test) {
       return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
     }
-    
+
     // 이미지 경로 수정
     const testData = test.toJSON();
     res.json(testData);
@@ -1115,13 +1118,13 @@ app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thu
     console.log('🎯 썸네일 업로드 요청 시작');
     console.log('요청 파일:', req.file);
     console.log('요청 파라미터:', req.params);
-    
+
     const testId = req.params.id;
     if (!req.file) {
       console.error('❌ 썸네일 파일이 없음');
       return res.status(400).json({ error: '썸네일 파일이 필요합니다.' });
     }
-    
+
     console.log('📁 업로드된 파일 정보:', {
       originalname: req.file.originalname,
       mimetype: req.file.mimetype,
@@ -1129,18 +1132,18 @@ app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thu
       path: req.file.path,
       filename: req.file.filename
     });
-    
+
     const test = await Test.findByPk(testId);
     if (!test) {
       console.error('❌ 테스트를 찾을 수 없음:', testId);
       return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
     }
-    
+
     // 파일이 이미 올바른 위치에 있으므로 경로만 설정
     const thumbnailPath = `/uploads/thumbnails/${req.file.filename}`;
-    
+
     console.log('📂 썸네일 경로:', thumbnailPath);
-    
+
     // 기존 썸네일 삭제 (기본 썸네일 제외)
     if (test.thumbnail && test.thumbnail !== '/uploads/thumbnails/default-thumb.png') {
       try {
@@ -1153,10 +1156,10 @@ app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thu
         console.error('⚠️ 기존 썸네일 삭제 실패:', error.message);
       }
     }
-    
+
     test.thumbnail = thumbnailPath;
     await test.save();
-    
+
     console.log('✅ 썸네일 업데이트 완료:', thumbnailPath);
     res.json({ success: true, message: '썸네일이 업데이트되었습니다.', thumbnail: thumbnailPath });
   } catch (error) {
@@ -1364,25 +1367,25 @@ app.put('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const testId = req.params.id;
     const { title, description, category } = req.body;
-    
+
     console.log('테스트 수정 요청:', testId, req.body);
-    
+
     const test = await Test.findByPk(testId);
     if (!test) {
       return res.status(404).json({ error: '테스트를 찾을 수 없습니다.' });
     }
-    
+
     // 필수 필드 검증
     if (!title || !description) {
       return res.status(400).json({ error: '제목과 설명은 필수입니다.' });
     }
-    
+
     // 테스트 정보 업데이트
     test.title = title;
     test.description = description;
     test.category = category || '기타';
     await test.save();
-    
+
     console.log('✅ 테스트 수정 완료:', testId);
     res.json({ success: true, message: '테스트가 수정되었습니다.', test });
   } catch (error) {
@@ -1395,38 +1398,38 @@ app.put('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => {
 app.post('/api/admin/update-thumbnail-paths', authenticateAdmin, async (req, res, next) => {
   try {
     console.log('🔄 기존 테스트 썸네일 경로 업데이트 시작');
-    
+
     const tests = await Test.findAll();
     let updatedCount = 0;
-    
+
     for (const test of tests) {
       let needsUpdate = false;
-      
+
       // 기본 썸네일 경로 수정
       if (test.thumbnail === '/default-thumb.png') {
         test.thumbnail = '/uploads/thumbnails/default-thumb.png';
         needsUpdate = true;
         console.log(`📝 테스트 ${test.id} 기본 썸네일 경로 업데이트`);
       }
-      
+
       // uploads 경로가 없는 경우 추가
       if (test.thumbnail && test.thumbnail.startsWith('/uploads/')) {
         test.thumbnail = test.thumbnail.replace('/uploads/', '/uploads/');
         needsUpdate = true;
         console.log(`📝 테스트 ${test.id} uploads 경로 업데이트`);
       }
-      
+
       if (needsUpdate) {
         await test.save();
         updatedCount++;
       }
     }
-    
+
     console.log(`✅ ${updatedCount}개 테스트 썸네일 경로 업데이트 완료`);
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: `${updatedCount}개 테스트의 썸네일 경로가 업데이트되었습니다.`,
-      updatedCount 
+      updatedCount
     });
   } catch (error) {
     console.error('❌ 썸네일 경로 업데이트 실패:', error);
@@ -1465,7 +1468,7 @@ app.post('/api/admin/cleanup-orphan-folders', authenticateAdmin, async (req, res
     }
     // 파일시스템의 테스트 폴더 목록
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
-    const filesystemFolders = fs.existsSync(testsDir) 
+    const filesystemFolders = fs.existsSync(testsDir)
       ? fs.readdirSync(testsDir, { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name)
@@ -1490,8 +1493,8 @@ app.post('/api/admin/cleanup-orphan-folders', authenticateAdmin, async (req, res
         console.error('⚠️ 폴더 삭제 실패:', folder, error.message);
       }
     }
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: `${deletedCount}개 등록되지 않은 폴더가 정리되었습니다.`,
       deletedCount,
       orphanFolders
@@ -1499,7 +1502,7 @@ app.post('/api/admin/cleanup-orphan-folders', authenticateAdmin, async (req, res
   } catch (error) {
     console.error('❌ 등록되지 않은 폴더 정리 실패:', error);
     // 명확한 에러 메시지 반환
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
       message: '등록되지 않은 폴더 정리 중 오류 발생',
       error: error.message || error.toString()
@@ -1515,17 +1518,17 @@ app.get('/api/admin/orphan-folders', authenticateAdmin, async (req, res, next) =
         .map(t => t.folder)
         .filter(Boolean)
     );
-    
+
     const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
-    const filesystemFolders = fs.existsSync(testsDir) 
+    const filesystemFolders = fs.existsSync(testsDir)
       ? fs.readdirSync(testsDir, { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name)
       : [];
-    
+
     const orphanFolders = filesystemFolders.filter(folder => !registeredFolders.has(folder));
-    
-    res.json({ 
+
+    res.json({
       orphanFolders,
       totalOrphans: orphanFolders.length,
       registeredFolders: Array.from(registeredFolders),
@@ -1648,13 +1651,13 @@ app.get('/api/lotto-rank', async (req, res) => {
   try {
     const { count = 10 } = req.query;
     const limit = parseInt(count);
-    
+
     // DB에서 로또 번호 데이터 조회
     const draws = await LottoDraw.findAll({
       order: [['drawNo', 'DESC']],
       limit: limit
     });
-    
+
     // 번호별 출현 빈도 계산
     const numberCount = {};
     draws.forEach(draw => {
@@ -1663,19 +1666,19 @@ app.get('/api/lotto-rank', async (req, res) => {
         numberCount[num] = (numberCount[num] || 0) + 1;
       });
     });
-    
+
     // 1~45까지 모든 번호에 대해 빈도가 없는 번호는 0으로 설정
     const allNumbers = [];
     for (let i = 1; i <= 45; i++) {
       const cnt = numberCount[i] || 0;
       allNumbers.push({ num: i, cnt });
     }
-    
+
     // 출현 빈도별로 정렬하여 top30 반환
     const top30 = allNumbers
       .sort((a, b) => b.cnt - a.cnt || a.num - b.num)
       .slice(0, 45);
-    
+
     res.json({ top30 });
   } catch (e) {
     res.status(500).json({ error: '로또 랭킹 조회 실패', detail: e.message });
@@ -1687,19 +1690,19 @@ app.get('/api/lotto-digit-rank', async (req, res) => {
   try {
     const { count = 10 } = req.query;
     const limit = parseInt(count);
-    
+
     // DB에서 로또 번호 데이터 조회
     const draws = await LottoDraw.findAll({
       order: [['drawNo', 'DESC']],
       limit: limit
     });
-    
+
     // 자릿수 조합별 출현 빈도 계산
     const combinationCount = {};
-    
+
     draws.forEach(draw => {
       const numbers = draw.numbers.split(',').map(n => parseInt(n));
-      
+
       // 각 자릿수별 개수 계산
       const digitCounts = {
         '1': 0,   // 1~9
@@ -1708,7 +1711,7 @@ app.get('/api/lotto-digit-rank', async (req, res) => {
         '30': 0,  // 30~39
         '40': 0   // 40~45
       };
-      
+
       numbers.forEach(num => {
         if (num >= 1 && num <= 9) {
           digitCounts['1']++;
@@ -1722,19 +1725,19 @@ app.get('/api/lotto-digit-rank', async (req, res) => {
           digitCounts['40']++;
         }
       });
-      
+
       // 조합 문자열 생성 (예: "1-2-1-1-1")
       const combination = `${digitCounts['1']}-${digitCounts['10']}-${digitCounts['20']}-${digitCounts['30']}-${digitCounts['40']}`;
-      
+
       // 조합별 출현 빈도 누적
       combinationCount[combination] = (combinationCount[combination] || 0) + 1;
     });
-    
+
     // 조합별 랭킹 정렬
     const combinationRank = Object.entries(combinationCount)
       .map(([combination, count]) => ({ combination, count }))
       .sort((a, b) => b.count - a.count || a.combination.localeCompare(b.combination));
-    
+
     res.json({ digitRank: combinationRank });
   } catch (e) {
     res.status(500).json({ error: '자릿수 조합 랭킹 조회 실패', detail: e.message });
