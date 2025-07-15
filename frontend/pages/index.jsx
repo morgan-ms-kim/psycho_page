@@ -499,10 +499,9 @@ if (pendingSlide === 'prev') baseTranslate = -100;
                 position: 'relative',
                 zIndex: idx === 1 ? 12 : 11,
               }}
-            >{console.log(test.thumbnail)}
+            >
               <RecommendCard>
                 <RecommendThumbnailContainer>
-                  
                   {test?.thumbnail && (
                     <RecommendItemImage
                       src={getImagePath(test.thumbnail)}
