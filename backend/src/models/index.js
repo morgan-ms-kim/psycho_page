@@ -242,7 +242,7 @@ export async function updateAllVisitorRegion() {
     regionNames = {};
   }
   try {
-    const visitors = await Visitor.findAll({ where: { region: null } });
+    const visitors = await Visitor.findAll({ where: { region: '' } });
     let updated = 0;
     for (const v of visitors) {
       if (!v.country) continue;
