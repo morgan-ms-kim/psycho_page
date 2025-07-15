@@ -767,6 +767,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
       const timestamp = Date.now();
       const tmpBuildPath = path.join(tmpBase, `psycho_build_${folderName}_${timestamp}`);
       //fs.mkdirSync(tmpBuildPath, { recursive: true });
+      if (!fs.existsSync(testPath)) fs.mkdirSync(testPath, { recursive: true });
       const logFile = path.join(testPath, 'psycho_build.log');
       function log(msg) {
         const time = new Date().toISOString();
