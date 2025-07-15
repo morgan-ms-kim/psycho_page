@@ -586,7 +586,7 @@ app.get('/api/visitors/count', async (req, res, next) => {
 app.post('/api/visitors', async (req, res, next) => {
   try {
     const userKey = getUserKeyOrIP(req);
-    console.log('Visitor insert userKey:', userKey); // userKey 값 로그
+    console.log('Visitor:', userKey,'country:', country, 'region:', region); // userKey 값 로그
     if (!userKey) return res.status(400).json({ error: 'IP를 확인할 수 없습니다.' });
     const geo = geoip.lookup(userKey);
     const country = geo ? geo.country : null;
