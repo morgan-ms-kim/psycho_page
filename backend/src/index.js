@@ -35,7 +35,7 @@ const execAsync = promisify(exec);
 // multer 설정
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(process.cwd(), '..', 'frontend', 'public', 'uploads', 'thumbnails');
+    const uploadDir = path.join(process.cwd(), '..', 'testGroup', 'public', 'uploads', 'thumbnails');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
