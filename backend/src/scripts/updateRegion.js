@@ -29,7 +29,7 @@ async function updateRegions() {
     const visitors = await Visitor.findAll({
       where: {
         region: null,
-        country: { [sequelize.Op.ne]: null },
+        country: {}, // not null로 동작
       },
     });
     let updated = 0;
