@@ -1,7 +1,5 @@
 // Visitor region 일괄 업데이트 스크립트
 import dotenv from 'dotenv';
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-console.log('DB_USER:', process.env.DB_USER); // 값이 제대로 찍히는지 확인
 import sequelize, { Visitor } from '../models/index.js';
 import fs from 'fs';
 import path from 'path';
@@ -10,6 +8,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+console.log('DB_USER:', process.env.DB_USER); // 값이 제대로 찍히는지 확인
 // region-map.json 불러오기
 let REGION_MAP = {};
 try {
