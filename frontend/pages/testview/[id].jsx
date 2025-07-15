@@ -169,6 +169,10 @@ export default function TestPage() {
         return apiClient.get(`/tests/${testId}/comments`);
       })(),
       (async () => {
+        // 외부 링크 테스트면 무조건 true 반환 (buildExists처럼 처리)
+        if (test && test.externalUrl) {
+          return true;
+        }
         if (/^test\d+$/.test(id)) {
           const res = await fetch(`/tests/${id}/index.html`, { method: 'HEAD' });
           return res.ok;
@@ -280,6 +284,10 @@ export default function TestPage() {
         </LoadingWrap>
       );
     } else if (buildExists) {
+      const src = test.externalUrl
+        ? test.externalUrl
+        : `/tests/${test.id}/index.html`;
+      console.log(buildExists);
       iframeSection = (
           <MobileTestFrame_
             id={id}
