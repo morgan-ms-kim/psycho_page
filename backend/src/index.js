@@ -11,6 +11,7 @@ import multer from 'multer';
 import geoip from 'geoip-lite';
 import { createRequire } from 'module';
 import sitemapRouter from './routes/sitemap.js';
+import { count } from 'console';
 const require = createRequire(import.meta.url);
 let REGION_MAP = {};
 try {
@@ -590,6 +591,7 @@ app.post('/api/visitors', async (req, res, next) => {
     const geo = geoip.lookup(userKey);
     const country = geo ? geo.country : null;
     let region = geo ? geo.region : null;
+    console.log('country:region', country, region); // userKey 값 로그
     // 1. region-map.json 우선 적용
     if (country && region && REGION_MAP[country] && REGION_MAP[country][region]) {
       region = REGION_MAP[country][region];
