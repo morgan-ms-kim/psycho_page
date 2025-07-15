@@ -762,61 +762,126 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     }
     // git clone
     try {
-      await execAsync(`git clone ${gitUrl} ${testPath}`, { timeout: 300000 });
-      steps.gitCloned = true;
-      console.log('✅ Git 클론 완료:', gitUrl);
-    } catch (error) {
-      if (test) await test.destroy();
-      return res.status(400).json({ error: 'Git 클론 실패', steps, detail: error.message });
-    }
-    // package.json 수정
-    const packageJsonPath = path.join(testPath, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-      try {
-        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-        packageJson.homepage = `/tests/${folderName}/`;
-        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-        steps.packageJsonModified = true;
-      } catch (error) {
-        if (test) await test.destroy();
-        return res.status(500).json({ error: 'package.json 수정 실패', steps, detail: error.message });
+      // 1. 임시 폴더 생성 (예: /tmp/psycho_build_{folderName}_{timestamp})
+      const os = require('os');
+      const tmpBase = os.tmpdir();
+      const timestamp = Date.now();
+      const tmpBuildPath = path.join(tmpBase, `psycho_build_${folderName}_${timestamp}`);
+      fs.mkdirSync(tmpBuildPath, { recursive: true });
+      const logFile = path.join(tmpBuildPath, 'psycho_build.log');
+      function log(msg) {
+        const time = new Date().toISOString();
+        fs.appendFileSync(logFile, `[${time}] ${msg}\n`);
+        console.log(msg);
       }
-    } else {
-      if (test) await test.destroy();
-      return res.status(400).json({ error: 'package.json 없음', steps, path: packageJsonPath });
-    }
-    // 빌드 작업을 nice로 실행하고, 빌드가 끝난 후에만 결과물 복사
-    try {
-      // 빌드 명령어를 nice로 실행
-      await execAsync(`nice -n 19 npm install`, { cwd: testPath, timeout: 300000 });
-      await execAsync(`nice -n 19 npm run build`, { cwd: testPath, timeout: 300000 });
-      steps.npmInstalled = true;
-      steps.buildCompleted = true;
-      // 빌드 결과물을 testGroup/public/tests/폴더명/에 복사
-      const buildPath = path.join(testPath, 'build');
-      if (fs.existsSync(buildPath)) {
-        // 복사 대상 폴더 생성
-        if (!fs.existsSync(testPath)) fs.mkdirSync(testPath, { recursive: true });
-        // 기존 내용 삭제 후 복사
-        fs.rmSync(testPath, { recursive: true, force: true });
-        fs.mkdirSync(testPath, { recursive: true });
-        // 빌드 결과물 복사
-        const copyRecursiveSync = (src, dest) => {
-          const entries = fs.readdirSync(src, { withFileTypes: true });
-          for (const entry of entries) {
-            const srcPath = path.join(src, entry.name);
-            const destPath = path.join(dest, entry.name);
-            if (entry.isDirectory()) {
-              if (!fs.existsSync(destPath)) fs.mkdirSync(destPath);
-              copyRecursiveSync(srcPath, destPath);
-            } else {
-              fs.copyFileSync(srcPath, destPath);
-            }
+      try {
+        // 2. git clone
+        log(`git clone ${gitUrl} ${tmpBuildPath}`);
+        await execAsync(`git clone ${gitUrl} ${tmpBuildPath}`, { timeout: 300000 });
+
+        // 3. package.json homepage 수정
+        const packageJsonPath = path.join(tmpBuildPath, 'package.json');
+        if (fs.existsSync(packageJsonPath)) {
+          const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+          packageJson.homepage = `/tests/${folderName}/`;
+          fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+          log('package.json homepage 필드 수정 완료');
+        } else {
+          log('package.json 없음');
+          if (test) await test.destroy();
+          return res.status(400).json({ error: 'package.json 없음', steps, path: packageJsonPath });
+        }
+
+        // 4. vite.config.js base 설정 추가
+        const viteConfigPath = path.join(tmpBuildPath, 'vite.config.js');
+        if (fs.existsSync(viteConfigPath)) {
+          let viteConfig = fs.readFileSync(viteConfigPath, 'utf8');
+          if (!viteConfig.includes('base:')) {
+            viteConfig = viteConfig.replace(
+              /defineConfig\s*\(\s*{/, 
+              `defineConfig({\n  base: '/tests/${folderName}/',`
+            );
+            fs.writeFileSync(viteConfigPath, viteConfig);
+            log('vite.config.js base 설정 추가 완료');
+          } else {
+            log('vite.config.js base 설정 이미 존재');
           }
-        };
-        copyRecursiveSync(buildPath, testPath);
-      } else {
-        throw new Error('빌드 결과물(build 폴더)이 없습니다.');
+        } else {
+          log('vite.config.js 없음');
+        }
+
+        // 5. (Browser)Router basename 자동치환
+        const appFiles = ['src/App.jsx', 'src/App.js'];
+        for (const appFile of appFiles) {
+          const appPath = path.join(tmpBuildPath, appFile);
+          if (fs.existsSync(appPath)) {
+            let appCode = fs.readFileSync(appPath, 'utf8');
+            // <Router> → <Router basename="/tests/폴더명">
+            appCode = appCode.replace(
+              /<Router>/g,
+              `<Router basename=\"/tests/${folderName}\">`
+            );
+            // <BrowserRouter> → <BrowserRouter basename="/tests/폴더명">
+            appCode = appCode.replace(
+              /<BrowserRouter>/g,
+              `<BrowserRouter basename=\"/tests/${folderName}\">`
+            );
+            // BrowserRouter import 없으면 추가
+            if (appCode.includes('<BrowserRouter') && !appCode.includes('import { BrowserRouter')) {
+              appCode = `import { BrowserRouter } from \"react-router-dom\";\n` + appCode;
+            }
+            fs.writeFileSync(appPath, appCode);
+            log(`${appFile} Router/Basename 자동치환 완료`);
+          }
+        }
+
+        // 6. npm install/build
+        log('npm install 시작');
+        await execAsync(`nice -n 19 npm install --legacy-peer-deps`, { cwd: tmpBuildPath, timeout: 300000 });
+        log('npm install 완료');
+        log('npm run build 시작');
+        await execAsync(`nice -n 19 npm run build`, { cwd: tmpBuildPath, timeout: 300000 });
+        log('npm run build 완료');
+
+        // 7. 빌드 결과물 복사
+        const buildPath = path.join(tmpBuildPath, 'build');
+        if (fs.existsSync(buildPath)) {
+          if (!fs.existsSync(testPath)) fs.mkdirSync(testPath, { recursive: true });
+          fs.rmSync(testPath, { recursive: true, force: true });
+          fs.mkdirSync(testPath, { recursive: true });
+          // 빌드 결과물 복사 (copyRecursiveSync 함수 사용)
+          const copyRecursiveSync = (src, dest) => {
+            const entries = fs.readdirSync(src, { withFileTypes: true });
+            for (const entry of entries) {
+              const srcPath = path.join(src, entry.name);
+              const destPath = path.join(dest, entry.name);
+              if (entry.isDirectory()) {
+                if (!fs.existsSync(destPath)) fs.mkdirSync(destPath);
+                copyRecursiveSync(srcPath, destPath);
+              } else {
+                fs.copyFileSync(srcPath, destPath);
+              }
+            }
+          };
+          copyRecursiveSync(buildPath, testPath);
+          log('빌드 결과물 복사 완료');
+        } else {
+          log('빌드 결과물(build 폴더)이 없습니다.');
+          if (test) await test.destroy();
+          return res.status(400).json({ error: '빌드 결과물(build 폴더)이 없습니다.', steps });
+        }
+
+        // 8. 임시 폴더 삭제
+        try {
+          fs.rmSync(tmpBuildPath, { recursive: true, force: true });
+          log('임시 폴더 삭제 완료');
+        } catch (e) {
+          log('임시 폴더 삭제 실패(무시)');
+        }
+      } catch (error) {
+        log(`에러 발생: ${error.message}`);
+        if (test) await test.destroy();
+        return res.status(500).json({ error: '서버 오류', steps, detail: error.message });
       }
     } catch (error) {
       if (test) await test.destroy();
