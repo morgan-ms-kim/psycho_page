@@ -1481,6 +1481,28 @@ app.post('/api/admin/update-all-folder-names', authenticateAdmin, async (req, re
   }
 });
 
+// 외부 링크 테스트 등록 API
+app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, next) => {
+  try {
+    console.log('/api/admin/tests/add-external');
+    const { externalUrl, title, description, category } = req.body;
+    if (!externalUrl || !title) {
+      return res.status(400).json({ error: '외부 링크와 제목은 필수입니다.' });
+    }
+    const test = await Test.create({
+      title,
+      description: description || '',
+      category: category || '기타',
+      externalUrl,
+      folder: null,
+      thumbnail: '/uploads/thumbnails/default-thumb.png',
+    });
+    res.json({ success: true, test });
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.get('/api/lotto/req', async (req, res) => {
   const drwNo = req.query.drwNo;
   const result = await fetch(`https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${drwNo}+1`);

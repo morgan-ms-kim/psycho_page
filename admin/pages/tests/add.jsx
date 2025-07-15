@@ -70,6 +70,7 @@ export default function AddTest() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     gitUrl: '',
+    externalUrl: '',
     title: '',
     description: '',
     category: '기타'
@@ -85,6 +86,7 @@ export default function AddTest() {
   const [currentStep, setCurrentStep] = useState('');
   const [logMessages, setLogMessages] = useState([]);
   const logPanelRef = useRef(null);
+  const [testType, setTestType] = useState('git'); // 'git' or 'external'
 
   // 서버 상태 확인
   useEffect(() => {
@@ -143,61 +145,56 @@ export default function AddTest() {
     addLog('테스트 추가 시작');
 
     // 입력값 검증
-    if (!formData.gitUrl.trim()) {
-      setError('Git 저장소 URL을 입력해주세요.');
-      setLoading(false);
-      return;
+    if (testType === 'git') {
+      if (!formData.gitUrl.trim()) {
+        setError('Git 저장소 URL을 입력해주세요.');
+        setLoading(false);
+        return;
+      }
+    } else if (testType === 'external') {
+      if (!formData.externalUrl.trim()) {
+        setError('외부 링크(URL)를 입력해주세요.');
+        setLoading(false);
+        return;
+      }
     }
-
     if (!formData.title.trim()) {
       setError('테스트 제목을 입력해주세요.');
       setLoading(false);
       return;
     }
 
-    // Git URL 형식 검증 및 자동 .git 추가
-    let gitUrl = formData.gitUrl.trim();
-    const baseGitPattern = /^https:\/\/(github\.com|gitlab\.com)\/[^\/]+\/[^\/]+$/;
-    const gitUrlPattern = /^https:\/\/(github\.com|gitlab\.com)\/[^\/]+\/[^\/]+\.git$/;
-    if (baseGitPattern.test(gitUrl) && !gitUrl.endsWith('.git')) {
-      gitUrl += '.git';
-      setFormData(prev => ({ ...prev, gitUrl }));
-    }
-    if (!gitUrlPattern.test(gitUrl)) {
-      setError('올바른 GitHub 또는 GitLab 저장소 URL을 입력해주세요. (예: https://github.com/username/repository.git)');
-      setLoading(false);
-      return;
-    }
-
     // 진행 단계 초기화
     const steps = [
-      'Git 저장소 클론',
+      testType === 'git' ? 'Git 저장소 클론' : '외부 링크 등록',
       'package.json 수정',
       '의존성 설치',
       '테스트 빌드',
       '데이터베이스 저장'
     ];
-
     steps.forEach(step => addProgressStep(step));
 
     try {
-      addLog('API 요청: 테스트 등록');
-      addLog('Git URL: ' + formData.gitUrl);
-      addLog('제목: ' + formData.title);
-      console.log('🔄 테스트 추가 시작:', formData);
-      setCurrentStep('테스트 추가 중...');
-      let response
-      if(selected === '1'){
-        addLog('일반 테스트 제목: ' + formData.title);
-        console.log('일반 테스트 제목: ' + formData.title);
-        console.log(apiClient.url);
+      let response;
+      if (testType === 'git') {
+        // Git URL 형식 검증 및 자동 .git 추가
+        let gitUrl = formData.gitUrl.trim();
+        const baseGitPattern = /^https:\/\/(github\.com|gitlab\.com)\/[^\/]+\/[^\/]+$/;
+        const gitUrlPattern = /^https:\/\/(github\.com|gitlab\.com)\/[^\/]+\/[^\/]+\.git$/;
+        if (baseGitPattern.test(gitUrl) && !gitUrl.endsWith('.git')) {
+          gitUrl += '.git';
+          setFormData(prev => ({ ...prev, gitUrl }));
+        }
+        if (!gitUrlPattern.test(gitUrl)) {
+          setError('올바른 GitHub 또는 GitLab 저장소 URL을 입력해주세요. (예: https://github.com/username/repository.git)');
+          setLoading(false);
+          return;
+        }
+        addLog('API 요청: 테스트 등록 (git)');
         response = await apiClient.post('/admin/tests/add', { ...formData, gitUrl }, { timeout: 300000 });
-      }
-      else if(selected === '2'){
-        addLog('템플릿 테스트 제목: ' + formData.title);
-        console.log('템플릿 테스트 제목: ' + formData.title);
-        console.log(apiClient.url);
-        response = await apiClient.post('/admin/tests/template', { ...formData, gitUrl }, { timeout: 300000 });
+      } else {
+        addLog('API 요청: 외부 링크 테스트 등록', formData);
+        response = await apiClient.post('/admin/tests/add-external', { ...formData }, { timeout: 300000 });
       }
       
       addLog('API 응답: ' + JSON.stringify(response.data));
@@ -392,34 +389,54 @@ export default function AddTest() {
           
           <Form onSubmit={handleSubmit}>
             <FormGroup>
-            <RadioLabel>
-              <RadioOption
-                label="일반 테스트"
-                name="example"
-                value="1"
-                checked={selected === '1'}
-                onChange={() => setSelected('1')}
-              />
-              <RadioOption
-                label="템플릿 테스트"
-                name="example"
-                value="2"
-                checked={selected === '2'}
-                onChange={() => setSelected('2')}
-              />
+              <Label>테스트 유형</Label>
+              <RadioLabel>
+                <RadioOption
+                  label="일반 테스트 (git clone)"
+                  name="testType"
+                  value="git"
+                  checked={testType === 'git'}
+                  onChange={() => setTestType('git')}
+                />
+                <RadioOption
+                  label="외부 링크 테스트 (iframe)"
+                  name="testType"
+                  value="external"
+                  checked={testType === 'external'}
+                  onChange={() => setTestType('external')}
+                />
               </RadioLabel>
-              <Label>Git 저장소 URL *</Label>
-              <Input
-                type="url"
-                value={formData.gitUrl}
-                onChange={(e) => setFormData({...formData, gitUrl: e.target.value})}
-                placeholder="https://github.com/username/repository.git"
-                required
-              />
-              <HelpText>
-                React/Next.js 테스트가 포함된 Git 저장소 URL을 입력하세요.
-              </HelpText>
             </FormGroup>
+            {testType === 'git' && (
+              <FormGroup>
+                <Label>Git 저장소 URL *</Label>
+                <Input
+                  type="url"
+                  value={formData.gitUrl}
+                  onChange={(e) => setFormData({...formData, gitUrl: e.target.value})}
+                  placeholder="https://github.com/username/repository.git"
+                  required={testType === 'git'}
+                />
+                <HelpText>
+                  React/Next.js 테스트가 포함된 Git 저장소 URL을 입력하세요.
+                </HelpText>
+              </FormGroup>
+            )}
+            {testType === 'external' && (
+              <FormGroup>
+                <Label>외부 링크(URL) *</Label>
+                <Input
+                  type="url"
+                  value={formData.externalUrl}
+                  onChange={(e) => setFormData({...formData, externalUrl: e.target.value})}
+                  placeholder="https://example.com/"
+                  required={testType === 'external'}
+                />
+                <HelpText>
+                  외부에서 제공하는 테스트 앱의 전체 URL을 입력하세요.
+                </HelpText>
+              </FormGroup>
+            )}
 
             <FormGroup>
               <Label>테스트 제목 *</Label>
@@ -617,11 +634,11 @@ const Form = styled.form`
   
 `;
 
+// 라디오 버튼 컴포넌트 추가
 const HiddenRadio = styled.input.attrs({ type: 'radio' })`
   opacity: 0;
   position: absolute;
 `;
-
 const CustomRadio = styled.span`
   width: 16px;
   height: 16px;
@@ -630,7 +647,6 @@ const CustomRadio = styled.span`
   display: inline-block;
   margin-right: 3px;
   position: relative;
-
   ${HiddenRadio}:checked + &::after {
     content: '';
     width: 8px;
@@ -642,7 +658,6 @@ const CustomRadio = styled.span`
     left: 2px;
   }
 `;
-
 const RadioLabel = styled.label`
   display: flex;
   align-items: center;
@@ -651,16 +666,13 @@ const RadioLabel = styled.label`
   margin-bottom: 1px;
   padding-right : 10px;
 `;
-
-
-
 const RadioOption = ({ label, name, value, checked, onChange }) => (
   <RadioLabel>
     <HiddenRadio
       name={name}
       value={value}
       checked={checked}
-      onChange={onChange}  
+      onChange={onChange}
     />
     <CustomRadio />
     {label}

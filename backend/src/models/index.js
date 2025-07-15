@@ -70,6 +70,10 @@ const Test = sequelize.define('Test', {
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW,
   },
+  externalUrl: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
 });
 
 const Comment = sequelize.define('Comment', {
