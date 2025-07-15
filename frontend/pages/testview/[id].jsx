@@ -173,7 +173,7 @@ export default function TestPage() {
         if (test && test.externalUrl) {
           return true;
         }
-        if (/^test\d+$/.test(id)) {
+        if (test&&/^test\d+$/.test(id)) {
           const res = await fetch(`/tests/${id}/index.html`, { method: 'HEAD' });
           return res.ok;
         }
@@ -204,7 +204,7 @@ export default function TestPage() {
 
   // 템플릿 테스트 여부
   const isTemplateTest = test && test.folder && /^template\d+$/.test(test.folder);
-  console.log('isTemplateTest: ', isTemplateTest)
+  
 
 
   // 광고 스크립트 중복 삽입 방지
