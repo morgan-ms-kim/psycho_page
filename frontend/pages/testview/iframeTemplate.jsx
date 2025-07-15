@@ -231,7 +231,7 @@ export default function MobileTestFrame_({ id, test }) {
         
         let tried = [];
         try {
-          const testUrl = `https://smartpick.website/tests/${id}/index.html`;
+          const testUrl = `https://smartpick.website/tests/${id}/`;
 
           tried.push(testUrl);
           console.log('import 시도:', testUrl);
@@ -239,7 +239,7 @@ export default function MobileTestFrame_({ id, test }) {
 
           const IframeComponent = () => (
             <iframe
-              src={`http://smartpick.website/tests/${id}/index.html`}
+              src={testUrl}
               title={test?.title || '테스트'}
               loading="lazy"
               scrolling="no"
