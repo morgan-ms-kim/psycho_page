@@ -226,8 +226,8 @@ export default sequelize;
 
 // region 일괄 업데이트 함수 (updateRegion.js 내용 이식)
 export async function updateAllVisitorRegion() {
-  const fs = require('fs');
-  const path = require('path');
+  const fs = (await import('fs')).default;
+  const path = (await import('path')).default;
   let REGION_MAP = {};
   try {
     REGION_MAP = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src/utils/region-map.json'), 'utf8'));
