@@ -293,7 +293,7 @@ export default function TestPage() {
     } else if (buildExists) {
       // 로컬 빌드 테스트
       iframeSection = (
-        <MobileTestFrame_ src={`/tests/test${test.id}/index.html`} test={test} id={test.id}/>
+        <MobileTestFrame_ src={`https://smartpick.website/tests/test${test.id}/`} test={test} id={test.id}/>
       );
     } else {
       // 빌드 결과 없음
