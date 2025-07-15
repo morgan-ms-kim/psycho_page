@@ -610,7 +610,8 @@ app.post('/api/visitors', async (req, res, next) => {
       page,
       duration
     });
-    res.json({ success: true, visitor });
+    //res.json({ success: true, visitor });
+    res.json({ success: true });
   } catch (error) {
     console.error('Visitor insert error:', error); // 전체 에러 로그
     res.status(500).json({ error: 'DB insert 실패', detail: error.message });
