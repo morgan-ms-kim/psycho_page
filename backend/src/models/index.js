@@ -244,6 +244,7 @@ export async function updateAllVisitorRegion() {
   try {
     const visitors = await Visitor.findAll({ where: { region: '' } });
     let updated = 0;
+    console.log(visitors);
     for (const v of visitors) {
       if (!v.country) continue;
       const country = v.country;
