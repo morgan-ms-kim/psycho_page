@@ -222,4 +222,52 @@ Visitor.belongsTo(Test, { foreignKey: 'testId' });
 sequelize.sync();
 
 export { Test, Comment, Like, Visitor, LottoDraw };
-export default sequelize; 
+export default sequelize;
+
+// region 일괄 업데이트 함수 (updateRegion.js 내용 이식)
+export async function updateAllVisitorRegion() {
+  const fs = require('fs');
+  const path = require('path');
+  let REGION_MAP = {};
+  try {
+    REGION_MAP = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src/utils/region-map.json'), 'utf8'));
+  } catch (e) {
+    console.error('region-map.json 파일을 불러올 수 없습니다.', e);
+    return;
+  }
+  let regionNames = {};
+  try {
+    regionNames = require('geoip-lite/regions.json');
+  } catch (e) {
+    regionNames = {};
+  }
+  try {
+    const visitors = await Visitor.findAll({ where: { region: null } });
+    let updated = 0;
+    for (const v of visitors) {
+      if (!v.country) continue;
+      const country = v.country;
+      let regionCode = v.getDataValue('region');
+      if (!regionCode && v.dataValues.region === null && v.dataValues.country) continue;
+      let regionName = null;
+      if (country && regionCode && REGION_MAP[country] && REGION_MAP[country][regionCode]) {
+        regionName = REGION_MAP[country][regionCode];
+      } else if (country === 'KR' && regionCode && regionNames['KR'] && regionNames['KR'][regionCode]) {
+        regionName = regionNames['KR'][regionCode];
+      }
+      if (regionName) {
+        v.region = regionName;
+        await v.save();
+        updated++;
+      }
+    }
+    console.log(`업데이트 완료: ${updated}개 방문자 region 필드가 갱신되었습니다.`);
+  } catch (err) {
+    console.error('업데이트 중 오류:', err);
+  }
+}
+
+// 환경변수 UPDATE_REGION이 true일 때만 region 업데이트 실행
+if (process.env.UPDATE_REGION === 'true') {
+  updateAllVisitorRegion().then(() => process.exit(0));
+} 
