@@ -28,8 +28,7 @@ async function updateRegions() {
     // region이 null이거나 빈 값인 방문자만
     const visitors = await Visitor.findAll({
       where: {
-        region: null,
-        country: {}, // not null로 동작
+        region: null
       },
     });
     let updated = 0;
