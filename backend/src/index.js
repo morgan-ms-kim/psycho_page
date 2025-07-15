@@ -851,7 +851,15 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
         } else if (fs.existsSync(distPath)) {
           outputPath = distPath;
         }
-
+        if (fs.existsSync(logFile)) {
+          log('로그 파일 존재');
+          const logTargetFile = path.join(testPath, 'psycho_build.log');
+          log(testPath);
+          log(logFile);
+          log(logTargetFile);
+          fs.copyFileSync(logFile, logTargetFile);
+          log('로그 파일 복사 완료');
+        }
         log(`outputPath:  ${outputPath}`);
 
         if (outputPath) {
@@ -874,15 +882,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
           };
           copyRecursiveSync(outputPath, testPath);
           // 로그파일 복사 (존재할 때만)
-          if (fs.existsSync(logFile)) {
-            log('로그 파일 존재');
-            const logTargetFile = path.join(testPath, 'psycho_build.log');
-            log(testPath);
-            log(logFile);
-            log(logTargetFile);
-            fs.copyFileSync(logFile, logTargetFile);
-            log('로그 파일 복사 완료');
-          }
+          
           log('빌드 결과물 복사 완료');
         } else {
           log('빌드 결과물(build/dist 폴더)이 없습니다.');
