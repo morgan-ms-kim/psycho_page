@@ -845,7 +845,14 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
 
         // 7. 빌드 결과물 복사
         const buildPath = path.join(tmpBuildPath, 'build');
+        const distPath = path.join(tmpBuildPath, 'dist');
+        let outputPath = null;
         if (fs.existsSync(buildPath)) {
+          outputPath = buildPath;
+        } else if (fs.existsSync(distPath)) {
+          outputPath = distPath;
+        }
+        if (outputPath) {
           if (!fs.existsSync(testPath)) fs.mkdirSync(testPath, { recursive: true });
           fs.rmSync(testPath, { recursive: true, force: true });
           fs.mkdirSync(testPath, { recursive: true });
@@ -863,12 +870,12 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
               }
             }
           };
-          copyRecursiveSync(buildPath, testPath);
+          copyRecursiveSync(outputPath, testPath);
           log('빌드 결과물 복사 완료');
         } else {
-          log('빌드 결과물(build 폴더)이 없습니다.');
+          log('빌드 결과물(build/dist 폴더)이 없습니다.');
           if (test) await test.destroy();
-          return res.status(400).json({ error: '빌드 결과물(build 폴더)이 없습니다.', steps });
+          return res.status(400).json({ error: '빌드 결과물(build/dist 폴더)이 없습니다.', steps });
         }
 
         // 8. 임시 폴더 삭제
