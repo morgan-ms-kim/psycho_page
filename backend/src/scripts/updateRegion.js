@@ -8,13 +8,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-console.log('DB_USER:', process.env.DB_USER); // 값이 제대로 찍히는지 확인
-console.log('DB_NAME:', process.env.DB_NAME);
-console.log('DB_HOST:', process.env.DB_HOST);
 import sequelize, { Visitor } from '../models/index.js';
+import { getSequelizeInstance } from '../models/index.js';
+const sequelize = getSequelizeInstance();
 
-
-console.log(process.env.DB_USER);
 console.log('sequelize.config:', sequelize.config);
 console.log('sequelize.options:', sequelize.options);
 console.log('sequelize.config.username:', sequelize.config.username); // mongsik41이 나와야 정상
