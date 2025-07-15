@@ -764,10 +764,10 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     try {
       // 1. 임시 폴더 생성 (예: /tmp/psycho_build_{folderName}_{timestamp})
       const os = require('os');
-      const tmpBase = os.tmpdir();
+      const tmpBase = testsDir;
       const timestamp = Date.now();
       const tmpBuildPath = path.join(tmpBase, `psycho_build_${folderName}_${timestamp}`);
-      fs.mkdirSync(tmpBuildPath, { recursive: true });
+      //fs.mkdirSync(tmpBuildPath, { recursive: true });
       const logFile = path.join(tmpBuildPath, 'psycho_build.log');
       function log(msg) {
         const time = new Date().toISOString();
