@@ -852,6 +852,9 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
         } else if (fs.existsSync(distPath)) {
           outputPath = distPath;
         }
+        
+        log('outputPath: ', outputPath);
+        
         if (outputPath) {
           if (!fs.existsSync(testPath)) fs.mkdirSync(testPath, { recursive: true });
           fs.rmSync(testPath, { recursive: true, force: true });
