@@ -14,7 +14,7 @@ const apiClient = axios.create({
 const MainFrame = styled.div`
   width: 100%;
   max-width: 500px;
-  min-height: 950px;
+  min-height: 100vh;
   margin: 0 auto;
   background: #f8f9fa;
   display: flex;

@@ -452,6 +452,7 @@ export default function Analytics() {
 }
 
 const Container = styled.div`
+  width: 100%;
   min-height: 100vh;
   background: linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%);
 `;

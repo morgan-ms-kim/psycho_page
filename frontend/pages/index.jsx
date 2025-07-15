@@ -540,7 +540,7 @@ if (pendingSlide === 'prev') baseTranslate = -100;
           <CurrentPage>{currentSlide + 1}</CurrentPage>          
           <TotalPages>/{recommendTests.length}</TotalPages>
         </SlidePageText>
-        <SlideDots>
+        <SlideDots> 
           {recommendTests.map((_, index) => (
             <SlideDot
               key={index}
