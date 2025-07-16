@@ -12,6 +12,7 @@ import geoip from 'geoip-lite';
 import { createRequire } from 'module';
 import sitemapRouter from './routes/sitemap.js';
 import { count } from 'console';
+import morgan from 'morgan';
 const require = createRequire(import.meta.url);
 let REGION_MAP = {};
 try {
