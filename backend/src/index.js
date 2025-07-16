@@ -590,11 +590,15 @@ app.post('/api/visitors', async (req, res, next) => {
     const geo = geoip.lookup(userKey);
     
     const country = geo ? geo.country : null;
+    let city = geo ? geo.city : null;
     let region = geo ? geo.region : null;
     console.log('geo:', geo, 'req:', req); // userKey 값 로그
     console.log('Visitor:', userKey, 'country:', country, 'region:', region); // userKey 값 로그
     // 1. region-map.json 우선 적용
-    if (country && region && REGION_MAP[country] && REGION_MAP[country][region]) {
+    if (city){
+      region = city;
+    }
+    else if (country && region && REGION_MAP[country] && REGION_MAP[country][region]) {
       region = REGION_MAP[country][region];
     } else if (country === 'KR' && region && regionNames['KR'] && regionNames['KR'][region]) {
       // 2. geoip-lite/regions.json (한국만)
