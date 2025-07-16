@@ -211,7 +211,7 @@ export default function TestManagement() {
             <TestCard key={test.id}>
               <TestThumbnail>
                 {test.thumbnail ? (
-                  <ThumbnailImage src={test.thumbnail} alt={test.title} />
+                  <ThumbnailImage src={`https://smartpick.website${test.thumbnail}`} alt={test.title} />
                 ) : (
                   <DefaultThumbnail>📊</DefaultThumbnail>
                 )}

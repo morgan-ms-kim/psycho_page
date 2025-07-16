@@ -588,9 +588,10 @@ app.post('/api/visitors', async (req, res, next) => {
     const userKey = getUserKeyOrIP(req);
     if (!userKey) return res.status(400).json({ error: 'IP를 확인할 수 없습니다.' });
     const geo = geoip.lookup(userKey);
+    
     const country = geo ? geo.country : null;
     let region = geo ? geo.region : null;
-
+    console.log('geo:', geo, 'req:', req); // userKey 값 로그
     console.log('Visitor:', userKey, 'country:', country, 'region:', region); // userKey 값 로그
     // 1. region-map.json 우선 적용
     if (country && region && REGION_MAP[country] && REGION_MAP[country][region]) {

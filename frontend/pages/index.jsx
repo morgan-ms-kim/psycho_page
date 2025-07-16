@@ -913,6 +913,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
 // 이미지 경로를 올바르게 처리하는 함수
 const getImagePath = (path) => {
   if (!path) return null;
+  path = `https://smartpick.website${path}`
   return path;
 };
 export default function Home() {
