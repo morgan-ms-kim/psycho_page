@@ -592,8 +592,7 @@ app.post('/api/visitors', async (req, res, next) => {
     const country = geo ? geo.country : null;
     let city = geo ? geo.city : null;
     let region = geo ? geo.region : null;
-    console.log('geo:', geo, 'req:', req); // userKey 값 로그
-    console.log('Visitor:', userKey, 'country:', country, 'region:', region); // userKey 값 로그
+    console.log('Visitor:', userKey, 'country:', country, 'city:',city, 'region:', region); // userKey 값 로그
     // 1. region-map.json 우선 적용
     if (city){
       region = city;
