@@ -182,7 +182,6 @@ export default function TestPage() {
         console.log('testRes:',testRes);
         console.log('buildOk:',buildOk);
         console.log('testData.externalUrl:',testData.externalUrl);
-        console.log(' res.ok:', buildOk);
         setTest(testData);
         setLiked(Boolean(testData.userLiked));
         setComments(commentsRes.data.comments);

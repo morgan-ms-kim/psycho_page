@@ -248,7 +248,7 @@ export default function MobileTestFrame_({ id, test, src }) {
                 width: '500px',
                 minWidth: '500px',
                 maxWidth: '500px',
-                minheight: '500px',
+                minheight: '100%',
                 maxheight: '1200px',
                 border: 'none',
                 background: '#fff',

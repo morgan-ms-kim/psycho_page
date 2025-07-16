@@ -1475,7 +1475,7 @@ app.post('/api/admin/cleanup-orphan-folders', authenticateAdmin, async (req, res
       }
     }
     // 파일시스템의 테스트 폴더 목록
-    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
+    const testsDir = path.join(process.cwd(), '..', 'testGroup', 'public', 'tests');
     const filesystemFolders = fs.existsSync(testsDir)
       ? fs.readdirSync(testsDir, { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
