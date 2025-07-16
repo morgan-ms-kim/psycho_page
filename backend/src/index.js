@@ -84,13 +84,16 @@ app.use(cors({
 }));
 
 // 정적 파일 서빙 (업로드된 썸네일)
-app.use('/uploads', express.static(path.join(process.cwd(), '..', 'frontend', 'public', 'uploads')));
+app.use('/uploads', express.static(path.join(process.cwd(), '..', 'testGroup', 'public', 'uploads')));
 // 빌드된 테스트 앱 정적 서빙
-app.use('/tests', express.static(path.join(process.cwd(), '..', 'frontend', 'public', 'tests')));
+app.use('/tests', express.static(path.join(process.cwd(), '..', 'testGroup', 'public', 'tests')));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
+// assets, .js, .css, .gif 등은 로그 제외
+app.use(morgan('dev', {
+  skip: (req) => req.url.startsWith('/tests/') && req.url.includes('/assets/')
+}));
 // 서버 상태 확인 라우트
 app.get('/api/health', (req, res) => {
   res.json({
