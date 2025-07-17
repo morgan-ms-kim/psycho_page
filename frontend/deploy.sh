@@ -15,7 +15,7 @@ echo "📁 프론트엔드 디렉토리로 이동..."
 cd frontend
 # 빌드 (빠른 빌드 사용)
 echo "🔨 빌드 중..."
-npm run build
+npm nice -n 19  run build
 
 # 정적 파일을 올바른 위치로 복사
 echo "📁 정적 파일 복사 중..."
@@ -24,7 +24,7 @@ cp -r out/* /var/www/html/psycho_page/
 echo "🔄 PM2 완전 재시작 중..."
 #pm2 delete psycho-frontend
 pm2 restart main-frontend
-#start npm --name "psycho-frontend" -- start
+#start npm nice -n 19  --name "psycho-frontend" -- start
 
 echo "✅ 배포 완료!"
 echo "🌐 https://smartpick.website/ 에서 확인하세요."

@@ -15,7 +15,7 @@ echo "📁 프론트엔드 디렉토리로 이동..."
 cd frontend
 # 빌드
 echo "🔨 빌드 중..."
-npm run build
+nice -n 19 npm run build
 
 
 # 관리자 디렉토리로 이동
@@ -24,7 +24,7 @@ cd /var/www/html/psycho_page/admin
 
 # 빌드
 echo "🔨 빌드 중..."
-npm run build
+nice -n 19 npm run build
 # PM2 완전 재시작
 echo "🔄 PM2 완전 재시작 중..."
 #pm2 delete psycho-frontend

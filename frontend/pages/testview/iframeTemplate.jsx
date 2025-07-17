@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -207,6 +207,9 @@ export default function IframeTemplate({ src, test, ...props }) {
   const [isClient, setIsClient] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(true); // 추가: 전체화면 여부
+
+  const topBarRef = useRef(null);
+  const bottomBarRef = useRef(null);
 
   // DB에서 like, comment, liked(내가 누른적 있는지) 불러오기
   useEffect(() => {
@@ -421,11 +424,14 @@ const RoundShareButton = styled.button`
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
     </Head>
       <TopBar
+        ref={topBarRef}
         style={{
           height: TOPBAR_HEIGHT,
           flexShrink: 0,
-          position: 'sticky',
-          top: 0,
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          top: 0, // JS에서 동적으로 덮어씀
           zIndex: 10,
         }}
       >
@@ -474,16 +480,19 @@ const RoundShareButton = styled.button`
         `}</style>
       </div>
       <BottomBar
+        ref={bottomBarRef}
         style={{
           height: BOTTOMBAR_HEIGHT,
           flexShrink: 0,
-          position: 'static',
-          bottom: 0,
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          // top: JS에서 동적으로 덮어씀
           zIndex: 10,
           width: '100%',
           paddingBottom: 'env(safe-area-inset-bottom)',
-          marginBottom: isFullScreen ? 0 : 16, // 추가: 주소창 있을 때만 띄움
-          transition: 'margin-bottom 0.2s',
+          marginBottom: 0,
+          transition: 'top 0.2s',
         }}
       >
         <ActionWrap>
