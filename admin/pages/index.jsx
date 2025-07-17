@@ -81,7 +81,7 @@ export default function AdminLogin() {
     <LoginContainer>
       <LoginCard>
         <LoginHeader>
-          <Logo>🧠심풀</Logo>
+          <Logo>🧩심풀</Logo>
           <Title>관리자 로그인</Title>
         </LoginHeader>
 

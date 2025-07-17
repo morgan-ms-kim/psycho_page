@@ -121,7 +121,7 @@ export default function EditTest() {
       <Header>
         <HeaderContent>
           <Logo onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer' }}>
-          🧠심풀
+          🧩심풀
           </Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>

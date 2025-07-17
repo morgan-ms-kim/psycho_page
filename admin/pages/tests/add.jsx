@@ -378,7 +378,7 @@ export default function AddTest() {
                 router.push('/dashboard');
               }
             }
-          }} style={{ cursor: 'pointer' }}>🧠심풀</Logo>
+          }} style={{ cursor: 'pointer' }}>🧩심풀</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
             <NavLink href="/tests">테스트 관리</NavLink>

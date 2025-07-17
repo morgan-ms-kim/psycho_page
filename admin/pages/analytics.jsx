@@ -272,7 +272,7 @@ export default function Analytics() {
                 router.push('/');
               }
             }
-          }} style={{ cursor: 'pointer' }}>🧠심풀 관리자</Logo>
+          }} style={{ cursor: 'pointer' }}>🧩심풀 관리자</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
             <NavLink href="/tests">테스트 관리</NavLink>

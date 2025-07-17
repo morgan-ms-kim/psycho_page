@@ -48,7 +48,7 @@ export const MainWrap = styled.div`
   maxWidth: 500px;
   min-height: 100vh;
 
-  
+  padding : 8px 16px 8px 16px 
   background: linear-gradient(135deg, #6a5acd 0%, #6a5acd 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -73,23 +73,18 @@ export const MainWrap = styled.div`
 `;
 
 export const Header = styled.header`
-  padding: 8px 16px 8px 16px;
+  position: relative;
   display: flex;
-  justify-content: space-between;
+  padding: 25px 16px;
+  justify-content: center;
   align-items: center;
   width: 100%;
   min-width: 500px;
   max-width: 500px;
   box-sizing: border-box;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  margin: 10 auto;
+  background:rgb(255, 255, 255);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  @media (max-width: 600px) {
-    padding: 0.7rem 0.5rem;
-    max-width: 100vw;
-    min-width: 0;
-  }
 `;
 
 export const BackButton = styled.button`
@@ -439,7 +434,7 @@ export const Section = styled.div`
   minWidth: '360px';
   maxWidth: '500px';
 
-  margin: 0 1px;
+  margin: 10px 1px;
   padding: 0 2px;
   display: flex;
   flex-direction: column;
@@ -521,7 +516,7 @@ export const Logo = styled.div`
   font-size: 2rem;
   font-weight: 200;
   color: #6a5acd;
-    
+  text-align:center;
   font-family: 'GongGothicMedium', sans-serif;
 @font-face {
     font-family: 'GongGothicMedium';

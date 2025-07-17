@@ -532,7 +532,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
                       style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
                       onClick={() => handleTestClick(test)}
                     >
-                      🧠
+                      🧩
                     </TestItemPlaceholder>
                     <RecommendStats>
                       <RecommendStat>👁️ {test?.views}</RecommendStat>
@@ -726,7 +726,7 @@ function NewSliderSection({ router, getTestFolderName }) {
 
   return (
     <>
-      <RecommendTitle>추천해요.</RecommendTitle>
+      <RecommendTitle>추천해요</RecommendTitle>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}
@@ -779,7 +779,7 @@ function NewSliderSection({ router, getTestFolderName }) {
                       style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
                       onClick={() => handleTestClick(test)}
                     >
-                      🧠
+                      🧩
                     </TestItemPlaceholder>
                     <RecommendStats>
                       <RecommendStat>👁️ {test?.views}</RecommendStat>
@@ -891,7 +891,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                       />
                     ) : null}
                     <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
-                      🧠
+                      🧩
                     </TestItemPlaceholder>
 
                     {(isNew || isHot) && (
@@ -1374,7 +1374,7 @@ export default function Home() {
       </Head>
       <MainWrap style={{ width: '100%', minWidth: '360px', maxWidth: '500px', minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 1%, #6a5acd 99%)' }}>
         <Section style={sectionContainerStyle}>
-
+{/*
           <div
             style={{
               width: '100vw',
@@ -1391,7 +1391,7 @@ export default function Home() {
               display: 'block',
             }}
           >
-          {/*
+          
             <iframe
               src="/kakao-ad.html"
               style={{
@@ -1406,21 +1406,44 @@ export default function Home() {
               }}
               scrolling="no"
               title="카카오광고"
-            />*/}
+            />
           </div>
+          */}
           {/* 헤더 */}
           <Header>
-            <Logo onClick={() => {
-              setSearchTerm('');
-              setSelectedCategory('');
-              setPage(1);
-              setError(null);
-              router.push('/');
-            }} style={{ cursor: 'pointer' }}>🧠심풀</Logo>
-
-
-            <PageLink href="/lotto/page" >
-              로또 번호<br></br>생성기
+            <Logo
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('');
+                setPage(1);
+                setError(null);
+                router.push('/');
+              }}
+              style={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                cursor: 'pointer',
+                zIndex: 2,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}
+            >
+              <Image src="/로고.png" alt="심풀 로고" width={32} height={32} style={{ verticalAlign: 'middle' }} />
+              <span style={{ marginLeft: 6 }}>심풀</span>
+            </Logo>
+            <PageLink
+              href="/lotto/page"
+              style={{
+                position: 'absolute',
+                right: 16,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 2
+              }}
+            >
+              로또 번호<br />생성기
             </PageLink>
 
             {/*<HistoryButton onClick={() => router.push('/history')}>
