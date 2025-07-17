@@ -27,9 +27,8 @@ import {
 } from '../../components/StyledComponents';
 import Image from 'next/image';
 import Head from 'next/head';
-import MobileTestFrame from './mobiletest.jsx';
-import MobileTestFrame_ from './iframeTemplate.jsx';
 
+import MobileTestFrame_ from './iframeTemplate.jsx';
 
 // axios 인스턴스 생성
 //baseURL: 'http://localhost:4000/api',
@@ -238,7 +237,7 @@ export default function TestPage() {
   // MobileTestFrame에 test, id만 넘김
   if (loading && isTemplateTest) {
     return (
-      <MobileTestFrame
+      <MobileTestFrame_
         id={id}
         test={test}
       />
@@ -246,7 +245,7 @@ export default function TestPage() {
   }
   else if (isTemplateTest) {
     return (
-      <MobileTestFrame
+      <MobileTestFrame_
         id={id}
         test={test}
       />
@@ -257,14 +256,10 @@ export default function TestPage() {
     // 렌더링 분기
     if (loading) {
       return (
-        <MainWrap>
-          <Header>
-            <BackButton onClick={() => router.push('/')}>← 홈으로</BackButton>
-          </Header>
-          <LoadingWrap style={{ width: '100%', maxWidth: CONTAINER_MAXWIDTH, minWidth: CONTAINER_MINWIDTH, margin: '32px auto 0 auto', background: 'white', borderRadius: 24, boxShadow: '0 4px 24px rgba(0,0,0,0.10)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 0' }}>
-            <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
-          </LoadingWrap>
-        </MainWrap>
+        
+        <MobileTestFrame_><span>테스트를 불러오는 중...</span>
+        </MobileTestFrame_>
+        
       );
     }
     if (error) {

@@ -297,16 +297,16 @@ function RecommendSliderSection({ router, getTestFolderName }) {
     const handleTouchEnd = (e) => handleDragEnd(e);
 
     // 전역 이벤트 리스너 추가
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove, { passive: false });
+    document.addEventListener('mouseup', handleMouseUp, { passive: false });
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('touchend', handleTouchEnd, { passive: false });
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('mousemove', handleMouseMove, { passive: false });
+      document.removeEventListener('mouseup', handleMouseUp, { passive: false });
+      document.removeEventListener('touchmove', handleTouchMove, { passive: false });
+      document.removeEventListener('touchend', handleTouchEnd, { passive: false });
     };
   }, [isDragging, dragStartX, dragOffsetX]);
 
@@ -403,11 +403,13 @@ function RecommendSliderSection({ router, getTestFolderName }) {
   }, [isHovered, isDragging, isTransitioning, recommendTests.length, lastInteractionTime]); // lastInteractionTime 추가
 
   const handleSlideClick = (index) => {
+    console.log('카드 클릭', test);
     setCurrentSlide(index);
     setLastInteractionTime(Date.now()); // 클릭 시 타이머 초기화
   };
 
   const handleTestClick = (test) => {
+    console.log('추천 테스트 클릭:', testPath, '원본 ID:', test.id);
     try {
       if (!test.id) {
         console.error('테스트 ID가 없습니다:', test);
@@ -501,11 +503,13 @@ if (pendingSlide === 'prev') baseTranslate = -100;
               }}
             >
               <RecommendCard>
-                <RecommendThumbnailContainer>
+                <RecommendThumbnailContainer >
+                  
                   {test?.thumbnail && (
                     <RecommendItemImage
                       src={getImagePath(test.thumbnail)}
                       alt={test.title}
+                      onClick={() => handleTestClick(test)}
                       draggable={false}
                       onContextMenu={e => e.preventDefault()}
                       onTouchStart={e => e.preventDefault()}
@@ -513,7 +517,6 @@ if (pendingSlide === 'prev') baseTranslate = -100;
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'flex';
                       }}
-                      onClick={() => handleTestClick(test)}
                       style={{ cursor: 'pointer' }}
                     />
                   )}
@@ -597,16 +600,16 @@ function NewSliderSection({ router, getTestFolderName }) {
     const handleTouchMove = (e) => handleDragging(e);
     const handleTouchEnd = (e) => handleDragEnd(e);
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove, { passive: false });
+    document.addEventListener('mouseup', handleMouseUp, { passive: false});
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('touchend', handleTouchEnd, { passive: false });
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('mousemove', handleMouseMove, { passive: false });
+      document.removeEventListener('mouseup', handleMouseUp, { passive: false });
+      document.removeEventListener('touchmove', handleTouchMove, { passive: false });
+      document.removeEventListener('touchend', handleTouchEnd, { passive: false });
     };
   }, [isDragging, dragStartX, dragOffsetX]);
 
@@ -1483,7 +1486,7 @@ const TestItemPlaceholder = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, #667eea, #764ba2);
+  background: linear-gradient(45deg, #667eea, #6a5acd);
   border-radius: 10px;
   display: flex;
   align-items: center;

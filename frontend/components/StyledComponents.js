@@ -47,7 +47,7 @@ max-width: 500px;
 min-width: 500px;  
 min-height: 100vh;
   
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #6a5acd 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow-y: auto;
