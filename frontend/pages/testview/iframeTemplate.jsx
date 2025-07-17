@@ -244,16 +244,6 @@ export default function IframeTemplate({ src, test, ...props }) {
       .catch(() => setRecommendTests([]));
   }, [test?.id]);
 
-  // 모바일 브라우저 주소창 대응: --vh 변수 동적 설정
-  useEffect(() => {
-    const setVh = () => {
-      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-    };
-    setVh();
-    window.addEventListener('resize', setVh);
-    return () => window.removeEventListener('resize', setVh);
-  }, []);
-
   // 좋아요
   const handleLike = async () => {
     if (!test?.id) return;
@@ -408,10 +398,10 @@ const RoundShareButton = styled.button`
    
     <MainFrame
       style={{
-        height: 'calc(var(--vh, 1vh) * 100)',
-        minHeight: 'calc(var(--vh, 1vh) * 100)',
         display: 'flex',
         flexDirection: 'column',
+        height: '100vh',
+        minHeight: '100vh',
         width: '100%',
         maxWidth: 500,
         margin: '0 auto',
@@ -481,8 +471,6 @@ const RoundShareButton = styled.button`
           position: 'static',
           bottom: 0,
           zIndex: 10,
-          width: '100%',
-          paddingBottom: 'env(safe-area-inset-bottom)',
         }}
       >
         <ActionWrap>
