@@ -1430,7 +1430,7 @@ export default function Home() {
                 gap: 8
               }}
             >
-              <Image src="/public/uploads/logo.png" alt="심풀 로고" width={32} height={32} style={{ verticalAlign: 'middle' }} />
+              <Image src="/ㅇuploads/logo.png" alt="심풀 로고" width={32} height={32} style={{ verticalAlign: 'middle' }} />
               <span style={{ marginLeft: 6 }}>심풀</span>
             </Logo>
             <PageLink
