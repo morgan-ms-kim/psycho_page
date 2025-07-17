@@ -848,6 +848,8 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
         await execAsync(`nice -n 19 npm install --legacy-peer-deps`, { cwd: tmpBuildPath, timeout: 300000 });
         log('npm install 완료');
         log('npm run build 시작');
+        //nice -n 19 npm install --legacy-peer-deps
+        //nice -n 19 npm run build
         await execAsync(`nice -n 19 npm run build`, { cwd: tmpBuildPath, timeout: 300000 });
         log('npm run build 완료');
 

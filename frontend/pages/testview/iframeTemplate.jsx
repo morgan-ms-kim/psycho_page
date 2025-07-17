@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { FaFacebook, FaTwitterSquare, FaLink } from 'react-icons/fa';
+import { SiKakaotalk} from 'react-icons/si';
+
 // axios 인스턴스 생성
 //'http://localhost:4000/api'
 const apiClient = axios.create({
@@ -199,6 +202,7 @@ export default function IframeTemplate({ src, test, ...props }) {
   const [shareCount, setShareCount] = useState(0);
   const [recommendTests, setRecommendTests] = useState([]);
   const [isClient, setIsClient] = useState(false);
+  const [showShare, setShowShare] = useState(false);
 
   // DB에서 like, comment, liked(내가 누른적 있는지) 불러오기
   useEffect(() => {
@@ -270,6 +274,110 @@ export default function IframeTemplate({ src, test, ...props }) {
   // 상세
   const handleDetail = () => setShowDetail(true);
   const closeDetailModal = () => setShowDetail(false);
+
+  const handleShare = () => setShowShare(true);
+  const closeShareModal = () => setShowShare(false);
+
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const shareTitle = test?.title || '심리테스트 결과 공유';
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success('URL이 복사되었습니다!');
+    } catch {
+      toast.error('복사 실패!');
+    }
+  };
+
+  const handleKakaoShare = () => {
+    if (window.Kakao && window.Kakao.Share) {
+      window.Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: shareTitle,
+          description: '재미있는 심리테스트 결과를 공유해보세요!',
+          imageUrl: test?.thumbnail ? (test.thumbnail.startsWith('http') ? test.thumbnail : `https://smartpick.website${test.thumbnail}`) : '',
+          link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+        },
+        buttons: [
+          { title: '결과 보기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }
+        ]
+      });
+    } else {
+      toast.info('카카오톡 공유를 사용할 수 없습니다.');
+    }
+  };
+
+  const handleFacebookShare = () => {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'width=500,height=500');
+  };
+  const handleTwitterShare = () => {
+    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`, '_blank', 'width=500,height=400');
+  };
+
+  const ShareModalOverlay = styled.div`
+    position: fixed;
+    left: 0; right: 0; top: 0; bottom: 0;
+    background: rgba(0,0,0,0.2);
+    z-index: 100;
+    display: ${({ open }) => (open ? 'block' : 'none')};
+  `;
+  const ShareModal = styled.div`
+    position: fixed;
+    left: 50%;
+    bottom: 90px;
+    transform: translateX(-50%) scale(${({ open }) => (open ? 1 : 0.7)});
+    opacity: ${({ open }) => (open ? 1 : 0)};
+    transition: all 0.25s cubic-bezier(.4,0,.2,1);
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    padding: 18px 20px 12px 20px;
+    z-index: 200;
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  `;
+  const ShareButtonRow = styled.div`
+    display: flex;
+    gap: 18px;
+    margin-top: 6px;
+  `;
+const RoundShareButton = styled.button`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  color: #888; /* 기본 아이콘 색상 */
+  &:hover {
+    background:rgb(230, 215, 240);
+    color: #6c63ff; /* 호버 시 아이콘 색상 */
+  }
+    
+    svg {
+    background: inherit !important; /* 반드시 inherit로! */
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px;
+    min-height: 28px;
+    max-width: 28px;
+    max-height: 28px;
+    display: block;
+     &:hover {
+    background: #e0e0e0;
+    color: #6c63ff; /* 호버 시 아이콘 색상 */
+  }
+`;
 
   return (
     <MainFrame
@@ -355,7 +463,7 @@ export default function IframeTemplate({ src, test, ...props }) {
           <ActionCount>{commentCount}</ActionCount>
         </ActionWrap>
         <ActionWrap>
-          <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={() => setShareCount(shareCount + 1)}>📤</button>
+          <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleShare}>📤</button>
           <ActionCount>{shareCount}</ActionCount>
         </ActionWrap>
         <ActionWrap>
@@ -437,6 +545,19 @@ export default function IframeTemplate({ src, test, ...props }) {
           )}
         </ModalBody>
       </ModalSheet>
+      {/* 공유 모달 */}
+      <ShareModalOverlay open={showShare} onClick={closeShareModal} />
+      <ShareModal open={showShare}>
+        <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 8 }}>공유하기</div>
+        <ShareButtonRow>
+  <RoundShareButton onClick={handleCopyUrl} title="URL 복사"><FaLink color='rgb(46, 44, 32)' size={28} /></RoundShareButton>
+  <RoundShareButton onClick={handleKakaoShare} title="카카오톡">
+    <SiKakaotalk color='rgb(46, 26, 10)' width='25px' size={28} />
+  </RoundShareButton>
+  <RoundShareButton onClick={handleFacebookShare} title="페이스북"><FaFacebook color="#1877f3" size={28} /></RoundShareButton>
+  <RoundShareButton onClick={handleTwitterShare} title="트위터"><FaTwitterSquare color="#1da1f2" size={28} /></RoundShareButton>
+</ShareButtonRow>
+      </ShareModal>
     </MainFrame>
   );
 }
