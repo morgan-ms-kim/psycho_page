@@ -7,6 +7,7 @@ import { SiKakaotalk} from 'react-icons/si';
 
 import Head from 'next/head';
 import Image from 'next/image';
+import Div100vh from 'react-div-100vh';
 // axios 인스턴스 생성
 //'http://localhost:4000/api'
 const apiClient = axios.create({
@@ -395,13 +396,10 @@ const RoundShareButton = styled.button`
 `;
 
   return (
-   
-    <MainFrame
+    <Div100vh
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
-        minHeight: '100vh',
         width: '100%',
         maxWidth: 500,
         margin: '0 auto',
@@ -471,6 +469,8 @@ const RoundShareButton = styled.button`
           position: 'static',
           bottom: 0,
           zIndex: 10,
+          width: '100%',
+          paddingBottom: 'env(safe-area-inset-bottom)',
         }}
       >
         <ActionWrap>
@@ -587,6 +587,6 @@ const RoundShareButton = styled.button`
   <RoundShareButton onClick={handleTwitterShare} title="트위터"><FaTwitterSquare color="#1da1f2" size={28} /></RoundShareButton>
 </ShareButtonRow>
       </ShareModal>
-    </MainFrame>
+    </Div100vh>
   );
 }
