@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 // axios 인스턴스 생성
 //'http://localhost:4000/api'
 const apiClient = axios.create({
@@ -208,12 +209,17 @@ export default function IframeTemplate({ src, test, ...props }) {
     axios.get(`https://smartpick.website/api/tests/${test.id}`, { headers: { 'x-user-key': userKey } })
       .then(res => {
         setLikeCount(res.data.likes || 0);
-        setCommentCount(res.data.comments || 0);
+        setCommentCount(res.data.commentCount || 0);
         setLiked(Boolean(res.data.userLiked));
       });
     // 댓글 목록
     axios.get(`https://smartpick.website/api/tests/${test.id}/comments`)
-      .then(res => setComments(res.data.comments || []));
+      .then(res => {
+        setComments(res.data.comments || []);
+        setCommentCount((res.data.comments || []).length);
+        console.log('commentCount',commentCount);
+      }
+    );
     // 추천 테스트
     axios.get(`https://smartpick.website/api/tests/${test.id}/recommends`)
       .then(res => setRecommendTests(res.data || []))
@@ -222,12 +228,13 @@ export default function IframeTemplate({ src, test, ...props }) {
 
   // 좋아요
   const handleLike = async () => {
-    if (liked || !test?.id) return;
+    if (!test?.id) return;
     const userKey = getUserKey();
     try {
       const res = await axios.post(`https://smartpick.website/api/tests/${test.id}/like`, {}, { headers: { 'x-user-key': userKey } });
-      setLikeCount(res.data.likes || likeCount + 1);
-      setLiked(true);
+      setLiked(res.data.liked);
+      if (typeof res.data.likes === 'number') setLikeCount(res.data.likes);
+      else setLikeCount(liked ? Math.max(likeCount - 1, 0) : likeCount + 1);
     } catch (e) {
       // 실패 시 무시
     }
@@ -238,16 +245,22 @@ export default function IframeTemplate({ src, test, ...props }) {
   const closeCommentModal = () => setShowComment(false);
   const submitComment = async () => {
     if (!newComment.nickname || !newComment.content || !newComment.password || !test?.id) return;
+    if (newComment.password.length < 4) {
+      toast.error('비밀번호는 4글자 이상이어야 합니다.');
+      return;
+    }
     const userKey = getUserKey();
     try {
-      const res = await axios.post(`https://smartpick.website/api/tests/${test.id}/comments`, {
+      await axios.post(`https://smartpick.website/api/tests/${test.id}/comments`, {
         nickname: newComment.nickname,
         content: newComment.content,
         password: newComment.password,
       }, { headers: { 'x-user-key': userKey } });
-      // 댓글 목록 갱신
-      setComments(res.data.comments || []);
-      setCommentCount((res.data.comments || []).length);
+      // 댓글 목록을 즉시 다시 불러와서 갱신
+      const res2 = await axios.get(`https://smartpick.website/api/tests/${test.id}/comments`);
+      setComments(res2.data.comments || []);
+      setCommentCount((res2.data.comments || []).length);
+      console.log('commentcount',commentCount);
       setNewComment({ nickname: '', content: '', password: '' });
     } catch (e) {
       // 실패 시 무시
@@ -328,7 +341,7 @@ export default function IframeTemplate({ src, test, ...props }) {
         style={{
           height: BOTTOMBAR_HEIGHT,
           flexShrink: 0,
-          position: 'sticky',
+          position: 'static',
           bottom: 0,
           zIndex: 10,
         }}
@@ -376,9 +389,32 @@ export default function IframeTemplate({ src, test, ...props }) {
       {/* 상세 모달 */}
       <ModalOverlay open={showDetail} onClick={closeDetailModal} />
       <ModalSheet open={showDetail}>
-        <ModalHeader>
-          상세 정보
-          <button onClick={closeDetailModal} style={{ float: 'right', background: 'none', border: 'none', fontSize: '1.2rem', color: '#fff', cursor: 'pointer' }}>✕</button>
+      <ModalHeader style={{
+    position: 'relative',
+    padding: '12px 16px',
+    width:'100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: '1.2rem',
+  }}>
+        상세 정보
+        <button
+    onClick={closeDetailModal}
+    style={{
+      position: 'absolute',
+      width:'50px',
+      right:'1%',
+      
+      background: 'none',
+      border: 'none',
+      fontSize: '1.2rem',
+      color: '#fff',
+      cursor: 'pointer',
+    }}
+  >✕</button>
         </ModalHeader>
         <ModalBody>
           <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 8 }}>{test?.title || '테스트'}</div>

@@ -304,8 +304,6 @@ export default function TestPage() {
             {/* 광고 컨테이너 - 그대로 */}
            
          
-          <Footer style={{ marginTop: '0.5rem' }} />
-         
       </>
     );
   }
