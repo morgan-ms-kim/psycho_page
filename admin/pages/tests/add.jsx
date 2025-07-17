@@ -85,11 +85,13 @@ export default function AddTest() {
   const [progressSteps, setProgressSteps] = useState([]);
   const [currentStep, setCurrentStep] = useState('');
   const [logMessages, setLogMessages] = useState([]);
+  const [categories, setCategories] = useState([]);
   const logPanelRef = useRef(null);
   const [testType, setTestType] = useState('git'); // 'git' or 'external'
 
   // 서버 상태 확인
   useEffect(() => {
+    loadCategories();
     const checkServerStatus = async () => {
       try {
         const response = await apiClient.get('/health');
@@ -108,7 +110,48 @@ export default function AddTest() {
     
     checkServerStatus();
   }, []);
+  // 카테고리 목록 로드
+  const loadCategories = async () => {
+    try {
+      // iframe 내부에서 실행 중인지 확인
+      if (window.self !== window.top) {
+        console.log('iframe 내부에서 실행 중 - 카테고리 API 호출 건너뜀');
+        setCategories([
+          { id: '성격', name: '성격' },
+          { id: '연애', name: '연애' },
+          { id: '취미', name: '취미' },
+          { id: '지능', name: '지능' },
+          { id: '사회성', name: '사회성' }
+        ]);
+        return;
+      }
 
+      const response = await apiClient.get('/categories');
+
+      // API 응답이 배열인 경우 카테고리 객체로 변환
+      if (Array.isArray(response.data)) {
+        const categoryObjects = response.data.map(category => ({
+          id: category,
+          name: category
+        }));
+        console.log(categoryObjects);
+        setCategories(categoryObjects);
+      } else {
+        setCategories(response.data);
+      }
+    } catch (error) {
+      console.error('카테고리 로드 실패:', error);
+      // API 연결 실패 시 기본 카테고리 제공
+      setCategories([
+        { id: '성격', name: '성격' },
+        { id: '연애', name: '연애' },
+        { id: '직업', name: '직업' },
+        { id: '취미', name: '취미' },
+        { id: '지능', name: '지능' },
+        { id: '사회성', name: '사회성' }
+      ]);
+    }
+  };
   const showMessage = (message, type = 'info') => {
     setModalMessage(message);
     setModalType(type);
@@ -335,7 +378,7 @@ export default function AddTest() {
                 router.push('/dashboard');
               }
             }
-          }} style={{ cursor: 'pointer' }}>🧠씸풀</Logo>
+          }} style={{ cursor: 'pointer' }}>🧠심풀</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
             <NavLink href="/tests">테스트 관리</NavLink>
@@ -467,7 +510,6 @@ export default function AddTest() {
               >
                 <option value="성격">성격</option>
                 <option value="연애">연애</option>
-                <option value="직업">직업</option>
                 <option value="취미">취미</option>
                 <option value="지능">지능</option>
                 <option value="사회성">사회성</option>
@@ -558,7 +600,7 @@ const HeaderContent = styled.div`
 const Logo = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
-  color: #667eea;
+  color: #6a5acd;
 `;
 
 const Nav = styled.nav`
@@ -573,7 +615,7 @@ const NavLink = styled(Link)`
   transition: color 0.3s ease;
 
   &:hover {
-    color: #667eea;
+    color: #6a5acd;
   }
 `;
 
@@ -610,7 +652,7 @@ const PageTitle = styled.h1`
 `;
 
 const BackButton = styled(Link)`
-  color: #667eea;
+  color: #6a5acd;
   font-weight: 500;
   text-decoration: none;
 
@@ -699,7 +741,7 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #6a5acd;
   }
 `;
 
@@ -713,7 +755,7 @@ const Textarea = styled.textarea`
   font-family: 'Fira Sans', sans-serif;
   &:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #6a5acd;
   }
 `;
 
@@ -736,7 +778,7 @@ const Select = styled.select`
   box-shadow: 0 2px 8px rgba(80,80,120,0.07);
   cursor: pointer;
   &:focus {
-    border-color: #667eea !important;
+    border-color: #6a5acd !important;
     box-shadow: 0 0 0 2px #ede7f6;
   }
   &::-ms-expand {
@@ -777,7 +819,7 @@ const CancelButton = styled.button`
 `;
 
 const SubmitButton = styled.button`
-  background: linear-gradient(45deg, #667eea, #764ba2);
+  background: linear-gradient(45deg, #6a5acd, #764ba2);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;

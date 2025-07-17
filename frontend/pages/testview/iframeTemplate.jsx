@@ -37,7 +37,9 @@ const TopBar = styled.div`
   max-width: 500px;
   margin: 0 auto;
   display: flex;
-  background: #6a5acd;
+  background: #여기 밑에 내가 가진 카테고리들을 모아다가 버튼으로 만들어서 띄울거야 
+디자인 적으로도 만족스러운 결과물이 필요해 
+버튼위에는 적절한 아이콘을 띄울거야 ;
   align-items: center;
   justify-content: flex-start;
   padding: 12px 16px 0 16px;
@@ -54,7 +56,7 @@ const BottomBar = styled.div`
   margin: 0 auto;
   position: fixed;
   bottom: 0;
-  background: #6a5acd;
+  background:rgb(175, 164, 245);
   display: flex;
   align-items: center;
   justify-content: space-around;

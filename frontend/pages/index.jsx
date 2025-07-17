@@ -29,10 +29,11 @@ import {
 } from '../components/StyledComponents';
 import Head from 'next/head';
 import Image from 'next/image';
+import { FaUserAlt, FaHeart, FaBriefcase, FaGamepad, FaBrain, FaUsers, FaEllipsisH } from 'react-icons/fa';
 
 // 추천 슬라이드 스타일 컴포넌트
 const RecommendSection = styled.div`
-  margin: 5px auto;
+  margin: 1px auto;
   max-width: 1200px;  
   min-width:360px;
   width:100%;
@@ -51,10 +52,10 @@ const RecommendTitle = styled.h2`
   width: 100%;  
   height: 100%;
   font-size: 1rem;
-  margin: 0 0 5px 5px;
+  margin: 5px 0 1px 5px;
   text-align: left;
-  color: #333;
-  margin: 0 0 5px 10px;
+  color: #6a5acd;
+  margin: 0 0 1x 10px;
   font-weight: 600;
 `;
 const RecommendItemImage = styled.img.attrs({ loading: 'lazy' })`
@@ -180,15 +181,16 @@ const SlideDot = styled.div`
   width: 10px;
   height: 10px;
   border-radius: 40%;
-  background: ${props => props.active ? '#667eea' : '#ddd'};
+  background: ${props => props.active ? '#6a5acd' : '#d5d0f7'};
   cursor: pointer;
+  color: #6a5acd;
   transition: background 0.5s ease;
 z-index: 50; /* 카드 위로 올라오도록 */
 bottom: 10px;  /* 카드 위에 고정되는 위치 */
 `;
 const RecommendTitleText = styled.h3`
   font-size: 1.3rem;
-  margin: 0 0 5px 0;
+  margin: 0 0 1px 0;
   font-weight: 600;
 `;
 
@@ -251,9 +253,9 @@ const getApiBase = () => {
 
 // Section 스타일 상수 (흰색 컨테이너 공통)
 const sectionContainerStyle = {
-  
+
   //minWidth: 1200,
-  margin: '15px auto 0 auto',
+  margin: '0px auto 0 auto',
   background: '#fff',
   borderRadius: 3,
   boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
@@ -292,7 +294,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
 
   useEffect(() => {
     if (!isDragging) return;
-    
+
     const handleMouseMove = (e) => handleDragging(e);
     const handleMouseUp = (e) => handleDragEnd(e);
     const handleTouchMove = (e) => handleDragging(e);
@@ -332,14 +334,14 @@ function RecommendSliderSection({ router, getTestFolderName }) {
     if (offset < -slideWidth) offset = -slideWidth;
     setDragOffsetX(offset);
   };
-  
+
   const handleDragEnd = (e) => {
     if (!isDragging) return;
     e.preventDefault(); // 기본 동작 방지
-    
+
     const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
     const threshold = slideWidth / 4;
-    
+
     if (dragOffsetX < -threshold) {
       // 다음 슬라이드로 이동
       setPendingSlide('next');
@@ -356,7 +358,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
       setIsTransitioning(true);
       setDragOffsetX(0);
     }
-    
+
     setIsDragging(false);
     setLastInteractionTime(Date.now()); // 드래그 종료 시 타이머 초기화
   };
@@ -392,7 +394,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
 
   useEffect(() => {
     if (isHovered || isDragging || isTransitioning) return;
-    
+
     const timer = setInterval(() => {
       setPendingSlide('next');
       setIsTransitioning(true);
@@ -400,7 +402,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
         setDragOffsetX(-sliderRef.current.offsetWidth);
       }
     }, 3000);
-    
+
     return () => clearInterval(timer);
   }, [isHovered, isDragging, isTransitioning, recommendTests.length, lastInteractionTime]); // lastInteractionTime 추가
 
@@ -432,18 +434,18 @@ function RecommendSliderSection({ router, getTestFolderName }) {
   };
 
   if (loading) {
-        return (
-          <>
-      <RecommendTitle>고민하기에 시간은 아까워!</RecommendTitle>
-          <RecommendSection>
-        <RecommendSlider>
-          <RecommendSlide active={true}>
-            <RecommendCard>
-              <RecommendTitleText>추천 테스트를 불러오는 중...</RecommendTitleText>
-            </RecommendCard>
-          </RecommendSlide>
-        </RecommendSlider>
-      </RecommendSection>
+    return (
+      <>
+        <RecommendTitle></RecommendTitle>
+        <RecommendSection>
+          <RecommendSlider>
+            <RecommendSlide active={true}>
+              <RecommendCard>
+                <RecommendTitleText>추천 테스트를 불러오는 중...</RecommendTitleText>
+              </RecommendCard>
+            </RecommendSlide>
+          </RecommendSlider>
+        </RecommendSection>
       </>
     );
   }
@@ -454,113 +456,113 @@ function RecommendSliderSection({ router, getTestFolderName }) {
 
   // 캐러셀용 인덱스 계산 (recommendTests 3개 미만 예외처리)
   const total = recommendTests.length;
-  
+
   // 애니메이션 중에는 currentSlide를 고정, 완료 후에만 업데이트
   const displaySlide = isTransitioning ? currentSlide : currentSlide;
   const prevIndex = (displaySlide - 1 + total) % total;
   const nextIndex = (displaySlide + 1) % total;
-  
+
   const visibleSlides = [
     recommendTests[prevIndex],
     recommendTests[displaySlide],
     recommendTests[nextIndex],
   ];
-// 트랙 transform
-let baseTranslate = -100;
-if (pendingSlide === 'next') baseTranslate = -100;
-if (pendingSlide === 'prev') baseTranslate = -100;
+  // 트랙 transform
+  let baseTranslate = -100;
+  if (pendingSlide === 'next') baseTranslate = -100;
+  if (pendingSlide === 'prev') baseTranslate = -100;
   return (
     <>
-<RecommendTitle>추천해요</RecommendTitle>
+      <RecommendTitle>추천해요</RecommendTitle>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}
       >
-      <RecommendSlider
-        ref={sliderRef}
-        onMouseDown={handleDragStart}
-        onTouchStart={handleDragStart}
-      >
-        
-        <div
-           style={{
-            display: 'flex',
-            width: '100%',
-            height: '100%',
-            transform: `translateX(calc(${baseTranslate}% + ${dragOffsetX}px))`,
-            transition: isDragging || !isTransitioning ? 'none' : 'transform 0.5s cubic-bezier(.4,0,.2,1)',
-          }}
-          
-        onTransitionEnd={handleTransitionEnd}
+        <RecommendSlider
+          ref={sliderRef}
+          onMouseDown={handleDragStart}
+          onTouchStart={handleDragStart}
         >
-          {visibleSlides.map((test, idx) => (
-            <RecommendSlide
-              key={test?.id || idx}
-              style={{
-                width: '100%',
-                height: '100%',
-                flex: '0 0 100%',
-                position: 'relative',
-                zIndex: idx === 1 ? 12 : 11,
-              }}
-            >
-              <RecommendCard>
-                <RecommendThumbnailContainer >
-                  
-                  {test?.thumbnail && (
-                    <Image
-                      src={getImagePath(test.thumbnail)}
-                      alt={test.title}
+
+          <div
+            style={{
+              display: 'flex',
+              width: '100%',
+              height: '100%',
+              transform: `translateX(calc(${baseTranslate}% + ${dragOffsetX}px))`,
+              transition: isDragging || !isTransitioning ? 'none' : 'transform 0.5s cubic-bezier(.4,0,.2,1)',
+            }}
+
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {visibleSlides.map((test, idx) => (
+              <RecommendSlide
+                key={test?.id || idx}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  flex: '0 0 100%',
+                  position: 'relative',
+                  zIndex: idx === 1 ? 12 : 11,
+                }}
+              >
+                <RecommendCard>
+                  <RecommendThumbnailContainer >
+
+                    {test?.thumbnail && (
+                      <Image
+                        src={getImagePath(test.thumbnail)}
+                        alt={test.title}
+                        onClick={() => handleTestClick(test)}
+                        draggable={false}
+                        onContextMenu={e => e.preventDefault()}
+                        onTouchStart={e => e.preventDefault()}
+                        onError={e => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+
+                        layout="responsive"
+                        width={120}
+                        height={120}
+
+                      />
+                    )}
+                    <TestItemPlaceholder
+                      style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
                       onClick={() => handleTestClick(test)}
-                      draggable={false}
-                      onContextMenu={e => e.preventDefault()}
-                      onTouchStart={e => e.preventDefault()}
-                      onError={e => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                      
-                      layout="responsive"
-                      width={120}
-                      height={120}
-                      
-                    />
-                  )}
-                  <TestItemPlaceholder 
-                    style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
-                    onClick={() => handleTestClick(test)}
-                  >
-                    🧠
-                  </TestItemPlaceholder>
-                  <RecommendStats>
-                    <RecommendStat>👁️ {test?.views}</RecommendStat>
-                    <RecommendStat>❤️ {test?.likes}</RecommendStat>
-                    <RecommendStat>💬 {typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
-                  </RecommendStats>
-                </RecommendThumbnailContainer>
-              </RecommendCard>
-            </RecommendSlide>
-          ))}
-        </div>
-      </RecommendSlider>
-      {recommendTests.length > 1 && (
-  <>
-        <SlidePageText>
-          <CurrentPage>{currentSlide + 1}</CurrentPage>          
-          <TotalPages>/{recommendTests.length}</TotalPages>
-        </SlidePageText>
-        <SlideDots> 
-          {recommendTests.map((_, index) => (
-            <SlideDot
-              key={index}
-              active={index === currentSlide}
-              onClick={() => handleSlideClick(index)}
-            />
-          ))}
-        </SlideDots>
-        </>          
-      )}
-    </RecommendSection>
+                    >
+                      🧠
+                    </TestItemPlaceholder>
+                    <RecommendStats>
+                      <RecommendStat>👁️ {test?.views}</RecommendStat>
+                      <RecommendStat>❤️ {test?.likes}</RecommendStat>
+                      <RecommendStat>💬 {typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
+                    </RecommendStats>
+                  </RecommendThumbnailContainer>
+                </RecommendCard>
+              </RecommendSlide>
+            ))}
+          </div>
+        </RecommendSlider>
+        {recommendTests.length > 1 && (
+          <>
+            <SlidePageText>
+              <CurrentPage>{currentSlide + 1}</CurrentPage>
+              <TotalPages>/{recommendTests.length}</TotalPages>
+            </SlidePageText>
+            <SlideDots>
+              {recommendTests.map((_, index) => (
+                <SlideDot
+                  key={index}
+                  active={index === currentSlide}
+                  onClick={() => handleSlideClick(index)}
+                />
+              ))}
+            </SlideDots>
+          </>
+        )}
+      </RecommendSection>
     </>
   );
 }
@@ -600,14 +602,14 @@ function NewSliderSection({ router, getTestFolderName }) {
   // 전역 마우스 이벤트
   useEffect(() => {
     if (!isDragging) return;
-    
+
     const handleMouseMove = (e) => handleDragging(e);
     const handleMouseUp = (e) => handleDragEnd(e);
     const handleTouchMove = (e) => handleDragging(e);
     const handleTouchEnd = (e) => handleDragEnd(e);
 
     document.addEventListener('mousemove', handleMouseMove, { passive: false });
-    document.addEventListener('mouseup', handleMouseUp, { passive: false});
+    document.addEventListener('mouseup', handleMouseUp, { passive: false });
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleTouchEnd, { passive: false });
 
@@ -622,11 +624,11 @@ function NewSliderSection({ router, getTestFolderName }) {
   // 자동 슬라이드 타이머
   useEffect(() => {
     if (isHovered || isDragging || isTransitioning || recommendTests.length === 0) return;
-    
+
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % recommendTests.length);
     }, 3000);
-    
+
     return () => clearInterval(timer);
   }, [isHovered, isDragging, isTransitioning, recommendTests.length, lastInteractionTime]); // lastInteractionTime 다시 추가
 
@@ -643,21 +645,21 @@ function NewSliderSection({ router, getTestFolderName }) {
     const x = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
     let offset = x - dragStartX;
     const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
-    
+
     // 드래그 범위 제한 (양 옆 슬라이드까지만)
     if (offset > slideWidth) offset = slideWidth;
     if (offset < -slideWidth) offset = -slideWidth;
-    
+
     setDragOffsetX(offset);
   };
 
   const handleDragEnd = (e) => {
     if (!isDragging) return;
     e.preventDefault();
-    
+
     const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
     const threshold = slideWidth / 3; // 33% 이상 드래그해야 이동
-    
+
     if (dragOffsetX < -threshold) {
       // 다음 슬라이드로 이동
       setCurrentSlide((prev) => (prev + 1) % recommendTests.length);
@@ -665,10 +667,10 @@ function NewSliderSection({ router, getTestFolderName }) {
       // 이전 슬라이드로 이동
       setCurrentSlide((prev) => (prev - 1 + recommendTests.length) % recommendTests.length);
     }
-    
+
     setIsDragging(false);
     setDragOffsetX(0);
-    
+
     // 드래그 종료 시 hover 상태 초기화 및 타이머 강제 재시작
     setIsHovered(false);
     setLastInteractionTime(Date.now());
@@ -697,7 +699,7 @@ function NewSliderSection({ router, getTestFolderName }) {
   if (loading) {
     return (
       <>
-        <RecommendTitle>추천해요.</RecommendTitle>
+        <RecommendTitle>추천해요</RecommendTitle>
         <RecommendSection>
           <RecommendSlider>
             <RecommendSlide active={true}>
@@ -718,7 +720,7 @@ function NewSliderSection({ router, getTestFolderName }) {
   // 무한 루프를 위한 슬라이드 배열 복제
   const infiniteSlides = [...recommendTests, ...recommendTests, ...recommendTests];
   const total = recommendTests.length;
-  
+
   // 실제 슬라이드 인덱스 (무한 루프용)
   const actualSlideIndex = currentSlide + total;
 
@@ -773,7 +775,7 @@ function NewSliderSection({ router, getTestFolderName }) {
                         height={120}
                       />
                     )}
-                    <TestItemPlaceholder 
+                    <TestItemPlaceholder
                       style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
                       onClick={() => handleTestClick(test)}
                     >
@@ -793,7 +795,7 @@ function NewSliderSection({ router, getTestFolderName }) {
         {recommendTests.length > 1 && (
           <>
             <SlidePageText>
-              <CurrentPage>{currentSlide + 1}</CurrentPage>          
+              <CurrentPage>{currentSlide + 1}</CurrentPage>
               <TotalPages>/{recommendTests.length}</TotalPages>
             </SlidePageText>
             <SlideDots>
@@ -808,7 +810,7 @@ function NewSliderSection({ router, getTestFolderName }) {
                 />
               ))}
             </SlideDots>
-          </>          
+          </>
         )}
       </RecommendSection>
     </>
@@ -817,10 +819,10 @@ function NewSliderSection({ router, getTestFolderName }) {
 
 // 리스트 영역 분리 컴포넌트
 function TestListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath, loading }) {
-  
+
   // 항상 Section/TestCount 구조 유지, Grid는 리스트 있을 때만
   const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
-  
+
   // hot/new 계산
   const now = Date.now();
   const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
@@ -851,8 +853,8 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
             const isNew = new Date(test.createdAt).getTime() > weekAgo;
             const isHot = hotIds.includes(test.id);
             return (
-              <Card 
-                key={test.id} 
+              <Card
+                key={test.id}
                 onClick={() => {
                   try {
                     if (!test.id) {
@@ -862,10 +864,9 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                     let testPath = null;
                     console.log(test.folder);
                     let stringTemplate = 'template'
-                    if(/^template\d+$/.test(test.folder))
-                     {
-                      testPath = `/testview/${stringTemplate+test.id}/`;
-                     }
+                    if (/^template\d+$/.test(test.folder)) {
+                      testPath = `/testview/${stringTemplate + test.id}/`;
+                    }
                     else testPath = `/testview/${getTestFolderName(test.id)}`;
                     console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
                     router.push(testPath);
@@ -878,7 +879,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                   <TestThumbnailContainer>
                     {test.thumbnail ? (
                       <Image
-                        src={getImagePath(test.thumbnail)} 
+                        src={getImagePath(test.thumbnail)}
                         alt={test.title}
                         onError={(e) => {
                           e.target.style.display = 'none';
@@ -892,9 +893,9 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                     <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
                       🧠
                     </TestItemPlaceholder>
-                    
+
                     {(isNew || isHot) && (
-                      <div style={{position:'absolute', left: '5px',top:'5px', minHeight: 24 }}>
+                      <div style={{ position: 'absolute', left: '5px', top: '5px', minHeight: 24 }}>
                         {isNew && <Badge type="new">NEW</Badge>}
                         {isHot && <Badge type="hot">HOT</Badge>}
                       </div>
@@ -931,6 +932,94 @@ const getImagePath = (path) => {
   path = `https://smartpick.website${path}`
   return path;
 };
+
+// 카테고리별 아이콘 매핑
+const categoryIcons = {
+  '성격': <FaUserAlt />,
+  '연애': <FaHeart />,
+  '직업': <FaBriefcase />,
+  '취미': <FaGamepad />,
+  '지능': <FaBrain />,
+  '사회성': <FaUsers />,
+  '기타': <FaEllipsisH />,
+};
+
+// 카테고리 그리드: 두 줄, 짝수면 반반, 홀수면 윗줄이 하나 더 많게
+const getRowCounts = (total) => {
+  const top = Math.ceil(total / 2);
+  const bottom = Math.floor(total / 2);
+  return { top, bottom };
+};
+
+function CategoryGrid({ categories, onSelect }) {
+  const { top, bottom } = getRowCounts(categories.length);
+  const topRow = categories.slice(0, top);
+  const bottomRow = categories.slice(top);
+  return (
+    <div>
+      <CategoryBar columns={top}>
+        {topRow.map(cat => (
+          <CategoryButton key={cat.id} onClick={() => onSelect?.(cat.id)}>
+            {categoryIcons[cat.name] || <FaEllipsisH />}
+            <span style={{ fontSize: '0.7rem' }}>{cat.name}</span>
+          </CategoryButton>
+        ))}
+      </CategoryBar>
+      {bottom > 0 && (
+        <CategoryBar columns={bottom}>
+          {bottomRow.map(cat => (
+            <CategoryButton key={cat.id} onClick={() => onSelect?.(cat.id)}>
+              {categoryIcons[cat.name] || <FaEllipsisH />}
+              <span style={{ fontSize: '0.7rem' }}>{cat.name}</span>
+            </CategoryButton>
+          ))}
+        </CategoryBar>
+      )}
+    </div>
+  );
+}
+
+const CategoryBar = styled.div`
+  display: grid;
+  grid-template-columns: ${({ columns }) => `repeat(${columns}, 1fr)`};
+  gap: 18px 24px;
+  max-width: 400px;
+  margin: 12px auto 12px auto;
+  justify-items: center;
+`;
+const CategoryButton = styled.button`
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  border: none;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px #6a5acd33;
+  padding: 18px 0 10px 0;
+  min-height: 80px;
+  cursor: pointer;
+  transition: box-shadow 0.18s, background 0.18s, color 0.18s;
+  color: #6a5acd;
+  font-weight: 600;
+  font-size: 1.05rem;
+  outline: none;
+  &:hover, &:focus {
+    background: #f3f0ff;
+    box-shadow: 0 6px 24px #6a5acd55;
+    color: #fff;
+  }
+  & svg {
+    font-size: 2.1rem;
+    margin-bottom: 6px;
+    color: #6a5acd;
+    transition: color 0.18s;
+  }
+  &:hover svg, &:focus svg {
+    color:rgb(147, 132, 248);
+  }
+`;
+
 export default function Home() {
   const [tests, setTests] = useState([]);
   const [offset, setOffset] = useState(0);
@@ -964,7 +1053,7 @@ export default function Home() {
   const getTestFolderName = (testId) => {
     // testId가 문자열이 아닌 경우 문자열로 변환
     const id = String(testId);
-    
+
     // 이미 test로 시작하는 경우 그대로 반환, 아니면 test 추가
     if (id.startsWith('test')) {
       return id;
@@ -995,10 +1084,10 @@ export default function Home() {
       // iframe 내부에서 실행 중인지 확인
       if (window.self !== window.top) {
         console.log('iframe 내부에서 실행 중 - API 호출 건너뜀');
-        setVisitorStats({ 
-          total: 15420, 
-          today: 342, 
-          week: 2156 
+        setVisitorStats({
+          total: 15420,
+          today: 342,
+          week: 2156
         });
         setApiStatus('failed');
         return;
@@ -1011,10 +1100,10 @@ export default function Home() {
       console.error('방문자 통계 로드 실패:', error);
       setApiStatus('failed');
       // API 연결 실패 시 기본 통계 제공
-      setVisitorStats({ 
-        total: 15420, 
-        today: 342, 
-        week: 2156 
+      setVisitorStats({
+        total: 15420,
+        today: 342,
+        week: 2156
       });
     }
   };
@@ -1028,7 +1117,6 @@ export default function Home() {
         setCategories([
           { id: '성격', name: '성격' },
           { id: '연애', name: '연애' },
-          { id: '직업', name: '직업' },
           { id: '취미', name: '취미' },
           { id: '지능', name: '지능' },
           { id: '사회성', name: '사회성' }
@@ -1037,13 +1125,14 @@ export default function Home() {
       }
 
       const response = await apiClient.get('/categories');
-      
+
       // API 응답이 배열인 경우 카테고리 객체로 변환
       if (Array.isArray(response.data)) {
         const categoryObjects = response.data.map(category => ({
           id: category,
           name: category
         }));
+        console.log(categoryObjects);
         setCategories(categoryObjects);
       } else {
         setCategories(response.data);
@@ -1084,7 +1173,7 @@ export default function Home() {
       const params = new URLSearchParams({
         page: reset ? 1 : page,
         limit: 10,
-        offset:offset,
+        offset: offset,
         sort: sort,
       });
 
@@ -1099,7 +1188,7 @@ export default function Home() {
       const response = await apiClient.get('/tests', {
         params: params
       });
-      
+
       // 테스트 데이터 검증 및 로깅
       console.log('받은 테스트 데이터:', response.data);
       const validatedTests = response.data.map(test => {
@@ -1109,7 +1198,7 @@ export default function Home() {
           id: String(test.id) // ID를 문자열로 확실히 변환
         };
       });
-      
+
       if (reset || searchTerm && searchTerm.trim()) {
         setTests(validatedTests);
       } else {
@@ -1120,7 +1209,7 @@ export default function Home() {
           return [...prev, ...newTests];
         });
       }
-      
+
       setHasMore(response.data.length === 10);
       setLoading(false);
       setLoadingMore(false);
@@ -1129,7 +1218,7 @@ export default function Home() {
       setError('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
       setLoading(false);
       setLoadingMore(false);
-      
+
       // API 연결 실패 시 기본 테스트 데이터 제공
       if (reset && tests.length === 0) {
         setTests([
@@ -1169,15 +1258,15 @@ export default function Home() {
   };
 
 
-  
-  
+
+
   // 더 많은 테스트 로드 (무한 스크롤)
   const loadMore = () => {
-      console.log('loadMore');
-    if (!loadingMore && hasMore && !loading && !searching && !showNoResults ) {
+    console.log('loadMore');
+    if (!loadingMore && hasMore && !loading && !searching && !showNoResults) {
       setLoadingMore(true)
       setPage(prev => prev + 1);
-      setOffset(offset+8);
+      setOffset(offset + 8);
       console.log('setOffset', offset);
       // 데이터를 다 불러온 후 setLoadingMore(false) 호출
     }
@@ -1202,12 +1291,12 @@ export default function Home() {
       if (selectedCategory) params.append('category', selectedCategory);
 
       const response = await apiClient.get('/tests', { params });
-      
+
       const validatedTests = response.data.map(test => ({
         ...test,
         id: String(test.id)
       }));
-      
+
       // 검색 결과만 업데이트 (전체 상태 초기화 없음)
       setTests(validatedTests);
       setHasMore(response.data.length === 10);
@@ -1278,45 +1367,47 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>씸풀 - 심심풀이에 좋은 심리테스트</title>
+        <title>심풀 - 심심풀이에 좋은 심리테스트</title>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-848040041408559"
           crossOrigin="anonymous"
-        />  
+        />
       </Head>
-      <MainWrap style={{width:'100%', minWidth:'360px', maxWidth:'500px',minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
+      <MainWrap style={{ width: '100%', minWidth: '360px', maxWidth: '500px', minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 1%, #6a5acd 99%)' }}>
         <Section style={sectionContainerStyle}>
+
           <div
-          style={{
-            width: '100vw',
-            minWidth: '360px',
-            maxWidth: '500px',
-            margin: '0 auto auto auto',
-            textAlign: 'center',
-            minHeight: '90px',
-            background: '#fff',
-            borderRadius: 12,
-            padding: 2,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            zIndex: 10,
-            display: 'block',
-          }}
-        >
-          <iframe
-            src="/kakao-ad.html"
             style={{
               width: '100vw',
-              minWidth: '320px',
+              minWidth: '360px',
               maxWidth: '500px',
-              height: '90px',
-              border: 'none',
-              margin: '0 auto',
+              margin: '0 auto auto auto',
+              textAlign: 'center',
+              minHeight: '90px',
+              background: '#fff',
+              borderRadius: 12,
+              padding: 2,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              zIndex: 10,
               display: 'block',
-              background: 'transparent',
             }}
-            scrolling="no"
-            title="카카오광고"
-          />
-        </div>
+          >
+          {/*
+            <iframe
+              src="/kakao-ad.html"
+              style={{
+                width: '100vw',
+                minWidth: '320px',
+                maxWidth: '500px',
+                height: '90px',
+                border: 'none',
+                margin: '0 auto',
+                display: 'block',
+                background: 'transparent',
+              }}
+              scrolling="no"
+              title="카카오광고"
+            />*/}
+          </div>
           {/* 헤더 */}
           <Header>
             <Logo onClick={() => {
@@ -1325,8 +1416,8 @@ export default function Home() {
               setPage(1);
               setError(null);
               router.push('/');
-            }} style={{ cursor: 'pointer' }}>🧠씸풀</Logo>
-              
+            }} style={{ cursor: 'pointer' }}>🧠심풀</Logo>
+
 
             <PageLink href="/lotto/page" >
               로또 번호<br></br>생성기
@@ -1338,7 +1429,7 @@ export default function Home() {
           </Header>
 
           {/* 검색 및 필터 섹션 */}
-       {/*    <SearchSection>
+          {/*    <SearchSection>
             <SearchBar>
               <SearchInput
                 type="text"
@@ -1351,16 +1442,16 @@ export default function Home() {
               
             <Stats>
               {/*<StatItem>👥 Total: {visitorStats.total.toLocaleString()}</StatItem>*/}
-              {/*<StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>*/}
-              {/*<StatItem>📈 Week: {visitorStats.week.toLocaleString()}</StatItem>*/}
-    {/*           <StatItem style={{ 
+          {/*<StatItem>📊 Today: {visitorStats.today.toLocaleString()}</StatItem>*/}
+          {/*<StatItem>📈 Week: {visitorStats.week.toLocaleString()}</StatItem>*/}
+          {/*           <StatItem style={{ 
                 color: apiStatus === 'connected' ? '#4CAF50' : 
                        apiStatus === 'failed' ? '#f44336' : '#ff9800',
                 fontWeight: 'bold'
               }}>
                {/* {apiStatus === 'connected' ? '🟢' : 
                  apiStatus === 'failed' ? '🔴' : '🟡'}*/}
-{/*               </StatItem>
+          {/*               </StatItem>
             </Stats>
             </SearchBar>
             
@@ -1410,18 +1501,19 @@ export default function Home() {
           )}
 
           {/* 추천 슬라이드 */}
-         {/* <RecommendSliderSection 
+          {/* <RecommendSliderSection 
             router={router}
             getTestFolderName={getTestFolderName}
           />
          */}
 
           {/* 새로운 슬라이더 */}
-          <NewSliderSection 
+          <NewSliderSection
             router={router}
             getTestFolderName={getTestFolderName}
           />
-
+          {/* 카테고리 버튼 바 */}
+          <CategoryGrid categories={categories} onSelect={setSelectedCategory} />
           {/* 리스트/검색/로딩 영역 */}
           {
             <TestListSection

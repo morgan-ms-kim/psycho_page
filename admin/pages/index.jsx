@@ -81,7 +81,7 @@ export default function AdminLogin() {
     <LoginContainer>
       <LoginCard>
         <LoginHeader>
-          <Logo>🧠씸풀</Logo>
+          <Logo>🧠심풀</Logo>
           <Title>관리자 로그인</Title>
         </LoginHeader>
 
@@ -124,7 +124,7 @@ const LoginContainer = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6a5acd 0%, #764ba2 100%);
   @media (max-width: 600px) {
     padding: 0;
     min-height: 100vh;
@@ -154,7 +154,7 @@ const LoginHeader = styled.div`
 const Logo = styled.div`
   font-size: 2rem;
   font-weight: bold;
-  color: #667eea;
+  color: #6a5acd;
   margin-bottom: 0.5rem;
 `;
 
@@ -189,7 +189,7 @@ const Input = styled.input`
   
   &:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #6a5acd;
   }
 `;
 
@@ -200,7 +200,7 @@ const ErrorMessage = styled.div`
 `;
 
 const LoginButton = styled.button`
-  background: #667eea;
+  background: #6a5acd;
   color: white;
   border: none;
   padding: 0.75rem;

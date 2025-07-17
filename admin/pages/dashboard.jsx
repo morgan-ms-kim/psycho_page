@@ -126,7 +126,7 @@ export default function Dashboard() {
                 router.push('/dashboard');
               }
             }
-          }} style={{ cursor: 'pointer' }}>🧠씸풀 관리자</Logo>
+          }} style={{ cursor: 'pointer' }}>🧠심풀 관리자</Logo>
           <Nav>
             <NavLink 
               href="/dashboard" 
@@ -250,7 +250,7 @@ const HeaderContent = styled.div`
 const Logo = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
-  color: #667eea;
+  color: #6a5acd;
 `;
 
 const Nav = styled.nav`
@@ -265,7 +265,7 @@ const NavLink = styled(Link)`
   transition: color 0.3s ease;
 
   &:hover {
-    color: #667eea;
+    color: #6a5acd;
   }
 `;
 

@@ -169,7 +169,7 @@ export default function TestManagement() {
                 router.push('/dashboard');
               }
             }
-          }} style={{ cursor: 'pointer' }}>🧠씸풀</Logo>
+          }} style={{ cursor: 'pointer' }}>🧠심풀</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
             <NavLink 
@@ -312,7 +312,7 @@ const HeaderContent = styled.div`
 const Logo = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
-  color: #667eea;
+  color: #6a5acd;
 `;
 
 const Nav = styled.nav`
@@ -327,7 +327,7 @@ const NavLink = styled(Link)`
   transition: color 0.3s ease;
 
   &:hover {
-    color: #667eea;
+    color: #6a5acd;
   }
 `;
 
@@ -364,7 +364,7 @@ const PageTitle = styled.h1`
 `;
 
 const AddButton = styled(Link)`
-  background: linear-gradient(45deg, #667eea, #764ba2);
+  background: linear-gradient(45deg, #6a5acd, #764ba2);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -381,7 +381,7 @@ const AddButton = styled(Link)`
 `;
 
 const TemplateButton = styled.button`
-  background: linear-gradient(45deg, #667eea, #764ba2);
+  background: linear-gradient(45deg, #6a5acd, #764ba2);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -493,7 +493,7 @@ const TestActions = styled.div`
 `;
 
 const ActionButton = styled.button`
-  background: #667eea;
+  background: #6a5acd;
   color: white;
   border: none;
   padding: 0.5rem 1rem;

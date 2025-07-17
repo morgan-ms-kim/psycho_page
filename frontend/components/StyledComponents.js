@@ -49,7 +49,7 @@ export const MainWrap = styled.div`
   min-height: 100vh;
 
   
-  background: linear-gradient(135deg, #667eea 0%, #6a5acd 100%);
+  background: linear-gradient(135deg, #6a5acd 0%, #6a5acd 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow-y: auto;
@@ -518,9 +518,43 @@ export const ProgressText = styled.div`
 
 
 export const Logo = styled.div`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #667eea;
+  font-size: 2rem;
+  font-weight: 200;
+  color: #6a5acd;
+    
+  font-family: 'GongGothicMedium', sans-serif;
+@font-face {
+    font-family: 'GongGothicMedium';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.0/GongGothicMedium.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+  @font-face {
+    font-family: 'BagelFatOne-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_JAMO@1.0/BagelFatOne-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+  @font-face {
+  font-family: 'UhBeeHyeki';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_five@.2.0/UhBeeHyeki.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+    font-family: 'PFStardustExtraBold';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2506-1@1.0/PFStardustExtraBold.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'SF_HambakSnow';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2106@1.1/SF_HambakSnow.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 `;
 
 

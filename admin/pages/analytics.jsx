@@ -154,7 +154,7 @@ export default function Analytics() {
       {
         label: '방문자 수',
         data: analyticsData.map(item => item.count).reverse(),
-        borderColor: '#667eea',
+        borderColor: '#6a5acd',
         backgroundColor: 'rgba(102, 126, 234, 0.1)',
         tension: 0.4,
         fill: true,
@@ -272,7 +272,7 @@ export default function Analytics() {
                 router.push('/');
               }
             }
-          }} style={{ cursor: 'pointer' }}>🧠씸풀 관리자</Logo>
+          }} style={{ cursor: 'pointer' }}>🧠심풀 관리자</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
             <NavLink href="/tests">테스트 관리</NavLink>
@@ -427,7 +427,7 @@ export default function Analytics() {
                     <td>{records[0].isBot ? '🤖 봇' : '🧑 인간'}</td>
                     <td>{records[0].visitedAt ? new Date(records[0].visitedAt).toLocaleString('ko-KR') : '-'}</td>
                     {records.length > 1 ? (
-                      <td style={{ color: '#667eea', fontWeight: 700 }}>
+                      <td style={{ color: '#6a5acd', fontWeight: 700 }}>
                         {openedIps.includes(ip) ? '▲' : `+${records.length - 1}`}
                       </td>
                     ) : <td></td>}
@@ -477,7 +477,7 @@ const HeaderContent = styled.div`
 const Logo = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
-  color: #667eea;
+  color: #6a5acd;
 `;
 
 const Nav = styled.nav`
@@ -492,7 +492,7 @@ const NavLink = styled(Link)`
   transition: color 0.3s ease;
 
   &:hover {
-    color: #667eea;
+    color: #6a5acd;
   }
 `;
 
@@ -545,9 +545,9 @@ const PeriodSelector = styled.div`
 `;
 
 const PeriodButton = styled.button`
-  background: ${props => props.active ? '#667eea' : 'white'};
+  background: ${props => props.active ? '#6a5acd' : 'white'};
   color: ${props => props.active ? 'white' : '#333'};
-  border: 2px solid #667eea;
+  border: 2px solid #6a5acd;
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;

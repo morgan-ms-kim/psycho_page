@@ -297,7 +297,7 @@ export default function TestPage() {
     return (
       <>
         <Head>
-          <title>{test?.title ? `${test.title} - 씸풀` : '씸풀 - 심심풀이에 좋은 심리테스트'}</title>
+          <title>{test?.title ? `${test.title} - 심풀` : '심풀 - 심심풀이에 좋은 심리테스트'}</title>
         </Head>
          {iframeSection}
 

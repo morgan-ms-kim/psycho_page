@@ -233,7 +233,7 @@ const UploadArea = styled.div`
   transition: border-color 0.3s ease;
 
   &:hover {
-    border-color: #667eea;
+    border-color: #6a5acd;
   }
 `;
 
@@ -319,7 +319,7 @@ const ButtonGroup = styled.div`
 `;
 
 const UploadButton = styled.button`
-  background: #667eea;
+  background: #6a5acd;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;

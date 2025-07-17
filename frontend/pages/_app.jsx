@@ -10,7 +10,7 @@ const theme = {
   colors: {
     primary: '#ff5e5e',
     secondary: '#ffe066',
-    background: '#fffbe7',
+    background: '#6a5acd',
     accent: '#6c63ff',
     retro: '#00e0ca',
     cute: '#ffb3e6',

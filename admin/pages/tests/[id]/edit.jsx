@@ -121,7 +121,7 @@ export default function EditTest() {
       <Header>
         <HeaderContent>
           <Logo onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer' }}>
-          🧠씸풀
+          🧠심풀
           </Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
@@ -225,7 +225,7 @@ const HeaderContent = styled.div`
 const Logo = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
-  color: #667eea;
+  color: #6a5acd;
 `;
 
 const Nav = styled.nav`
@@ -240,7 +240,7 @@ const NavLink = styled(Link)`
   transition: color 0.3s ease;
 
   &:hover {
-    color: #667eea;
+    color: #6a5acd;
   }
 `;
 
@@ -347,7 +347,7 @@ const Input = styled.input`
   
   &:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #6a5acd;
   }
 `;
 
@@ -360,7 +360,7 @@ const Textarea = styled.textarea`
   
   &:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #6a5acd;
   }
 `;
 
@@ -384,7 +384,7 @@ const Select = styled.select`
   cursor: pointer;
 
   &:focus {
-    border-color: #667eea !important;
+    border-color: #6a5acd !important;
     box-shadow: 0 0 0 2px #ede7f6;
   }
 
@@ -420,7 +420,7 @@ const CancelButton = styled.button`
 `;
 
 const SubmitButton = styled.button`
-  background: #667eea;
+  background: #6a5acd;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
