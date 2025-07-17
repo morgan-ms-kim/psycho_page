@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import Link from 'next/link';
 import React from 'react';
+import Image from 'next/image';
 
 const apiClient = axios.create({
   //baseURL: 'http://localhost:4000/api',
@@ -211,7 +212,13 @@ export default function TestManagement() {
             <TestCard key={test.id}>
               <TestThumbnail>
                 {test.thumbnail ? (
-                  <ThumbnailImage src={`https://smartpick.website${test.thumbnail}`} alt={test.title} />
+                  <Image
+                    src={`https://smartpick.website${test.thumbnail}`}
+                    alt={test.title}
+                    width={200}
+                    height={200}
+                    style={{ width: '100%', maxWidth: '500px', minWidth: '360px', height: 'auto' }}
+                  />
                 ) : (
                   <DefaultThumbnail>📊</DefaultThumbnail>
                 )}
@@ -434,12 +441,6 @@ const TestThumbnail = styled.div`
   align-items: center;
   justify-content: center;
   overflow: hidden;
-`;
-
-const ThumbnailImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 `;
 
 const DefaultThumbnail = styled.div`

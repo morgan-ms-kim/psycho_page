@@ -28,11 +28,13 @@ import {
   TestCount
 } from '../components/StyledComponents';
 import Head from 'next/head';
+import Image from 'next/image';
 
 // 추천 슬라이드 스타일 컴포넌트
 const RecommendSection = styled.div`
   margin: 5px auto;
-  max-width: 1200px;
+  max-width: 1200px;  
+  min-width:360px;
   width:100%;
   height: 350px;
   background: #fff;
@@ -258,8 +260,8 @@ const sectionContainerStyle = {
   padding: '0 0 32px 0',
   minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
   position: 'relative',
-  // 모바일 중앙정렬 보정
-  width: '500px',
+  // 모바일 중앙정렬 보정  width: 100vw;
+  minWidth: '360px',
   maxWidth: '500px',
   boxSizing: 'border-box',
 };
@@ -506,7 +508,7 @@ if (pendingSlide === 'prev') baseTranslate = -100;
                 <RecommendThumbnailContainer >
                   
                   {test?.thumbnail && (
-                    <RecommendItemImage
+                    <Image
                       src={getImagePath(test.thumbnail)}
                       alt={test.title}
                       onClick={() => handleTestClick(test)}
@@ -517,7 +519,11 @@ if (pendingSlide === 'prev') baseTranslate = -100;
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'flex';
                       }}
-                      style={{ cursor: 'pointer' }}
+                      
+                      layout="responsive"
+                      width={120}
+                      height={120}
+                      
                     />
                   )}
                   <TestItemPlaceholder 
@@ -750,7 +756,7 @@ function NewSliderSection({ router, getTestFolderName }) {
                 <RecommendCard>
                   <RecommendThumbnailContainer>
                     {test?.thumbnail && (
-                      <RecommendItemImage
+                      <Image
                         src={getImagePath(test.thumbnail)}
                         alt={test.title}
                         draggable={false}
@@ -761,7 +767,10 @@ function NewSliderSection({ router, getTestFolderName }) {
                           e.target.nextSibling.style.display = 'flex';
                         }}
                         onClick={() => handleTestClick(test)}
-                        style={{ cursor: 'pointer' }}
+                        style={{ width: '100%', maxWidth: '500px', minWidth: '360px', height: 'auto' }}
+                        layout="responsive"
+                        width={120}
+                        height={120}
                       />
                     )}
                     <TestItemPlaceholder 
@@ -868,13 +877,16 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                 <TestCardContent>
                   <TestThumbnailContainer>
                     {test.thumbnail ? (
-                      <TestItemImage  
+                      <Image
                         src={getImagePath(test.thumbnail)} 
                         alt={test.title}
                         onError={(e) => {
                           e.target.style.display = 'none';
                           e.target.nextSibling.style.display = 'flex';
                         }}
+                        layout="responsive"
+                        width={120}
+                        height={120}
                       />
                     ) : null}
                     <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
@@ -1271,12 +1283,12 @@ export default function Home() {
           crossOrigin="anonymous"
         />  
       </Head>
-      <MainWrap style={{maxWidth:'500px',minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
+      <MainWrap style={{width:'100%', minWidth:'360px', maxWidth:'500px',minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)' }}>
         <Section style={sectionContainerStyle}>
           <div
           style={{
-            width: '500px',
-            minWidth: '320px',
+            width: '100vw',
+            minWidth: '360px',
             maxWidth: '500px',
             margin: '0 auto auto auto',
             textAlign: 'center',
@@ -1292,7 +1304,7 @@ export default function Home() {
           <iframe
             src="/kakao-ad.html"
             style={{
-              width: '500px',
+              width: '100vw',
               minWidth: '320px',
               maxWidth: '500px',
               height: '90px',
@@ -1460,10 +1472,13 @@ const NoResults = styled.div`
 
 const TestCardContent = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: column;  width: 100vw;
+  
+  width: 100vw;
   max-width:500px;
+  min-width:360px;
   width: 100%;
-  height: 100%;
+  min-height: 120px;
 `;
 
 
@@ -1471,8 +1486,10 @@ const TestThumbnailContainer = styled.div`
   position: relative;
   margin-bottom: 15px;
   padding: 5px 5px 5px 5px;
+  width: 100vw;
   max-width:500px;
-  min-height:350px;
+  min-width:360px;
+  min-height:120px;
   width: 100%;
   height:100%
   display: flex;
@@ -1484,7 +1501,9 @@ const TestItemPlaceholder = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 100vw;
+  max-width:500px;
+  min-width:360px;
   height: 100%;
   background: linear-gradient(45deg, #667eea, #6a5acd);
   border-radius: 10px;
@@ -1537,9 +1556,9 @@ const TestItemImage = styled.img.attrs({ loading: 'lazy' })`
 
 
 const TestContainer = styled.div`
-  width: 100%;
-  max-width: 500px;
-  min-width: 500px;
+    width: 100vw;
+  minWidth: '320px';
+  maxWidth: '500px';
   margin: 2rem auto;
   background: #fff;
   border-radius: 24px;
@@ -1550,8 +1569,10 @@ const TestContainer = styled.div`
 `;
 
 const TestIframe = styled.iframe`
-  width: 100%;
-  min-width: 500px;
+  
+  width: 100vw;
+  minWidth: '320px';
+  maxWidth: '500px';
   min-height: 800px;
   border: none;
   background: #fff;

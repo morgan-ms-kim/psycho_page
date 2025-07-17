@@ -43,9 +43,11 @@ export const wiggle = keyframes`
 
 
 export const MainWrap = styled.div`
-max-width: 500px;
-min-width: 500px;  
-min-height: 100vh;
+  width: 100vw;
+  minWidth: 320px;
+  maxWidth: 500px;
+  min-height: 100vh;
+
   
   background: linear-gradient(135deg, #667eea 0%, #6a5acd 100%);
   color: white;
@@ -281,9 +283,11 @@ export const Grid = styled.div`
   grid-template-columns: 1fr;
   justify-content: center;
   justify-items: center;
-  width: 500px;
-  max-width: 500px;
-  min-width: 500px;
+  width: 100vw;
+  max-width:500px;
+  min-width:360px;
+  
+  min-height: 120px;
   margin: 0 auto;
   /* 바깥쪽 여백 넓힘 */
   padding-left: 2px;
@@ -310,9 +314,10 @@ export const Card = styled.div`
   box-shadow: 0 10px 30px rgba(0,0,0,0.18);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
-  max-width: 500px;
-  min-width: 500px;
-  min-height: 350px;  
+  width: 100vw;
+  max-width:500px;
+  min-width:360px;
+  min-height: 120px;  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -326,7 +331,8 @@ export const Card = styled.div`
     padding: 14px 4px;
   }
   @media (max-width: 600px) {
-    min-width: 0;
+  max-width: 100vw;
+  max-width: 100vw;
     margin: 0 0 10px 0;
     padding: 10px 2px;
   }
@@ -429,8 +435,9 @@ export const FlexColumn = styled.div`
 
 // 섹션 스타일들
 export const Section = styled.div`
-  max-width: 500px;
-  min-width: 500px;
+  width: 100vw;
+  minWidth: '360px';
+  maxWidth: '500px';
 
   margin: 0 1px;
   padding: 0 2px;
@@ -438,7 +445,8 @@ export const Section = styled.div`
   flex-direction: column;
   align-items: center;
   @media (max-width: 600px) {
-    max-width: 500px;
+  max-width: 100vw;
+  max-width: 100vw;
     padding: 0 2vw;
     margin-bottom: 16px;
   }

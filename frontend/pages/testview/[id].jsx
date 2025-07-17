@@ -59,7 +59,7 @@ const TestContainer = styled.div`
   max-height: 700px;
   width: 100%;
   max-width: 500px;
-  min-width: 500px;
+  min-width: 360px;
   margin: auto 0 auto;
   background: white;
   border-radius: 24px;

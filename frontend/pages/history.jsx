@@ -15,6 +15,7 @@ import {
   Section,
   Title
 } from '../components/StyledComponents';
+import Image from 'next/image';
 
 export default function History() {
   const router = useRouter();
@@ -107,7 +108,13 @@ export default function History() {
                   <ResultTitle>{result.result.title}</ResultTitle>
                   <ResultDescription>{result.result.description}</ResultDescription>
                   {result.result.image && (
-                    <ResultImage src={result.result.image} alt={result.result.title} />
+                    <Image
+                      src={result.result.image}
+                      width={150}
+                      height={150}
+                      alt={result.result.title}
+                      style={{ width: '100%', maxWidth: '500px', minWidth: '360px', height: 'auto' }}
+                    />
                   )}
                 </ResultContent>
 

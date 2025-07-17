@@ -452,7 +452,7 @@ export default function Analytics() {
 }
 
 const Container = styled.div`
-  width: 100%;
+  width: 100vw;
   min-height: 100vh;
   background: linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%);
 `;
@@ -511,19 +511,19 @@ const LogoutButton = styled.button`
 `;
 
 const Main = styled.main`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
   width: 100vw;
+  max-width: none;
+  min-width: 0;
+  margin: 0;
   box-sizing: border-box;
   @media (max-width: 900px) {
     padding: 1rem 0.5rem;
-    max-width: 100vw;
+    max-width: none;
     width: 100vw;
   }
   @media (max-width: 600px) {
     padding: 0.5rem 0;
-    max-width: 100vw;
+    max-width: none;
     width: 100vw;
   }
 `;
@@ -541,7 +541,6 @@ const PageTitle = styled.h1`
 `;
 
 const PeriodSelector = styled.div`
-  display: flex;
   gap: 0.5rem;
 `;
 

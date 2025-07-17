@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import Link from 'next/link';
 import ThumbnailUploader from '../../../components/ThumbnailUploader';
+import Image from 'next/image';
 
 const apiClient = axios.create({
   baseURL: 'https://smartpick.website/api',
@@ -160,10 +161,12 @@ export default function ThumbnailTest() {
           <CurrentThumbnail>
             <h3>현재 썸네일</h3>
             {imageLoading && <ThumbnailLoading>🔄 이미지 로딩 중...</ThumbnailLoading>}
-            <ThumbnailImage 
+            <Image 
               src={test.thumbnail} 
+              width={200}
+              height={200}
               alt="현재 썸네일"
-              style={{ display: imageLoading ? 'none' : 'block' }}
+              style={{ width: '100%', maxWidth: '500px', minWidth: '360px', height: 'auto' }}
               onLoad={() => {
                 console.log('✅ 썸네일 이미지 로딩 성공:', test.thumbnail);
                 setImageLoading(false);
@@ -351,14 +354,6 @@ const CurrentThumbnail = styled.div`
     margin-bottom: 1rem;
     color: #333;
   }
-`;
-
-const ThumbnailImage = styled.img`
-  max-width: 200px;
-  max-height: 200px;
-  border-radius: 10px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 `;
 
 const ThumbnailLoading = styled.div`

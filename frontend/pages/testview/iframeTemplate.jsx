@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import { FaFacebook, FaTwitterSquare, FaLink } from 'react-icons/fa';
 import { SiKakaotalk} from 'react-icons/si';
 
+import Head from 'next/head';
+import Image from 'next/image';
 // axios 인스턴스 생성
 //'http://localhost:4000/api'
 const apiClient = axios.create({
@@ -164,8 +166,8 @@ const RecommendList = styled.div`
 `;
 
 const RecommendCard = styled.div`
-  min-width: 140px;
-  max-width: 180px;
+  min-width: 120px;
+  max-width: 140px;
   background: #f5f5f5;
   border-radius: 12px;
   padding: 12px;
@@ -208,6 +210,18 @@ export default function IframeTemplate({ src, test, ...props }) {
   useEffect(() => {
     setIsClient(true);
     if (!test?.id) return;
+    //카톡 공유 api 신청해야함
+    // if (typeof window !== 'undefined') {
+    //   const checkKakao = setInterval(() => {
+    //     if (window.Kakao && window.Kakao.init && !window.Kakao.isInitialized()) {
+    //       window.Kakao.init('여기에_본인_카카오_JavaScript_키');
+    //       clearInterval(checkKakao);
+    //     }
+    //   }, 100);
+    //   return () => clearInterval(checkKakao);
+    // }
+
+
     const userKey = getUserKey();
     // 테스트 정보(좋아요, 내가 누른적 있는지, 댓글 수 등)
     axios.get(`https://smartpick.website/api/tests/${test.id}`, { headers: { 'x-user-key': userKey } })
@@ -291,6 +305,7 @@ export default function IframeTemplate({ src, test, ...props }) {
   };
 
   const handleKakaoShare = () => {
+    console.log(window.Kakao ,window.Kakao.Share);
     if (window.Kakao && window.Kakao.Share) {
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
@@ -380,6 +395,7 @@ const RoundShareButton = styled.button`
 `;
 
   return (
+   
     <MainFrame
       style={{
         display: 'flex',
@@ -391,7 +407,10 @@ const RoundShareButton = styled.button`
         margin: '0 auto',
         background: '#fff',
       }}
-    >
+    > <Head>
+    {/* ...기존... */}
+    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+    </Head>
       <TopBar
         style={{
           height: TOPBAR_HEIGHT,
@@ -535,7 +554,17 @@ const RoundShareButton = styled.button`
                 {recommendTests.map((t, i) => (
                   <RecommendCard key={t.id || i} onClick={() => window.location.href = `/testview/${t.id}` }>
                     <div style={{ color: '#888', fontSize: '0.9rem' }}>👁️ {t.views || 0}</div>
-                    {t.thumbnail && <img src={t.thumbnail} alt={t.title} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, marginBottom: 8 }} />}
+                    {t.thumbnail && (
+                      <Image
+                        src={t.thumbnail.startsWith('http') ? t.thumbnail : `https://smartpick.website${t.thumbnail}`}
+                        alt={t.title}
+                        width={30}
+                        height={80}
+                        style={{ width: '120px', maxWidth: '120px', minWidth: '120px', height: 'auto',
+                           objectFit: 'cover', borderRadius: 8, marginBottom: 8 }}
+                        unoptimized
+                      />
+                    )}
                     <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{t.title}</div>
                     <div style={{ color: '#888', fontSize: '0.9rem', marginBottom: 8 }}>{t.desc}</div>
                   </RecommendCard>
