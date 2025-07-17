@@ -206,6 +206,7 @@ export default function IframeTemplate({ src, test, ...props }) {
   const [recommendTests, setRecommendTests] = useState([]);
   const [isClient, setIsClient] = useState(false);
   const [showShare, setShowShare] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(true); // 추가: 전체화면 여부
 
   // DB에서 like, comment, liked(내가 누른적 있는지) 불러오기
   useEffect(() => {
@@ -243,6 +244,16 @@ export default function IframeTemplate({ src, test, ...props }) {
     axios.get(`https://smartpick.website/api/tests/${test.id}/recommends`)
       .then(res => setRecommendTests(res.data || []))
       .catch(() => setRecommendTests([]));
+
+    // 추가: 주소창 유무 감지
+    const handleResize = () => {
+      const vh = window.innerHeight;
+      const vvh = window.visualViewport ? window.visualViewport.height : vh;
+      setIsFullScreen(Math.abs(vh - vvh) < 20); // 20px 이하 차이면 fullscreen
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [test?.id]);
 
   // 좋아요
@@ -471,6 +482,8 @@ const RoundShareButton = styled.button`
           zIndex: 10,
           width: '100%',
           paddingBottom: 'env(safe-area-inset-bottom)',
+          marginBottom: isFullScreen ? 0 : 16, // 추가: 주소창 있을 때만 띄움
+          transition: 'margin-bottom 0.2s',
         }}
       >
         <ActionWrap>
