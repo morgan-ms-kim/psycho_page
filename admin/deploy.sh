@@ -16,7 +16,8 @@ cd admin
 
 # 빌드
 echo "🔨 빌드 중..."
-npm run build
+nice -n 19 npm run build
+
 
 # PM2 완전 재시작
 echo "🔄 PM2 완전 재시작 중..."
