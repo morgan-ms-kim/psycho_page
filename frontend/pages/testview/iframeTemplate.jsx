@@ -1,13 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
+
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FaFacebook, FaTwitterSquare, FaLink } from 'react-icons/fa';
-import { SiKakaotalk} from 'react-icons/si';
+import { SiKakaotalk } from 'react-icons/si';
 
 import Head from 'next/head';
 import Image from 'next/image';
 import Div100vh from 'react-div-100vh';
+
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Logo,
+  ButtonWrapper,
+  Bubble,
+  RedCircle,
+  HeartWrapper,
+  LittleBubble
+} from '../../components/StyledComponents';
+
 // axios 인스턴스 생성
 //'http://localhost:4000/api'
 const apiClient = axios.create({
@@ -208,9 +221,10 @@ export default function IframeTemplate({ src, test, ...props }) {
   const [showShare, setShowShare] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(true); // 추가: 전체화면 여부
 
+  const [animating, setAnimating] = useState(false);
   const topBarRef = useRef(null);
   const bottomBarRef = useRef(null);
-
+  const router = useRouter();
   // DB에서 like, comment, liked(내가 누른적 있는지) 불러오기
   useEffect(() => {
     setIsClient(true);
@@ -240,9 +254,9 @@ export default function IframeTemplate({ src, test, ...props }) {
       .then(res => {
         setComments(res.data.comments || []);
         setCommentCount((res.data.comments || []).length);
-        console.log('commentCount',commentCount);
+        console.log('commentCount', commentCount);
       }
-    );
+      );
     // 추천 테스트
     axios.get(`https://smartpick.website/api/tests/${test.id}/recommends`)
       .then(res => setRecommendTests(res.data || []))
@@ -266,12 +280,15 @@ export default function IframeTemplate({ src, test, ...props }) {
     try {
       const res = await axios.post(`https://smartpick.website/api/tests/${test.id}/like`, {}, { headers: { 'x-user-key': userKey } });
       setLiked(res.data.liked);
+      setAnimating(true)
+      setTimeout(() => setAnimating(false), 1000);
       if (typeof res.data.likes === 'number') setLikeCount(res.data.likes);
       else setLikeCount(liked ? Math.max(likeCount - 1, 0) : likeCount + 1);
     } catch (e) {
       // 실패 시 무시
     }
   };
+
 
   // 댓글
   const handleComment = () => setShowComment(true);
@@ -293,7 +310,7 @@ export default function IframeTemplate({ src, test, ...props }) {
       const res2 = await axios.get(`https://smartpick.website/api/tests/${test.id}/comments`);
       setComments(res2.data.comments || []);
       setCommentCount((res2.data.comments || []).length);
-      console.log('commentcount',commentCount);
+      console.log('commentcount', commentCount);
       setNewComment({ nickname: '', content: '', password: '' });
     } catch (e) {
       // 실패 시 무시
@@ -320,7 +337,7 @@ export default function IframeTemplate({ src, test, ...props }) {
   };
 
   const handleKakaoShare = () => {
-    console.log(window.Kakao ,window.Kakao.Share);
+    console.log(window.Kakao, window.Kakao.Share);
     if (window.Kakao && window.Kakao.Share) {
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
@@ -375,7 +392,7 @@ export default function IframeTemplate({ src, test, ...props }) {
     gap: 18px;
     margin-top: 6px;
   `;
-const RoundShareButton = styled.button`
+  const RoundShareButton = styled.button`
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -416,13 +433,14 @@ const RoundShareButton = styled.button`
         flexDirection: 'column',
         width: '100%',
         maxWidth: 500,
+        marginTop: TOPBAR_HEIGHT,
         margin: '0 auto',
         background: '#fff',
       }}
     > <Head>
-    {/* ...기존... */}
-    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
-    </Head>
+        {/* ...기존... */}
+        <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+      </Head>
       <TopBar
         ref={topBarRef}
         style={{
@@ -435,8 +453,27 @@ const RoundShareButton = styled.button`
           zIndex: 10,
         }}
       >
-        <IconButton onClick={() => window.location.href = '/'}>🏠</IconButton>
-        <IconButton onClick={() => window.history.back()}>←</IconButton>
+        <Logo
+          onClick={() => {
+             window.location.href = '/'
+          }}
+          style={{
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            cursor: 'pointer',
+            zIndex: 2,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8
+          }}
+        >
+          
+          <span style={{ marginRight: -5 }}>심</span>
+          <Image src="/uploads/logo.png" alt="심풀 로고"
+            layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle', marginTop: -10 }} />
+          <span style={{ marginLeft: -5 }}>풀</span>
+        </Logo>
       </TopBar>
       <div
         style={{
@@ -496,19 +533,106 @@ const RoundShareButton = styled.button`
         }}
       >
         <ActionWrap>
-          <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleLike}>{liked ? '❤️' : '🤍'}</button>
+          <ButtonWrapper onClick={handleLike}>
+            {/* 하얀 하트 */}
+            {!liked && (
+              <motion.div
+                initial={{ scale: 1.2 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.4 }}
+              >
+                <HeartWrapper>
+                  <Image src="/uploads/heart_white.png" alt="빈하트" width={20} height={20} />
+                </HeartWrapper>
+              </motion.div>
+            )}
+            {liked && (
+              <motion.div
+                initial={{ scale: 1 }}
+                animate={{ scale: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <HeartWrapper>
+                  <Image src="/uploads/heart_white.png" alt="빈하트" width={20} height={20} />
+                </HeartWrapper>
+              </motion.div>
+            )}
+
+            {/* 빨간 하트 */}
+            {liked && (
+              
+              <motion.div
+                as={motion.div}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+
+                top= '-50%'
+                left= '-50%'
+
+              >
+                
+                <HeartWrapper>
+                <Image src="/uploads/heart.png" alt="좋아요" width={20} height={20} />
+              </HeartWrapper>
+              </motion.div>
+            )}
+
+            {/* 빨간 원 */}
+            <AnimatePresence>
+              {animating && liked && (
+              <motion.div  
+                  as={motion.div}
+                  initial={{ scale: 0, opacity: 1 }}
+                  animate={{ scale: 2, opacity: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.6, ease: 'easeOut' }}
+                  >
+              <RedCircle
+                /></motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* 물방울 */}
+            {animating && liked &&
+              ['-1,-1.2','1.2,-1','-1.2,1', '1,1.2'].map((pos, i) => {
+                const [x, y] = pos.split(',').map(Number);
+                
+                return (
+                 <> <motion.div  
+                 as={motion.div}
+                 key={i}
+                 initial={{ x: 0, y: 0, opacity: 1, scale: 0.5 }}
+                 animate={{ x: x * 15, y: y * 15, opacity: 0.5, scale: 1 }}
+                 transition={{ duration: 0.6 , ease: 'easeOut'}}
+               >
+                 <Bubble></Bubble>
+                 </motion.div>
+                 <motion.div  
+                    as={motion.div}
+                    key={i}
+                    initial={{ x: 0, y: 0, opacity: 1, scale: 0.3 }}
+                    animate={{ x: x * 15 * 0.8, y: y * 15 * 1.2, opacity:0.5, scale: 0.7 }}
+                    transition={{ duration: 0.6 , ease: 'easeOut'}}
+                  >
+                    <Bubble></Bubble>
+                    </motion.div>
+                    </>
+                );
+              })}
+          </ButtonWrapper>
           <ActionCount>{likeCount}</ActionCount>
         </ActionWrap>
         <ActionWrap>
-          <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleComment}>💬</button>
+          <button style={{ background: 'none', border: 'none', boxShadow: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleComment}>💬</button>
           <ActionCount>{commentCount}</ActionCount>
         </ActionWrap>
         <ActionWrap>
-          <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleShare}>📤</button>
+          <button style={{ background: 'none', border: 'none', boxShadow: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleShare}>📤</button>
           <ActionCount>{shareCount}</ActionCount>
         </ActionWrap>
         <ActionWrap>
-          <button style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleDetail}>ℹ️</button>
+          <button style={{ background: 'none', border: 'none', boxShadow: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '8px' }} onClick={handleDetail}>ℹ️</button>
         </ActionWrap>
       </BottomBar>
       {/* 댓글 모달 */}
@@ -538,32 +662,32 @@ const RoundShareButton = styled.button`
       {/* 상세 모달 */}
       <ModalOverlay open={showDetail} onClick={closeDetailModal} />
       <ModalSheet open={showDetail}>
-      <ModalHeader style={{
-    position: 'relative',
-    padding: '12px 16px',
-    width:'100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: '1.2rem',
-  }}>
-        상세 정보
-        <button
-    onClick={closeDetailModal}
-    style={{
-      position: 'absolute',
-      width:'50px',
-      right:'1%',
-      
-      background: 'none',
-      border: 'none',
-      fontSize: '1.2rem',
-      color: '#fff',
-      cursor: 'pointer',
-    }}
-  >✕</button>
+        <ModalHeader style={{
+          position: 'relative',
+          padding: '12px 16px',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '1.2rem',
+        }}>
+          상세 정보
+          <button
+            onClick={closeDetailModal}
+            style={{
+              position: 'absolute',
+              width: '50px',
+              right: '1%',
+
+              background: 'none',
+              border: 'none',
+              fontSize: '1.2rem',
+              color: '#fff',
+              cursor: 'pointer',
+            }}
+          >✕</button>
         </ModalHeader>
         <ModalBody>
           <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 8 }}>{test?.title || '테스트'}</div>
@@ -574,7 +698,7 @@ const RoundShareButton = styled.button`
               <div style={{ fontWeight: 'bold', marginBottom: 8 }}>추천 테스트</div>
               <RecommendList>
                 {recommendTests.map((t, i) => (
-                  <RecommendCard key={t.id || i} onClick={() => window.location.href = `/testview/${t.id}` }>
+                  <RecommendCard key={t.id || i} onClick={() => window.location.href = `/testview/${t.id}`}>
                     <div style={{ color: '#888', fontSize: '0.9rem' }}>👁️ {t.views || 0}</div>
                     {t.thumbnail && (
                       <Image
@@ -582,8 +706,10 @@ const RoundShareButton = styled.button`
                         alt={t.title}
                         width={30}
                         height={80}
-                        style={{ width: '120px', maxWidth: '120px', minWidth: '120px', height: 'auto',
-                           objectFit: 'cover', borderRadius: 8, marginBottom: 8 }}
+                        style={{
+                          width: '120px', maxWidth: '120px', minWidth: '120px', height: 'auto',
+                          objectFit: 'cover', borderRadius: 8, marginBottom: 8
+                        }}
                         unoptimized
                       />
                     )}
@@ -601,13 +727,13 @@ const RoundShareButton = styled.button`
       <ShareModal open={showShare}>
         <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 8 }}>공유하기</div>
         <ShareButtonRow>
-  <RoundShareButton onClick={handleCopyUrl} title="URL 복사"><FaLink color='rgb(46, 44, 32)' size={28} /></RoundShareButton>
-  <RoundShareButton onClick={handleKakaoShare} title="카카오톡">
-    <SiKakaotalk color='rgb(46, 26, 10)' width='25px' size={28} />
-  </RoundShareButton>
-  <RoundShareButton onClick={handleFacebookShare} title="페이스북"><FaFacebook color="#1877f3" size={28} /></RoundShareButton>
-  <RoundShareButton onClick={handleTwitterShare} title="트위터"><FaTwitterSquare color="#1da1f2" size={28} /></RoundShareButton>
-</ShareButtonRow>
+          <RoundShareButton onClick={handleCopyUrl} title="URL 복사"><FaLink color='rgb(46, 44, 32)' size={28} /></RoundShareButton>
+          <RoundShareButton onClick={handleKakaoShare} title="카카오톡">
+            <SiKakaotalk color='rgb(46, 26, 10)' width='25px' size={28} />
+          </RoundShareButton>
+          <RoundShareButton onClick={handleFacebookShare} title="페이스북"><FaFacebook color="#1877f3" size={28} /></RoundShareButton>
+          <RoundShareButton onClick={handleTwitterShare} title="트위터"><FaTwitterSquare color="#1da1f2" size={28} /></RoundShareButton>
+        </ShareButtonRow>
       </ShareModal>
     </Div100vh>
   );

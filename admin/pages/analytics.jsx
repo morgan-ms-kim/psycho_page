@@ -272,7 +272,9 @@ export default function Analytics() {
                 router.push('/');
               }
             }
-          }} style={{ cursor: 'pointer' }}>🧩심풀 관리자</Logo>
+          }} style={{ cursor: 'pointer' }}> <Image src="/uploads/logo.png" alt="심풀 로고"
+          layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
+     심풀 관리자</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
             <NavLink href="/tests">테스트 관리</NavLink>

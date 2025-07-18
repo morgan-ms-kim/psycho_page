@@ -11,33 +11,39 @@ export const wiggle = keyframes`
   }
   10% {
     transform: rotate(1deg);
-    color:rgb(118, 196, 18);
-    text-shadow: 0 0 5px rgba(0, 102, 255, 0.5);
+    color: #6a5acd;
+    text-shadow: 0 0 1px rgb(0, 0, 0);
   }
   20% {
     transform: rotate(-1deg);
-    color:rgb(245, 14, 14);
-    text-shadow: 0 0 6px rgba(0, 153, 255, 0.6);
+    color: #6a5acd;
+    text-shadow: 0 0 1px rgb(0, 0, 0);
   }
   30% {
     transform: rotate(1deg);
-    color: #3399ff;
-    text-shadow: 0 0 5px rgba(51, 153, 255, 0.5);
+    color:rgb(40, 34, 77);
+    text-shadow: 0 0 1px rgb(255, 255, 255);
   }
   40% {
     transform: rotate(-1deg);
-    color:rgb(240, 29, 159);
-    text-shadow: 0 0 4px rgba(0, 102, 255, 0.4);
+    color: #6a5acd;
+    text-shadow: 0 0 1px rgb(0, 0, 0);
   }
   50% {
     transform: rotate(0deg);
-    color: #333;
-    text-shadow: none;
+    color:rgb(55, 43, 131);
+    text-shadow: 0 0 1px rgb(0, 0, 0);
   }
+  60% {
+    transform: rotate(0deg);
+    color: #6a5acd;
+    text-shadow: 0 0 1px rgb(0, 0, 0);
+  }
+
   100% {
     transform: rotate(0deg);
-    color: #333;
-    text-shadow: none;
+    color:rgb(0, 0, 0);
+    text-shadow: 0 3px 7px rgba(39, 37, 37, 0.5);
   }
 `;
 
@@ -182,13 +188,14 @@ export const PrimaryButton = styled.button`
 export const PageLink = styled.a`
   all: unset; /* 버튼 기본 스타일 제거 */
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 2rem;
   color: #333;
   position: relative;
   transition: text-shadow 0.3s ease;
-
+  font-weight: bold;
+  font-family: 'GangwonEduHyeonokT_OTFMediumA';
   /* 가끔씩 자동으로 흔들리는 효과 */
-  animation: ${wiggle} 1s ease-in-out infinite;
+  animation: ${wiggle} 3s ease-in-out infinite;
   animation-delay: 5s;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
@@ -197,10 +204,9 @@ export const PageLink = styled.a`
   animation-play-state: running;
 
   &:hover {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 3px 7px rgba(39, 37, 37, 0.5);
     color: #333;
-    background: #fff;
-    font-size: 1.1rem;
+    font-size: 2.1rem;
     outline: none;
   }
   &:focus {
@@ -209,6 +215,24 @@ export const PageLink = styled.a`
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     animation-play-state: paused; /* 호버 중엔 흔들리지 않음 */
   }
+@font-face {
+    font-family: 'GangwonEduHyeonokT_OTFMediumA';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEduHyeonokT_OTFMediumA.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+  @font-face {
+    font-family: 'WarhavenB';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2312-1@1.1/WarhavenB.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+    @font-face {
+    font-family: 'ghanachoco';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ghanachoco.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
 `;
 
 export const PageButton = styled.button`
@@ -284,10 +308,6 @@ export const Grid = styled.div`
   
   min-height: 120px;
   margin: 0 auto;
-  /* 바깥쪽 여백 넓힘 */
-  padding-left: 2px;
-  padding-right: 2px;
-  padding-top: 2px;
   grid-row-gap: 5px;
 
   background: rgba(255, 255, 255, 0.1);
@@ -304,7 +324,6 @@ export const Grid = styled.div`
 export const Card = styled.div`
    background: rgba(255,255,255,0.1);
   border-radius: 15px;
-  padding: 2px 2px;
   backdrop-filter: blur(10px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.18);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -323,13 +342,11 @@ export const Card = styled.div`
   }
   @media (max-width: 900px) {
     margin: 0 0 14px 0;
-    padding: 14px 4px;
   }
   @media (max-width: 600px) {
   max-width: 100vw;
   max-width: 100vw;
-    margin: 0 0 10px 0;
-    padding: 10px 2px;
+    margin: 0 0 10px 0
   }
 `;
 
@@ -434,8 +451,8 @@ export const Section = styled.div`
   minWidth: '360px';
   maxWidth: '500px';
 
-  margin: 10px 1px;
-  padding: 0 2px;
+  margin: 10px;
+  padding: 0 2px 0 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -513,7 +530,7 @@ export const ProgressText = styled.div`
 
 
 export const Logo = styled.div`
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 200;
   color: #6a5acd;
   text-align:center;
@@ -906,4 +923,57 @@ export const CommentSubmitButton = styled.button`
     font-size: 1rem;
     padding: 0.6rem 1.2rem;
   }
+`;
+
+export const ButtonWrapper = styled.button`
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  box-shadow : none;
+  
+  &:hover {
+    background:rgba(122, 77, 228, 0.58);
+    scale:1.2;
+    color: #222;
+  }
+`;
+
+
+export const HeartWrapper = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  
+  align-items: center;
+  justify-content: center;
+`;
+
+export const RedCircle = styled.div`
+width: 30px;
+height: 30px;
+border-radius: 50%;
+position: absolute;
+border: 1px solid #ff4d4d;
+top: 50%;
+left: 50%;
+  transform: translate(-50%, -50%);
+`;
+
+export const Bubble = styled.div`
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #ff4d4d;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;

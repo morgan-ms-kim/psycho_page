@@ -41,13 +41,12 @@ const RecommendSection = styled.div`
   background: #fff;
   border-radius: 1px;
   box-shadow: 0 6px 32px rgba(80,80,120,0.10);
-  padding: 1px;
   position: relative;
   overflow: hidden;
 `;
 
 const RecommendTitle = styled.h2`
-
+  left:10px;
   position: relative;
   width: 100%;  
   height: 100%;
@@ -98,7 +97,6 @@ const RecommendSlide = styled.div`
 `;
 const RecommendCard = styled.div`
   border-radius: 15px;
-  padding: 2px;
   color: white;
   text-align: center;
   width: 100%;
@@ -164,7 +162,7 @@ const TotalPages = styled.span`
 `;
 const SlideDots = styled.div`
   position: absolute;
-  display: flex;
+  display: none;
   transform: translateX(-50%);  /* 정중앙 정렬 */
   text-align:center;
   justify-content: center;
@@ -473,7 +471,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
   if (pendingSlide === 'prev') baseTranslate = -100;
   return (
     <>
-      <RecommendTitle>추천해요</RecommendTitle>
+      <RecommendTitle>#추천해요</RecommendTitle>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}
@@ -532,7 +530,8 @@ function RecommendSliderSection({ router, getTestFolderName }) {
                       style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
                       onClick={() => handleTestClick(test)}
                     >
-                      🧩
+                      <Image src="/uploads/logo.png" alt="심풀 로고"
+                        layout="fixed" width={50} height={50} style={{ verticalAlign: 'middle' }} />
                     </TestItemPlaceholder>
                     <RecommendStats>
                       <RecommendStat>👁️ {test?.views}</RecommendStat>
@@ -551,7 +550,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
               <CurrentPage>{currentSlide + 1}</CurrentPage>
               <TotalPages>/{recommendTests.length}</TotalPages>
             </SlidePageText>
-            <SlideDots>
+            <SlideDots >
               {recommendTests.map((_, index) => (
                 <SlideDot
                   key={index}
@@ -726,7 +725,7 @@ function NewSliderSection({ router, getTestFolderName }) {
 
   return (
     <>
-      <RecommendTitle>추천해요</RecommendTitle>
+      <RecommendTitle>#추천해요</RecommendTitle>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}
@@ -779,7 +778,9 @@ function NewSliderSection({ router, getTestFolderName }) {
                       style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
                       onClick={() => handleTestClick(test)}
                     >
-                      🧩
+                       <Image src="/uploads/logo.png" alt="심풀 로고"
+                        layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
+                   
                     </TestItemPlaceholder>
                     <RecommendStats>
                       <RecommendStat>👁️ {test?.views}</RecommendStat>
@@ -891,7 +892,9 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                       />
                     ) : null}
                     <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
-                      🧩
+                    <Image src="/uploads/logo.png" alt="심풀 로고"
+                        layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
+                   
                     </TestItemPlaceholder>
 
                     {(isNew || isHot) && (
@@ -1315,7 +1318,9 @@ export default function Home() {
       setOffset(0);
       setPage(1);
       setHasMore(true);
+      setLoading(true);
       loadTests();
+
     }, 100);
 
     return () => clearTimeout(timer);
@@ -1430,21 +1435,22 @@ export default function Home() {
                 gap: 8
               }}
             >
+              <span style={{ marginRight: -10, marginTop:5 }}>심</span>
               <Image src="/uploads/logo.png" alt="심풀 로고"
-                        layout="fixed" width={40} height={40} style={{ verticalAlign: 'middle' }} />
-              <span style={{ marginLeft: 6 }}>심풀</span>
+                        layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
+              <span style={{ marginLeft: -10, marginTop:5 }}>풀</span>
             </Logo>
             <PageLink
               href="/lotto/page"
               style={{
                 position: 'absolute',
-                right: 16,
-                top: '50%',
-                transform: 'translateY(-50%)',
+                right: 15,
+                top: '110%',
+                transform: 'translateY(-10%)',
                 zIndex: 2
               }}
             >
-              로또 번호<br />생성기
+              Lotto
             </PageLink>
 
             {/*<HistoryButton onClick={() => router.push('/history')}>
@@ -1601,7 +1607,6 @@ const TestCardContent = styled.div`
 const TestThumbnailContainer = styled.div`
   position: relative;
   margin-bottom: 15px;
-  padding: 5px 5px 5px 5px;
   width: 100vw;
   max-width:500px;
   min-width:360px;

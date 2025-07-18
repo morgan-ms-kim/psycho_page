@@ -169,7 +169,9 @@ export default function TestManagement() {
                 router.push('/dashboard');
               }
             }
-          }} style={{ cursor: 'pointer' }}>🧩심풀</Logo>
+          }} style={{ cursor: 'pointer' }}> <Image src="/uploads/logo.png" alt="심풀 로고"
+          layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
+     심풀</Logo>
           <Nav>
             <NavLink href="/dashboard">대시보드</NavLink>
             <NavLink 

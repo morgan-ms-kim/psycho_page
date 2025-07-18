@@ -285,7 +285,7 @@ export default function LottoPage() {
       <div className={styles.lottoLayout}>
         {/* 메인 생성기/결과 */}
         <section className={styles.lottoMain}>
-          <h1 className={styles.title}>로또번호 생성기</h1>
+          <h1 className={styles.title}>Lotto 번호 생성기</h1>
 
           <h2 className={styles.resultTitle}>자릿수 조합 결과</h2>
           <div className={styles.formBox}>
