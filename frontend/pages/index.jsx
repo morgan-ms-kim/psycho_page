@@ -529,7 +529,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
                       style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
                       onClick={() => handleTestClick(test)}
                     >
-                      <Image src="/admin/uploads/logo.png" alt="심풀 로고"
+                      <Image src="/uploads/logo.png" alt="심풀 로고"
                         layout="fixed" width={50} height={50} style={{ verticalAlign: 'middle' }} />
                     </TestItemPlaceholder>
                     <RecommendStats>
