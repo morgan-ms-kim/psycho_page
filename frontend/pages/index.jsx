@@ -35,7 +35,7 @@ import { FaUserAlt, FaHeart, FaBriefcase, FaGamepad, FaBrain, FaUsers, FaEllipsi
 const RecommendSection = styled.div`
   margin: 1px auto;
   max-width: 1200px;  
-  min-width:360px;
+  min-width:320px;
   width:100%;
   height: 350px;
   background: #fff;
@@ -47,14 +47,13 @@ const RecommendSection = styled.div`
 
 const RecommendTitle = styled.h2`
   left:10px;
-  position: relative;
   width: 100%;  
   height: 100%;
   font-size: 1rem;
-  margin: 5px 0 1px 5px;
+  margin: 5px 0 ;
   text-align: left;
   color: #6a5acd;
-  margin: 0 0 1x 10px;
+  margin: 0 0 ;
   font-weight: 600;
 `;
 const RecommendItemImage = styled.img.attrs({ loading: 'lazy' })`
@@ -261,7 +260,7 @@ const sectionContainerStyle = {
   minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
   position: 'relative',
   // 모바일 중앙정렬 보정  width: 100vw;
-  minWidth: '360px',
+  minWidth: '320px',
   maxWidth: '500px',
   boxSizing: 'border-box',
 };
@@ -726,6 +725,18 @@ function NewSliderSection({ router, getTestFolderName }) {
   return (
     <>
       <RecommendTitle>#추천해요</RecommendTitle>
+            <PageLink
+              href="/lotto/page"
+              style={{
+                position: 'absolute',
+                right: 15,
+                top: '0%',
+                transform: 'translateY(-10%)',
+                zIndex: 2
+              }}
+            >
+              Lotto
+            </PageLink>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}
@@ -768,7 +779,7 @@ function NewSliderSection({ router, getTestFolderName }) {
                           e.target.nextSibling.style.display = 'flex';
                         }}
                         onClick={() => handleTestClick(test)}
-                        style={{ width: '100%', maxWidth: '500px', minWidth: '360px', height: 'auto' }}
+                        style={{ width: '100%', maxWidth: '500px', minWidth: '320px', height: 'auto' }}
                         layout="responsive"
                         width={120}
                         height={120}
@@ -1371,19 +1382,19 @@ export default function Home() {
   // 항상 MainWrap을 최상위로 렌더링하고, 내부에서 상태별로 Section을 분기 처리
   return (
     <>
-      <Head>
+      <Head style={{ width: '100%', minWidth: '320px', maxWidth: '500px'}}>
         <title>심풀 - 심심풀이에 좋은 심리테스트</title>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-848040041408559"
           crossOrigin="anonymous"
         />
       </Head>
-      <MainWrap style={{ width: '100%', minWidth: '360px', maxWidth: '500px', minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 1%, #6a5acd 99%)' }}>
+      <MainWrap style={{ width: '100%', minWidth: '320px', maxWidth: '500px', minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 1%, #6a5acd 99%)' }}>
         <Section style={sectionContainerStyle}>
 {/*
           <div
             style={{
               width: '100vw',
-              minWidth: '360px',
+              minWidth: '320px',
               maxWidth: '500px',
               margin: '0 auto auto auto',
               textAlign: 'center',
@@ -1440,18 +1451,6 @@ export default function Home() {
                         layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
               <span style={{ marginLeft: -10, marginTop:5 }}>풀</span>
             </Logo>
-            <PageLink
-              href="/lotto/page"
-              style={{
-                position: 'absolute',
-                right: 15,
-                top: '110%',
-                transform: 'translateY(-10%)',
-                zIndex: 2
-              }}
-            >
-              Lotto
-            </PageLink>
 
             {/*<HistoryButton onClick={() => router.push('/history')}>
               📋 기록보기
@@ -1598,7 +1597,7 @@ const TestCardContent = styled.div`
   
   width: 100vw;
   max-width:500px;
-  min-width:360px;
+  min-width:320px;
   width: 100%;
   min-height: 120px;
 `;
@@ -1609,7 +1608,7 @@ const TestThumbnailContainer = styled.div`
   margin-bottom: 15px;
   width: 100vw;
   max-width:500px;
-  min-width:360px;
+  min-width:320px;
   min-height:120px;
   width: 100%;
   height:100%
@@ -1624,7 +1623,7 @@ const TestItemPlaceholder = styled.div`
   left: 0;
   width: 100vw;
   max-width:500px;
-  min-width:360px;
+  min-width:320px;
   height: 100%;
   background: linear-gradient(45deg, #667eea, #6a5acd);
   border-radius: 10px;

@@ -54,7 +54,6 @@ export const MainWrap = styled.div`
   maxWidth: 500px;
   min-height: 100vh;
 
-  padding : 8px 16px 8px 16px 
   background: linear-gradient(135deg, #6a5acd 0%, #6a5acd 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -62,13 +61,13 @@ export const MainWrap = styled.div`
 
    @media (max-width: 1200px) {
     max-width: 500px;
-    min-width: 500px;
+    min-width: 320px;
     border-radius: 1px;
     
   }
   @media (max-width: 600px) {
     max-width: 500px;
-    min-width: 500px;
+    min-width: 320x;
     border-radius: 1px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     
@@ -85,7 +84,7 @@ export const Header = styled.header`
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-width: 500px;
+  min-width: 320px;
   max-width: 500px;
   box-sizing: border-box;
   margin: 10 auto;
@@ -190,7 +189,8 @@ export const PageLink = styled.a`
   cursor: pointer;
   font-size: 2rem;
   color: #333;
-  position: relative;
+  position: absolute;
+  top:0;
   transition: text-shadow 0.3s ease;
   font-weight: bold;
   font-family: 'GangwonEduHyeonokT_OTFMediumA';
@@ -304,7 +304,7 @@ export const Grid = styled.div`
   justify-items: center;
   width: 100vw;
   max-width:500px;
-  min-width:360px;
+  min-width:320px;
   
   min-height: 120px;
   margin: 0 auto;
@@ -330,7 +330,7 @@ export const Card = styled.div`
   cursor: pointer;
   width: 100vw;
   max-width:500px;
-  min-width:360px;
+  min-width:320px;
   min-height: 120px;  
   display: flex;
   flex-direction: column;
@@ -448,8 +448,8 @@ export const FlexColumn = styled.div`
 // 섹션 스타일들
 export const Section = styled.div`
   width: 100vw;
-  minWidth: '360px';
-  maxWidth: '500px';
+  minWidth: 320px;
+  maxWidth: 500px;
 
   margin: 10px;
   padding: 0 2px 0 2px;
