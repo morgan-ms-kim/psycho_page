@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import Link from 'next/link';
 
+import Image from 'next/image';
 const apiClient = axios.create({
   baseURL: 'https://smartpick.website/api',
   timeout: 10000,

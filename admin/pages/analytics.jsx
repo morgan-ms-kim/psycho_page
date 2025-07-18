@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import {
   Chart as ChartJS,
   CategoryScale,
