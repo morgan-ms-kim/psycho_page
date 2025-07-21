@@ -36,7 +36,7 @@ const execAsync = promisify(exec);
 // multer 설정
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(process.cwd(), '..', 'frontend', 'public', 'uploads', 'thumbnails');
+    const uploadDir = path.join(process.cwd(), '..', 'testGroup', 'public', 'uploads', 'thumbnails');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
@@ -960,7 +960,7 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
     // 2. 실제 id로 폴더명 생성 (템플릿 테스트는 다른 폴더명 사용)
     const folderName = `template${test.id}`;
     test.folder = folderName;
-    const testsDir = path.join(process.cwd(), '..', 'frontend', 'tests');
+    const testsDir = path.join(process.cwd(), '..', 'testGroup', 'tests');
     const testPath = path.join(testsDir, folderName);
     const tmpDir = path.join(process.cwd(), '..', 'tmp-template-' + Date.now());
     console.log(testsDir, testPath, tmpDir);
@@ -1073,8 +1073,8 @@ app.post('/api/admin/tests/template', authenticateAdmin, async (req, res) => {
     // 9. 임시폴더 삭제
     try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch { }
     try {
-      // frontend/scripts/generate-app-module-map.js 실행
-      exec('node ../frontend/scripts/generate-app-module-map.js', { stdio: 'inherit' });
+      // testGroup/scripts/generate-app-module-map.js 실행
+      exec('node ../testGroup/scripts/generate-app-module-map.js', { stdio: 'inherit' });
     } catch (e) {
       console.error('generate-app-module-map 생성 스크립트 실행 실패:', e);
     }
@@ -1157,7 +1157,7 @@ app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thu
     // 기존 썸네일 삭제 (기본 썸네일 제외)
     if (test.thumbnail && test.thumbnail !== '/uploads/thumbnails/default-thumb.png') {
       try {
-        const oldThumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail.replace('/', ''));
+        const oldThumbPath = path.join(process.cwd(), '..', 'testGroup', 'public', test.thumbnail.replace('/', ''));
         if (fs.existsSync(oldThumbPath)) {
           fs.unlinkSync(oldThumbPath);
           console.log('🗑️ 기존 썸네일 삭제:', oldThumbPath);
@@ -1181,7 +1181,7 @@ app.post('/api/admin/tests/:id/thumbnail', authenticateAdmin, upload.single('thu
 // 실시간 로그 API
 app.get('/api/admin/tests/:repo/log', authenticateAdmin, (req, res) => {
   const repo = req.params.repo;
-  const logPath = path.join(process.cwd(), '..', 'frontend', 'public', 'tests', repo, 'deploy.log');
+  const logPath = path.join(process.cwd(), '..', 'testGroup', 'public', 'tests', repo, 'deploy.log');
   if (fs.existsSync(logPath)) {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     fs.createReadStream(logPath).pipe(res);
@@ -1331,7 +1331,7 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
     await Like.destroy({ where: { testId } });
     // 테스트 폴더 삭제
     if (test.folder) {
-      const testFolderPath = path.join(process.cwd(), '..', 'frontend', 'public', 'tests', test.folder);
+      const testFolderPath = path.join(process.cwd(), '..', 'testGroup', 'public', 'tests', test.folder);
       if (fs.existsSync(testFolderPath)) {
         fs.rmSync(testFolderPath, { recursive: true, force: true });
         console.log('🗑️ 테스트 폴더 삭제:', testFolderPath);
@@ -1339,7 +1339,7 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
     }
     // 썸네일 파일 삭제 (기본 썸네일 제외)
     if (test.thumbnail && test.thumbnail !== '/uploads/thumbnails/default-thumb.png') {
-      const thumbPath = path.join(process.cwd(), '..', 'frontend', 'public', test.thumbnail.replace('/', ''));
+      const thumbPath = path.join(process.cwd(), '..', 'testGroup', 'public', test.thumbnail.replace('/', ''));
       if (fs.existsSync(thumbPath)) {
         fs.unlinkSync(thumbPath);
         console.log('🗑️ 썸네일 파일 삭제:', thumbPath);
@@ -1349,7 +1349,7 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
     await test.destroy();
     // 필요 없는 썸네일 파일 정리 (어떤 테스트와도 연결되지 않은 파일)
     const usedThumbnails = new Set((await Test.findAll({ attributes: ['thumbnail'], raw: true })).map(t => t.thumbnail));
-    const thumbsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'uploads', 'thumbnails');
+    const thumbsDir = path.join(process.cwd(), '..', 'testGroup', 'public', 'uploads', 'thumbnails');
     if (fs.existsSync(thumbsDir)) {
       const files = fs.readdirSync(thumbsDir);
       for (const file of files) {
@@ -1529,7 +1529,7 @@ app.get('/api/admin/orphan-folders', authenticateAdmin, async (req, res, next) =
         .filter(Boolean)
     );
 
-    const testsDir = path.join(process.cwd(), '..', 'frontend', 'public', 'tests');
+    const testsDir = path.join(process.cwd(), '..', 'testGroup', 'public', 'tests');
     const filesystemFolders = fs.existsSync(testsDir)
       ? fs.readdirSync(testsDir, { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
