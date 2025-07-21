@@ -500,6 +500,7 @@ export default function IframeTemplate({ src, test, ...props }) {
               display: 'block',
               background: '#fff',
               flex: 1,
+              paddingTop:TOPBAR_HEIGHT,
               minHeight: 0,
               overflow: 'auto',
             }}

@@ -145,9 +145,9 @@ export default function LottoPage() {
   const top6 = statsArr.sort((a, b) => b.cnt - a.cnt || a.num - b.num).slice(0, 45);
   const bottom6 = statsArr.sort((a, b) => a.cnt - b.cnt || a.num - b.num).slice(0, 45);
 
-  
+
   //let urlpath='http://localhost:4000/api';
-  let urlpath='https://smartpick.website/api';
+  let urlpath = 'https://smartpick.website/api';
   // 실제 로또 랭킹 조회
   const fetchLottoRank = async () => {
     setRealLoading(true);
@@ -190,7 +190,7 @@ export default function LottoPage() {
     const digitCounts: { [digit: string]: number } = {
       '1': 0, '10': 0, '20': 0, '30': 0, '40': 0
     };
-    
+
     numbers.forEach(num => {
       if (num >= 1 && num <= 9) digitCounts['1']++;
       else if (num >= 10 && num <= 19) digitCounts['10']++;
@@ -198,7 +198,7 @@ export default function LottoPage() {
       else if (num >= 30 && num <= 39) digitCounts['30']++;
       else if (num >= 40 && num <= 45) digitCounts['40']++;
     });
-    
+
     return digitCounts;
   };
 
@@ -350,13 +350,13 @@ export default function LottoPage() {
         {/* 탭 컨테이너 */}
         <div className={styles.tabContainer}>
           <div className={styles.tabButtons}>
-            <button 
+            <button
               className={`${styles.tabButton} ${activeTab === 'numberRank' ? styles.active : ''}`}
               onClick={() => setActiveTab('numberRank')}
             >
               번호 랭킹
             </button>
-            <button 
+            <button
               className={`${styles.tabButton} ${activeTab === 'digitRank' ? styles.active : ''}`}
               onClick={() => setActiveTab('digitRank')}
             >
@@ -381,7 +381,7 @@ export default function LottoPage() {
                 <div className={styles.rankColumns}>
                   <ol className={styles.rankList}>
                     {realRank.slice(0, 23).map((x) => (
-                      <li key={x.num} style={{fontSize:12}}>
+                      <li key={x.num} style={{ fontSize: 12 }}>
                         <span className={`${styles.circle} ${getColorClass(x.num)}`}>
                           {x.num}
                         </span> - ({x.cnt}회)
@@ -390,7 +390,7 @@ export default function LottoPage() {
                   </ol>
                   <ol className={styles.rankList}>
                     {realRank.slice(23).map((x) => (
-                      <li key={x.num} style={{fontSize:12}}>
+                      <li key={x.num} style={{ fontSize: 12 }}>
                         <span className={`${styles.circle} ${getColorClass(x.num)}`}>
                           {x.num}
                         </span> - ({x.cnt}회)
@@ -410,7 +410,7 @@ export default function LottoPage() {
                 <div className={styles.rankColumns}>
                   <ol className={styles.rankList}>
                     {top6.slice(0, 23).map((x) => (
-                      <li key={x.num} style={{fontSize:12}}>
+                      <li key={x.num} style={{ fontSize: 12 }}>
                         <span className={`${styles.circle} ${getColorClass(x.num)}`}>
                           {x.num}
                         </span> - ({x.cnt}회)
@@ -419,7 +419,7 @@ export default function LottoPage() {
                   </ol>
                   <ol className={styles.rankList}>
                     {top6.slice(23).map((x) => (
-                      <li key={x.num} style={{fontSize:12}}>
+                      <li key={x.num} style={{ fontSize: 12 }}>
                         <span className={`${styles.circle} ${getColorClass(x.num)}`}>
                           {x.num}
                         </span> - ({x.cnt}회)
@@ -447,30 +447,36 @@ export default function LottoPage() {
                     const hasNonZero = item.combination.split('-').some(count => count !== '0');
                     return (
                       <li 
-                        key={index} 
-                        className={styles.digitRankItem}
-                        style={{ 
-                          borderLeftColor: hasNonZero ? '#5a4fff' : '#ccc',
-                          borderLeftWidth: hasNonZero ? '4px' : '2px'
-                        }}
-                      >{item.combination}
-                        <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                          
+                      key={index} 
+                      className={styles.digitRankItem}
+                      style={{ 
+                        borderLeftColor: hasNonZero ? '#5a4fff' : '#ccc',
+                        borderLeftWidth: hasNonZero ? '4px' : '2px',
+                        display: 'flex',
+                        flexDirection: 'column', // 수직 정렬
+                        padding: '8px 0',
+                      }}
+                    >
+                      {/* 첫 번째 줄: combination 문자열 */}
+                      <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                        {item.combination}
+                      </div>
+                    
+                      {/* 두 번째 줄: 기존 flex 구조 */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
                           <span className={styles.rankNumber}>{index + 1}</span>
-                          
-                          <div className={styles.digitCombination}>
-                            
+                          <div className={styles.digitCombination} style={{ display: 'flex', gap: '6px', marginLeft: '8px' }}>
                             {item.combination.split('-').map((count, idx) => {
                               const labels = ['1', '10', '20', '30', '40'];
                               const isZero = count === '0';
                               return (
-                            
                                 <div 
                                   key={idx} 
                                   className={styles.digitGroup}
                                   style={{
                                     borderColor: isZero ? '#ccc' : '#5a4fff',
-                                    borderWidth: isZero ? '1px' : '2px'
+                                    borderWidth: isZero ? '1px' : '2px',
                                   }}
                                 >
                                   <span className={`${styles.circle} ${getColorClass(labels[idx])}`}>
@@ -481,8 +487,11 @@ export default function LottoPage() {
                             })}
                           </div>
                         </div>
+                    
+                        {/* 오른쪽 끝: count 표시 */}
                         <span className={styles.digitRankCount}>{item.count}회</span>
-                      </li>
+                      </div>
+                    </li>
                     );
                   })}
                 </ul>

@@ -63,12 +63,14 @@
 
 .circle {
   display: inline-block;
-  width: 24px;
-  height: 24px;
+  width: 4vw;
+  height: 4vw;
   border-radius: 50%;
   text-align: center;
   line-height: 24px;
-  font-size: 0.9rem;
+  
+  line-height: 4vw; /* 글자를 중앙에 오도록 */
+  font-size: 1.5vw;  /* 폰트도 너비에 비례 */
   color: white;
   font-weight: 500;
   margin-right: 6px;
@@ -274,6 +276,7 @@
 }
 
 .digitRankSection {
+  min-width: 360px;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 2px 16px 0 #e6e6f0;

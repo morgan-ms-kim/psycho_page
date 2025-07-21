@@ -46,15 +46,12 @@ const RecommendSection = styled.div`
 `;
 
 const RecommendTitle = styled.h2`
-  left:10px;
-  width: 100%;  
-  height: 100%;
+  position: relative;
   font-size: 1rem;
-  margin: 5px 0 ;
-  text-align: left;
   color: #6a5acd;
-  margin: 0 0 ;
+  left:5px;
   font-weight: 600;
+  z-index:1;
 `;
 const RecommendItemImage = styled.img.attrs({ loading: 'lazy' })`
   max-width: 100%;
@@ -724,19 +721,28 @@ function NewSliderSection({ router, getTestFolderName }) {
 
   return (
     <>
+            <div style={{
+              width: '100%',
+              
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center', // 수직 정렬 조정
+              }}>
+                
       <RecommendTitle>#추천해요</RecommendTitle>
-            <PageLink
+              <PageLink
               href="/lotto/page"
               style={{
-                position: 'absolute',
+                position: 'relative',
                 right: 15,
-                top: '0%',
-                transform: 'translateY(-10%)',
                 zIndex: 2
               }}
             >
               Lotto
             </PageLink>
+              
+            </div>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}

@@ -534,7 +534,13 @@ export const Logo = styled.div`
   font-weight: 200;
   color: #6a5acd;
   text-align:center;
-  font-family: 'GongGothicMedium', sans-serif;
+  font-family: 'kdg_Medium', sans-serif;
+  @font-face {
+    font-family: 'kdg_Medium';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts-20-12@1.0/kdg_Medium.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
 @font-face {
     font-family: 'GongGothicMedium';
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.0/GongGothicMedium.woff') format('woff');
