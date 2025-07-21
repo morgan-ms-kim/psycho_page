@@ -22,7 +22,7 @@ nice -n 19 npm run build
 # PM2 완전 재시작
 echo "🔄 PM2 완전 재시작 중..."
 #pm2 delete psycho-frontend
-pm2 restart main-frontend
+pm2 restart admin
 #start npm --name "psycho-frontend" -- start
 
 echo "✅ 강력한 배포 완료!"
