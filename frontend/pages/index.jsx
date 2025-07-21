@@ -260,7 +260,7 @@ const sectionContainerStyle = {
 
   //minWidth: 1200,
   margin: '0px auto 0 auto',
-  background: '#fff',
+  background: '#f7f7fa',
   borderRadius: 3,
   boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
   padding: '0 0 32px 0',

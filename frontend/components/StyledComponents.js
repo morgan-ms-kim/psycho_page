@@ -88,7 +88,6 @@ export const Header = styled.header`
   max-width: 500px;
   box-sizing: border-box;
   margin: 10 auto;
-  background:rgb(255, 255, 255);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
