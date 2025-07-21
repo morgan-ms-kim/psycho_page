@@ -29,29 +29,30 @@ import {
 } from '../components/StyledComponents';
 import Head from 'next/head';
 import Image from 'next/image';
-import { FaUserAlt, FaHeart, FaBriefcase, FaGamepad, FaBrain, FaUsers, FaEllipsisH } from 'react-icons/fa';
+import { FaThumbsUp, FaPlay, FaUserAlt, FaHeart, FaBriefcase, FaGamepad, FaBrain, FaUsers, FaEllipsisH, FaComment } from 'react-icons/fa';
 
 // 추천 슬라이드 스타일 컴포넌트
 const RecommendSection = styled.div`
   margin: 1px auto;
-  max-width: 1200px;  
-  min-width:320px;
+  max-width: 500px;  
+  min-width: 320px;
   width:100%;
-  height: 350px;
-  background: #fff;
+  aspect-ratio: 5 / 3;
   border-radius: 1px;
   box-shadow: 0 6px 32px rgba(80,80,120,0.10);
   position: relative;
+  padding:4vw 4vw;
   overflow: hidden;
 `;
 
 const RecommendTitle = styled.h2`
   position: relative;
   font-size: 1rem;
-  color: #6a5acd;
+  color:rgb(0, 0, 0);
   left:5px;
   font-weight: 600;
   z-index:1;
+  margin:0;
 `;
 const RecommendItemImage = styled.img.attrs({ loading: 'lazy' })`
   max-width: 100%;
@@ -67,6 +68,7 @@ const RecommendItemImage = styled.img.attrs({ loading: 'lazy' })`
 `;
 const RecommendSlider = styled.div`
   position: relative;
+  border-radius: 5px;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -125,12 +127,20 @@ const RecommendStats = styled.div`
   padding: 10px;
   border-radius: 2px;
   font-weight:600;
-  background: rgba(255, 248, 248, 0.9); 
+  background: rgba(8, 8, 8, 0.9); 
+  
 `;
-
+//background: rgba(255, 248, 248, 0.9); 
 const RecommendStat = styled.span`
   display: flex;
-  color :  rgba(3, 12, 24, 0.9); 
+  color :  rgba(255, 255, 255, 0.9); 
+  align-items: center;
+  gap: 0.5px;
+`;
+const RecommendIconStat = styled.span`
+  display: flex;
+  color :  rgba(255, 255, 255, 0.9); 
+  font-size: 0.7rem;
   align-items: center;
   gap: 0.5px;
 `;
@@ -138,8 +148,8 @@ const RecommendStat = styled.span`
 
 const SlidePageText = styled.div`
   position: absolute;
-  bottom: 10px;  
-  right : 10px;
+  bottom: 1vw;  
+  right : 1vw;
   font-size: 0.9rem;
   font-weight: bold;
   background: rgba(0, 0, 0, 0.5);
@@ -467,7 +477,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
   if (pendingSlide === 'prev') baseTranslate = -100;
   return (
     <>
-      <RecommendTitle>#추천해요</RecommendTitle>
+      <RecommendTitle>추천해요</RecommendTitle>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}
@@ -694,8 +704,23 @@ function NewSliderSection({ router, getTestFolderName }) {
   if (loading) {
     return (
       <>
-        <RecommendTitle>추천해요</RecommendTitle>
         <RecommendSection>
+          
+        {/* RecommendTitle을 왼쪽 정렬 */}
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'flex-start', // 왼쪽 정렬
+            alignItems: 'center',
+            padding: '0 10px', // 좌우 여백 (선택사항)
+          }}
+        >
+          <RecommendTitle>
+            <FaThumbsUp style={{ marginRight: '5px', fontSize: '0.9rem' }} />
+            추천해요
+          </RecommendTitle>
+        </div>
           <RecommendSlider>
             <RecommendSlide active={true}>
               <RecommendCard>
@@ -721,32 +746,43 @@ function NewSliderSection({ router, getTestFolderName }) {
 
   return (
     <>
-            <div style={{
-              width: '100%',
-              
-    position: 'relative',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center', // 수직 정렬 조정
-              }}>
-                
-      <RecommendTitle>#추천해요</RecommendTitle>
-              <PageLink
-              href="/lotto/page"
-              style={{
-                position: 'relative',
-                right: 15,
-                zIndex: 2
-              }}
-            >
-              Lotto
-            </PageLink>
-              
-            </div>
+      <div style={{
+        width: '100%',
+        position: 'relative',
+        display: 'flex',
+        justifyContent: 'flex-end',
+
+      }}>
+
+
+        <PageLink
+          href="/lotto/page"
+          style={{
+            position: 'relative',
+            zIndex: 2
+          }}
+        >Lotto</PageLink>
+
+      </div>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}
       >
+        {/* RecommendTitle을 왼쪽 정렬 */}
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'flex-start', // 왼쪽 정렬
+            alignItems: 'center',
+            padding: '0 10px', // 좌우 여백 (선택사항)
+          }}
+        >
+          <RecommendTitle>
+            <FaThumbsUp style={{ marginRight: '5px', fontSize: '0.9rem' }} />
+            추천해요
+          </RecommendTitle>
+        </div>
         <RecommendSlider
           ref={sliderRef}
           onMouseDown={handleDragStart}
@@ -795,27 +831,27 @@ function NewSliderSection({ router, getTestFolderName }) {
                       style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
                       onClick={() => handleTestClick(test)}
                     >
-                       <Image src="/uploads/logo.png" alt="심풀 로고"
+                      <Image src="/uploads/logo.png" alt="심풀 로고"
                         layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
-                   
+
                     </TestItemPlaceholder>
                     <RecommendStats>
-                      <RecommendStat>👁️ {test?.views}</RecommendStat>
-                      <RecommendStat>❤️ {test?.likes}</RecommendStat>
-                      <RecommendStat>💬 {typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
+                      <RecommendStat><RecommendIconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></RecommendIconStat>{test?.views}</RecommendStat>
+                      <RecommendStat><RecommendIconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></RecommendIconStat>{test?.likes}</RecommendStat>
+                      <RecommendStat><RecommendIconStat><FaComment style={{ marginRight: '3px' }}></FaComment></RecommendIconStat>{typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
                     </RecommendStats>
                   </RecommendThumbnailContainer>
                 </RecommendCard>
               </RecommendSlide>
             ))}
           </div>
+          <SlidePageText>
+            <CurrentPage>{currentSlide + 1}</CurrentPage>
+            <TotalPages>/{recommendTests.length}</TotalPages>
+          </SlidePageText>
         </RecommendSlider>
         {recommendTests.length > 1 && (
           <>
-            <SlidePageText>
-              <CurrentPage>{currentSlide + 1}</CurrentPage>
-              <TotalPages>/{recommendTests.length}</TotalPages>
-            </SlidePageText>
             <SlideDots>
               {recommendTests.map((_, index) => (
                 <SlideDot
@@ -909,9 +945,9 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                       />
                     ) : null}
                     <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
-                    <Image src="/uploads/logo.png" alt="심풀 로고"
+                      <Image src="/uploads/logo.png" alt="심풀 로고"
                         layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
-                   
+
                     </TestItemPlaceholder>
 
                     {(isNew || isHot) && (
@@ -1388,15 +1424,16 @@ export default function Home() {
   // 항상 MainWrap을 최상위로 렌더링하고, 내부에서 상태별로 Section을 분기 처리
   return (
     <>
-      <Head style={{ width: '100%', minWidth: '320px', maxWidth: '500px'}}>
+      <Head style={{ width: '100%', minWidth: '320px', maxWidth: '500px' }}>
         <title>심풀 - 심심풀이에 좋은 심리테스트</title>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-848040041408559"
           crossOrigin="anonymous"
         />
       </Head>
-      <MainWrap style={{ width: '100%', minWidth: '320px', maxWidth: '500px', minHeight: '100vh', background: 'linear-gradient(135deg, #7f7fd5 1%, #6a5acd 99%)' }}>
+      <MainWrap style={{ width: '100%', minWidth: '320px', maxWidth: '500px', minHeight: '100vh',
+         background: 'linear-gradient(135deg, #7f7fd5 1%, #6a5acd 99%)' }}>
         <Section style={sectionContainerStyle}>
-{/*
+          {/*
           <div
             style={{
               width: '100vw',
@@ -1443,6 +1480,7 @@ export default function Home() {
               }}
               style={{
                 position: 'absolute',
+                top: '50%',
                 left: '50%',
                 transform: 'translateX(-50%)',
                 cursor: 'pointer',
@@ -1452,10 +1490,10 @@ export default function Home() {
                 gap: 8
               }}
             >
-              <span style={{ marginRight: -10, marginTop:5 }}>심</span>
+              <span style={{ marginRight: -10, marginTop: 5 }}>심</span>
               <Image src="/uploads/logo.png" alt="심풀 로고"
-                        layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
-              <span style={{ marginLeft: -10, marginTop:5 }}>풀</span>
+                layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
+              <span style={{ marginLeft: -10, marginTop: 5 }}>풀</span>
             </Logo>
 
             {/*<HistoryButton onClick={() => router.push('/history')}>

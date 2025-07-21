@@ -185,15 +185,14 @@ export const PrimaryButton = styled.button`
   }
 `;
 export const PageLink = styled.a`
-  all: unset; /* 버튼 기본 스타일 제거 */
+  all: unset; /* a 기본 스타일 제거 */
   cursor: pointer;
-  font-size: 2rem;
+  font-size: 1rem;
   color: #333;
-  position: absolute;
-  top:0;
   transition: text-shadow 0.3s ease;
   font-weight: bold;
-  font-family: 'GangwonEduHyeonokT_OTFMediumA';
+  padding-right:3vw;
+  font-family:'kdg_Medium', sans-serif;
   /* 가끔씩 자동으로 흔들리는 효과 */
   animation: ${wiggle} 3s ease-in-out infinite;
   animation-delay: 5s;
@@ -206,7 +205,8 @@ export const PageLink = styled.a`
   &:hover {
     text-shadow: 0 3px 7px rgba(39, 37, 37, 0.5);
     color: #333;
-    font-size: 2.1rem;
+    
+    transform: scale(1.5); /* ✅ 크기만 시각적으로 확대 */
     outline: none;
   }
   &:focus {
@@ -238,33 +238,10 @@ export const PageLink = styled.a`
 export const PageButton = styled.button`
   all: unset; /* 버튼 기본 스타일 제거 */
   cursor: pointer;
-  font-size: 1.1rem;
   color: #333;
   position: relative;
   transition: text-shadow 0.3s ease;
 
-  /* 가끔씩 자동으로 흔들리는 효과 */
-  animation: ${wiggle} 1s ease-in-out infinite;
-  animation-delay: 5s;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
-  animation-fill-mode: forwards;
-  animation-direction: alternate;
-  animation-play-state: running;
-
-  &:hover {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    color: #333;
-    background: #fff;
-    font-size: 1.1rem;
-    outline: none;
-  }
-  &:focus {
-    outline: none;
-    
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    animation-play-state: paused; /* 호버 중엔 흔들리지 않음 */
-  }
 `;
 
 export const SecondaryButton = styled.button`
