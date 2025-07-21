@@ -41,7 +41,7 @@ const RecommendSection = styled.div`
   border-radius: 1px;
   box-shadow: 0 6px 32px rgba(80,80,120,0.10);
   position: relative;
-  padding:4vw 4vw;
+  padding:0 2vw;
   overflow: hidden;
 `;
 
@@ -70,7 +70,7 @@ const RecommendSlider = styled.div`
   position: relative;
   border-radius: 5px;
   width: 100%;
-  height: 100%;
+  height: 85%;
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
@@ -114,6 +114,7 @@ const RecommendThumbnailContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow:hidden;
 `;
 
 const RecommendStats = styled.div`
@@ -124,14 +125,14 @@ const RecommendStats = styled.div`
   font-size: 0.8rem;
   opacity: 0.8;
   bottom: 0px;
-  padding: 10px;
-  border-radius: 2px;
+  border-radius: 5px;
   font-weight:600;
   background: rgba(8, 8, 8, 0.9); 
   
 `;
 //background: rgba(255, 248, 248, 0.9); 
 const RecommendStat = styled.span`
+  padding:1vw;
   display: flex;
   color :  rgba(255, 255, 255, 0.9); 
   align-items: center;
@@ -477,7 +478,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
   if (pendingSlide === 'prev') baseTranslate = -100;
   return (
     <>
-      <RecommendTitle>추천해요</RecommendTitle>
+      <RecommendTitle>추천해용</RecommendTitle>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}
@@ -821,7 +822,8 @@ function NewSliderSection({ router, getTestFolderName }) {
                           e.target.nextSibling.style.display = 'flex';
                         }}
                         onClick={() => handleTestClick(test)}
-                        style={{ width: '100%', maxWidth: '500px', minWidth: '320px', height: 'auto' }}
+                        style={{ maxHeight: '100%', maxWidth: '100%', height: 'auto' ,width:'auto',
+                          objectFit: 'cover'}}
                         layout="responsive"
                         width={120}
                         height={120}
@@ -835,12 +837,12 @@ function NewSliderSection({ router, getTestFolderName }) {
                         layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
 
                     </TestItemPlaceholder>
+                  </RecommendThumbnailContainer>
                     <RecommendStats>
                       <RecommendStat><RecommendIconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></RecommendIconStat>{test?.views}</RecommendStat>
                       <RecommendStat><RecommendIconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></RecommendIconStat>{test?.likes}</RecommendStat>
                       <RecommendStat><RecommendIconStat><FaComment style={{ marginRight: '3px' }}></FaComment></RecommendIconStat>{typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
                     </RecommendStats>
-                  </RecommendThumbnailContainer>
                 </RecommendCard>
               </RecommendSlide>
             ))}
