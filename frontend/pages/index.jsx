@@ -25,11 +25,26 @@ import {
   SortSelect,
   FilterBarLeft,
   FilterCountBar,
-  TestCount
+  TestCount,
+  ScrollRow,
+  ScrollCard
+
 } from '../components/StyledComponents';
 import Head from 'next/head';
 import Image from 'next/image';
 import { FaThumbsUp, FaPlay, FaUserAlt, FaHeart, FaBriefcase, FaGamepad, FaBrain, FaUsers, FaEllipsisH, FaComment } from 'react-icons/fa';
+
+
+
+const TitleSection = styled.div`
+
+  all: unset; /* 기본 스타일 제거 */
+  position: relative;
+  display: flex;
+  width: 100%;
+  justifyContent: flex-end;
+  margin-bottom:20px;
+`;
 
 // 추천 슬라이드 스타일 컴포넌트
 const RecommendSection = styled.div`
@@ -39,19 +54,21 @@ const RecommendSection = styled.div`
   width:100%;
   aspect-ratio: 5 / 3;
   border-radius: 1px;
-  box-shadow: 0 6px 32px rgba(80,80,120,0.10);
   position: relative;
   padding:0 2vw;
   overflow: hidden;
+  box-shadow: 0 6px 6px -4px rgba(0, 0, 0, 0.29);
 `;
 
 const RecommendTitle = styled.h2`
   position: relative;
   font-size: 1rem;
+  
+  justify-items: center;
+  width:100%;
   color:rgb(0, 0, 0);
-  left:5px;
   font-weight: 600;
-  z-index:1;
+  justifyContent:flex-start;
   margin:0;
 `;
 const RecommendItemImage = styled.img.attrs({ loading: 'lazy' })`
@@ -120,7 +137,7 @@ const RecommendThumbnailContainer = styled.div`
 const RecommendStats = styled.div`
   position: absolute;
   display: flex;
-  gap: 10px;
+  gap: 1px;
   left: 0px;
   font-size: 0.8rem;
   opacity: 0.8;
@@ -132,13 +149,13 @@ const RecommendStats = styled.div`
 `;
 //background: rgba(255, 248, 248, 0.9); 
 const RecommendStat = styled.span`
-  padding:1vw;
+  padding: 8px;
   display: flex;
   color :  rgba(255, 255, 255, 0.9); 
   align-items: center;
   gap: 0.5px;
 `;
-const RecommendIconStat = styled.span`
+const IconStat = styled.span`
   display: flex;
   color :  rgba(255, 255, 255, 0.9); 
   font-size: 0.7rem;
@@ -225,6 +242,20 @@ const SlideProgress = styled.div`
   transition: width 0.5s cubic-bezier(0.45, 0, 0.55, 1);
 `;
 
+const ScrollSection = styled.div`
+  margin: 0px auto 0 auto;
+  border-radius: 3;
+  box-shadow: 0 6px 32px rgba(80,80,120,0.10);
+  padding: 0 0 2px 0;
+  position: relative;
+  min-width: 320px;
+  max-width: 500px;
+  width:100%;
+
+  box-sizing: border-box;
+  box-shadow: none;
+  display:block;
+`;
 
 // 스타일 상수 정의 (공통 사용)
 const CONTAINER_WIDTH = '100%';
@@ -237,7 +268,7 @@ const loadingContainerStyle = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  minHeight: 300
+  minHeight: 700
 };
 // axios 인스턴스 생성
 //'http://localhost:4000/api',
@@ -255,15 +286,20 @@ const getApiBase = () => {
   const timestamp = Date.now();
   return `https://smartpick.website/api?t=${timestamp}`.replace('?t=', '');
 };
+const backgroundColor = '#f0f0f0';
+//const backgroundColor = 'rgb(255, 246, 167)';
+// Section 스타일 상수 (backgroundColor 컨테이너 공통)
+'rgba(255, 208, 0, 0.1)'
 
-// Section 스타일 상수 (흰색 컨테이너 공통)
+
+
+
 const sectionContainerStyle = {
-
   //minWidth: 1200,
   margin: '0px auto 0 auto',
-  background: '#f7f7fa',
+  background: backgroundColor,
   borderRadius: 3,
-  boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
+  //boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
   padding: '0 0 32px 0',
   minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
   position: 'relative',
@@ -271,7 +307,11 @@ const sectionContainerStyle = {
   minWidth: '320px',
   maxWidth: '500px',
   boxSizing: 'border-box',
+  boxShadow: 'none'
 };
+
+
+
 const sectionCenterStyle = {
   ...sectionContainerStyle,
   display: 'flex',
@@ -706,22 +746,22 @@ function NewSliderSection({ router, getTestFolderName }) {
     return (
       <>
         <RecommendSection>
-          
-        {/* RecommendTitle을 왼쪽 정렬 */}
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'flex-start', // 왼쪽 정렬
-            alignItems: 'center',
-            padding: '0 10px', // 좌우 여백 (선택사항)
-          }}
-        >
-          <RecommendTitle>
-            <FaThumbsUp style={{ marginRight: '5px', fontSize: '0.9rem' }} />
-            추천해요
-          </RecommendTitle>
-        </div>
+
+          {/* RecommendTitle을 왼쪽 정렬 */}
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'flex-start', // 왼쪽 정렬
+              alignItems: 'center',
+              padding: '0 10px', // 좌우 여백 (선택사항)
+            }}
+          >
+            <RecommendTitle>
+              <FaThumbsUp style={{ marginRight: '5px', fontSize: '0.9rem' }} />
+              추천해요
+            </RecommendTitle>
+          </div>
           <RecommendSlider>
             <RecommendSlide active={true}>
               <RecommendCard>
@@ -747,43 +787,48 @@ function NewSliderSection({ router, getTestFolderName }) {
 
   return (
     <>
-      <div style={{
-        width: '100%',
-        position: 'relative',
-        display: 'flex',
-        justifyContent: 'flex-end',
 
-      }}>
-
-
-        <PageLink
-          href="/lotto/page"
-          style={{
-            position: 'relative',
-            zIndex: 2
-          }}
-        >Lotto</PageLink>
-
-      </div>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}
       >
         {/* RecommendTitle을 왼쪽 정렬 */}
-        <div
+        <TitleSection
           style={{
             width: '100%',
             display: 'flex',
-            justifyContent: 'flex-start', // 왼쪽 정렬
-            alignItems: 'center',
-            padding: '0 10px', // 좌우 여백 (선택사항)
+            alignItems: 'between-space',
           }}
         >
-          <RecommendTitle>
-            <FaThumbsUp style={{ marginRight: '5px', fontSize: '0.9rem' }} />
+          <RecommendTitle style={{
+            position: 'relative',
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center', //
+            //  👈 추가!
+          }}>
+            <FaThumbsUp style={{ verticalAlign: 'middle' ,marginRight: '5px', fontSize: '0.9rem' }} />
             추천해요
           </RecommendTitle>
-        </div>
+
+          <div style={{
+            width: '100%',
+            position: 'relative',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            justifyItems:'center',
+          }}>
+
+            <PageLink
+              href="/lotto/page"
+              style={{
+                paddingTop:'8px',
+                position: 'relative',
+                alignItems: 'center',
+              }}
+            >Lotto</PageLink>
+          </div>
+        </TitleSection>
         <RecommendSlider
           ref={sliderRef}
           onMouseDown={handleDragStart}
@@ -822,13 +867,17 @@ function NewSliderSection({ router, getTestFolderName }) {
                           e.target.nextSibling.style.display = 'flex';
                         }}
                         onClick={() => handleTestClick(test)}
-                        style={{ maxHeight: '100%', maxWidth: '100%', height: 'auto' ,width:'auto',
-                          objectFit: 'cover'}}
+                        style={{
+                          maxHeight: '100%', maxWidth: '100%', height: 'auto', width: 'auto',
+                          objectFit: 'cover'
+                        }}
                         layout="responsive"
                         width={120}
                         height={120}
                       />
+                      
                     )}
+                    
                     <TestItemPlaceholder
                       style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
                       onClick={() => handleTestClick(test)}
@@ -838,11 +887,11 @@ function NewSliderSection({ router, getTestFolderName }) {
 
                     </TestItemPlaceholder>
                   </RecommendThumbnailContainer>
-                    <RecommendStats>
-                      <RecommendStat><RecommendIconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></RecommendIconStat>{test?.views}</RecommendStat>
-                      <RecommendStat><RecommendIconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></RecommendIconStat>{test?.likes}</RecommendStat>
-                      <RecommendStat><RecommendIconStat><FaComment style={{ marginRight: '3px' }}></FaComment></RecommendIconStat>{typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
-                    </RecommendStats>
+                  <RecommendStats>
+                    <RecommendStat><IconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></IconStat>{test?.views}</RecommendStat>
+                    <RecommendStat><IconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></IconStat>{test?.likes}</RecommendStat>
+                    <RecommendStat><IconStat><FaComment style={{ marginRight: '3px' }}></FaComment></IconStat>{typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
+                  </RecommendStats>
                 </RecommendCard>
               </RecommendSlide>
             ))}
@@ -873,6 +922,79 @@ function NewSliderSection({ router, getTestFolderName }) {
   );
 }
 
+function ShadowedImage({ src, alt }) {
+  const imageContainerRef = useRef(null);
+  const [shadowStyle, setShadowStyle] = useState({});
+
+  const handleImageLoad = async (e) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // 필요 시
+    img.src = e.target.currentSrc; // next/image가 실제 로드한 이미지 경로
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+      let r = 0,
+        g = 0,
+        b = 0;
+      let count = 0;
+
+      for (let i = 0; i < imageData.length; i += 4 * 100) {
+        r += imageData[i];
+        g += imageData[i + 1];
+        b += imageData[i + 2];
+        count++;
+      }
+
+      const avgR = r / count;
+      const avgG = g / count;
+      const avgB = b / count;
+
+      const brightness = (avgR * 299 + avgG * 587 + avgB * 114) / 1000;
+
+      if (brightness > 170) {
+        setShadowStyle({
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+        });
+      } else {
+        setShadowStyle({ boxShadow: 'none' });
+      }
+    };
+  };
+
+  return (
+    <div
+      ref={imageContainerRef}
+      style={{
+        width: '100%',
+        maxWidth: 500,
+        height: 300,
+        position: 'relative',
+        ...shadowStyle,
+        transition: 'box-shadow 0.3s ease',
+      }}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        layout="fill"
+        objectFit="contain"
+        onLoadingComplete={handleImageLoad}
+        style={{
+          objectFit: 'contain',
+        }}
+      />
+    </div>
+  );
+}
 // 리스트 영역 분리 컴포넌트
 function TestListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath, loading }) {
 
@@ -892,11 +1014,11 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
     <Section style={sectionBlockStyle}>
       {loading ? (
         <LoadingWrap style={loadingContainerStyle}>
-          <span style={{ color: '#888', fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
+          <span style={{ fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
         </LoadingWrap>
       ) : searching ? (
         <LoadingWrap style={loadingContainerStyle}>
-          <span style={{ color: '#888', fontSize: '1.1rem' }}>검색 중...</span>
+          <span style={{ fontSize: '1.1rem' }}>검색 중...</span>
         </LoadingWrap>
       ) : showNoResults ? (
         <NoResults>
@@ -941,14 +1063,17 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                           e.target.style.display = 'none';
                           e.target.nextSibling.style.display = 'flex';
                         }}
-                        layout="responsive"
-                        width={120}
-                        height={120}
+                        layout="fill"
+                        style={{
+                          maxHeight: '100%', maxWidth: '100%',
+                          objectFit: 'contain', display: 'block', verticalAlign: 'middle'
+                        }}
+
                       />
                     ) : null}
-                    <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex' }}>
+                    <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex', maxHeight: '360px', maxWidth: '100%', }}>
                       <Image src="/uploads/logo.png" alt="심풀 로고"
-                        layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
+                        layout="fixed" width={50} height={50} style={{ borderRadius:'10px',verticalAlign: 'middle' }} />
 
                     </TestItemPlaceholder>
 
@@ -959,9 +1084,10 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                       </div>
                     )}
                     <TestItemStats>
-                      <Stat>👁️ {test.views}</Stat>
-                      <Stat>❤️ {test.likes}</Stat>
-                      <Stat>💬 {typeof test.comments === 'number' ? test.comments : 0}</Stat>
+                    <Stat><IconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></IconStat>{test?.views}</Stat>
+                    <Stat><IconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></IconStat>{test?.likes}</Stat>
+                    <Stat><IconStat><FaComment style={{ marginRight: '3px' }}></FaComment></IconStat>{typeof test?.comments === 'number' ? test.comments : 0}</Stat>
+             
                     </TestItemStats>
                   </TestThumbnailContainer>
                   <TestContent>
@@ -982,6 +1108,115 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
         </LoadingMore> <blank></blank>
       )}**/}
     </Section>
+  );
+}
+function ScrollListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath, loading }) {
+
+  // 항상 Section/TestCount 구조 유지, Grid는 리스트 있을 때만
+  const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
+
+  // hot/new 계산
+  const now = Date.now();
+  const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const hotIds = sortedTests
+    .slice()
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 10)
+    .map(t => t.id);
+
+  return (
+    <ScrollSection>
+      {loading ? (
+        <LoadingWrap style={loadingContainerStyle}>
+          <span style={{ fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
+        </LoadingWrap>
+      ) : searching ? (
+        <LoadingWrap style={loadingContainerStyle}>
+          <span style={{ fontSize: '1.1rem' }}>검색 중...</span>
+        </LoadingWrap>
+      ) : showNoResults ? (
+        <NoResults>
+          <h3>검색 결과가 없습니다</h3>
+          <p>다른 검색어나 카테고리를 시도해보세요.</p>
+        </NoResults>
+      ) : (
+        <ScrollRow>
+          {sortedTests.map((test) => {
+            const isNew = new Date(test.createdAt).getTime() > weekAgo;
+            const isHot = hotIds.includes(test.id);
+            return (
+              <ScrollCard
+                key={test.id}
+                onClick={() => {
+                  try {
+                    if (!test.id) {
+                      console.error('테스트 ID가 없습니다:', test);
+                      return;
+                    }
+                    let testPath = null;
+                    console.log(test.folder);
+                    let stringTemplate = 'template'
+                    if (/^template\d+$/.test(test.folder)) {
+                      testPath = `/testview/${stringTemplate + test.id}/`;
+                    }
+                    else testPath = `/testview/${getTestFolderName(test.id)}`;
+                    console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
+                    router.push(testPath);
+                  } catch (error) {
+                    console.error('테스트 클릭 에러:', error, '테스트 데이터:', test);
+                  }
+                }}
+              >
+                <ScrollTestCardContent>
+                  <ScrollThumbnailContainer>
+                    {test.thumbnail ? (
+                      <Image
+                        src={getImagePath(test.thumbnail)}
+                        alt={test.title}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                        layout="fill"
+                        style={{
+                          maxHeight: '100%', maxWidth: '100%',
+                          objectFit: 'contain', display: 'block', verticalAlign: 'middle'
+                        }}
+
+                      />
+                    ) : null}
+                    <ScrollTestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex', maxHeight: '360px', maxWidth: '100%', }}>
+                      <Image src="/uploads/logo.png" alt="심풀 로고"
+                        layout="fixed" width={50} height={50} style={{ borderRadius:'10px',verticalAlign: 'middle' }} />
+
+                    </ScrollTestItemPlaceholder>
+
+                    {(isNew || isHot) && (
+                      <div style={{ position: 'absolute', left: '5px', top: '5px', minHeight: 24 }}>
+                        {isNew && <Badge type="new">NEW</Badge>}
+                        {isHot && <Badge type="hot">HOT</Badge>}
+                      </div>
+                    )}
+                    <TestItemStats>
+                    <Stat><IconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></IconStat>{test?.views}</Stat>
+                    <Stat><IconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></IconStat>{test?.likes}</Stat>
+                    <Stat><IconStat><FaComment style={{ marginRight: '3px' }}></FaComment></IconStat>{typeof test?.comments === 'number' ? test.comments : 0}</Stat>
+             
+                    </TestItemStats>
+                  </ScrollThumbnailContainer>
+                  <TestContent>
+                    <TestItemTitle>
+                      {test.title}
+                      <TestItemDesc>{test.description}</TestItemDesc>
+                    </TestItemTitle>
+                  </TestContent>
+                </ScrollTestCardContent>
+              </ScrollCard>
+            );
+          })}
+        </ScrollRow>
+      )}
+    </ScrollSection>
   );
 }
 // 이미지 경로를 올바르게 처리하는 함수
@@ -1432,8 +1667,10 @@ export default function Home() {
           crossOrigin="anonymous"
         />
       </Head>
-      <MainWrap style={{ width: '100%', minWidth: '320px', maxWidth: '500px', minHeight: '100vh',
-         background: 'linear-gradient(135deg, #7f7fd5 1%, #6a5acd 99%)' }}>
+      <MainWrap style={{
+        width: '100%', minWidth: '320px', maxWidth: '500px',
+        background: 'linear-gradient(135deg, #7f7fd5 1%, #6a5acd 99%)'
+      }}>
         <Section style={sectionContainerStyle}>
           {/*
           <div
@@ -1481,12 +1718,7 @@ export default function Home() {
                 router.push('/');
               }}
               style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translateX(-50%)',
                 cursor: 'pointer',
-                zIndex: 2,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8
@@ -1591,7 +1823,7 @@ export default function Home() {
           <CategoryGrid categories={categories} onSelect={setSelectedCategory} />
           {/* 리스트/검색/로딩 영역 */}
           {
-            <TestListSection
+            <ScrollListSection
               searching={searching}
               sortedTests={sortedTests}
               loadingMore={loadingMore}
@@ -1640,12 +1872,23 @@ const NoResults = styled.div`
 const TestCardContent = styled.div`
   display: flex;
   flex-direction: column;  width: 100vw;
-  
   width: 100vw;
   max-width:500px;
   min-width:320px;
   width: 100%;
+  padding: 10px;
   min-height: 120px;
+`;
+
+const ScrollTestCardContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width:100%;
+  min-width:100%;
+  width: 100%;
+  padding: 10px;
+  min-height: 100%;
 `;
 
 
@@ -1654,13 +1897,30 @@ const TestThumbnailContainer = styled.div`
   margin-bottom: 15px;
   width: 100vw;
   max-width:500px;
-  min-width:320px;
-  min-height:120px;
+  min-width:400px;
+  max-height:300px;
+  min-height:240px;
   width: 100%;
   height:100%
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow:hidden;
+`;
+const ScrollThumbnailContainer = styled.div`
+  position: relative;
+  margin-bottom: 15px;
+  width: 100%;
+  max-width:100%;
+  min-width:100%;
+  max-height:100%;
+  min-height:100%;
+  width: 100%;
+  height:100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow:hidden;
 `;
 
 const TestItemPlaceholder = styled.div`
@@ -1683,6 +1943,28 @@ const TestItemPlaceholder = styled.div`
     transform: scale(1.05);
   }
 `;
+
+const ScrollTestItemPlaceholder = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width:100%;
+  min-width:100%;
+  height: 100%;
+  background: linear-gradient(45deg, #667eea, #6a5acd);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: white;
+  transition: transform 0.3s ease;
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
 
 const TestContent = styled.div`
   flex: 1;
@@ -1709,6 +1991,7 @@ const Stat = styled.span`
   display: flex;
   align-items: center;
   gap: 4px;
+  color :  rgba(255, 255, 255, 0.9); 
 `;
 
 const TestItemImage = styled.img.attrs({ loading: 'lazy' })`
@@ -1762,7 +2045,7 @@ const TestItemStats = styled.div`
   padding: 10px 10px 10px 10px;
   border-radius: 2px;
   font-weight:600;
-  background: rgba(255, 248, 248, 0.9); 
+  background: rgba(8, 8, 8, 0.9); 
 `;
 
 // 뱃지 스타일 추가

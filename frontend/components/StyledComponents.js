@@ -12,47 +12,60 @@ export const wiggle = keyframes`
   10% {
     transform: rotate(1deg);
     color: #6a5acd;
+    transform: scale(1.1);
     text-shadow: 0 0 1px rgb(0, 0, 0);
   }
   20% {
     transform: rotate(-1deg);
     color: #6a5acd;
+    transform: scale(1.1);
     text-shadow: 0 0 1px rgb(0, 0, 0);
   }
   30% {
     transform: rotate(1deg);
     color:rgb(40, 34, 77);
+    transform: scale(1.1);
     text-shadow: 0 0 1px rgb(255, 255, 255);
   }
   40% {
     transform: rotate(-1deg);
     color: #6a5acd;
+    transform: scale(1.1);
     text-shadow: 0 0 1px rgb(0, 0, 0);
   }
   50% {
     transform: rotate(0deg);
     color:rgb(55, 43, 131);
+    transform: scale(1.1);
     text-shadow: 0 0 1px rgb(0, 0, 0);
   }
   60% {
     transform: rotate(0deg);
     color: #6a5acd;
+    transform: scale(1.1);
     text-shadow: 0 0 1px rgb(0, 0, 0);
   }
 
   100% {
     transform: rotate(0deg);
     color:rgb(0, 0, 0);
+    transform: scale(1.1);
     text-shadow: 0 3px 7px rgba(39, 37, 37, 0.5);
+  }
+    &:hover {
+    text-shadow: 0 3px 7px rgba(39, 37, 37, 0.5);
+    color: #333;
+    
+    transform: scale(1.1); /* ✅ 크기만 시각적으로 확대 */
+    outline: none;
   }
 `;
 
 
 export const MainWrap = styled.div`
   width: 100vw;
-  minWidth: 320px;
-  maxWidth: 500px;
-  min-height: 100vh;
+  min-width: 320px;
+  max-width: 500px;
 
   background: linear-gradient(135deg, #6a5acd 0%, #6a5acd 100%);
   color: white;
@@ -63,31 +76,28 @@ export const MainWrap = styled.div`
     max-width: 500px;
     min-width: 320px;
     border-radius: 1px;
-    
   }
   @media (max-width: 600px) {
     max-width: 500px;
     min-width: 320x;
     border-radius: 1px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    
-    
   }
-
-
 `;
 
 export const Header = styled.header`
+  all: unset; /* a 기본 스타일 제거 */
   position: relative;
   display: flex;
-  padding: 25px 16px;
+  padding: 0px 16px;
   justify-content: center;
   align-items: center;
   width: 100%;
   min-width: 320px;
   max-width: 500px;
   box-sizing: border-box;
-  margin: 10 auto;
+  
+  //margin: 10 auto;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
@@ -190,8 +200,8 @@ export const PageLink = styled.a`
   color: #333;
   transition: text-shadow 0.3s ease;
   font-weight: bold;
-  padding-right:3vw;
   font-family:'kdg_Medium', sans-serif;
+
   /* 가끔씩 자동으로 흔들리는 효과 */
   animation: ${wiggle} 3s ease-in-out infinite;
   animation-delay: 5s;
@@ -205,7 +215,7 @@ export const PageLink = styled.a`
     text-shadow: 0 3px 7px rgba(39, 37, 37, 0.5);
     color: #333;
     
-    transform: scale(1.5); /* ✅ 크기만 시각적으로 확대 */
+    transform: scale(1.1); /* ✅ 크기만 시각적으로 확대 */
     outline: none;
   }
   &:focus {
@@ -275,6 +285,7 @@ export const SocialButton = styled.button`
 // 그리드 스타일들
 export const Grid = styled.div`
    display: grid;
+  border-radius: 10px;
   grid-template-columns: 1fr;
   justify-content: center;
   justify-items: center;
@@ -282,12 +293,14 @@ export const Grid = styled.div`
   max-width:500px;
   min-width:320px;
   
-  min-height: 120px;
-  margin: 0 auto;
-  grid-row-gap: 5px;
+  margin: 10px auto;
+  grid-row-gap: 10px;
 
   background: rgba(255, 255, 255, 0.1);
   box-sizing: border-box;
+
+  
+
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
     max-width: 500px;
@@ -295,11 +308,24 @@ export const Grid = styled.div`
     padding: 0 2vw;
   }
 `;
+export const ScrollRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  width:100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 8px 0;
+  -webkit-overflow-scrolling: touch;
 
+  &::-webkit-scrollbar {
+    display: none; /* 모바일에서 스크롤바 감춤 */
+  }
+`;
 // 카드 스타일들
 export const Card = styled.div`
    background: rgba(255,255,255,0.1);
-  border-radius: 15px;
+  border-radius: 10px;
   backdrop-filter: blur(10px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.18);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -307,7 +333,6 @@ export const Card = styled.div`
   width: 100vw;
   max-width:500px;
   min-width:320px;
-  min-height: 120px;  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -325,6 +350,20 @@ export const Card = styled.div`
     margin: 0 0 10px 0
   }
 `;
+export const ScrollCard = styled.div`
+   flex: 0 0 40%; // 2.5개 보이려면 (200 * 2.5 ≈ 500px)
+  height: 280px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  scroll-snap-align: start;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+`;
+
 
 export const QuestionCard = styled(Card)`
   padding: 40px;
@@ -423,15 +462,18 @@ export const FlexColumn = styled.div`
 
 // 섹션 스타일들
 export const Section = styled.div`
-  width: 100vw;
+
   minWidth: 320px;
   maxWidth: 500px;
-
+  min-height: 500px;  
+  border-radius: 10px;
   margin: 10px;
   padding: 0 2px 0 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  
+  border-radius: 10px;
   @media (max-width: 600px) {
   max-width: 100vw;
   max-width: 100vw;
