@@ -28,7 +28,7 @@ import {
 import Image from 'next/image';
 import Head from 'next/head';
 
-import MobileTestFrame_ from './iframeTemplate.jsx';
+import MobileTestFrame from './iframeTemplate.jsx';
 
 // axios 인스턴스 생성
 //baseURL: 'http://localhost:4000/api',
@@ -237,7 +237,7 @@ export default function TestPage() {
   // MobileTestFrame에 test, id만 넘김
   if (loading && isTemplateTest) {
     return (
-      <MobileTestFrame_
+      <MobileTestFrame
         id={id}
         test={test}
       />
@@ -245,7 +245,7 @@ export default function TestPage() {
   }
   else if (isTemplateTest) {
     return (
-      <MobileTestFrame_
+      <MobileTestFrame
         id={id}
         test={test}
       />
@@ -257,8 +257,8 @@ export default function TestPage() {
     if (loading) {
       return (
         
-        <MobileTestFrame_><span>테스트를 불러오는 중...</span>
-        </MobileTestFrame_>
+        <MobileTestFrame><span>테스트를 불러오는 중...</span>
+        </MobileTestFrame>
         
       );
     }
@@ -282,12 +282,12 @@ export default function TestPage() {
     if (test.externalUrl) {
       // 외부 링크 테스트
       iframeSection = (
-        <MobileTestFrame_ src={test.externalUrl} test={test} id={test.id}/>
+        <MobileTestFrame src={test.externalUrl} test={test} id={test.id}/>
       );
     } else if (buildExists) {
       // 로컬 빌드 테스트
       iframeSection = (
-        <MobileTestFrame_ src={`https://smartpick.website/tests/test${test.id}/`} test={test} id={test.id}/>
+        <MobileTestFrame src={`https://smartpick.website/tests/test${test.id}/`} test={test} id={test.id}/>
       );
     } else {
       // 빌드 결과 없음

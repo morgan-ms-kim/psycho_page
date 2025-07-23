@@ -845,7 +845,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
     </Section>
   );
 }
-function ScrollListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath, loading }) {
+export function ScrollListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath, loading }) {
 
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
@@ -853,9 +853,6 @@ function ScrollListSection({ searching, sortedTests, loadingMore, error, searchT
   const [wasDragging, setWasDragging] = useState(false);
   const lastClientXRef = useRef(0); // ⭐ 마지막 x 위치 저장
   const scrollRef = useRef(null);
-  // 항상 Section/TestCount 구조 유지, Grid는 리스트 있을 때만
-  const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
-
   // hot/new 계산
   const now = Date.now();
   const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
@@ -1024,7 +1021,7 @@ function ScrollListSection({ searching, sortedTests, loadingMore, error, searchT
   );
 }
 // 이미지 경로를 올바르게 처리하는 함수
-const getImagePath = (path) => {
+export const getImagePath = (path) => {
   if (!path) return null;
   path = `https://smartpick.website${path}`
   return path;
@@ -1834,7 +1831,7 @@ const ScrollInner = styled.div`
 `;
 
 const ScrollCard = styled.div`
-   flex: 0 0 40%; // 2.5개 보이려면 (200 * 2.5 ≈ 500px)
+  flex: 0 0 40%; // 2.5개 보이려면 (200 * 2.5 ≈ 500px)
   height: 280px;
   border: 1px solid #eee;
   border-radius: 3px;
@@ -1945,11 +1942,9 @@ const ScrollBadges = styled.div`
   display: flex;
   align-items: center;
   gap: 0px;
-  
   color :  rgba(255, 255, 255, 0.9); 
   position : absolute;
   left: 0px;
-  top: 1px;
   max-height:14px;  
 `;
 // 뱃지 스타일 추가
@@ -1959,7 +1954,7 @@ const ScrollBadge = styled.span`
   border-radius: 1px;
   font-size: 0.6rem;
   font-weight: bold;
-  color: #fff; ;
+  color: #fff;
   background: ${props => props.type === 'hot' ? '#ff5e5e' : props.type === 'new' ? '#ff9500' : '#4CAF50'};
 `;
 const TestThumbnailContainer = styled.div`

@@ -127,6 +127,7 @@ export const MainWrap = styled.div`
 
 export const Header = styled.header`
   all: unset; /* a 기본 스타일 제거 */
+  margin: 0 0 -20px 0;
   position: relative;
   display: flex;
   justify-content: center;
@@ -985,14 +986,14 @@ export const ButtonWrapper = styled.button`
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  padding: 8px;
+  padding: 0px;
   position: relative;
   width: 40px;
   height: 40px;
   box-shadow : none;
   
   &:hover {
-    background:rgba(122, 77, 228, 0.58);
+    background:rgba(122, 77, 228, 0.07);
     scale:1.2;
     color: #222;
   }
