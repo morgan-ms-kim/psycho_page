@@ -1744,10 +1744,10 @@ export default function Home() {
                 gap: 8
               }}
             >
-              <span style={{ marginRight: -10, marginTop: 5 }}>심</span>
+              <span style={{ marginRight: -10, marginTop: 11 }}>심</span>
               <Image src="/uploads/logo.png" alt="심풀 로고"
                 layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
-              <span style={{ marginLeft: -10, marginTop: 5 }}>풀</span>
+              <span style={{ marginLeft: -10, marginTop: 12 }}>풀</span>
             </Logo>
 
             {/*<HistoryButton onClick={() => router.push('/history')}>

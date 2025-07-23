@@ -1,4 +1,4 @@
-import styled, {keyframes} from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 // 공통 스타일 컴포넌트들
 
@@ -70,8 +70,13 @@ export const MainWrap = styled.div`
   background: linear-gradient(135deg, #6a5acd 0%, #6a5acd 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-family: 'omyu_pretty';
-    font-family: 'Freesentation-9Black';
+  font-weight: 100;
+  font-family: 'omyu_pretty';
+  font-family: 'Freesentation-9Black';
+  font-family: 'Danjo-bold-Regular';
+  font-family: 'Uiyeun';
+  font-family: 'GowunDodum-Regular';
+  font-family: 'NanumSquareRound';
   overflow-y: auto;
 
    @media (max-width: 1200px) {
@@ -85,13 +90,33 @@ export const MainWrap = styled.div`
     border-radius: 1px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
-@font-face {
-    font-family: 'Freesentation-9Black';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-9Black.woff2') format('woff2');
-    font-weight: 900;
+
+    @font-face {
+    font-family: 'NanumSquareRound';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff') format('woff');
+    font-weight: normal;
     font-style: normal;
 }
-  
+
+
+@font-face {
+    font-family: 'GowunDodum-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/GowunDodum-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+     @font-face {
+    font-family: 'Uiyeun';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2105@1.1/Uiyeun.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}  
+  @font-face {
+    font-family: 'Freesentation-9Black';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-9Black.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
  @font-face {
     font-family: 'omyu_pretty';
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');
@@ -537,10 +562,31 @@ export const ProgressText = styled.div`
 
 
 export const Logo = styled.div`
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 200;
   color: #6a5acd;
   text-align:center;
+    font-family: 'Danjo-bold-Regular';
+    font-family: 'GangwonEdu_OTFBoldA';
+  @font-face {
+  font-family: 'Danjo-bold-Regular';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-1@1.1/Danjo-bold-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+    font-family: 'GangwonEdu_OTFBoldA';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OTFBoldA.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+    @font-face {
+    font-family: 'SF_HambakSnow';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2106@1.1/SF_HambakSnow.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
   @font-face {
     font-family: 'kdg_Medium';
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts-20-12@1.0/kdg_Medium.woff') format('woff');
