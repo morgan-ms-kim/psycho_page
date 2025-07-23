@@ -70,6 +70,7 @@ export const MainWrap = styled.div`
   background: linear-gradient(135deg, #6a5acd 0%, #6a5acd 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'omyu_pretty';
   overflow-y: auto;
 
    @media (max-width: 1200px) {
@@ -83,6 +84,14 @@ export const MainWrap = styled.div`
     border-radius: 1px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
+
+  
+ @font-face {
+    font-family: 'omyu_pretty';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
 `;
 
 export const Header = styled.header`
@@ -200,7 +209,6 @@ export const PageLink = styled.a`
   color: #333;
   transition: text-shadow 0.3s ease;
   font-weight: bold;
-  font-family:'kdg_Medium', sans-serif;
 
   /* 가끔씩 자동으로 흔들리는 효과 */
   animation: ${wiggle} 3s ease-in-out infinite;
@@ -527,7 +535,7 @@ export const Logo = styled.div`
   font-weight: 200;
   color: #6a5acd;
   text-align:center;
-  font-family: 'kdg_Medium', sans-serif;
+    font-family: 'omyu_pretty';
   @font-face {
     font-family: 'kdg_Medium';
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts-20-12@1.0/kdg_Medium.woff') format('woff');
@@ -896,7 +904,6 @@ export const CommentTextarea = styled.textarea`
   border-radius: 8px;
   font-size: 1rem;
   min-height: 80px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   @media (max-width: 600px) {
     font-size: 1rem;
     padding: 0.6rem;

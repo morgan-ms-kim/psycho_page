@@ -60,12 +60,19 @@ const RecommendTitle = styled.h2`
   position: relative;
   font-size: 1rem;
   
+    font-family: 'omyu_pretty';
   justify-items: center;
   width:100%;
   color:rgb(0, 0, 0);
   font-weight: 600;
   justifyContent:flex-start;
   margin:0;
+ @font-face {
+    font-family: 'omyu_pretty';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
 `;
 const RecommendItemImage = styled.img.attrs({ loading: 'lazy' })`
   max-width: 100%;
@@ -802,48 +809,48 @@ function NewSliderSection({ router, getTestFolderName }) {
 
   return (
     <>
- {/* RecommendTitle을 왼쪽 정렬 */}
- <TitleSection
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'between-space',
-          }}
-        >
-          <RecommendTitle style={{
-            position: 'relative',
-            display: 'flex',
-            justifyContent: 'flex-start',
-            alignItems: 'center', 
-            padding: '10px',
-          }}>
-            <FaThumbsUp style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
-            추천해요
-          </RecommendTitle>
+      {/* RecommendTitle을 왼쪽 정렬 */}
+      <TitleSection
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'between-space',
+        }}
+      >
+        <RecommendTitle style={{
+          position: 'relative',
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          padding: '10px',
+        }}>
+          <FaThumbsUp style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
+          추천해요
+        </RecommendTitle>
 
-          <div style={{
-            width: '100%',
-            position: 'relative',
-            display: 'flex',
-            justifyContent: 'flex-end',
-            justifyItems: 'center',
-          }}>
+        <div style={{
+          width: '100%',
+          position: 'relative',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          justifyItems: 'center',
+        }}>
 
-            <PageLink
-              href="/lotto/page"
-              style={{
-                padding: '10px',
-                position: 'relative',
-                alignItems: 'center',
-              }}
-            >Lotto</PageLink>
-          </div>
-        </TitleSection>
+          <PageLink
+            href="/lotto/page"
+            style={{
+              padding: '10px',
+              position: 'relative',
+              alignItems: 'center',
+            }}
+          >Lotto</PageLink>
+        </div>
+      </TitleSection>
       <RecommendSection
         onMouseEnter={() => !isDragging && setIsHovered(true)}
         onMouseLeave={() => !isDragging && setIsHovered(false)}
       >
-       
+
         <RecommendSlider
           ref={sliderRef}
           onMouseDown={handleDragStart}
@@ -1222,14 +1229,14 @@ function ScrollListSection({ searching, sortedTests, loadingMore, error, searchT
                     <ScrollItemTitle>
                       {test.title}
                     </ScrollItemTitle>
-                      <ScrollItemDesc>{test.description}</ScrollItemDesc>
+                    <ScrollItemDesc>{test.description}</ScrollItemDesc>
                   </ScrollContent>
                 </ScrollTestCardContent>
               </ScrollCard>
             );
           })}
-       
-       </ScrollInner></ScrollRow>
+
+        </ScrollInner></ScrollRow>
       )}
     </ScrollSection>
   );
