@@ -26,8 +26,6 @@ import {
   FilterBarLeft,
   FilterCountBar,
   TestCount,
-  ScrollRow,
-  ScrollCard
 
 } from '../components/StyledComponents';
 import Head from 'next/head';
@@ -37,13 +35,12 @@ import { FaThumbsUp, FaPlay, FaUserAlt, FaHeart, FaBriefcase, FaGamepad, FaBrain
 
 
 const TitleSection = styled.div`
-
+  
   all: unset; /* 기본 스타일 제거 */
   position: relative;
   display: flex;
   width: 100%;
   justifyContent: flex-end;
-  margin-bottom:20px;
 `;
 
 // 추천 슬라이드 스타일 컴포넌트
@@ -57,7 +54,6 @@ const RecommendSection = styled.div`
   position: relative;
   padding:0 2vw;
   overflow: hidden;
-  box-shadow: 0 6px 6px -4px rgba(0, 0, 0, 0.29);
 `;
 
 const RecommendTitle = styled.h2`
@@ -87,7 +83,7 @@ const RecommendSlider = styled.div`
   position: relative;
   border-radius: 5px;
   width: 100%;
-  height: 85%;
+  height: 100%;
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
@@ -97,6 +93,9 @@ const RecommendSlider = styled.div`
   /* 드래그 이동을 transform으로 처리 (실시간 반영) */
   transform: translateX(${props => props.dragOffsetX}px);
   transition: ${props => (props.isDragging ? 'none' : 'transform 0.5s ease')};
+
+  
+
 `;
 
 const RecommendSlide = styled.div`
@@ -109,6 +108,17 @@ const RecommendSlide = styled.div`
   align-items: center;
   pointer-events: auto;
   z-index: ${props => (props.style?.zIndex ? props.style.zIndex : 11)};
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 100%;
+    box-shadow: 5px 0px 10px 2px rgba(0, 0, 0, 0.51);
+    pointer-events: none;
+    z-index: 10;
+  }
 `;
 const RecommendCard = styled.div`
   border-radius: 15px;
@@ -119,9 +129,22 @@ const RecommendCard = styled.div`
   cursor: pointer;
   transition: transform 0.3s ease;
   pointer-events: auto;
+  
   &:hover {
     transform: scale(1.05);
   }
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 100%;
+    box-shadow: 0px 5px 10px 2px rgba(0, 0, 0, 0.51);
+    pointer-events: none;
+    
+  }
+
 `;
 
 const RecommendThumbnailContainer = styled.div`
@@ -131,7 +154,6 @@ const RecommendThumbnailContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow:hidden;
 `;
 
 const RecommendStats = styled.div`
@@ -159,6 +181,13 @@ const IconStat = styled.span`
   display: flex;
   color :  rgba(255, 255, 255, 0.9); 
   font-size: 0.7rem;
+  align-items: center;
+  gap: 0.5px;
+`;
+const ScrollIconStat = styled.span`
+  display: flex;
+  color :  rgba(255, 255, 255, 0.9); 
+  font-size: 0.5rem;
   align-items: center;
   gap: 0.5px;
 `;
@@ -242,20 +271,6 @@ const SlideProgress = styled.div`
   transition: width 0.5s cubic-bezier(0.45, 0, 0.55, 1);
 `;
 
-const ScrollSection = styled.div`
-  margin: 0px auto 0 auto;
-  border-radius: 3;
-  box-shadow: 0 6px 32px rgba(80,80,120,0.10);
-  padding: 0 0 2px 0;
-  position: relative;
-  min-width: 320px;
-  max-width: 500px;
-  width:100%;
-
-  box-sizing: border-box;
-  box-shadow: none;
-  display:block;
-`;
 
 // 스타일 상수 정의 (공통 사용)
 const CONTAINER_WIDTH = '100%';
@@ -566,7 +581,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
                           e.target.style.display = 'none';
                           e.target.nextSibling.style.display = 'flex';
                         }}
-
+                        style={{ boxShadow: '6px 6px 6px 6px rgb(0, 0, 0)', overflow: 'visible' }}
                         layout="responsive"
                         width={120}
                         height={120}
@@ -787,13 +802,8 @@ function NewSliderSection({ router, getTestFolderName }) {
 
   return (
     <>
-
-      <RecommendSection
-        onMouseEnter={() => !isDragging && setIsHovered(true)}
-        onMouseLeave={() => !isDragging && setIsHovered(false)}
-      >
-        {/* RecommendTitle을 왼쪽 정렬 */}
-        <TitleSection
+ {/* RecommendTitle을 왼쪽 정렬 */}
+ <TitleSection
           style={{
             width: '100%',
             display: 'flex',
@@ -804,10 +814,10 @@ function NewSliderSection({ router, getTestFolderName }) {
             position: 'relative',
             display: 'flex',
             justifyContent: 'flex-start',
-            alignItems: 'center', //
-            //  👈 추가!
+            alignItems: 'center', 
+            padding: '10px',
           }}>
-            <FaThumbsUp style={{ verticalAlign: 'middle' ,marginRight: '5px', fontSize: '0.9rem' }} />
+            <FaThumbsUp style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
             추천해요
           </RecommendTitle>
 
@@ -816,19 +826,24 @@ function NewSliderSection({ router, getTestFolderName }) {
             position: 'relative',
             display: 'flex',
             justifyContent: 'flex-end',
-            justifyItems:'center',
+            justifyItems: 'center',
           }}>
 
             <PageLink
               href="/lotto/page"
               style={{
-                paddingTop:'8px',
+                padding: '10px',
                 position: 'relative',
                 alignItems: 'center',
               }}
             >Lotto</PageLink>
           </div>
         </TitleSection>
+      <RecommendSection
+        onMouseEnter={() => !isDragging && setIsHovered(true)}
+        onMouseLeave={() => !isDragging && setIsHovered(false)}
+      >
+       
         <RecommendSlider
           ref={sliderRef}
           onMouseDown={handleDragStart}
@@ -875,9 +890,9 @@ function NewSliderSection({ router, getTestFolderName }) {
                         width={120}
                         height={120}
                       />
-                      
+
                     )}
-                    
+
                     <TestItemPlaceholder
                       style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
                       onClick={() => handleTestClick(test)}
@@ -1073,7 +1088,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                     ) : null}
                     <TestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex', maxHeight: '360px', maxWidth: '100%', }}>
                       <Image src="/uploads/logo.png" alt="심풀 로고"
-                        layout="fixed" width={50} height={50} style={{ borderRadius:'10px',verticalAlign: 'middle' }} />
+                        layout="fixed" width={50} height={50} style={{ borderRadius: '10px', verticalAlign: 'middle' }} />
 
                     </TestItemPlaceholder>
 
@@ -1084,10 +1099,10 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                       </div>
                     )}
                     <TestItemStats>
-                    <Stat><IconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></IconStat>{test?.views}</Stat>
-                    <Stat><IconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></IconStat>{test?.likes}</Stat>
-                    <Stat><IconStat><FaComment style={{ marginRight: '3px' }}></FaComment></IconStat>{typeof test?.comments === 'number' ? test.comments : 0}</Stat>
-             
+                      <Stat><IconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></IconStat>{test?.views}</Stat>
+                      <Stat><IconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></IconStat>{test?.likes}</Stat>
+                      <Stat><IconStat><FaComment style={{ marginRight: '3px' }}></FaComment></IconStat>{typeof test?.comments === 'number' ? test.comments : 0}</Stat>
+
                     </TestItemStats>
                   </TestThumbnailContainer>
                   <TestContent>
@@ -1140,7 +1155,8 @@ function ScrollListSection({ searching, sortedTests, loadingMore, error, searchT
           <p>다른 검색어나 카테고리를 시도해보세요.</p>
         </NoResults>
       ) : (
-        <ScrollRow>
+        <ScrollRow><ScrollInner>
+
           {sortedTests.map((test) => {
             const isNew = new Date(test.createdAt).getTime() > weekAgo;
             const isHot = hotIds.includes(test.id);
@@ -1187,34 +1203,33 @@ function ScrollListSection({ searching, sortedTests, loadingMore, error, searchT
                     ) : null}
                     <ScrollTestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex', maxHeight: '360px', maxWidth: '100%', }}>
                       <Image src="/uploads/logo.png" alt="심풀 로고"
-                        layout="fixed" width={50} height={50} style={{ borderRadius:'10px',verticalAlign: 'middle' }} />
+                        layout="fixed" width={50} height={50} style={{ borderRadius: '10px', verticalAlign: 'middle' }} />
 
                     </ScrollTestItemPlaceholder>
 
                     {(isNew || isHot) && (
-                      <div style={{ position: 'absolute', left: '5px', top: '5px', minHeight: 24 }}>
-                        {isNew && <Badge type="new">NEW</Badge>}
-                        {isHot && <Badge type="hot">HOT</Badge>}
-                      </div>
+                      <ScrollBadges>
+                        {isNew && <ScrollBadge type="new">NEW</ScrollBadge>}
+                        {isHot && <ScrollBadge type="hot">HOT</ScrollBadge>}
+                      </ScrollBadges>
                     )}
-                    <TestItemStats>
-                    <Stat><IconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></IconStat>{test?.views}</Stat>
-                    <Stat><IconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></IconStat>{test?.likes}</Stat>
-                    <Stat><IconStat><FaComment style={{ marginRight: '3px' }}></FaComment></IconStat>{typeof test?.comments === 'number' ? test.comments : 0}</Stat>
-             
-                    </TestItemStats>
+                    <ScrollItemStats>
+                      <ScrollStat><ScrollIconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></ScrollIconStat>{test?.views}</ScrollStat>
+                      <ScrollStat><ScrollIconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></ScrollIconStat>{test?.likes}</ScrollStat>
+                    </ScrollItemStats>
                   </ScrollThumbnailContainer>
-                  <TestContent>
-                    <TestItemTitle>
+                  <ScrollContent>
+                    <ScrollItemTitle>
                       {test.title}
-                      <TestItemDesc>{test.description}</TestItemDesc>
-                    </TestItemTitle>
-                  </TestContent>
+                    </ScrollItemTitle>
+                      <ScrollItemDesc>{test.description}</ScrollItemDesc>
+                  </ScrollContent>
                 </ScrollTestCardContent>
               </ScrollCard>
             );
           })}
-        </ScrollRow>
+       
+       </ScrollInner></ScrollRow>
       )}
     </ScrollSection>
   );
@@ -1668,7 +1683,6 @@ export default function Home() {
         />
       </Head>
       <MainWrap style={{
-        width: '100%', minWidth: '320px', maxWidth: '500px',
         background: 'linear-gradient(135deg, #7f7fd5 1%, #6a5acd 99%)'
       }}>
         <Section style={sectionContainerStyle}>
@@ -1819,8 +1833,6 @@ export default function Home() {
             router={router}
             getTestFolderName={getTestFolderName}
           />
-          {/* 카테고리 버튼 바 */}
-          <CategoryGrid categories={categories} onSelect={setSelectedCategory} />
           {/* 리스트/검색/로딩 영역 */}
           {
             <ScrollListSection
@@ -1838,9 +1850,11 @@ export default function Home() {
             />
           }
 
+          {/* 카테고리 버튼 바 */}
+          <CategoryGrid categories={categories} onSelect={setSelectedCategory} />
           {/* 푸터 */}
           <Footer>
-            <p>© Smartpick.website - 재미있는 심리테스트 모음</p>
+            <p>© 심풀 - 재미있는 심리테스트 모음</p>
           </Footer>
         </Section>
       </MainWrap>
@@ -1880,6 +1894,64 @@ const TestCardContent = styled.div`
   min-height: 120px;
 `;
 
+const ScrollSection = styled.div`
+  margin: 0px auto 0 auto;
+  border-radius: 3;
+  box-shadow: 0 6px 32px rgba(80,80,120,0.10);
+  padding: 0 0 2px 0;
+  position: relative;
+  min-width: 320px;
+  max-width: 500px;
+  width:100%;
+
+  box-sizing: border-box;
+  box-shadow: none;
+  display:block;
+`;
+const ScrollRow = styled.div`
+  display: flex;
+  
+  flex-direction: row;
+  gap: 12px;
+  width:100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 8px 0 0 2vw;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none; /* 모바일에서 스크롤바 감춤 */
+  }
+`;
+
+const ScrollInner = styled.div`
+ display: flex;
+  
+  flex-direction: row;
+  gap: 12px;
+  width:100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none; /* 모바일에서 스크롤바 감춤 */
+  }
+`;
+
+const ScrollCard = styled.div`
+   flex: 0 0 40%; // 2.5개 보이려면 (200 * 2.5 ≈ 500px)
+  height: 280px;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  scroll-snap-align: start;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+`;
 const ScrollTestCardContent = styled.div`
   display: flex;
   flex-direction: column;
@@ -1887,11 +1959,114 @@ const ScrollTestCardContent = styled.div`
   max-width:100%;
   min-width:100%;
   width: 100%;
-  padding: 10px;
   min-height: 100%;
 `;
 
 
+const ScrollThumbnailContainer = styled.div`
+  position: relative;
+  margin-bottom: 0;
+  width: 100%;
+  max-width:100%;
+  min-width:100%;
+  max-height:70%;
+  min-height:70%;
+  width: 100%;
+  height:100%;
+  display: block;
+  align-items: center;
+  justify-content: center;
+  overflow:hidden;
+  display: block;
+`;
+
+const ScrollContent = styled.div`
+  padding:5px 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+const ScrollItemTitle = styled.h3`
+  font-size: 0.9rem;
+  margin: 0 0 0 0;
+  line-height: 1.3;
+  font-weight: 600;
+  text-align: left; /* 자식 내부는 왼쪽 정렬 */
+`;
+const ScrollItemDesc = styled.p`
+  font-size: 0.7rem;
+  margin: 5px 0 0 0;
+  opacity: 0.8;
+  line-height: 1.4;
+  flex: 1;
+  text-align: left; /* 자식 내부는 왼쪽 정렬 */
+`;
+
+const ScrollTestItemPlaceholder = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width:100%;
+  min-width:100%;
+  height: 100%;
+  background: linear-gradient(45deg, #667eea, #6a5acd);
+  border-radius: 3px;
+  display: block;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: white;
+  transition: transform 0.3s ease;
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+const ScrollStat = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color :  rgba(255, 255, 255, 0.9); 
+`;
+const ScrollItemStats = styled.div`
+  position: absolute;
+  
+  left: 0px;
+  display: flex;
+  gap: 6px;
+  font-size: 0.8rem;
+  opacity: 0.7;
+  width:30px
+  font-size: 0.8rem;
+  opacity: 0.8;
+  bottom: 0px;
+  padding: 3px 7px 3px 7px;
+  border-radius: 2px;
+  font-weight:600;
+  background: rgba(8, 8, 8, 0.9); 
+`;
+const ScrollBadges = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0px;
+  color :  rgba(255, 255, 255, 0.9); 
+  position : absolute;
+  left: 0px;
+  top: 0px;
+  max-height:14px;  
+`;
+// 뱃지 스타일 추가
+const ScrollBadge = styled.span`
+  display: inline-block;
+  padding: 3px 3px 3px 3px;
+  border-radius: 1px;
+  font-size: 0.6rem;
+  font-weight: bold;
+  color: #fff; ;
+  background: ${props => props.type === 'hot' ? '#ff5e5e' : props.type === 'new' ? '#ff9500' : '#4CAF50'};
+`;
 const TestThumbnailContainer = styled.div`
   position: relative;
   margin-bottom: 15px;
@@ -1902,21 +2077,6 @@ const TestThumbnailContainer = styled.div`
   min-height:240px;
   width: 100%;
   height:100%
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow:hidden;
-`;
-const ScrollThumbnailContainer = styled.div`
-  position: relative;
-  margin-bottom: 15px;
-  width: 100%;
-  max-width:100%;
-  min-width:100%;
-  max-height:100%;
-  min-height:100%;
-  width: 100%;
-  height:100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1943,28 +2103,6 @@ const TestItemPlaceholder = styled.div`
     transform: scale(1.05);
   }
 `;
-
-const ScrollTestItemPlaceholder = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  max-width:100%;
-  min-width:100%;
-  height: 100%;
-  background: linear-gradient(45deg, #667eea, #6a5acd);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  color: white;
-  transition: transform 0.3s ease;
-  &:hover {
-    transform: scale(1.05);
-  }
-`;
-
 
 const TestContent = styled.div`
   flex: 1;
@@ -1993,7 +2131,6 @@ const Stat = styled.span`
   gap: 4px;
   color :  rgba(255, 255, 255, 0.9); 
 `;
-
 const TestItemImage = styled.img.attrs({ loading: 'lazy' })`
   width: 100%;
   height: auto;

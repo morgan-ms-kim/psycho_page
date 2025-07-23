@@ -66,7 +66,7 @@ export const MainWrap = styled.div`
   width: 100vw;
   min-width: 320px;
   max-width: 500px;
-
+  overflow:block;
   background: linear-gradient(135deg, #6a5acd 0%, #6a5acd 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -89,7 +89,7 @@ export const Header = styled.header`
   all: unset; /* a 기본 스타일 제거 */
   position: relative;
   display: flex;
-  padding: 0px 16px;
+  padding: 10px 16px;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -308,20 +308,8 @@ export const Grid = styled.div`
     padding: 0 2vw;
   }
 `;
-export const ScrollRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  width:100%;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 8px 0;
-  -webkit-overflow-scrolling: touch;
 
-  &::-webkit-scrollbar {
-    display: none; /* 모바일에서 스크롤바 감춤 */
-  }
-`;
+
 // 카드 스타일들
 export const Card = styled.div`
    background: rgba(255,255,255,0.1);
@@ -349,19 +337,6 @@ export const Card = styled.div`
   max-width: 100vw;
     margin: 0 0 10px 0
   }
-`;
-export const ScrollCard = styled.div`
-   flex: 0 0 40%; // 2.5개 보이려면 (200 * 2.5 ≈ 500px)
-  height: 280px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  background: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  scroll-snap-align: start;
-  overflow: hidden;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
 `;
 
 
