@@ -129,7 +129,6 @@ export const Header = styled.header`
   all: unset; /* a 기본 스타일 제거 */
   position: relative;
   display: flex;
-  padding: 10px 16px;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -137,7 +136,6 @@ export const Header = styled.header`
   max-width: 500px;
   box-sizing: border-box;
   
-  //margin: 10 auto;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
@@ -212,10 +210,11 @@ export const ErrorMessage = styled.div`
 
 export const Footer = styled.footer`
   text-align: center;
-  padding: 1rem;
+  padding: 15px;
+  width: 80%;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid rgba(56, 10, 10, 0.34);
 `;
 
 // 버튼 스타일들
@@ -491,7 +490,6 @@ export const Section = styled.div`
   @media (max-width: 600px) {
   max-width: 100vw;
   max-width: 100vw;
-    padding: 0 2vw;
     margin-bottom: 16px;
   }
 `;

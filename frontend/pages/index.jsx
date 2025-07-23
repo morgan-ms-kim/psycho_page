@@ -324,7 +324,7 @@ const sectionContainerStyle = {
   background: backgroundColor,
   borderRadius: 3,
   //boxShadow: '0 6px 32px rgba(80,80,120,0.10)',
-  padding: '0 0 32px 0',
+  padding: '0 0 10px 0',
   minHeight: 'calc(100vh - 32px)', // 기존보다 더 크게, 화면을 아래까지 채움
   position: 'relative',
   // 모바일 중앙정렬 보정  width: 100vw;
