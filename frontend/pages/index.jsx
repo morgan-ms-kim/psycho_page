@@ -30,7 +30,10 @@ import {
 } from '../components/StyledComponents';
 import Head from 'next/head';
 import Image from 'next/image';
-import { FaThumbsUp, FaPlay, FaUserAlt, FaHeart, FaBriefcase, FaGamepad, FaBrain, FaUsers, FaEllipsisH, FaComment } from 'react-icons/fa';
+import { FaThumbsUp, FaPlay, FaUserAlt, 
+  FaHeart, FaBriefcase, FaGamepad,
+   FaBrain, FaUsers, FaEllipsisH,
+    FaComment, FaFire, FaStar, FaHandSparkles } from 'react-icons/fa';
 
 
 
@@ -52,14 +55,14 @@ const RecommendSection = styled.div`
   aspect-ratio: 5 / 3;
   border-radius: 1px;
   position: relative;
-  padding:0 2vw;
+  padding:20px 2vw;
   overflow: hidden;
 `;
 
-const RecommendTitle = styled.h2`
+const Title = styled.h2`
   position: relative;
   font-size: 1rem;
-  
+  padding: 10px 2vw;
   justify-items: center;
   width:100%;
   color:rgb(0, 0, 0);
@@ -193,7 +196,7 @@ const IconStat = styled.span`
 const ScrollIconStat = styled.span`
   display: flex;
   color :  rgba(255, 255, 255, 0.9); 
-  font-size: 0.5rem;
+  font-size: 0.6rem;
   align-items: center;
   gap: 0.5px;
 `;
@@ -493,10 +496,10 @@ function RecommendSliderSection({ router, getTestFolderName }) {
               padding: '0 10px', // 좌우 여백 (선택사항)
             }}
           >
-            <RecommendTitle>
+            <Title>
               <FaThumbsUp style={{ marginRight: '5px', fontSize: '0.9rem' }} />
               추천해요
-            </RecommendTitle>
+            </Title>
           </div>
           <RecommendSlider>
             <RecommendSlide active={true}>
@@ -531,16 +534,16 @@ function RecommendSliderSection({ router, getTestFolderName }) {
           alignItems: 'between-space',
         }}
       >
-        <RecommendTitle style={{
+        <Title style={{
           position: 'relative',
           display: 'flex',
           justifyContent: 'flex-start',
           alignItems: 'center',
-          padding: '10px  2vw',
+          padding: '0 2vw',
         }}>
           <FaThumbsUp style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
           추천해요
-        </RecommendTitle>
+        </Title>
 
         <div style={{
           width: '100%',
@@ -553,7 +556,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
           <PageLink
             href="/lotto/page"
             style={{
-              padding: '10px 2vw',
+              padding: '0 2vw',
               position: 'relative',
               alignItems: 'center',
             }}
@@ -624,7 +627,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
                     </TestItemPlaceholder>
                   </RecommendThumbnailContainer>
                   <RecommendStats>
-                    <RecommendStat><IconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></IconStat>{test?.views}</RecommendStat>
+                    <RecommendStat><IconStat><FaPlay style={{ marginRight: '3px' , fontSize: '0.6rem' }}></FaPlay></IconStat>{test?.views}</RecommendStat>
                     <RecommendStat><IconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></IconStat>{test?.likes}</RecommendStat>
                     <RecommendStat><IconStat><FaComment style={{ marginRight: '3px' }}></FaComment></IconStat>{typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
                   </RecommendStats>
@@ -816,7 +819,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                       </div>
                     )}
                     <TestItemStats>
-                      <Stat><IconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></IconStat>{test?.views}</Stat>
+                      <Stat><IconStat><FaPlay style={{ marginRight: '3px', fontSize: '0.6rem' }}></FaPlay></IconStat>{test?.views}</Stat>
                       <Stat><IconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></IconStat>{test?.likes}</Stat>
                       <Stat><IconStat><FaComment style={{ marginRight: '3px' }}></FaComment></IconStat>{typeof test?.comments === 'number' ? test.comments : 0}</Stat>
 
@@ -932,20 +935,7 @@ function ScrollListSection({ searching, sortedTests, loadingMore, error, searchT
 
   return (
     <ScrollSection>
-      {loading ? (
-        <LoadingWrap style={loadingContainerStyle}>
-          <span style={{ fontSize: '1.1rem' }}>테스트를 불러오는 중...</span>
-        </LoadingWrap>
-      ) : searching ? (
-        <LoadingWrap style={loadingContainerStyle}>
-          <span style={{ fontSize: '1.1rem' }}>검색 중...</span>
-        </LoadingWrap>
-      ) : showNoResults ? (
-        <NoResults>
-          <h3>검색 결과가 없습니다</h3>
-          <p>다른 검색어나 카테고리를 시도해보세요.</p>
-        </NoResults>
-      ) : (
+      {(
         <ScrollRow>
           <ScrollInner  ref={scrollRef}
         onMouseDown={handleDragStart}
@@ -1013,7 +1003,7 @@ function ScrollListSection({ searching, sortedTests, loadingMore, error, searchT
                       </ScrollBadges>
                     )}
                     <ScrollItemStats>
-                      <ScrollStat><ScrollIconStat><FaPlay style={{ marginRight: '3px' }}></FaPlay></ScrollIconStat>{test?.views}</ScrollStat>
+                      <ScrollStat><ScrollIconStat><FaPlay style={{ marginRight: '3px' , fontSize: '0.5rem' }}></FaPlay></ScrollIconStat>{test?.views}</ScrollStat>
                       <ScrollStat><ScrollIconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></ScrollIconStat>{test?.likes}</ScrollStat>
                     </ScrollItemStats>
                   </ScrollThumbnailContainer>
@@ -1143,18 +1133,8 @@ export default function Home() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [apiStatus, setApiStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
+  const [fixedTests, setFixedTests] = useState([]);
   const router = useRouter();
-  // URL 경로 정규화 - 중복 test 제거
-  useEffect(() => {
-    const currentPath = router.asPath;
-    if (currentPath.includes('/tests/testtest')) {
-      const normalizedPath = currentPath.replace('/tests/testtest', '/tests/test');
-      console.log('URL 정규화:', currentPath, '->', normalizedPath);
-      router.replace(normalizedPath);
-    }
-  }, [router.asPath, router]);
-
-
 
   // 테스트 ID를 폴더명으로 변환하는 함수
   const getTestFolderName = (testId) => {
@@ -1175,6 +1155,7 @@ export default function Home() {
       loadCategories()
     ]);
     loadTests();
+    loadFixedTests();
     apiClient.post('/visitors', { page: 'index', userAgent: navigator.userAgent });
   }, []);
 
@@ -1364,7 +1345,68 @@ export default function Home() {
     }
   };
 
+  // 테스트 데이터 로드
+  const loadFixedTests = async (reset = false) => {
+    try {
+      // iframe 내부에서 실행 중인지 확인 - 완전 차단
+      if (window.self !== window.top) {
+        console.log('iframe 내부에서 실행 중 - 모든 API 호출 차단');
+        setLoading(false);
+        setLoadingMore(false);
+        return;
+      }
 
+      if (reset) {
+        setLoading(true);
+        // 검색 시에는 에러 상태를 초기화하지 않음 (페이지 새로고침 방지)
+        // setError(null);
+      } else {
+        setLoadingMore(true);
+      }
+
+      const params = new URLSearchParams({
+        page: reset ? 1 : page,
+        offset: offset,
+        sort: sort,
+      });
+
+      // 타임아웃 설정 (5초)
+      const response = await apiClient.get('/tests', {
+        params: params
+      });
+
+      // 테스트 데이터 검증 및 로깅
+      console.log('받은 테스트 데이터:', response.data);
+      const validatedTests = response.data.map(test => {
+        console.log('테스트 ID 타입:', typeof test.id, '값:', test.id);
+        return {
+          ...test,
+          id: String(test.id) // ID를 문자열로 확실히 변환
+        };
+      });
+
+      if (reset || searchTerm && searchTerm.trim()) {
+        setFixedTests(validatedTests);
+      } else {
+        // 중복 제거 로직 추가
+        setFixedTests(prev => {
+          const existingIds = new Set(prev.map(test => test.id));
+          const newTests = validatedTests.filter(test => !existingIds.has(test.id));
+          return [...prev, ...newTests];
+        });
+      }
+
+      setHasMore(response.data.length === 10);
+      setLoading(false);
+      setLoadingMore(false);
+    } catch (error) {
+      console.error('테스트 데이터 로드 실패:', error);
+      setError('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      setLoading(false);
+      setLoadingMore(false);
+
+    }
+  };
 
 
   // 더 많은 테스트 로드 (무한 스크롤)
@@ -1443,6 +1485,24 @@ export default function Home() {
     if (sort === 'likes') return b.likes - a.likes;
     if (sort === 'popular') return (b.views + b.likes) - (a.views + a.likes);
     return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+  const popularTests = [...fixedTests].sort((a, b) => {
+    console.log('pop');
+    const local_sort = 'views';
+    if (local_sort === 'views') return b.views - a.views;
+    if (local_sort === 'likes') return b.likes - a.likes;
+    if (local_sort === 'popular') return (b.views + b.likes) - (a.views + a.likes);
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
+  const latestTests = [...fixedTests].sort((a, b) => {
+    console.log('latest');
+    const local_sort = 'latest';
+    if (local_sort === 'views') return b.views - a.views;
+    if (local_sort === 'likes') return b.likes - a.likes;
+    if (local_sort === 'popular') return (b.views + b.likes) - (a.views + a.likes);
+    if (local_sort === 'latest') return new Date(b.createdAt) - new Date(a.createdAt);
+    return new Date(b.createdAt) - new Date(a.createdAt);//최신
   });
 
   const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
@@ -1614,6 +1674,7 @@ export default function Home() {
               <button onClick={() => {
                 setError(null);
                 loadTests(true);
+                loadFixedTests(true);
                 loadVisitorStats();
                 loadCategories();
               }}>🔄 다시 시도</button>
@@ -1626,24 +1687,61 @@ export default function Home() {
             getTestFolderName={getTestFolderName}
           />
           {/* 리스트/검색/로딩 영역 */}
+          {/*인기 테스트 영역*/}
           {
+            <>
+            <Title style={{
+              position: 'relative',
+              display: 'flex',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+            }}>
+              <FaStar style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
+              인기 테스트
+            </Title>
+            {console.log("pop:",popularTests)}
             <ScrollListSection
-              searching={searching}
-              sortedTests={sortedTests}
+              searching={searching}              
+              sortedTests={popularTests}
               loadingMore={loadingMore}
               error={error}
-              searchTerm={searchTerm}
-              selectedCategory={selectedCategory}
               loadMore={loadMore}
               getTestFolderName={getTestFolderName}
               router={router}
               getImagePath={getImagePath}
               loading={loading}
-            />
+            /></>
           }
 
+          {/*최신 테스트 영역*/}
+          {
+            <>
+            <Title style={{
+              position: 'relative',
+              display: 'flex',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+            }}>
+              <FaFire  style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
+              최신 테스트
+            </Title>
+            {console.log("latests:",latestTests)}
+            <ScrollListSection
+              searching={searching}              
+              sortedTests={latestTests}
+              loadingMore={loadingMore}
+              error={error}
+              loadMore={loadMore}
+              getTestFolderName={getTestFolderName}
+              router={router}
+              getImagePath={getImagePath}
+              loading={loading}
+            /></>
+          }
+
+
           {/* 카테고리 버튼 바 */}
-          <CategoryGrid categories={categories} onSelect={setSelectedCategory} />
+          {/*<CategoryGrid categories={categories} onSelect={setSelectedCategory} />*/}
           {/* 푸터 */}
           <Footer>
             <p>© 심풀 - 재미있는 심리테스트 모음</p>
@@ -1690,7 +1788,7 @@ const ScrollSection = styled.div`
   margin: 0px auto 0 auto;
   border-radius: 3;
   box-shadow: 0 6px 32px rgba(80,80,120,0.10);
-  padding: 0 0 2px 0;
+  padding: 0 0 20px 0;
   position: relative;
   min-width: 320px;
   max-width: 500px;
@@ -1721,7 +1819,7 @@ const ScrollInner = styled.div`
   
   flex-direction: row;
   gap: 12px;
-  width: max-content; /* 핵심 */
+  width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   //scroll-behavior: smooth;
@@ -1830,6 +1928,7 @@ const ScrollItemStats = styled.div`
   position: absolute;
   
   left: 0px;
+  bottom: 0px;
   display: flex;
   gap: 6px;
   font-size: 0.8rem;
@@ -1837,7 +1936,6 @@ const ScrollItemStats = styled.div`
   width:30px
   font-size: 0.8rem;
   opacity: 0.8;
-  bottom: 0px;
   padding: 3px 7px 3px 7px;
   border-radius: 2px;
   font-weight:600;
@@ -1847,16 +1945,17 @@ const ScrollBadges = styled.div`
   display: flex;
   align-items: center;
   gap: 0px;
+  
   color :  rgba(255, 255, 255, 0.9); 
   position : absolute;
   left: 0px;
-  top: 0px;
+  top: 1px;
   max-height:14px;  
 `;
 // 뱃지 스타일 추가
 const ScrollBadge = styled.span`
   display: inline-block;
-  padding: 3px 3px 3px 3px;
+  padding: 2px 3px;
   border-radius: 1px;
   font-size: 0.6rem;
   font-weight: bold;
