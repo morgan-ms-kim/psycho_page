@@ -205,8 +205,8 @@ const SlidePageText = styled.div`
   right : 1vw;
   font-size: 0.9rem;
   font-weight: bold;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 4px 8px;
+  background: rgba(8, 8, 8, 0.78); 
+  padding: 5px 10px;
   border-radius: 12px;
   z-index: 50;
   color: #333;
@@ -344,298 +344,9 @@ const sectionBlockStyle = {
   display: 'block',
 };
 
-// 추천 슬라이드 컴포넌트
+
+// 추천 슬라이더 컴포넌트
 function RecommendSliderSection({ router, getTestFolderName }) {
-  const [recommendTests, setRecommendTests] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const [isHovered, setIsHovered] = useState(false);
-  const [dragStartX, setDragStartX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [dragOffsetX, setDragOffsetX] = useState(0);
-  const [pendingSlide, setPendingSlide] = useState(null); // 'next' | 'prev' | null
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [lastInteractionTime, setLastInteractionTime] = useState(Date.now()); // 자동 슬라이드 타이머 초기화용
-
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e) => handleDragging(e);
-    const handleMouseUp = (e) => handleDragEnd(e);
-    const handleTouchMove = (e) => handleDragging(e);
-    const handleTouchEnd = (e) => handleDragEnd(e);
-
-    // 전역 이벤트 리스너 추가
-    document.addEventListener('mousemove', handleMouseMove, { passive: false });
-    document.addEventListener('mouseup', handleMouseUp, { passive: false });
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd, { passive: false });
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove, { passive: false });
-      document.removeEventListener('mouseup', handleMouseUp, { passive: false });
-      document.removeEventListener('touchmove', handleTouchMove, { passive: false });
-      document.removeEventListener('touchend', handleTouchEnd, { passive: false });
-    };
-  }, [isDragging, dragStartX, dragOffsetX]);
-
-  const handleDragStart = (e) => {
-    e.preventDefault(); // 기본 동작 방지
-    const x = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-    setDragStartX(x);
-    setIsDragging(true);
-    setLastInteractionTime(Date.now()); // 드래그 시작 시 타이머 초기화
-  };
-
-  const sliderRef = useRef(null);
-  const handleDragging = (e) => {
-    if (!isDragging) return;
-    e.preventDefault(); // 기본 동작 방지
-    const x = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-    let offset = x - dragStartX;
-    const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
-    // clamp
-    if (offset > slideWidth) offset = slideWidth;
-    if (offset < -slideWidth) offset = -slideWidth;
-    setDragOffsetX(offset);
-  };
-
-  const handleDragEnd = (e) => {
-    if (!isDragging) return;
-    e.preventDefault(); // 기본 동작 방지
-
-    const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
-    const threshold = slideWidth / 4;
-
-    if (dragOffsetX < -threshold) {
-      // 다음 슬라이드로 이동
-      setPendingSlide('next');
-      setIsTransitioning(true);
-      setDragOffsetX(-slideWidth);
-    } else if (dragOffsetX > threshold) {
-      // 이전 슬라이드로 이동
-      setPendingSlide('prev');
-      setIsTransitioning(true);
-      setDragOffsetX(slideWidth);
-    } else {
-      // 원래 위치로 복귀
-      setPendingSlide(null);
-      setIsTransitioning(true);
-      setDragOffsetX(0);
-    }
-
-    setIsDragging(false);
-    setLastInteractionTime(Date.now()); // 드래그 종료 시 타이머 초기화
-  };
-
-  const handleTransitionEnd = () => {
-    if (pendingSlide === 'next') {
-      setCurrentSlide((prev) => (prev + 1) % recommendTests.length);
-    } else if (pendingSlide === 'prev') {
-      setCurrentSlide((prev) => (prev - 1 + recommendTests.length) % recommendTests.length);
-    }
-    setPendingSlide(null);
-    setIsTransitioning(false);
-    setDragOffsetX(0);
-  };
-
-  useEffect(() => {
-    const loadRecommendTests = async () => {
-      try {
-        setLoading(true);
-        const response = await apiClient.get('/recommends');
-        if (response.data && response.data.length > 0) {
-          setRecommendTests(response.data);
-        }
-      } catch (error) {
-        console.error('추천 테스트 로딩 실패:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadRecommendTests();
-  }, []);
-
-  useEffect(() => {
-    if (isHovered || isDragging || isTransitioning) return;
-
-    const timer = setInterval(() => {
-      setPendingSlide('next');
-      setIsTransitioning(true);
-      if (sliderRef.current) {
-        setDragOffsetX(-sliderRef.current.offsetWidth);
-      }
-    }, 3000);
-
-    return () => clearInterval(timer);
-  }, [isHovered, isDragging, isTransitioning, recommendTests.length, lastInteractionTime]); // lastInteractionTime 추가
-
-  const handleSlideClick = (index) => {
-    console.log('카드 클릭', test);
-    setCurrentSlide(index);
-    setLastInteractionTime(Date.now()); // 클릭 시 타이머 초기화
-  };
-
-  const handleTestClick = (test) => {
-    console.log('추천 테스트 클릭:', testPath, '원본 ID:', test.id);
-    try {
-      if (!test.id) {
-        console.error('테스트 ID가 없습니다:', test);
-        return;
-      }
-      let testPath = null;
-      let stringTemplate = 'template';
-      if (/^template\d+$/.test(test.folder)) {
-        testPath = `/testview/${stringTemplate + test.id}/`;
-      } else {
-        testPath = `/testview/${getTestFolderName(test.id)}`;
-      }
-      console.log('추천 테스트 클릭:', testPath, '원본 ID:', test.id);
-      router.push(testPath);
-    } catch (error) {
-      console.error('추천 테스트 클릭 에러:', error, '테스트 데이터:', test);
-    }
-  };
-
-  if (loading) {
-    return (
-      <>
-        <RecommendTitle></RecommendTitle>
-        <RecommendSection>
-          <RecommendSlider>
-            <RecommendSlide active={true}>
-              <RecommendCard>
-                <RecommendTitleText>추천 테스트를 불러오는 중...</RecommendTitleText>
-              </RecommendCard>
-            </RecommendSlide>
-          </RecommendSlider>
-        </RecommendSection>
-      </>
-    );
-  }
-
-  if (recommendTests.length === 0) {
-    return null;
-  }
-
-  // 캐러셀용 인덱스 계산 (recommendTests 3개 미만 예외처리)
-  const total = recommendTests.length;
-
-  // 애니메이션 중에는 currentSlide를 고정, 완료 후에만 업데이트
-  const displaySlide = isTransitioning ? currentSlide : currentSlide;
-  const prevIndex = (displaySlide - 1 + total) % total;
-  const nextIndex = (displaySlide + 1) % total;
-
-  const visibleSlides = [
-    recommendTests[prevIndex],
-    recommendTests[displaySlide],
-    recommendTests[nextIndex],
-  ];
-  // 트랙 transform
-  let baseTranslate = -100;
-  if (pendingSlide === 'next') baseTranslate = -100;
-  if (pendingSlide === 'prev') baseTranslate = -100;
-  return (
-    <>
-      <RecommendTitle>추천해용</RecommendTitle>
-      <RecommendSection
-        onMouseEnter={() => !isDragging && setIsHovered(true)}
-        onMouseLeave={() => !isDragging && setIsHovered(false)}
-      >
-        <RecommendSlider
-          ref={sliderRef}
-          onMouseDown={handleDragStart}
-          onTouchStart={handleDragStart}
-        >
-
-          <div
-            style={{
-              display: 'flex',
-              width: '100%',
-              height: '100%',
-              transform: `translateX(calc(${baseTranslate}% + ${dragOffsetX}px))`,
-              transition: isDragging || !isTransitioning ? 'none' : 'transform 0.5s cubic-bezier(.4,0,.2,1)',
-            }}
-
-            onTransitionEnd={handleTransitionEnd}
-          >
-            {visibleSlides.map((test, idx) => (
-              <RecommendSlide
-                key={test?.id || idx}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  flex: '0 0 100%',
-                  position: 'relative',
-                  zIndex: idx === 1 ? 12 : 11,
-                }}
-              >
-                <RecommendCard>
-                  <RecommendThumbnailContainer >
-
-                    {test?.thumbnail && (
-                      <Image
-                        src={getImagePath(test.thumbnail)}
-                        alt={test.title}
-                        onClick={() => handleTestClick(test)}
-                        draggable={false}
-                        onContextMenu={e => e.preventDefault()}
-                        onTouchStart={e => e.preventDefault()}
-                        onError={e => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                        style={{ boxShadow: '6px 6px 6px 6px rgb(0, 0, 0)', overflow: 'visible' }}
-                        layout="responsive"
-                        width={120}
-                        height={120}
-
-                      />
-                    )}
-                    <TestItemPlaceholder
-                      style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
-                      onClick={() => handleTestClick(test)}
-                    >
-                      <Image src="/uploads/logo.png" alt="심풀 로고"
-                        layout="fixed" width={50} height={50} style={{ verticalAlign: 'middle' }} />
-                    </TestItemPlaceholder>
-                    <RecommendStats>
-                      <RecommendStat>👁️ {test?.views}</RecommendStat>
-                      <RecommendStat>❤️ {test?.likes}</RecommendStat>
-                      <RecommendStat>💬 {typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
-                    </RecommendStats>
-                  </RecommendThumbnailContainer>
-                </RecommendCard>
-              </RecommendSlide>
-            ))}
-          </div>
-        </RecommendSlider>
-        {recommendTests.length > 1 && (
-          <>
-            <SlidePageText>
-              <CurrentPage>{currentSlide + 1}</CurrentPage>
-              <TotalPages>/{recommendTests.length}</TotalPages>
-            </SlidePageText>
-            <SlideDots >
-              {recommendTests.map((_, index) => (
-                <SlideDot
-                  key={index}
-                  active={index === currentSlide}
-                  onClick={() => handleSlideClick(index)}
-                />
-              ))}
-            </SlideDots>
-          </>
-        )}
-      </RecommendSection>
-    </>
-  );
-}
-
-// 새로운 슬라이더 컴포넌트
-function NewSliderSection({ router, getTestFolderName }) {
   const [recommendTests, setRecommendTests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -725,7 +436,7 @@ function NewSliderSection({ router, getTestFolderName }) {
     e.preventDefault();
 
     const slideWidth = sliderRef.current ? sliderRef.current.offsetWidth : 0;
-    const threshold = slideWidth / 3; // 33% 이상 드래그해야 이동
+    const threshold = slideWidth / 4; // 25% 이상 드래그해야 이동
 
     if (dragOffsetX < -threshold) {
       // 다음 슬라이드로 이동
@@ -733,7 +444,11 @@ function NewSliderSection({ router, getTestFolderName }) {
     } else if (dragOffsetX > threshold) {
       // 이전 슬라이드로 이동
       setCurrentSlide((prev) => (prev - 1 + recommendTests.length) % recommendTests.length);
+    }else if (dragOffsetX === 0) {
+      // 테스트로 이동
+      handleTestClick(recommendTests[currentSlide]);
     }
+
 
     setIsDragging(false);
     setDragOffsetX(0);
@@ -821,7 +536,7 @@ function NewSliderSection({ router, getTestFolderName }) {
           display: 'flex',
           justifyContent: 'flex-start',
           alignItems: 'center',
-          padding: '10px',
+          padding: '10px  2vw',
         }}>
           <FaThumbsUp style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
           추천해요
@@ -838,7 +553,7 @@ function NewSliderSection({ router, getTestFolderName }) {
           <PageLink
             href="/lotto/page"
             style={{
-              padding: '10px',
+              padding: '10px 2vw',
               position: 'relative',
               alignItems: 'center',
             }}
@@ -881,8 +596,8 @@ function NewSliderSection({ router, getTestFolderName }) {
                         src={getImagePath(test.thumbnail)}
                         alt={test.title}
                         draggable={false}
-                        onContextMenu={e => e.preventDefault()}
-                        onTouchStart={e => e.preventDefault()}
+                        onContextMenu={handleDragStart}
+                        onTouchStart={handleDragStart}
                         onError={e => {
                           e.target.style.display = 'none';
                           e.target.nextSibling.style.display = 'flex';
@@ -1062,11 +777,7 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
                     }
                     let testPath = null;
                     console.log(test.folder);
-                    let stringTemplate = 'template'
-                    if (/^template\d+$/.test(test.folder)) {
-                      testPath = `/testview/${stringTemplate + test.id}/`;
-                    }
-                    else testPath = `/testview/${getTestFolderName(test.id)}`;
+                    testPath = `/testview/${getTestFolderName(test.id)}`;
                     console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
                     router.push(testPath);
                   } catch (error) {
@@ -1133,6 +844,12 @@ function TestListSection({ searching, sortedTests, loadingMore, error, searchTer
 }
 function ScrollListSection({ searching, sortedTests, loadingMore, error, searchTerm, selectedCategory, loadMore, getTestFolderName, router, getImagePath, loading }) {
 
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragOffsetX, setDragOffsetX] = useState(0);
+  const [wasDragging, setWasDragging] = useState(false);
+  const lastClientXRef = useRef(0); // ⭐ 마지막 x 위치 저장
+  const scrollRef = useRef(null);
   // 항상 Section/TestCount 구조 유지, Grid는 리스트 있을 때만
   const showNoResults = !searching && !loading && sortedTests.length === 0 && (searchTerm || selectedCategory);
 
@@ -1144,6 +861,74 @@ function ScrollListSection({ searching, sortedTests, loadingMore, error, searchT
     .sort((a, b) => b.views - a.views)
     .slice(0, 10)
     .map(t => t.id);
+
+  
+  // 전역 마우스 이벤트
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e) => handleDragging(e);
+    const handleMouseUp = (e) => handleDragEnd(e);
+    const handleTouchMove = (e) => handleDragging(e);
+    const handleTouchEnd = (e) => handleDragEnd(e);
+
+    document.addEventListener('mousemove', handleMouseMove, { passive: false });
+    document.addEventListener('mouseup', handleMouseUp, { passive: false });
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove, { passive: false });
+      document.removeEventListener('mouseup', handleMouseUp, { passive: false });
+      document.removeEventListener('touchmove', handleTouchMove, { passive: false });
+      document.removeEventListener('touchend', handleTouchEnd, { passive: false });
+    };
+  }, [isDragging, dragStartX, dragOffsetX]);
+
+  const handleDragStart = (e) => {
+    
+    console.log('handleDragStart',e);
+    const x = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+    setDragStartX(x);
+    lastClientXRef.current = x; // 초기값 설정
+    setIsDragging(true);
+    if (e.type === 'touchstart') {
+      e.preventDefault();
+    }
+  };
+
+  const handleDragging = (e) => {
+    if (!isDragging || !scrollRef.current) return;
+  
+  // 모바일에서만 preventDefault
+  if (e.type === 'touchmove') {
+    e.preventDefault();
+  }
+  
+    console.log('handleDragging',e);
+    console.log('scrollRef.current.scrollLeft', scrollRef.current.scrollLeft)
+    console.log('scrollWidth:', scrollRef.current.scrollWidth);
+    console.log('clientWidth:', scrollRef.current.clientWidth);
+    const x = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+    const offset = x - lastClientXRef.current;
+  
+    scrollRef.current.scrollLeft -= offset;
+  
+    if (Math.abs(offset) > 5) { // 5px 이상 움직이면 드래그로 인식
+      setWasDragging(true);
+    }
+    lastClientXRef.current = x; 
+    setDragStartX(x); // ✅ 기준점 업데이트해서 부드럽게 이동
+  };
+
+  const handleDragEnd = (e) => {
+    console.log('handleDragEnd',e);
+    setIsDragging(false);
+      
+    // 100ms 후 드래그 상태 초기화 (클릭과 시간 겹치지 않도록)
+    setTimeout(() => setWasDragging(false), 100);
+
+  };
 
   return (
     <ScrollSection>
@@ -1161,8 +946,14 @@ function ScrollListSection({ searching, sortedTests, loadingMore, error, searchT
           <p>다른 검색어나 카테고리를 시도해보세요.</p>
         </NoResults>
       ) : (
-        <ScrollRow><ScrollInner>
-
+        <ScrollRow>
+          <ScrollInner  ref={scrollRef}
+        onMouseDown={handleDragStart}
+        onMouseUp={handleDragEnd}
+        onTouchStart={handleDragStart}
+        onTouchEnd={handleDragEnd}
+        onContextMenu={(e) => e.preventDefault()} 
+        >
           {sortedTests.map((test) => {
             const isNew = new Date(test.createdAt).getTime() > weekAgo;
             const isHot = hotIds.includes(test.id);
@@ -1171,17 +962,16 @@ function ScrollListSection({ searching, sortedTests, loadingMore, error, searchT
                 key={test.id}
                 onClick={() => {
                   try {
+                    if (wasDragging){
+                      return; //drag중 클릭 방지
+                    }
                     if (!test.id) {
                       console.error('테스트 ID가 없습니다:', test);
                       return;
                     }
                     let testPath = null;
                     console.log(test.folder);
-                    let stringTemplate = 'template'
-                    if (/^template\d+$/.test(test.folder)) {
-                      testPath = `/testview/${stringTemplate + test.id}/`;
-                    }
-                    else testPath = `/testview/${getTestFolderName(test.id)}`;
+                    testPath = `/testview/${getTestFolderName(test.id)}`;
                     console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
                     router.push(testPath);
                   } catch (error) {
@@ -1195,6 +985,9 @@ function ScrollListSection({ searching, sortedTests, loadingMore, error, searchT
                       <Image
                         src={getImagePath(test.thumbnail)}
                         alt={test.title}
+                        draggable={false}
+                        onContextMenu={handleDragStart}
+                        onTouchStart={handleDragStart}
                         onError={(e) => {
                           e.target.style.display = 'none';
                           e.target.nextSibling.style.display = 'flex';
@@ -1828,14 +1621,7 @@ export default function Home() {
           )}
 
           {/* 추천 슬라이드 */}
-          {/* <RecommendSliderSection 
-            router={router}
-            getTestFolderName={getTestFolderName}
-          />
-         */}
-
-          {/* 새로운 슬라이더 */}
-          <NewSliderSection
+          <RecommendSliderSection
             router={router}
             getTestFolderName={getTestFolderName}
           />
@@ -1935,9 +1721,13 @@ const ScrollInner = styled.div`
   
   flex-direction: row;
   gap: 12px;
-  width:100%;
+  width: max-content; /* 핵심 */
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
+  overflow-y: hidden;
+  //scroll-behavior: smooth;
+  cursor: grab;
+  //scroll-snap-type: x mandatory;
+  user-select: none; // ✅ 텍스트 선택 방지
   -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
