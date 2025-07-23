@@ -71,6 +71,7 @@ export const MainWrap = styled.div`
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-family: 'omyu_pretty';
+    font-family: 'Freesentation-9Black';
   overflow-y: auto;
 
    @media (max-width: 1200px) {
@@ -84,7 +85,12 @@ export const MainWrap = styled.div`
     border-radius: 1px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
-
+@font-face {
+    font-family: 'Freesentation-9Black';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-9Black.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+}
   
  @font-face {
     font-family: 'omyu_pretty';
@@ -535,7 +541,6 @@ export const Logo = styled.div`
   font-weight: 200;
   color: #6a5acd;
   text-align:center;
-    font-family: 'omyu_pretty';
   @font-face {
     font-family: 'kdg_Medium';
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts-20-12@1.0/kdg_Medium.woff') format('woff');

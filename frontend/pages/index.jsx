@@ -60,7 +60,6 @@ const RecommendTitle = styled.h2`
   position: relative;
   font-size: 1rem;
   
-    font-family: 'omyu_pretty';
   justify-items: center;
   width:100%;
   color:rgb(0, 0, 0);
