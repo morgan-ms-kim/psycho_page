@@ -1746,7 +1746,7 @@ export default function Home() {
             >
               <span style={{ marginRight: -10, marginTop: 11 }}>심</span>
               <Image src="/uploads/logo.png" alt="심풀 로고"
-                layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
+                layout="fixed" width={32} height={32} style={{ verticalAlign: 'middle' }} />
               <span style={{ marginLeft: -10, marginTop: 12 }}>풀</span>
             </Logo>
 
