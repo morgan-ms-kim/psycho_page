@@ -177,7 +177,7 @@ const RecommendStats = styled.div`
   bottom: 0px;
   border-radius: 5px;
   font-weight:600;
-  background: rgba(8, 8, 8, 0.9); 
+  background: rgba(8, 8, 8, 0.49); 
   
 `;
 //background: rgba(255, 248, 248, 0.9); 
@@ -206,11 +206,11 @@ const ScrollIconStat = styled.span`
 
 const SlidePageText = styled.div`
   position: absolute;
-  bottom: 1vw;  
-  right : 1vw;
+  bottom: 0.5vw;  
+  right : 0.5vw;
   font-size: 0.9rem;
   font-weight: bold;
-  background: rgba(8, 8, 8, 0.78); 
+  background: rgba(8, 8, 8, 0.49); 
   padding: 5px 10px;
   border-radius: 12px;
   z-index: 50;
@@ -1937,7 +1937,7 @@ const ScrollItemStats = styled.div`
   padding: 3px 7px 3px 7px;
   border-radius: 2px;
   font-weight:600;
-  background: rgba(8, 8, 8, 0.9); 
+  background: rgba(8, 8, 8, 0.49); 
 `;
 const ScrollBadges = styled.div`
   display: flex;
