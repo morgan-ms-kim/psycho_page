@@ -415,6 +415,8 @@ export default function IframeTemplate({ src, test, ...props }) {
     bottom: 90px;
     transform: translateX(-50%) scale(${({ open }) => (open ? 1 : 0.7)});
     opacity: ${({ open }) => (open ? 1 : 0)};
+    
+    height: ${({ open }) => (open ? 'none' : 0)};
     transition: all 0.25s cubic-bezier(.4,0,.2,1);
     background: #fff;
     border-radius: 24px;
