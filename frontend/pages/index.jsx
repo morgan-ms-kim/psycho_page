@@ -109,6 +109,8 @@ const RecommendSlider = styled.div`
 
 const RecommendSlide = styled.div`
   position: relative;
+  max-width:500px;
+  min-width:320px;
   width: 100%;
   height: 100%;
   display: flex;
@@ -310,7 +312,7 @@ const getApiBase = () => {
   const timestamp = Date.now();
   return `https://smartpick.website/api?t=${timestamp}`.replace('?t=', '');
 };
-const backgroundColor = '#f0f0f0';
+const backgroundColor = '#fdfdfd';
 //const backgroundColor = 'rgb(255, 246, 167)';
 // Section 스타일 상수 (backgroundColor 컨테이너 공통)
 'rgba(255, 208, 0, 0.1)'
@@ -1785,7 +1787,7 @@ const ScrollSection = styled.div`
   margin: 0px auto 0 auto;
   border-radius: 3;
   box-shadow: 0 6px 32px rgba(80,80,120,0.10);
-  padding: 0 0 20px 0;
+  padding: 0 0 30px 0;
   position: relative;
   min-width: 320px;
   max-width: 500px;

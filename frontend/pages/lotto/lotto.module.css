@@ -63,20 +63,18 @@
 
 .circle {
   display: inline-block;
-  width: 4vw;
-  height: 4vw;
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: 50%;
   text-align: center;
-  line-height: 24px;
-  
-  line-height: 4vw; /* 글자를 중앙에 오도록 */
-  font-size: 1.5vw;  /* 폰트도 너비에 비례 */
+  line-height: 1.5rem; /* 글자를 중앙에 오도록 */
+  font-size: 1rem;  /* 폰트도 너비에 비례 */
   color: white;
   font-weight: 500;
   margin-right: 6px;
   box-shadow:  0px 0px 2px rgba(0, 0, 0, 1); 
   text-shadow: 0px 0px 2px rgba(0, 0, 0, 1); 
-  
+  margin:1px; 
 }
 
 .ball_645 {display:inline-block; border-radius:100%; text-align:center; vertical-align:middle; color:#fff; font-weight:500; /* text-shadow: 0px 0px 2px rgba(0, 0, 0, 1); */}

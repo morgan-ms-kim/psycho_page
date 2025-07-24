@@ -10,7 +10,7 @@ import { SiKakaotalk } from 'react-icons/si';
 import Head from 'next/head';
 import Image from 'next/image';
 import Div100vh from 'react-div-100vh';
-import { ScrollListSection, getImagePath } from '../index.jsx';
+import { ScrollListSection, getImagePath } from '../index';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Logo,
@@ -51,8 +51,7 @@ const TopBar = styled.div`
   margin: 0 auto;
   display: flex;
   background: #6a5acd ;
-  background: linear-gradient(135deg, #6a5acd, #7f7fd5, #b3aaff);
-  align-items: center;
+  background: linear-gradient(45deg,rgb(156, 145, 252) , #7f7fd5, #6a5acd);
   justify-content: flex-start;
   padding: 12px 16px 0 16px;
   position: fixed;
@@ -69,7 +68,8 @@ const BottomBar = styled.div`
   position: fixed;
   bottom: 0;
   background: #6a5acd;
-  background: linear-gradient(45deg,rgb(156, 145, 252) , #7f7fd5, #6a5acd);
+  background: linear-gradient(135deg, #6a5acd, #7f7fd5, #b3aaff);
+  align-items: center;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -137,6 +137,7 @@ const ModalSheet = styled.div`
   max-width: 500px;
   height: ${({ open }) => (open ? '60vh' : '0')};
   background: #6a5acd;
+  background: linear-gradient(45deg,rgb(156, 145, 252) , #7f7fd5, #6a5acd);
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
   transition: height 0.3s cubic-bezier(.4,0,.2,1);
@@ -816,7 +817,7 @@ export default function IframeTemplate({ src, test, ...props }) {
         </ModalHeader>
         <ModalBody>
           <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 8 }}>{test?.title || '테스트'}</div>
-          <div style={{ color: '#888', marginBottom: 16 }}>{test?.description || '테스트 설명'}</div>
+          <div style={{ color: '#111111', marginBottom: 16 }}>{test?.description || '테스트 설명'}</div>
           {/* 추천 테스트 카드 리스트 */}
           
           <ScrollListSection       

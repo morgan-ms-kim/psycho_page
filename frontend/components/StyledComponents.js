@@ -63,10 +63,9 @@ export const wiggle = keyframes`
 
 
 export const MainWrap = styled.div`
-  width: 100vw;
+  width: 100%;
   min-width: 320px;
   max-width: 500px;
-  overflow:block;
   background: linear-gradient(135deg, #6a5acd 0%, #6a5acd 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -78,6 +77,7 @@ export const MainWrap = styled.div`
   font-family: 'GowunDodum-Regular';
   font-family: 'NanumSquareRound';
   overflow-y: auto;
+  overflow-x: hidden;
 
    @media (max-width: 1200px) {
     max-width: 500px;
@@ -86,7 +86,7 @@ export const MainWrap = styled.div`
   }
   @media (max-width: 600px) {
     max-width: 500px;
-    min-width: 320x;
+    min-width: 320px;
     border-radius: 1px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
@@ -211,8 +211,9 @@ export const ErrorMessage = styled.div`
 
 export const Footer = styled.footer`
   text-align: center;
-  padding: 15px;
-  width: 80%;
+  margin-top:20px;
+  padding: 5px;
+  width: 95%;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(56, 10, 10, 0.34);
