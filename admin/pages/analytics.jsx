@@ -86,6 +86,25 @@ const validateAndFixPath = (path, router) => {
 
 const Line = dynamic(() => import('react-chartjs-2').then(mod => mod.Line), { ssr: false });
 
+// period에 따라 날짜 범위 계산 함수 추가
+function getDateRange(period) {
+  const now = new Date();
+  let startDate;
+  if (period === 'day') {
+    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  } else if (period === 'week') {
+    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+  } else if (period === 'month') {
+    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29);
+  } else {
+    startDate = new Date(2000, 0, 1); // 전체 기간 등 예외처리
+  }
+  // YYYY-MM-DD 형식으로 변환
+  const pad = n => n.toString().padStart(2, '0');
+  const format = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return { start: format(startDate), end: format(now) };
+}
+
 export default function Analytics() {
   const router = useRouter();
   const [period, setPeriod] = useState('day');
@@ -114,10 +133,12 @@ export default function Analytics() {
 
   // 방문자 상세 리스트 로드
   useEffect(() => {
+    const { start, end } = getDateRange(period);
     const fetchVisitors = async () => {
       try {
         setVisitorLoading(true);
-        const res = await apiClient.get('/admin/visitors?page=1&limit=50');
+        let url = `/admin/visitors?start=${start}&end=${end}`;
+        const res = await apiClient.get(url);
         setVisitorList(res.data.visitors || []);
       } catch (e) {
         setVisitorList([]);
@@ -126,7 +147,7 @@ export default function Analytics() {
       }
     };
     fetchVisitors();
-  }, []);
+  }, [period]);
 
   const loadAnalytics = async (customStart, customEnd) => {
     try {

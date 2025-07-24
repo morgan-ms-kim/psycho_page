@@ -983,8 +983,7 @@ export const CommentSubmitButton = styled.button`
 `;
 
 export const ButtonWrapper = styled.button`
-  background: none;
-  border: none;
+  all:unset;  
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0px;
@@ -992,11 +991,11 @@ export const ButtonWrapper = styled.button`
   width: 40px;
   height: 40px;
   box-shadow : none;
-  
+  color:#fff;
   &:hover {
-    background:rgba(122, 77, 228, 0.07);
     scale:1.2;
-    color: #222;
+    color: #fff;
+    background:none;
   }
 `;
 
@@ -1006,8 +1005,6 @@ export const HeartWrapper = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 30px;
-  height: 30px;
   
   align-items: center;
   justify-content: center;

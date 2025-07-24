@@ -312,7 +312,7 @@ const getApiBase = () => {
   const timestamp = Date.now();
   return `https://smartpick.website/api?t=${timestamp}`.replace('?t=', '');
 };
-const backgroundColor = '#fdfdfd';
+const backgroundColor = '#fafafa';
 //const backgroundColor = 'rgb(255, 246, 167)';
 // Section 스타일 상수 (backgroundColor 컨테이너 공통)
 'rgba(255, 208, 0, 0.1)'
@@ -494,8 +494,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
               width: '100%',
               display: 'flex',
               justifyContent: 'flex-start', // 왼쪽 정렬
-              alignItems: 'center',
-              padding: '0 10px', // 좌우 여백 (선택사항)
+              padding: '0 2vw', // 좌우 여백 (선택사항)
             }}
           >
             <Title>
@@ -1833,7 +1832,7 @@ const ScrollInner = styled.div`
 `;
 
 const ScrollCard = styled.div`
-  flex: 0 0 40%; // 2.5개 보이려면 (200 * 2.5 ≈ 500px)
+  flex: 0 0 40%; // 100% 나누기 x개 2.5=40%, 1.5= 70%
   height: 280px;
   border: 1px solid #eee;
   border-radius: 3px;

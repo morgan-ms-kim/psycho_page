@@ -4,7 +4,10 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaFacebook, FaTwitterSquare, FaLink } from 'react-icons/fa';
+import {
+  FaFacebook, FaTwitterSquare, FaLink, FaComment,
+  FaShareSquare, FaInfo, FaInfoCircle, FaThumbsUp, FaChevronDown, FaAngleDown
+} from 'react-icons/fa';
 import { SiKakaotalk } from 'react-icons/si';
 
 import Head from 'next/head';
@@ -163,6 +166,9 @@ const ModalBody = styled.div`
   flex: 1;
   overflow-y: auto;
   padding: 16px;
+  background: linear-gradient(135deg, #7f7fd5 1%,rgb(255, 255, 255) 99%);
+  background: #fff;
+  background: #fafafa;
 `;
 
 const CommentInputRow = styled.div`
@@ -189,6 +195,7 @@ const CommentInput = styled.input`
 `;
 
 const CommentButton = styled.button`
+  all:unset;
   padding: 8px 12px;
   border-radius: 8px;
   background: #6c63ff;
@@ -196,6 +203,13 @@ const CommentButton = styled.button`
   border: none;
   font-weight: 500;
   cursor: pointer;
+  
+  &:hover {
+    
+    color:rgb(162, 158, 245);
+    background:rgb(211, 209, 250);
+  color: #6c63ff;
+  }
 `;
 
 const RecommendList = styled.div`
@@ -272,7 +286,6 @@ export default function IframeTemplate({ src, test, ...props }) {
     axios.get(`https://smartpick.website/api/tests/${test.id}`, { headers: { 'x-user-key': userKey } })
       .then(res => {
         setLikeCount(res.data.likes || 0);
-        setCommentCount(res.data.commentCount || 0);
         setLiked(Boolean(res.data.userLiked));
       });
     // 댓글 목록
@@ -317,7 +330,7 @@ export default function IframeTemplate({ src, test, ...props }) {
 
 
   // 댓글
-  const handleComment = () => setShowComment(true);
+  const handleComment = () => setShowComment(true) || setShowDetail(false);
   const closeCommentModal = () => setShowComment(false);
   const submitComment = async () => {
     if (!newComment.nickname || !newComment.content || !newComment.password || !test?.id) return;
@@ -499,8 +512,8 @@ export default function IframeTemplate({ src, test, ...props }) {
           }}>심</span>
           <Image src="/uploads/logo.png" alt="심풀 로고"
             layout="fixed" width={35} height={35} style={{
-               marginTop: -5
-            }}/>
+              marginTop: -5
+            }} />
           <span style={{
             marginLeft: -10, marginTop: 0
           }}>풀</span>
@@ -565,7 +578,7 @@ export default function IframeTemplate({ src, test, ...props }) {
                 transition={{ duration: 0.4 }}
               >
                 <HeartWrapper>
-                  <Image src="/uploads/heart_white.png" alt="빈하트" width={25} height={25} />
+                  <Image src="/uploads/heart_white.png" alt="빈하트" width={20} height={20} />
                 </HeartWrapper>
               </motion.div>
             )}
@@ -576,7 +589,7 @@ export default function IframeTemplate({ src, test, ...props }) {
                 transition={{ duration: 0.4 }}
               >
                 <HeartWrapper>
-                  <Image src="/uploads/heart_white.png" alt="빈하트" width={25} height={25} />
+                  <Image src="/uploads/heart_white.png" alt="빈하트" width={20} height={20} />
                 </HeartWrapper>
               </motion.div>
             )}
@@ -596,7 +609,7 @@ export default function IframeTemplate({ src, test, ...props }) {
               >
 
                 <HeartWrapper>
-                  <Image src="/uploads/heart.png" alt="좋아요" width={25} height={25} />
+                  <Image src="/uploads/heart.png" alt="좋아요" width={20} height={20} />
                 </HeartWrapper>
               </motion.div>
             )}
@@ -647,15 +660,15 @@ export default function IframeTemplate({ src, test, ...props }) {
           <ActionCount>{likeCount}</ActionCount>
         </ActionWrap>
         <ActionWrap>
-          <ButtonWrapper  onClick={handleComment}>💬</ButtonWrapper>
-          <ActionCount>{commentCount}</ActionCount>
+          <ButtonWrapper onClick={handleComment}><FaComment></FaComment></ButtonWrapper>
+          <ActionCount></ActionCount>
         </ActionWrap>
         <ActionWrap>
-          <ButtonWrapper  onClick={handleShare}>📤</ButtonWrapper>
-          <ActionCount>{shareCount}</ActionCount>
+          <ButtonWrapper onClick={handleShare}><FaShareSquare></FaShareSquare></ButtonWrapper>
+          <ActionCount></ActionCount>
         </ActionWrap>
         <ActionWrap>
-          <ButtonWrapper onClick={handleDetail}>ℹ️</ButtonWrapper>
+          <ButtonWrapper onClick={handleDetail}><FaInfoCircle></FaInfoCircle></ButtonWrapper>
         </ActionWrap>
       </BottomBar>
       {/* 댓글 모달 */}
@@ -663,22 +676,46 @@ export default function IframeTemplate({ src, test, ...props }) {
       <ModalSheet open={showComment}>
         <ModalHeader>
           댓글 ({commentCount})
-          <button onClick={closeCommentModal} style={{ float: 'right', background: 'none', border: 'none', fontSize: '1.2rem', color: '#fff', cursor: 'pointer' }}>✕</button>
+          <ButtonWrapper
+            onClick={closeCommentModal}
+          ><FaChevronDown /></ButtonWrapper>
         </ModalHeader>
         <ModalBody>
-          <div style={{ marginBottom: 8 }}>
-            <input placeholder="닉네임" value={newComment.nickname} onChange={e => setNewComment({ ...newComment, nickname: e.target.value })} style={{ marginRight: 8 }} />
-            <input placeholder="비밀번호" type="password" value={newComment.password} onChange={e => setNewComment({ ...newComment, password: e.target.value })} style={{ marginRight: 8 }} />
-          </div>
-          <textarea rows={3} placeholder="댓글을 입력하세요" value={newComment.content} onChange={e => setNewComment({ ...newComment, content: e.target.value })} style={{ width: '100%', marginBottom: 8 }} />
-          <button onClick={submitComment} style={{ marginBottom: 16 }}>댓글 작성</button>
           <div>
             {comments.map((c, i) => (
-              <div key={i} style={{ borderBottom: '1px solid #eee', padding: '8px 0' }}>
-                <b>{c.nickname}</b> <span style={{ color: '#888', fontSize: '0.85rem' }}>{c.createdAt ? new Date(c.createdAt).toLocaleString() : ''}</span>
-                <div style={{ whiteSpace: 'pre-line', marginTop: 4 }}>{c.content}</div>
+              <div
+                key={i}
+                style={{
+                  borderBottom: '1px solid #eee',
+                  padding: '8px 0',
+                  textAlign: 'left', // ✅ 핵심
+                }}
+              >
+                <div style={{ marginBottom: 4 }}>
+                  <b>{c.nickname}</b>{' '}
+                  <span style={{ color: '#888', fontSize: '0.85rem' }}>
+                    {c.createdAt ? new Date(c.createdAt).toLocaleString() : ''}
+                  </span>
+                </div>
+                <div style={{ marginTop: 4, whiteSpace: 'pre-wrap' }}>
+                  {c.content}
+                </div>
               </div>
             ))}
+          </div>
+          <div style={{ marginTop:'20px', }}>
+            <div style={{ width: '100%', marginBottom: 8, display: 'flex',  }}>
+              <input style={{ height: 30, flex:0.8, border: '1px solid #ccc', minWidth: 0 }} placeholder="닉네임" value={newComment.nickname} onChange={e => setNewComment({ ...newComment, nickname: e.target.value })} />
+              <input style={{ height: 30, flex:0.8, border: '1px solid #ccc', minWidth: 0}} placeholder="비밀번호" type="password" value={newComment.password} onChange={e => setNewComment({ ...newComment, password: e.target.value })} />
+            </div>
+            <textarea style={{
+              fontFamily: 'inherit', fontSize: 'inherit', width: '100%',
+              marginBottom: 8, height: 80, resize: 'none', overflowY: 'auto', lineHeight: '1.4', fontSize: 14, border: '1px solid #ccc', borderRadius: 4,
+            }}
+              rows={3} placeholder="댓글을 입력하세요" value={newComment.content} onChange={e => setNewComment({ ...newComment, content: e.target.value })} />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', }}>
+              <CommentButton onClick={submitComment} style={{ right: '5px', marginBottom: 16 }}>댓글 작성</CommentButton>
+            </div>
           </div>
         </ModalBody>
       </ModalSheet>
@@ -689,7 +726,7 @@ export default function IframeTemplate({ src, test, ...props }) {
           position: 'relative',
           padding: '12px 16px',
           width: '100%',
-          flexShrink:'0',
+          flexShrink: '0',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -697,133 +734,125 @@ export default function IframeTemplate({ src, test, ...props }) {
           fontWeight: 'bold',
           fontSize: '1.2rem',
         }}>
-         { /* 상세도 같이 추가 */}
+          { /* 상세도 같이 추가 */}
           <ActionWrap>
-          <ButtonWrapper onClick={handleLike}>
-            {/* 하얀 하트 */}
-            {!liked && (
-              <motion.div
-                initial={{ scale: 1.2 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.4 }}
-              >
-                <HeartWrapper>
-                  <Image src="/uploads/heart_white.png" alt="빈하트" width={25} height={25} />
-                </HeartWrapper>
-              </motion.div>
-            )}
-            {liked && (
-              <motion.div
-                initial={{ scale: 1 }}
-                animate={{ scale: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                <HeartWrapper>
-                  <Image src="/uploads/heart_white.png" alt="빈하트" width={25} height={25} />
-                </HeartWrapper>
-              </motion.div>
-            )}
+            <ButtonWrapper onClick={handleLike}>
+              {/* 하얀 하트 */}
+              {!liked && (
+                <motion.div
+                  initial={{ scale: 1.2 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <HeartWrapper>
+                    <Image src="/uploads/heart_white.png" alt="빈하트" width={25} height={25} />
+                  </HeartWrapper>
+                </motion.div>
+              )}
+              {liked && (
+                <motion.div
+                  initial={{ scale: 1 }}
+                  animate={{ scale: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <HeartWrapper>
+                    <Image src="/uploads/heart_white.png" alt="빈하트" width={25} height={25} />
+                  </HeartWrapper>
+                </motion.div>
+              )}
 
-            {/* 빨간 하트 */}
-            {liked && (
+              {/* 빨간 하트 */}
+              {liked && (
 
-              <motion.div
-                as={motion.div}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.1 }}
-
-                top='-50%'
-                left='-50%'
-
-              >
-
-                <HeartWrapper>
-                  <Image src="/uploads/heart.png" alt="좋아요" width={25} height={25} />
-                </HeartWrapper>
-              </motion.div>
-            )}
-
-            {/* 빨간 원 */}
-            <AnimatePresence>
-              {animating && liked && (
                 <motion.div
                   as={motion.div}
-                  initial={{ scale: 0, opacity: 1 }}
-                  animate={{ scale: 2, opacity: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+
+                  top='-50%'
+                  left='-50%'
+
                 >
-                  <RedCircle
-                  /></motion.div>
+
+                  <HeartWrapper>
+                    <Image src="/uploads/heart.png" alt="좋아요" width={25} height={25} />
+                  </HeartWrapper>
+                </motion.div>
               )}
-            </AnimatePresence>
 
-            {/* 물방울 */}
-            {animating && liked &&
-              ['-1,-1.2', '1.2,-1', '-1.2,1', '1,1.2'].map((pos, i) => {
-                const [x, y] = pos.split(',').map(Number);
-
-                return (
-                  <> <motion.div
+              {/* 빨간 원 */}
+              <AnimatePresence>
+                {animating && liked && (
+                  <motion.div
                     as={motion.div}
-                    key={i}
-                    initial={{ x: 0, y: 0, opacity: 1, scale: 0.5 }}
-                    animate={{ x: x * 15, y: y * 15, opacity: 0.5, scale: 1 }}
+                    initial={{ scale: 0, opacity: 1 }}
+                    animate={{ scale: 2, opacity: 0 }}
+                    exit={{ opacity: 0 }}
                     transition={{ duration: 0.6, ease: 'easeOut' }}
                   >
-                    <Bubble></Bubble>
-                  </motion.div>
-                    <motion.div
+                    <RedCircle
+                    /></motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* 물방울 */}
+              {animating && liked &&
+                ['-1,-1.2', '1.2,-1', '-1.2,1', '1,1.2'].map((pos, i) => {
+                  const [x, y] = pos.split(',').map(Number);
+
+                  return (
+                    <> <motion.div
                       as={motion.div}
                       key={i}
-                      initial={{ x: 0, y: 0, opacity: 1, scale: 0.3 }}
-                      animate={{ x: x * 15 * 0.8, y: y * 15 * 1.2, opacity: 0.5, scale: 0.7 }}
+                      initial={{ x: 0, y: 0, opacity: 1, scale: 0.5 }}
+                      animate={{ x: x * 15, y: y * 15, opacity: 0.5, scale: 1 }}
                       transition={{ duration: 0.6, ease: 'easeOut' }}
                     >
                       <Bubble></Bubble>
                     </motion.div>
-                  </>
-                );
-              })}
-          </ButtonWrapper>
-          <ActionCount>{likeCount}</ActionCount>
-        </ActionWrap>
-        <ActionWrap>
-          <ButtonWrapper  onClick={handleComment}>💬</ButtonWrapper>
-          <ActionCount>{commentCount}</ActionCount>
-        </ActionWrap>
-        <ActionWrap>
-          <ButtonWrapper  onClick={handleShare}>📤</ButtonWrapper>
-          <ActionCount>{shareCount}</ActionCount>
-        </ActionWrap>
-        <ActionWrap>
-          <ButtonWrapper onClick={handleDetail}>ℹ️</ButtonWrapper>
-        </ActionWrap>
-          <ButtonWrapper
-            onClick={closeDetailModal}
-            style={{
-              position: 'absolute',
-              width: '50px',
-              right: '1%',
-
-              background: 'none',
-              border: 'none',
-              fontSize: '1.2rem',
-              color: '#fff',
-              cursor: 'pointer',
-            }}
-          >✕</ButtonWrapper>
+                      <motion.div
+                        as={motion.div}
+                        key={i}
+                        initial={{ x: 0, y: 0, opacity: 1, scale: 0.3 }}
+                        animate={{ x: x * 15 * 0.8, y: y * 15 * 1.2, opacity: 0.5, scale: 0.7 }}
+                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                      >
+                        <Bubble></Bubble>
+                      </motion.div>
+                    </>
+                  );
+                })}
+            </ButtonWrapper>
+            <ActionCount>{likeCount}</ActionCount>
+          </ActionWrap>
+          <ActionWrap>
+            <ButtonWrapper onClick={handleComment}><FaComment></FaComment></ButtonWrapper>
+            <ActionCount>{commentCount}</ActionCount>
+          </ActionWrap>
+          <ActionWrap>
+            <ButtonWrapper onClick={handleShare}><FaShareSquare></FaShareSquare></ButtonWrapper>
+            <ActionCount>{shareCount}</ActionCount>
+          </ActionWrap>
+          <ActionWrap>
+            <ButtonWrapper
+              onClick={closeDetailModal}
+            ><FaChevronDown /></ButtonWrapper>
+          </ActionWrap>
         </ModalHeader>
         <ModalBody>
-          <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 8 }}>{test?.title || '테스트'}</div>
-          <div style={{ color: '#111111', marginBottom: 16 }}>{test?.description || '테스트 설명'}</div>
+          <div style={{ color: '#000000', fontWeight: 'bold', fontSize: '1.3rem', marginBottom: 8 }}>{test?.title || '테스트'}</div>
+          <div style={{ color: '#0e0e0e', marginBottom: 16 }}>{test?.description || '테스트 설명'}</div>
+
           {/* 추천 테스트 카드 리스트 */}
-          
-          <ScrollListSection       
-              sortedTests={recommendTests}
-              getImagePath={getImagePath}
-            />
+          <div style={{ marginLeft: '2vw', color: '#0e0e0e', display: 'flex', justifyContent: 'flex-start', }}>
+            <FaThumbsUp style={{ marginTop: '5px', marginRight: '2px', fontSize: '0.9rem' }} />
+            추천해요
+          </div>
+          <ScrollListSection
+            sortedTests={recommendTests}
+            getImagePath={getImagePath}
+          />
 
         </ModalBody>
       </ModalSheet>

@@ -455,6 +455,9 @@ export default function LottoPage() {
                         display: 'flex',
                         flexDirection: 'column', // 수직 정렬
                         padding: '8px 0',
+                        maxWidth:'500px',
+                        minWidth:'320px',
+                        width:'100%',
                       }}
                     >
                       {/* 첫 번째 줄: combination 문자열 */}
