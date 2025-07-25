@@ -10,6 +10,7 @@ import path from 'path';
 import https from 'https';
 import multer from 'multer';
 import geoip from 'geoip-lite';
+import sharp from('sharp');
 import { createRequire } from 'module';
 import sitemapRouter from './routes/sitemap.js';
 import { count } from 'console';
@@ -1660,7 +1661,8 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
               results.push({
                 lang,
                 path,
-                fileName: `${lang}.png`
+                pngName: `${lang}.png`,
+                webpName:`${lang}.webp`,
               });
             }
           } catch (error) {
@@ -1670,28 +1672,42 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
       }
       return results; // 존재하는 이미지 리스트 반환
     };
-    const downloadImage = (url, destPath) => {
+    const downloadImage = (url, pngPath, webpPath) => {
       return new Promise((resolve, reject) => {
-        const file = fs.createWriteStream(destPath);
+        const file = fs.createWriteStream(pngPath);
         https.get(url, (response) => {
           response.pipe(file);
-          file.on('finish', () => {
+          file.on('finish', async () => {
             file.close();
-            resolve(destPath);
+            console.log(`PNG 저장 완료: ${destPath}`);
+    
+            // PNG → WEBP 변환
+            await convertToWebp(pngPath, webpPath);
+            resolve({ png: destPath, webp: webpPath });
           });
         }).on('error', (error) => {
-          fs.unlink(destPath, () => { });
+          fs.unlink(destPath, () => {});
           reject(error);
         });
       });
     };
-
+    const convertToWebp = async (inputPath, outputPath) => {
+      try {
+        await sharp(inputPath)
+          .webp({ quality: 85 })
+          .toFile(outputPath);
+        console.log(`Converted to WEBP: ${outputPath}`);
+      } catch (error) {
+        console.error(`WEBP 변환 실패: ${outputPath}`, error);
+      }
+    };
     fs.mkdirSync(thumbnailPath);
     const imgPaths = await getValidImagePaths(externalUrl);
     for (const img of imgPaths) {
-      const destPath = path.join(thumbnailPath, img.fileName);
-      console.log('📥 Downloading:', img.path, '➡️', destPath);
-      await downloadImage(img.path, destPath);
+      const pngPath = path.join(thumbnailPath, img.pngName);
+      const webpPath = path.join(thumbnailPath, img.webpName);
+      console.log('📥 Downloading:', img.path, '➡️', pngPath,'➡️', webpPath);
+      await downloadImage(img.path, pngPath, webpPath);
     }
     await test.save();
     res.json({ success: true, test });

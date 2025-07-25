@@ -505,7 +505,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
             </Title>
           </div>
           <RecommendSlider>
-            <RecommendSlide active={true}>
+            <RecommendSlide active="true">
               <RecommendCard>
                 <RecommendTitleText>추천 테스트를 불러오는 중...</RecommendTitleText>
               </RecommendCard>
@@ -656,7 +656,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
               {recommendTests.map((_, index) => (
                 <SlideDot
                   key={index}
-                  active={index === currentSlide}
+                  active={index === currentSlide?'true':'false'}
                   onClick={() => {
                     setCurrentSlide(index);
                     setLastInteractionTime(Date.now());
@@ -913,7 +913,7 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
 
   const handleDragStart = (e) => {
 
-    console.log('handleDragStart', e);
+    //console.log('handleDragStart', e);
     const x = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
     setDragStartX(x);
     lastClientXRef.current = x; // 초기값 설정
@@ -931,10 +931,10 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
       e.preventDefault();
     }
 
-    console.log('handleDragging', e);
-    console.log('scrollRef.current.scrollLeft', scrollRef.current.scrollLeft)
-    console.log('scrollWidth:', scrollRef.current.scrollWidth);
-    console.log('clientWidth:', scrollRef.current.clientWidth);
+    // console.log('handleDragging', e);
+    // console.log('scrollRef.current.scrollLeft', scrollRef.current.scrollLeft)
+    // console.log('scrollWidth:', scrollRef.current.scrollWidth);
+    // console.log('clientWidth:', scrollRef.current.clientWidth);
     const x = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
     const offset = x - lastClientXRef.current;
 
