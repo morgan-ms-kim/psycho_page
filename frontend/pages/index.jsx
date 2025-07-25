@@ -449,7 +449,8 @@ const getThumbnailByLang = async (thumbnailPath) => {
     langCode = 'ko';
   }
   const homePage = 'https://smartpick.website/';
-  const ext = '.webp';
+  //const ext = '.webp';
+  const ext = '.png'
   const imgPath = `${homePage}${thumbnailPath}/${langCode}${ext}`;
   try {
  // const res = await fetch(imgPath, { method: 'HEAD' });
@@ -690,7 +691,7 @@ const getThumbnailByLang = async (thumbnailPath) => {
                         }}
                         onClick={() => handleTestClick(test)}
                         style={{
-                          maxHeight: '100%', maxWidth: '100%', height: 'auto', width: '100%',
+                          maxHeight: '100%', maxWidth: '100%', height: '100%', width: '100%',
                           objectFit: 'fill',
                           display: 'block',
                         }}
@@ -1200,6 +1201,7 @@ const getThumbnailByLang = async (thumbnailPath) => {
   }
   const homePage = 'https://smartpick.website/';
   const ext = '.webp';
+  //const ext = '.png';
   const imgPath = `${homePage}${thumbnailPath}/${langCode}${ext}`;
   try {
  // const res = await fetch(imgPath, { method: 'HEAD' });
