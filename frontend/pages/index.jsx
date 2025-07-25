@@ -1000,7 +1000,7 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
                         ///assets/start-images/ko_start.png
                       }
                       //버셀 이미지 가져오기
-                      {/*console.log(resolvedPath)||test.externalUrl ? (
+                      {test.externalUrl||!test.thumbnail.includes('.') ? (
                         
                         <img
                           src={resolvedPath}
@@ -1028,7 +1028,7 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
                           }}
 
                         />
-                      ) : */test.thumbnail ? (
+                      ) : test.thumbnail ? (
                         <Image
                           src={getImagePath(test.thumbnail)}
                           alt={test.title}
