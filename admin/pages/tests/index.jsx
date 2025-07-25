@@ -93,9 +93,14 @@ export default function TestManagement() {
       }
       return;
     }
-    ImagePathsByLang();
     loadTests();
+    ImagePathsByLang();
   }, [router]);
+
+  useEffect(() => {
+    // 로그인 확인
+    ImagePathsByLang();
+  }, [tests]);
   const getThumbnailByLang = async (thumbnailPath) => {
     if (!thumbnailPath) return null;
   
@@ -261,7 +266,7 @@ export default function TestManagement() {
       : test.thumbnail && !test.thumbnail.includes('default-thumb.png')
       ? `https://smartpick.website${test.thumbnail}`
       : null;
-
+    console.log(thumbnailSrc);
     return (
       <TestCard key={test.id}>
         <TestThumbnail>
