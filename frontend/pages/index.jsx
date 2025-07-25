@@ -877,8 +877,8 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
     const fetchImagePaths = async () => {
       const paths = {};
       for (const test of sortedTests) {
-        if (test.externalUrl) {
-          const path = await getExternalImagePath(test.externalUrl);
+        if (test.thumbnail) {
+          const path = await getExternalImagePath(test.thumbnail);
           if (path) paths[test.id] = path;
         }
       }
@@ -999,7 +999,6 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
                       {//test.externalUrl?imgPath=test.externalUrl+'assets/start-images/ko_start.png'
                         ///assets/start-images/ko_start.png
                       }
-                      //버셀 이미지 가져오기
                       {test.externalUrl||!test.thumbnail.includes('.') ? (
                         
                         <img
@@ -1108,13 +1107,13 @@ const getExternalImagePath = async (thumbnailPath) => {
 
       const contentType = res.headers.get('Content-Type');
       
-      console.log('img : ', path);
+      console.log('img : ', imgPath);
       console.log('img contentType : ', contentType);
       if (res.ok && contentType?.startsWith('image/')) {
-        return path;
+        return imgPath;
       }
     }catch (error) {
-      console.warn(`Failed to fetch ${path}`, error);
+      console.warn(`Failed to fetch ${imgPath}`, error);
     }
 
     return null;

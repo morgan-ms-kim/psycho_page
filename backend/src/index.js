@@ -1598,8 +1598,11 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
     const folderName = `test${test.id}`;
     test.folder = folderName;
     // testGroup 경로로 변경
-    const thumbnailPath = `/uploads/thumbnails/${folderName}`;
-    test.thumbnail = thumbnailPath;
+    const thumbnail = `/uploads/thumbnails/${folderName}`;
+    test.thumbnail = thumbnail;
+    
+    const pwd = path.join(process.cwd(), '..', 'testGroup', 'public', 'uploads','thumbnails');
+    const thumbnailPath = path.join(pwd, folderName);
     // 기존 폴더가 있으면 삭제
     if (fs.existsSync(thumbnailPath)) {
       try {
