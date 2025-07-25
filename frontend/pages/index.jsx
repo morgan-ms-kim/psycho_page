@@ -363,6 +363,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
   const [dragOffsetX, setDragOffsetX] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
+  const [imagePaths, setImagePaths] = useState({}); // { [test.id]: resolvedImageUrl }
   const sliderRef = useRef(null);
 
   // 추천 테스트 로딩
@@ -382,8 +383,23 @@ function RecommendSliderSection({ router, getTestFolderName }) {
     };
 
     loadRecommendTests();
+    ImagePathsByLang();
   }, []);
 
+  useEffect(() => {
+   
+    ImagePathsByLang();
+  }, [recommendTests]);
+   const ImagePathsByLang = async () => {
+    const paths = {};
+    for (const test of recommendTests) {
+      if (!test.thumbnail.includes('.')) {
+        const path = await getThumbnailByLang(test.thumbnail);
+        if (path) paths[test.id] = path;
+      }
+    }
+    setImagePaths(paths);
+  };
   // 전역 마우스 이벤트
   useEffect(() => {
     if (!isDragging) return;
@@ -416,6 +432,66 @@ function RecommendSliderSection({ router, getTestFolderName }) {
 
     return () => clearInterval(timer);
   }, [isHovered, isDragging, isTransitioning, recommendTests.length, lastInteractionTime]); // lastInteractionTime 다시 추가
+
+
+  
+const getThumbnailByLang = async (thumbnailPath) => {
+  if (!thumbnailPath) return null;
+
+  // 브라우저 언어 설정 확인
+  const language = navigator.language || navigator.userLanguage;
+
+  // 언어 코드 결정
+  let langCode = 'en'; // 기본값
+  if (language.startsWith('es')) {
+    langCode = 'es';
+  } else if (language.startsWith('ko')) {
+    langCode = 'ko';
+  }
+  const homePage = 'https://smartpick.website/';
+  const ext = '.webp';
+  const imgPath = `${homePage}${thumbnailPath}/${langCode}${ext}`;
+  try {
+ // const res = await fetch(imgPath, { method: 'HEAD' });
+
+   //   const contentType = res.headers.get('Content-Type');
+      
+      console.log('lang:' , langCode,' img :',imgPath.split());
+    //  console.log('img contentType : ', contentType);
+    //  if (res.ok && contentType?.startsWith('image/')) {
+      return imgPath.split();
+     // }
+    }catch (error) {
+      console.warn(`Failed to fetch ${imgPath}`, error);
+    }
+
+    return null;
+    
+  const fallbackPaths = [
+    `assets/start-images/${langCode}_start.png`,
+    `assets/images/start/start-${langCode}.png`,
+    `images/start-${langCode}.png`,
+  ];
+
+  for (const imgPath of fallbackPaths) {
+    const path = `${thumbnailPath}${imgPath}`;
+    try {
+      const res = await fetch(path, { method: 'HEAD' });
+
+      const contentType = res.headers.get('Content-Type');
+      
+      console.log('img : ', path);
+      console.log('img contentType : ', contentType);
+      if (res.ok && contentType?.startsWith('image/')) {
+        return path;
+      }
+    } catch (error) {
+      console.warn(`Failed to fetch ${path}`, error);
+    }
+  }
+
+  return null;
+};
 
   const handleDragStart = (e) => {
     e.preventDefault();
@@ -589,6 +665,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
             }}
           >
             {infiniteSlides.map((test, idx) => (
+              
               <RecommendSlide
                 key={`${test?.id || idx}-${Math.floor(idx / total)}`}
                 style={{
@@ -600,7 +677,26 @@ function RecommendSliderSection({ router, getTestFolderName }) {
               >
                 <RecommendCard>
                   <RecommendThumbnailContainer>
-                    {test?.thumbnail && (
+                    {(test.externalUrl&&!test.thumbnail.includes('.')) ? (
+                      <img
+                        src={imagePaths[test.id]}
+                        alt={test.title}
+                        draggable={false}
+                        onContextMenu={handleDragStart}
+                        onTouchStart={handleDragStart}
+                        onError={e => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                        onClick={() => handleTestClick(test)}
+                        style={{
+                          maxHeight: '100%', maxWidth: '100%', height: 'auto', width: '100%',
+                          objectFit: 'fill',
+                          display: 'block',
+                        }}
+                      />
+
+                    ):test?.thumbnail?(
                       <Image
                         src={getImagePath(test.thumbnail)}
                         alt={test.title}
@@ -621,9 +717,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
                         height={120}
                       />
 
-                    )}
-
-                    <TestItemPlaceholder
+                    ):(<TestItemPlaceholder
                       style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
                       onClick={() => handleTestClick(test)}
                     >
@@ -634,7 +728,9 @@ function RecommendSliderSection({ router, getTestFolderName }) {
                         }}
                         layout="fixed" width={35} height={35} />
 
-                    </TestItemPlaceholder>
+                    </TestItemPlaceholder>)}
+
+                    
                   </RecommendThumbnailContainer>
                   <RecommendStats>
                     <RecommendStat><IconStat><FaPlay style={{ marginRight: '3px', fontSize: '0.6rem' }}></FaPlay></IconStat>{test?.views}</RecommendStat>
