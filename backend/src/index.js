@@ -1332,13 +1332,21 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
         fs.rmSync(testFolderPath, { recursive: true, force: true });
         console.log('🗑️ 테스트 폴더 삭제:', testFolderPath);
       }
+     
     }
     // 썸네일 파일 삭제 (기본 썸네일 제외)
-    if (test.thumbnail && test.thumbnail !== '/uploads/thumbnails/default-thumb.png') {
+    if (test.thumbnail && test.thumbnail !== '/uploads/thumbnails/default-thumb.png' && test.thumbnail.include('.') ) {
       const thumbPath = path.join(process.cwd(), '..', 'testGroup', 'public', test.thumbnail.replace('/', ''));
       if (fs.existsSync(thumbPath)) {
         fs.unlinkSync(thumbPath);
         console.log('🗑️ 썸네일 파일 삭제:', thumbPath);
+      }
+      
+    } else{
+      const thumbnailFolderPath = path.join(process.cwd(), '..', 'testGroup', 'public', 'uploads', 'thumbnails', test.folder);
+      if (fs.existsSync(thumbnailFolderPath)) {
+        fs.rmSync(thumbnailFolderPath, { recursive: true, force: true });
+        console.log('🗑️ 썸네일 폴더 삭제:', thumbnailFolderPath);
       }
     }
     // 테스트 삭제
@@ -1569,7 +1577,7 @@ app.post('/api/admin/update-all-folder-names', authenticateAdmin, async (req, re
 
 // 외부 링크 테스트 등록 API. thumbnail 폴더 따로 생성 / 언어별로 저장
 app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, next) => {
-  
+
   let test = null; // 생성된 테스트 객체 추적
   try {
     console.log('/api/admin/tests/add-external');
@@ -1578,21 +1586,21 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
       return res.status(400).json({ error: '외부 링크와 제목은 필수입니다.' });
     }
 
-    
 
-    
-    let test =null;
+
+
+    let test = null;
     try {
-        test = await Test.create({
+      test = await Test.create({
         title,
         description: description || '',
         category: category || '기타',
         externalUrl,
         folder: null,
-        thumbnail: '/uploads/thumbnails/default-thumb.png',        
+        thumbnail: '/uploads/thumbnails/default-thumb.png',
       });
     } catch (error) {
-      return res.status(500).json({ error: 'DB 저장 실패',  detail: error.message });
+      return res.status(500).json({ error: 'DB 저장 실패', detail: error.message });
     }
     // 2. 실제 id로 폴더명 생성
     const folderName = `test${test.id}`;
@@ -1600,8 +1608,8 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
     // testGroup 경로로 변경
     const thumbnail = `/uploads/thumbnails/${folderName}`;
     test.thumbnail = thumbnail;
-    
-    const pwd = path.join(process.cwd(), '..', 'testGroup', 'public', 'uploads','thumbnails');
+
+    const pwd = path.join(process.cwd(), '..', 'testGroup', 'public', 'uploads', 'thumbnails');
     const thumbnailPath = path.join(pwd, folderName);
     // 기존 폴더가 있으면 삭제
     if (fs.existsSync(thumbnailPath)) {
@@ -1648,7 +1656,6 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
             const contentType = res.headers.get('Content-Type');
 
             if (res.ok && contentType?.startsWith('image/')) {
-
               console.log('exist img:', path);
               results.push({
                 lang,

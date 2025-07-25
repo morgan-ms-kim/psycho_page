@@ -874,7 +874,7 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
     .map(t => t.id);
 
   useEffect(() => {
-    const fetchImagePaths = async () => {
+   const ImagePathsByLang = async () => {
       const paths = {};
       for (const test of sortedTests) {
         if (!test.thumbnail.includes('.')) {
@@ -885,7 +885,7 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
       setImagePaths(paths);
     };
 
-    fetchImagePaths();
+    ImagePathsByLang();
   }, [sortedTests]);
 //}, [sortedTests]);
 
@@ -972,8 +972,8 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
 
               const resolvedPath = imagePaths[test.id]; // 비동기로 구한 이미지 경로
               
-              console.info('resolvedPath:', resolvedPath);
-              console.info('test.thumbnail:', test.thumbnail);
+              //console.info('resolvedPath:', resolvedPath);
+              //console.info('test.thumbnail:', test.thumbnail);
               return (
                 <ScrollCard
                   key={test.id}
@@ -1004,7 +1004,6 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
                       {(test.externalUrl&&!test.thumbnail.includes('.')) ? (
                         
                         <img
-
                           loading="lazy"
                           src={resolvedPath}
                           alt={test.title}
@@ -1030,7 +1029,8 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
                           }}
 
                         />
-                      ) : (test.thumbnail&& !test.thumbnail.includes('default-thumb.png')) ? (
+                      ) :
+                      (test.thumbnail&& !test.thumbnail.includes('default-thumb.png')) ? (
                         <Image
                           src={getImagePath(test.thumbnail)}
                           alt={test.title}

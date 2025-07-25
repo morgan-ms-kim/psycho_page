@@ -83,6 +83,7 @@ export default function TestManagement() {
   const [templateCategory, setTemplateCategory] = useState('기타');
   const [templateLoading, setTemplateLoading] = useState(false);
 
+  const [imagePaths, setImagePaths] = useState({}); // { [test.id]: resolvedImageUrl }
   useEffect(() => {
     // 로그인 확인
     const token = localStorage.getItem('adminToken');
@@ -92,9 +93,52 @@ export default function TestManagement() {
       }
       return;
     }
-
+    ImagePathsByLang();
     loadTests();
   }, [router]);
+  const getThumbnailByLang = async (thumbnailPath) => {
+    if (!thumbnailPath) return null;
+  
+    // 브라우저 언어 설정 확인
+    const language = navigator.language || navigator.userLanguage;
+  
+    // 언어 코드 결정
+    let langCode = 'en'; // 기본값
+    if (language.startsWith('es')) {
+      langCode = 'es';
+    } else if (language.startsWith('ko')) {
+      langCode = 'ko';
+    }
+    const homePage = 'https://smartpick.website/';
+    const ext = '.png';
+    const imgPath = `${homePage}${thumbnailPath}/${langCode}${ext}`;
+    try {
+   // const res = await fetch(imgPath, { method: 'HEAD' });
+  
+     //   const contentType = res.headers.get('Content-Type');
+        
+        console.log('lang:' , langCode,' img :',imgPath.split());
+      //  console.log('img contentType : ', contentType);
+      //  if (res.ok && contentType?.startsWith('image/')) {
+        return imgPath.split();
+       // }
+      }catch (error) {
+        console.warn(`Failed to fetch ${imgPath}`, error);
+      }
+  
+      return null;
+      
+  };
+  const ImagePathsByLang = async () => {
+    const paths = {};
+    for (const test of tests) {
+      if (!test.thumbnail.includes('.')) {
+        const path = await getThumbnailByLang(test.thumbnail);
+        if (path) paths[test.id] = path;
+      }
+    }
+    setImagePaths(paths);
+  };
 
   const loadTests = async () => {
     try {
@@ -210,57 +254,74 @@ export default function TestManagement() {
 
 
         <TestsGrid>
-          {tests.map(test => (
-            <TestCard key={test.id}>
-              <TestThumbnail>
-                {test.thumbnail ? (
-                  <Image
-                    src={`https://smartpick.website${test.thumbnail}`}
-                    alt={test.title}
-                    width={200}
-                    height={200}
-                    style={{ width: '100%', maxWidth: '500px', minWidth: '360px', height: 'auto' }}
-                  />
-                ) : (
-                  <DefaultThumbnail>📊</DefaultThumbnail>
-                )}
-              </TestThumbnail>
-              
-              <TestInfo>
-                <TestTitle>{test.title}</TestTitle>
-                <TestDescription>{test.description}</TestDescription>
-                <TestMeta>
-                  <MetaItem>카테고리: {test.category}</MetaItem>
-                  <MetaItem>조회수: {test.views?.toLocaleString() || 0}</MetaItem>
-                  <MetaItem>좋아요: {test.likes?.toLocaleString() || 0}</MetaItem>
-                </TestMeta>
-                <TestDate>
-                  생성일: {new Date(test.createdAt).toLocaleDateString()}
-                </TestDate>
-              </TestInfo>
-              
-              <TestActions>
-                <ActionButton onClick={() => {
-                  console.log('수정 버튼 클릭:', test.id);
-                  // 히스토리를 완전히 초기화하고 수정 페이지로 강제 이동
-                  window.location.href = `/admin/tests/${test.id}/edit`;
-                }}>
-                  ✏️ 수정
-                </ActionButton>
-                <ActionButton onClick={() => {
-                  console.log('썸네일 버튼 클릭:', test.id);
-                  // 히스토리를 완전히 초기화하고 썸네일 페이지로 강제 이동
-                  window.location.href = `/admin/tests/${test.id}/thumbnail`;
-                }}>
-                  🖼️ 썸네일
-                </ActionButton>
-                <DeleteButton onClick={() => handleDeleteTest(test.id)}>
-                  🗑️ 삭제
-                </DeleteButton>
-              </TestActions>
-            </TestCard>
-          ))}
-        </TestsGrid>
+  {tests.map((test) => {
+    const path = imagePaths[test.id];
+    const thumbnailSrc = test.thumbnail && !test.thumbnail.includes('.')
+      ? path
+      : test.thumbnail && !test.thumbnail.includes('default-thumb.png')
+      ? `https://smartpick.website${test.thumbnail}`
+      : null;
+
+    return (
+      <TestCard key={test.id}>
+        <TestThumbnail>
+          {thumbnailSrc ? (
+            <img
+              src={thumbnailSrc}
+              alt={test.title}
+              width={200}
+              height={200}
+              style={{
+                width: '100%',
+                maxWidth: '500px',
+                minWidth: '360px',
+                height: 'auto',
+              }}
+            />
+          ) : (
+            <DefaultThumbnail>📊</DefaultThumbnail>
+          )}
+        </TestThumbnail>
+
+        <TestInfo>
+          <TestTitle>{test.title}</TestTitle>
+          <TestDescription>{test.description}</TestDescription>
+          <TestMeta>
+            <MetaItem>카테고리: {test.category}</MetaItem>
+            <MetaItem>조회수: {test.views?.toLocaleString() || 0}</MetaItem>
+            <MetaItem>좋아요: {test.likes?.toLocaleString() || 0}</MetaItem>
+          </TestMeta>
+          <TestDate>
+            생성일: {new Date(test.createdAt).toLocaleDateString()}
+          </TestDate>
+        </TestInfo>
+
+        <TestActions>
+          <ActionButton
+            onClick={() => {
+              console.log('수정 버튼 클릭:', test.id);
+              window.location.href = `/admin/tests/${test.id}/edit`;
+            }}
+          >
+            ✏️ 수정
+          </ActionButton>
+          <ActionButton
+            onClick={() => {
+              console.log('썸네일 버튼 클릭:', test.id);
+              window.location.href = `/admin/tests/${test.id}/thumbnail`;
+            }}
+          >
+            🖼️ 썸네일
+          </ActionButton>
+          <DeleteButton onClick={() => handleDeleteTest(test.id)}>
+            🗑️ 삭제
+          </DeleteButton>
+        </TestActions>
+      </TestCard>
+    );
+  })}
+</TestsGrid>
+
 
         {tests.length === 0 && (
           <EmptyState>
