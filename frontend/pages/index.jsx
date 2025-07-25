@@ -623,7 +623,11 @@ function RecommendSliderSection({ router, getTestFolderName }) {
                       onClick={() => handleTestClick(test)}
                     >
                       <Image src="/uploads/logo.png" alt="심풀 로고"
-                        layout="fixed" width={35} height={35} style={{ verticalAlign: 'middle' }} />
+                      style={{
+                        maxHeight: '100%', maxWidth: '100%', height: 'auto', width: 'auto',
+                        objectFit: 'cover'
+                      }}
+                        layout="fixed" width={35} height={35}  />
 
                     </TestItemPlaceholder>
                   </RecommendThumbnailContainer>
@@ -1980,7 +1984,7 @@ const TestItemPlaceholder = styled.div`
   top: 0;
   left: 0;
   width: 100vw;
-  max-width:500px;
+  max-width:100%;
   min-width:320px;
   height: 100%;
   background: linear-gradient(45deg, #667eea, #6a5acd);

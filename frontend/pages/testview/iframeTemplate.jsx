@@ -152,6 +152,7 @@ const ModalSheet = styled.div`
 
 const ModalHeader = styled.div`
   padding: 16px;
+  width:100%;
   font-weight: bold;
   font-size: 1.1rem;
   color: #fff;
@@ -159,7 +160,7 @@ const ModalHeader = styled.div`
   display: flex;         // 또는 grid
   align-items: center;   // 수직 정렬
   justify-content: space-around; // 가로 정렬 간격
-  gap: 10vw;             // 항목 사이 간격
+  gap: 10px;             // 항목 사이 간격
 `;
 
 const ModalBody = styled.div`
@@ -377,6 +378,9 @@ export default function IframeTemplate({ src, test, ...props }) {
 
   const handleKakaoShare = () => {
     console.log(window.Kakao, window.Kakao.Share);
+    if (!window.Kakao.isInitialized()) {
+      window.Kakao.init('74fb3033cd26d246d32ee28d6ea4586f');
+    }
     if (window.Kakao && window.Kakao.Share) {
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
@@ -423,7 +427,7 @@ export default function IframeTemplate({ src, test, ...props }) {
     box-shadow: 0 4px 24px rgba(0,0,0,0.18);
     padding: 18px 20px 12px 20px;
     z-index: 200;
-    min-width: 220px;
+    min-width: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -438,7 +442,7 @@ export default function IframeTemplate({ src, test, ...props }) {
   height: 48px;
   border-radius: 50%;
   border: none;
-  background: #f5f5f5;
+  background:rgb(233, 230, 230);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -730,11 +734,10 @@ export default function IframeTemplate({ src, test, ...props }) {
           width: '100%',
           flexShrink: '0',
           display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
           color: '#fff',
           fontWeight: 'bold',
           fontSize: '1.2rem',
+          boxSizing: 'border-box',
         }}>
           { /* 상세도 같이 추가 */}
           <ActionWrap>
@@ -864,11 +867,13 @@ export default function IframeTemplate({ src, test, ...props }) {
         <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 8 }}>공유하기</div>
         <ShareButtonRow>
           <RoundShareButton onClick={handleCopyUrl} title="URL 복사"><FaLink color='rgb(46, 44, 32)' size={28} /></RoundShareButton>
+         {/**/}
           <RoundShareButton onClick={handleKakaoShare} title="카카오톡">
             <SiKakaotalk color='rgb(46, 26, 10)' width='25px' size={28} />
           </RoundShareButton>
           <RoundShareButton onClick={handleFacebookShare} title="페이스북"><FaFacebook color="#1877f3" size={28} /></RoundShareButton>
           <RoundShareButton onClick={handleTwitterShare} title="트위터"><FaTwitterSquare color="#1da1f2" size={28} /></RoundShareButton>
+          
         </ShareButtonRow>
       </ShareModal>
     </Div100vh>
