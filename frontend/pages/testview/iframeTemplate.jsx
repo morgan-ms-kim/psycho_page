@@ -400,6 +400,32 @@ export default function IframeTemplate({ src, test, ...props }) {
   };
 
   const handleFacebookShare = () => {
+    try {
+      if (!shareUrl) {
+        toast.info('공유할 URL이 없습니다.');
+        return;
+      }
+  
+      const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  
+      // 팝업을 화면 중앙에 띄우기
+      const width = 500;
+      const height = 500;
+      const left = window.screenX + (window.innerWidth - width) / 2;
+      const top = window.screenY + (window.innerHeight - height) / 2;
+  
+      window.open(
+        facebookShareUrl,
+        '_blank',
+        `width=${width},height=${height},left=${left},top=${top},noopener,noreferrer`
+      );
+    } catch (error) {
+      console.error('Facebook 공유 오류:', error);
+      toast.info('페이스북 공유를 사용할 수 없습니다.');
+    }
+  };
+
+  const handleFacebookShare1 = () => {
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'width=500,height=500');
   };
   const handleTwitterShare = () => {
