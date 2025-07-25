@@ -1579,7 +1579,6 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
     }
 
     
-    let thumbnailPath = '/uploads/thumbnails/default-thumb.png';
 
     
     let test =null;
@@ -1590,8 +1589,7 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
         category: category || '기타',
         externalUrl,
         folder: null,
-        //thumbnail: '/uploads/thumbnails/default-thumb.png',
-        thumbnail: thumbnailPath,
+        thumbnail: '/uploads/thumbnails/default-thumb.png',        
       });
     } catch (error) {
       return res.status(500).json({ error: 'DB 저장 실패',  detail: error.message });
@@ -1600,28 +1598,27 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
     const folderName = `test${test.id}`;
     test.folder = folderName;
     // testGroup 경로로 변경
-    const testsDir = path.join(process.cwd(), '..', 'testGroup', 'public', 'tests');
-    const testPath = path.join(testsDir, folderName);
-    test.thumbnail = testPath;
+    const thumbnailPath = `/uploads/thumbnails/${folderName}`;
+    test.thumbnail = thumbnailPath;
     // 기존 폴더가 있으면 삭제
-    if (fs.existsSync(testPath)) {
+    if (fs.existsSync(thumbnailPath)) {
       try {
-        fs.rmSync(testPath, { recursive: true, force: true });
-        console.log('🗑️ 기존 폴더 삭제:', testPath);
+        fs.rmSync(thumbnailPath, { recursive: true, force: true });
+        console.log('🗑️ 기존 폴더 삭제:', thumbnailPath);
       } catch (error) {
         console.error('⚠️ 기존 폴더 삭제 실패:', error.message);
         // 삭제 실패 시 폴더 내용만 비우기
         try {
-          const files = fs.readdirSync(testPath);
+          const files = fs.readdirSync(thumbnailPath);
           for (const file of files) {
-            const filePath = path.join(testPath, file);
+            const filePath = path.join(thumbnailPath, file);
             if (fs.lstatSync(filePath).isDirectory()) {
               fs.rmSync(filePath, { recursive: true, force: true });
             } else {
               fs.unlinkSync(filePath);
             }
           }
-          console.log('🗑️ 폴더 내용 비우기 완료:', testPath);
+          console.log('🗑️ 폴더 내용 비우기 완료:', thumbnailPath);
         } catch (clearError) {
           console.error('⚠️ 폴더 내용 비우기 실패:', clearError.message);
         }
@@ -1679,10 +1676,10 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
       });
     };
 
-    fs.mkdirSync(testPath);
+    fs.mkdirSync(thumbnailPath);
     const imgPaths = await getValidImagePaths(externalUrl);
     for (const img of imgPaths) {
-      const destPath = path.join(testPath, img.fileName);
+      const destPath = path.join(thumbnailPath, img.fileName);
       console.log('📥 Downloading:', img.path, '➡️', destPath);
       await downloadImage(img.path, destPath);
     }
