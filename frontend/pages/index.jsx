@@ -877,8 +877,8 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
     const fetchImagePaths = async () => {
       const paths = {};
       for (const test of sortedTests) {
-        if (test.thumbnail) {
-          const path = await getExternalImagePath(test.thumbnail);
+        if (!test.thumbnail.includes('.')) {
+          const path = await getThumbnailByLang(test.thumbnail);
           if (path) paths[test.id] = path;
         }
       }
@@ -886,7 +886,7 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
     };
 
     fetchImagePaths();
-  }, []);
+  }, [sortedTests]);
 //}, [sortedTests]);
 
   // 전역 마우스 이벤트
@@ -971,7 +971,9 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
               const isHot = hotIds.includes(test.id);
 
               const resolvedPath = imagePaths[test.id]; // 비동기로 구한 이미지 경로
-
+              
+              console.info('resolvedPath:', resolvedPath);
+              console.info('test.thumbnail:', test.thumbnail);
               return (
                 <ScrollCard
                   key={test.id}
@@ -999,11 +1001,12 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
                       {//test.externalUrl?imgPath=test.externalUrl+'assets/start-images/ko_start.png'
                         ///assets/start-images/ko_start.png
                       }
-                      {test.externalUrl||!test.thumbnail.includes('.') ? (
+                      {(test.externalUrl&&!test.thumbnail.includes('.')) ? (
                         
                         <img
+
+                          loading="lazy"
                           src={resolvedPath}
-                          
                           alt={test.title}
                           draggable={false}
                           onContextMenu={handleDragStart}
@@ -1027,7 +1030,7 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
                           }}
 
                         />
-                      ) : test.thumbnail ? (
+                      ) : (test.thumbnail&& !test.thumbnail.includes('default-thumb.png')) ? (
                         <Image
                           src={getImagePath(test.thumbnail)}
                           alt={test.title}
@@ -1047,7 +1050,7 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
 
                         />
                       ) : (
-                        <ScrollTestItemPlaceholder style={{ display: test.thumbnail || resolvedPath ? 'none' : 'none', maxHeight: '360px', maxWidth: '100%', }}>
+                        <ScrollTestItemPlaceholder style={{ display: 'flex', maxHeight: '360px', maxWidth: '100%', }}>
                           <Image src="/uploads/logo.png" alt="심풀 로고"
                             layout="fixed" width={50} height={50} style={{ borderRadius: '10px', verticalAlign: 'middle' }} />
 
@@ -1086,7 +1089,7 @@ export const getImagePath = (path) => {
   path = `https://smartpick.website${path}`
   return path;
 };
-const getExternalImagePath = async (thumbnailPath) => {
+const getThumbnailByLang = async (thumbnailPath) => {
   if (!thumbnailPath) return null;
 
   // 브라우저 언어 설정 확인
@@ -1099,19 +1102,19 @@ const getExternalImagePath = async (thumbnailPath) => {
   } else if (language.startsWith('ko')) {
     langCode = 'ko';
   }
-
+  const homePage = 'https://smartpick.website/';
   const ext = '.png';
-  const imgPath = `${langCode}${ext}`;
+  const imgPath = `${homePage}${thumbnailPath}/${langCode}${ext}`;
   try {
-  const res = await fetch(path, { method: 'HEAD' });
+ // const res = await fetch(imgPath, { method: 'HEAD' });
 
-      const contentType = res.headers.get('Content-Type');
+   //   const contentType = res.headers.get('Content-Type');
       
-      console.log('img : ', imgPath);
-      console.log('img contentType : ', contentType);
-      if (res.ok && contentType?.startsWith('image/')) {
-        return imgPath;
-      }
+      console.log('lang:' , langCode,' img :',imgPath.split());
+    //  console.log('img contentType : ', contentType);
+    //  if (res.ok && contentType?.startsWith('image/')) {
+      return imgPath.split();
+     // }
     }catch (error) {
       console.warn(`Failed to fetch ${imgPath}`, error);
     }
