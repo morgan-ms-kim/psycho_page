@@ -1335,7 +1335,7 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
      
     }
     // 썸네일 파일 삭제 (기본 썸네일 제외)
-    if (test.thumbnail && test.thumbnail !== '/uploads/thumbnails/default-thumb.png' && test.thumbnail.include('.') ) {
+    if (test.thumbnail && test.thumbnail !== '/uploads/thumbnails/default-thumb.png' && test.thumbnail.includes('.') ) {
       const thumbPath = path.join(process.cwd(), '..', 'testGroup', 'public', test.thumbnail.replace('/', ''));
       if (fs.existsSync(thumbPath)) {
         fs.unlinkSync(thumbPath);

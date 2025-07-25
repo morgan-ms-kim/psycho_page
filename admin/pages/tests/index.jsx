@@ -256,7 +256,7 @@ export default function TestManagement() {
         <TestsGrid>
   {tests.map((test) => {
     const path = imagePaths[test.id];
-    const thumbnailSrc = test.thumbnail && !test.thumbnail.includes('.')
+    const thumbnailSrc = (test.thumbnail && !test.thumbnail.includes('.'))
       ? path
       : test.thumbnail && !test.thumbnail.includes('default-thumb.png')
       ? `https://smartpick.website${test.thumbnail}`
