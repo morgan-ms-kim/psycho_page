@@ -10,7 +10,7 @@ import path from 'path';
 import https from 'https';
 import multer from 'multer';
 import geoip from 'geoip-lite';
-import sharp from('sharp');
+import sharp from 'sharp';
 import { createRequire } from 'module';
 import sitemapRouter from './routes/sitemap.js';
 import { count } from 'console';
