@@ -1679,14 +1679,14 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
           response.pipe(file);
           file.on('finish', async () => {
             file.close();
-            console.log(`PNG 저장 완료: ${destPath}`);
+            console.log(`PNG 저장 완료: ${pngPath}`);
     
             // PNG → WEBP 변환
             await convertToWebp(pngPath, webpPath);
-            resolve({ png: destPath, webp: webpPath });
+            resolve({ png: pngPath, webp: webpPath });
           });
         }).on('error', (error) => {
-          fs.unlink(destPath, () => {});
+          fs.unlink(pngPath, () => {});
           reject(error);
         });
       });
