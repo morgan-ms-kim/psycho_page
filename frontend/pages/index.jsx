@@ -983,7 +983,8 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
                         layout="fill"
                         style={{
                           maxHeight: '100%', maxWidth: '100%',
-                          objectFit: 'contain', display: 'block', verticalAlign: 'middle'
+                           display: 'block', verticalAlign: 'middle',
+                          objectFit: 'cover'
                         }}
 
                       />
