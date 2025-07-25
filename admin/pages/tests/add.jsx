@@ -88,7 +88,7 @@ export default function AddTest() {
   const [logMessages, setLogMessages] = useState([]);
   const [categories, setCategories] = useState([]);
   const logPanelRef = useRef(null);
-  const [testType, setTestType] = useState('git'); // 'git' or 'external'
+  const [testType, setTestType] = useState('external'); // 'git' or 'external'
 
   // 서버 상태 확인
   useEffect(() => {
@@ -438,18 +438,18 @@ export default function AddTest() {
               <Label>테스트 유형</Label>
               <RadioLabel>
                 <RadioOption
-                  label="일반 테스트 (git clone)"
-                  name="testType"
-                  value="git"
-                  checked={testType === 'git'}
-                  onChange={() => setTestType('git')}
-                />
-                <RadioOption
                   label="외부 링크 테스트 (iframe)"
                   name="testType"
                   value="external"
                   checked={testType === 'external'}
                   onChange={() => setTestType('external')}
+                />
+                <RadioOption
+                  label="일반 테스트 (git clone)"
+                  name="testType"
+                  value="git"
+                  checked={testType === 'git'}
+                  onChange={() => setTestType('git')}
                 />
               </RadioLabel>
             </FormGroup>

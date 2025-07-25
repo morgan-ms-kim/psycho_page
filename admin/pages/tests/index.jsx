@@ -266,7 +266,7 @@ export default function TestManagement() {
       : test.thumbnail && !test.thumbnail.includes('default-thumb.png')
       ? `https://smartpick.website${test.thumbnail}`
       : null;
-    console.log(thumbnailSrc);
+   // console.log(thumbnailSrc);
     return (
       <TestCard key={test.id}>
         <TestThumbnail>

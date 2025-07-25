@@ -1342,7 +1342,7 @@ app.delete('/api/admin/tests/:id', authenticateAdmin, async (req, res, next) => 
         console.log('🗑️ 썸네일 파일 삭제:', thumbPath);
       }
       
-    } else{
+    } else if(test.externalUrl && !test.thumbnail.includes('.')){
       const thumbnailFolderPath = path.join(process.cwd(), '..', 'testGroup', 'public', 'uploads', 'thumbnails', test.folder);
       if (fs.existsSync(thumbnailFolderPath)) {
         fs.rmSync(thumbnailFolderPath, { recursive: true, force: true });

@@ -1110,7 +1110,7 @@ const getThumbnailByLang = async (thumbnailPath) => {
 
    //   const contentType = res.headers.get('Content-Type');
       
-      console.log('lang:' , langCode,' img :',imgPath.split());
+      //console.log('lang:' , langCode,' img :',imgPath.split());
     //  console.log('img contentType : ', contentType);
     //  if (res.ok && contentType?.startsWith('image/')) {
       return imgPath.split();
