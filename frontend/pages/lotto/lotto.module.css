@@ -68,12 +68,12 @@
 
 .circle {
   display: inline-block;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.5em;
+  height: 1.5em;
   border-radius: 50%;
   text-align: center;
-  line-height: 1.5rem; /* 글자를 중앙에 오도록 */
-  font-size: 1rem;  /* 폰트도 너비에 비례 */
+  line-height: 1.5em; /* 글자를 중앙에 오도록 */
+  font-size: 1em;  /* 폰트도 너비에 비례 */
   color: white;
   font-weight: 500;
   margin-right: 6px;
@@ -151,7 +151,7 @@
   margin: 0 auto;
 }
 .rankSide {
-  flex: 0 0 220px;
+  flex: 0 0 180px;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 2px 16px 0 #e6e6f0;
@@ -334,13 +334,20 @@
 
 /* 자릿수 조합 시각화 */
 .digitCombination {
+  max-width: 100%;
+  width:100%;
   display: flex;
   align-items: center;
   gap: 0.3rem;
   flex-wrap: nowrap;
-  min-width: 0;
+  min-width: 0;  
+  overflow: hidden;   
 }
 
+.digitCombination > * {
+  flex-shrink: 1;          /* 넘칠 경우 너비 줄이기 */
+  min-width: 0;            /* 축소 가능하게 설정 */
+}
 .digitGroup {
   display: flex;
   align-items: center;
@@ -351,7 +358,8 @@
   border: 1px solid #e0e0e7;
   font-size: 0.75rem;
   min-width: 0;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  text-overflow: ellipsis;
 }
 
 .digitLabel {
@@ -388,5 +396,4 @@
   justify-content: center;
   font-size: 0.8rem;
   font-weight: 600;
-  margin-right: 0.8rem;
 } 

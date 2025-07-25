@@ -446,55 +446,58 @@ export default function LottoPage() {
                   {Array.isArray(digitRank) && digitRank.map((item, index) => {
                     const hasNonZero = item.combination.split('-').some(count => count !== '0');
                     return (
-                      <li 
-                      key={index} 
-                      className={styles.digitRankItem}
-                      style={{ 
-                        borderLeftColor: hasNonZero ? '#5a4fff' : '#ccc',
-                        borderLeftWidth: hasNonZero ? '4px' : '2px',
-                        display: 'flex',
-                        flexDirection: 'column', // 수직 정렬
-                        padding: '8px 0',
-                        maxWidth:'500px',
-                        minWidth:'320px',
-                        width:'100%',
-                      }}
-                    >
-                      {/* 첫 번째 줄: combination 문자열 */}
-                      <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-                        {item.combination}
-                      </div>
-                    
-                      {/* 두 번째 줄: 기존 flex 구조 */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <span className={styles.rankNumber}>{index + 1}</span>
-                          <div className={styles.digitCombination} style={{ display: 'flex', gap: '6px', marginLeft: '8px' }}>
-                            {item.combination.split('-').map((count, idx) => {
-                              const labels = ['1', '10', '20', '30', '40'];
-                              const isZero = count === '0';
-                              return (
-                                <div 
-                                  key={idx} 
-                                  className={styles.digitGroup}
-                                  style={{
-                                    borderColor: isZero ? '#ccc' : '#5a4fff',
-                                    borderWidth: isZero ? '1px' : '2px',
-                                  }}
-                                >
-                                  <span className={`${styles.circle} ${getColorClass(labels[idx])}`}>
-                                    {labels[idx]}
-                                  </span>{count}회
-                                </div>
-                              );
-                            })}
+                      <li
+                        key={index}
+                        className={styles.digitRankItem}
+                        style={{
+                          borderLeftColor: hasNonZero ? '#5a4fff' : '#ccc',
+                          borderLeftWidth: hasNonZero ? '4px' : '2px',
+                          display: 'flex',
+                          flexDirection: 'column', // 수직 정렬
+                          padding: '8px 0',
+                          maxWidth: '500px',
+                          minWidth: '320px',
+                          width: '100%',
+                        }}
+                      >
+                        <div style={{ display: 'flex', marginBottom: '4px' }}>
+                          <div style={{ display: 'flex',fontWeight: 'bold', marginBottom: '4px' }}>
+
+                            <span className={styles.rankNumber}>{index + 1}</span>
+                            {/*  combination 문자열 */}
+                            {item.combination}
+                            {/* count 표시 */}
+                            <span className={styles.digitRankCount}>{item.count}회</span>
                           </div>
                         </div>
-                    
-                        {/* 오른쪽 끝: count 표시 */}
-                        <span className={styles.digitRankCount}>{item.count}회</span>
-                      </div>
-                    </li>
+                        {/* 두 번째 줄: 기존 flex 구조 */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <div className={styles.digitCombination} style={{ display: 'flex', gap: '6px', marginLeft: '8px' }}>
+                              {item.combination.split('-').map((count, idx) => {
+                                const labels = ['1', '10', '20', '30', '40'];
+                                const isZero = count === '0';
+                                return (
+
+                                  <div
+                                    key={idx}
+                                    className={styles.digitGroup}
+                                    style={{
+                                      borderColor: isZero ? '#ccc' : '#5a4fff',
+                                      borderWidth: isZero ? '1px' : '2px',
+                                    }}
+                                  >
+                                    <span className={`${styles.circle} ${getColorClass(labels[idx])}`}>
+                                      {labels[idx]}
+                                    </span>{count}회
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                        </div>
+                      </li>
                     );
                   })}
                 </ul>

@@ -108,8 +108,8 @@ background: #fff;
 flex: 1;
 min-height: 0;
 overflow: auto;
-
-  
+fullscreen:allow;
+  object-fit: cover
 
   &::-webkit-scrollbar {
     display: none; /* 모바일에서 스크롤바 감춤 */
@@ -634,6 +634,7 @@ async function getServerdSideProps(context) {
         {isClient && src ? (
           <IframeSection
             src={src}
+            allowFullScreen
             style={{
               paddingTop: TOPBAR_HEIGHT,
             }}
