@@ -7,12 +7,12 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
+import https from 'https';
 import multer from 'multer';
 import geoip from 'geoip-lite';
 import { createRequire } from 'module';
 import sitemapRouter from './routes/sitemap.js';
 import { count } from 'console';
-import morgan from 'morgan';
 const require = createRequire(import.meta.url);
 let REGION_MAP = {};
 try {
@@ -91,10 +91,6 @@ app.use('/tests', express.static(path.join(process.cwd(), '..', 'testGroup', 'pu
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-// assets, .js, .css, .gif 등은 로그 제외
-app.use(morgan('dev', {
-  skip: (req) => req.url.startsWith('/tests/') && req.url.includes('/assets/')
-}));
 // 서버 상태 확인 라우트
 app.get('/api/health', (req, res) => {
   res.json({
@@ -592,13 +588,13 @@ app.post('/api/visitors', async (req, res, next) => {
     const userKey = getUserKeyOrIP(req);
     if (!userKey) return res.status(400).json({ error: 'IP를 확인할 수 없습니다.' });
     const geo = geoip.lookup(userKey);
-    
+
     const country = geo ? geo.country : null;
     let city = geo ? geo.city : null;
     let region = geo ? geo.region : null;
-    console.log('Visitor:', userKey, 'country:', country, 'city:',city, 'region:', region); // userKey 값 로그
+    console.log('Visitor:', userKey, 'country:', country, 'city:', city, 'region:', region); // userKey 값 로그
     // 1. region-map.json 우선 적용
-    if (city){
+    if (city) {
       region = city;
     }
     else if (country && region && REGION_MAP[country] && REGION_MAP[country][region]) {
@@ -884,7 +880,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
           };
           copyRecursiveSync(outputPath, testPath);
           // 로그파일 복사 (존재할 때만)
-          
+
           log('빌드 결과물 복사 완료');
         } else {
           log('빌드 결과물(build/dist 폴더)이 없습니다.');
@@ -905,7 +901,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
         return res.status(500).json({ error: '서버 오류', steps, detail: error.message });
       }
     } catch (error) {
-      
+
       console.log(`에러 발생: ${error.message}`);
       if (test) await test.destroy();
       return res.status(400).json({ error: '테스트 빌드/복사 실패', steps, detail: error.message });
@@ -915,7 +911,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     await test.save();
     return res.json({ success: true, test, steps, folderName });
   } catch (error) {
-    
+
     console.log(`에러 발생: ${error.message}`);
     if (test) await test.destroy();
     return res.status(500).json({ error: '서버 오류', steps, detail: error.message });
@@ -1571,22 +1567,126 @@ app.post('/api/admin/update-all-folder-names', authenticateAdmin, async (req, re
   }
 });
 
-// 외부 링크 테스트 등록 API
+// 외부 링크 테스트 등록 API. thumbnail 폴더 따로 생성 / 언어별로 저장
 app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, next) => {
+  
+  let test = null; // 생성된 테스트 객체 추적
   try {
     console.log('/api/admin/tests/add-external');
     const { externalUrl, title, description, category } = req.body;
     if (!externalUrl || !title) {
       return res.status(400).json({ error: '외부 링크와 제목은 필수입니다.' });
     }
-    const test = await Test.create({
-      title,
-      description: description || '',
-      category: category || '기타',
-      externalUrl,
-      folder: null,
-      thumbnail: '/uploads/thumbnails/default-thumb.png',
-    });
+
+    
+    let thumbnailPath = '/uploads/thumbnails/default-thumb.png';
+
+    
+    let test =null;
+    try {
+        test = await Test.create({
+        title,
+        description: description || '',
+        category: category || '기타',
+        externalUrl,
+        folder: null,
+        //thumbnail: '/uploads/thumbnails/default-thumb.png',
+        thumbnail: thumbnailPath,
+      });
+    } catch (error) {
+      return res.status(500).json({ error: 'DB 저장 실패',  detail: error.message });
+    }
+    // 2. 실제 id로 폴더명 생성
+    const folderName = `test${test.id}`;
+    test.folder = folderName;
+    // testGroup 경로로 변경
+    const testsDir = path.join(process.cwd(), '..', 'testGroup', 'public', 'tests');
+    const testPath = path.join(testsDir, folderName);
+    test.thumbnail = testPath;
+    // 기존 폴더가 있으면 삭제
+    if (fs.existsSync(testPath)) {
+      try {
+        fs.rmSync(testPath, { recursive: true, force: true });
+        console.log('🗑️ 기존 폴더 삭제:', testPath);
+      } catch (error) {
+        console.error('⚠️ 기존 폴더 삭제 실패:', error.message);
+        // 삭제 실패 시 폴더 내용만 비우기
+        try {
+          const files = fs.readdirSync(testPath);
+          for (const file of files) {
+            const filePath = path.join(testPath, file);
+            if (fs.lstatSync(filePath).isDirectory()) {
+              fs.rmSync(filePath, { recursive: true, force: true });
+            } else {
+              fs.unlinkSync(filePath);
+            }
+          }
+          console.log('🗑️ 폴더 내용 비우기 완료:', testPath);
+        } catch (clearError) {
+          console.error('⚠️ 폴더 내용 비우기 실패:', clearError.message);
+        }
+      }
+    }
+
+    const getValidImagePaths = async (externalUrl) => {
+      if (!externalUrl) return [];
+
+      const langPacks = ['en', 'ko', 'es'];
+      const fallbackTemplatePaths = [
+        (code) => `assets/start-images/${code}_start.png`,
+        (code) => `assets/images/start/start-${code}.png`,
+        (code) => `images/start-${code}.png`,
+      ];
+
+      const results = [];
+
+      for (const lang of langPacks) {
+        for (const template of fallbackTemplatePaths) {
+          const path = `${externalUrl}${template(lang)}`;
+          try {
+            const res = await fetch(path, { method: 'HEAD' });
+            const contentType = res.headers.get('Content-Type');
+
+            if (res.ok && contentType?.startsWith('image/')) {
+
+              console.log('exist img:', path);
+              results.push({
+                lang,
+                path,
+                fileName: `${lang}.png`
+              });
+            }
+          } catch (error) {
+            console.warn(`Failed to fetch ${path}`, error);
+          }
+        }
+      }
+      return results; // 존재하는 이미지 리스트 반환
+    };
+    const downloadImage = (url, destPath) => {
+      return new Promise((resolve, reject) => {
+        const file = fs.createWriteStream(destPath);
+        https.get(url, (response) => {
+          response.pipe(file);
+          file.on('finish', () => {
+            file.close();
+            resolve(destPath);
+          });
+        }).on('error', (error) => {
+          fs.unlink(destPath, () => { });
+          reject(error);
+        });
+      });
+    };
+
+    fs.mkdirSync(testPath);
+    const imgPaths = await getValidImagePaths(externalUrl);
+    for (const img of imgPaths) {
+      const destPath = path.join(testPath, img.fileName);
+      console.log('📥 Downloading:', img.path, '➡️', destPath);
+      await downloadImage(img.path, destPath);
+    }
+    test.save();
     res.json({ success: true, test });
   } catch (error) {
     next(error);

@@ -7,8 +7,8 @@ import ThumbnailUploader from '../../components/ThumbnailUploader';
 
 import Image from 'next/image';
 const apiClient = axios.create({
-  baseURL: 'https://smartpick.website/api',
-  //baseURL: 'http://localhost:4000/api',
+// baseURL: 'https://smartpick.website/api',
+baseURL: 'http://localhost:4000/api',
   headers: {
     'Content-Type': 'application/json',
   }
@@ -543,7 +543,7 @@ export default function AddTest() {
                 취소
               </CancelButton>
               <SubmitButton type="submit" disabled={loading}>
-                {loading ? '추가 중...' : '테스트 추가'+ selected}
+                {loading ? '추가 중...' : '테스트 추가'}
               </SubmitButton>
             </ButtonGroup>
           </Form>

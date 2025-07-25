@@ -27,4 +27,5 @@ frontend/public/uploads/thumbnails/test76_1752059466363.png
 frontend/test/template74/
 frontend/test/template76/
 frontend/pages/item/
-frontend/public/item/
+frontend/public/
+testGroup/public/

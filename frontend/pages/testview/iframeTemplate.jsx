@@ -103,17 +103,21 @@ const IframeSection = styled.iframe`
 width: 100%;
 height: 100%;
 border: none;
-display: block;
+display: flex;
+justify-content: center; /* 가운데 정렬 (선택 사항) */
+align-items: center;     /* 수직 정렬 (선택 사항) */
 background: #fff;
 flex: 1;
 min-height: 0;
-overflow: auto;
+box-sizing: border-box;
+border: none;
+overflow: hidden;
 fullscreen:allow;
-  object-fit: cover
+object-fit: cover
 
-  &::-webkit-scrollbar {
-    display: none; /* 모바일에서 스크롤바 감춤 */
-  }
+&::-webkit-scrollbar {
+  display: none; /* 모바일에서 스크롤바 감춤 */
+}
 
 `;
 
@@ -378,7 +382,7 @@ export default function IframeTemplate({ src, test, ...props }) {
 
   const handleKakaoShare = () => {
     console.log(window.Kakao, window.Kakao.Share);
-    console.info('test.thumbnail:' , test.thumbnail);
+    console.info('test.thumbnail:', test.thumbnail);
     if (!window.Kakao.isInitialized()) {
       window.Kakao.init('74fb3033cd26d246d32ee28d6ea4586f');
     }
@@ -406,26 +410,26 @@ export default function IframeTemplate({ src, test, ...props }) {
         toast.info('공유할 URL이 없습니다.');
         return;
       }
-  
+
       const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-  
+
       const width = 500;
       const height = 500;
       const left = window.screenX + (window.innerWidth - width) / 2;
       const top = window.screenY + (window.innerHeight - height) / 2;
-  
+
       window.open(
         facebookShareUrl,
         '_blank',
         `width=${width},height=${height},left=${left},top=${top},noopener,noreferrer`
       );
     };
-  
+
     return (
       <>
         <Head>
           {/* Open Graph 메타 태그 */}
-          
+
           <meta property="og:description" content="재미있는 심리테스트를 공유해보세요!" />
           <meta
             property="og:image"
@@ -437,7 +441,7 @@ export default function IframeTemplate({ src, test, ...props }) {
           />
           <meta property="og:url" content={window.location.href} />
         </Head>
-  
+
         <main>
           <h1>{shareTitle}</h1>
           <button onClick={handleFacebookShare}>페이스북 공유</button>
@@ -451,17 +455,17 @@ export default function IframeTemplate({ src, test, ...props }) {
         toast.info('공유할 URL이 없습니다.');
         return;
       }
-  
+
       const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-  
+
       console.info('Facebook 공유');
-      console.info('test.thumbnail:' , test.thumbnail);
+      console.info('test.thumbnail:', test.thumbnail);
       // 팝업을 화면 중앙에 띄우기
       const width = 500;
       const height = 500;
       const left = window.screenX + (window.innerWidth - width) / 2;
       const top = window.screenY + (window.innerHeight - height) / 2;
-  
+
       window.open(
         facebookShareUrl,
         '_blank',
@@ -472,24 +476,24 @@ export default function IframeTemplate({ src, test, ...props }) {
       toast.info('페이스북 공유를 사용할 수 없습니다.');
     }
   };
-//"/assets/start-images/ko_start.png"
+  //"/assets/start-images/ko_start.png"
 
-async function getServerdSideProps(context) {
-  const { id } = context.params;
+  async function getServerdSideProps(context) {
+    const { id } = context.params;
 
-  // 테스트 데이터 가져오기
-  const test = await fetchTestDataById(id);
+    // 테스트 데이터 가져오기
+    const test = await fetchTestDataById(id);
 
-  // SSR 시점에서 정확한 URL 만들어서 전달
-  const shareUrl = `https://smartpick.website/result/${id}`;
+    // SSR 시점에서 정확한 URL 만들어서 전달
+    const shareUrl = `https://smartpick.website/result/${id}`;
 
-  return {
-    props: {
-      test,
-      shareUrl,
-    },
-  };
-}
+    return {
+      props: {
+        test,
+        shareUrl,
+      },
+    };
+  }
   const handleFacebookShare1 = () => {
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'width=500,height=500');
   };
@@ -801,10 +805,10 @@ async function getServerdSideProps(context) {
               </div>
             ))}
           </div>
-          <div style={{ marginTop:'20px', }}>
-            <div style={{ width: '100%', marginBottom: 8, display: 'flex',  }}>
-              <input style={{ height: 30, flex:0.8, border: '1px solid #ccc', minWidth: 0 }} placeholder="닉네임" value={newComment.nickname} onChange={e => setNewComment({ ...newComment, nickname: e.target.value })} />
-              <input style={{ height: 30, flex:0.8, border: '1px solid #ccc', minWidth: 0}} placeholder="비밀번호" type="password" value={newComment.password} onChange={e => setNewComment({ ...newComment, password: e.target.value })} />
+          <div style={{ marginTop: '20px', }}>
+            <div style={{ width: '100%', marginBottom: 8, display: 'flex', }}>
+              <input style={{ height: 30, flex: 0.8, border: '1px solid #ccc', minWidth: 0 }} placeholder="닉네임" value={newComment.nickname} onChange={e => setNewComment({ ...newComment, nickname: e.target.value })} />
+              <input style={{ height: 30, flex: 0.8, border: '1px solid #ccc', minWidth: 0 }} placeholder="비밀번호" type="password" value={newComment.password} onChange={e => setNewComment({ ...newComment, password: e.target.value })} />
             </div>
             <textarea style={{
               fontFamily: 'inherit', fontSize: 'inherit', width: '100%',
@@ -959,13 +963,13 @@ async function getServerdSideProps(context) {
         <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 8 }}>공유하기</div>
         <ShareButtonRow>
           <RoundShareButton onClick={handleCopyUrl} title="URL 복사"><FaLink color='rgb(46, 44, 32)' size={28} /></RoundShareButton>
-         {/**/}
+          {/**/}
           <RoundShareButton onClick={handleKakaoShare} title="카카오톡">
             <SiKakaotalk color='rgb(46, 26, 10)' width='25px' size={28} />
           </RoundShareButton>
           <RoundShareButton onClick={handleFacebookShare} title="페이스북"><FaFacebook color="#1877f3" size={28} /></RoundShareButton>
           <RoundShareButton onClick={handleTwitterShare} title="트위터"><FaTwitterSquare color="#1da1f2" size={28} /></RoundShareButton>
-          
+
         </ShareButtonRow>
       </ShareModal>
     </Div100vh>

@@ -30,10 +30,12 @@ import {
 } from '../components/StyledComponents';
 import Head from 'next/head';
 import Image from 'next/image';
-import { FaThumbsUp, FaPlay, FaUserAlt, 
+import {
+  FaThumbsUp, FaPlay, FaUserAlt,
   FaHeart, FaBriefcase, FaGamepad,
-   FaBrain, FaUsers, FaEllipsisH,
-    FaComment, FaFire, FaStar, FaHandSparkles } from 'react-icons/fa';
+  FaBrain, FaUsers, FaEllipsisH,
+  FaComment, FaFire, FaStar, FaHandSparkles
+} from 'react-icons/fa';
 
 
 
@@ -449,7 +451,7 @@ function RecommendSliderSection({ router, getTestFolderName }) {
     } else if (dragOffsetX > threshold) {
       // 이전 슬라이드로 이동
       setCurrentSlide((prev) => (prev - 1 + recommendTests.length) % recommendTests.length);
-    }else if (dragOffsetX === 0) {
+    } else if (dragOffsetX === 0) {
       // 테스트로 이동
       handleTestClick(recommendTests[currentSlide]);
     }
@@ -524,6 +526,9 @@ function RecommendSliderSection({ router, getTestFolderName }) {
 
   // 실제 슬라이드 인덱스 (무한 루프용)
   const actualSlideIndex = currentSlide + total;
+
+
+
 
   return (
     <>
@@ -623,16 +628,16 @@ function RecommendSliderSection({ router, getTestFolderName }) {
                       onClick={() => handleTestClick(test)}
                     >
                       <Image src="/uploads/logo.png" alt="심풀 로고"
-                      style={{
-                        maxHeight: '100%', maxWidth: '100%', height: 'auto', width: 'auto',
-                        objectFit: 'cover'
-                      }}
-                        layout="fixed" width={35} height={35}  />
+                        style={{
+                          maxHeight: '100%', maxWidth: '100%', height: 'auto', width: 'auto',
+                          objectFit: 'cover'
+                        }}
+                        layout="fixed" width={35} height={35} />
 
                     </TestItemPlaceholder>
                   </RecommendThumbnailContainer>
                   <RecommendStats>
-                    <RecommendStat><IconStat><FaPlay style={{ marginRight: '3px' , fontSize: '0.6rem' }}></FaPlay></IconStat>{test?.views}</RecommendStat>
+                    <RecommendStat><IconStat><FaPlay style={{ marginRight: '3px', fontSize: '0.6rem' }}></FaPlay></IconStat>{test?.views}</RecommendStat>
                     <RecommendStat><IconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></IconStat>{test?.likes}</RecommendStat>
                     <RecommendStat><IconStat><FaComment style={{ marginRight: '3px' }}></FaComment></IconStat>{typeof test?.comments === 'number' ? test.comments : 0}</RecommendStat>
                   </RecommendStats>
@@ -856,6 +861,7 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
   const [dragStartX, setDragStartX] = useState(0);
   const [dragOffsetX, setDragOffsetX] = useState(0);
   const [wasDragging, setWasDragging] = useState(false);
+  const [imagePaths, setImagePaths] = useState({}); // { [test.id]: resolvedImageUrl }
   const lastClientXRef = useRef(0); // ⭐ 마지막 x 위치 저장
   const scrollRef = useRef(null);
   // hot/new 계산
@@ -867,7 +873,22 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
     .slice(0, 10)
     .map(t => t.id);
 
-  
+  useEffect(() => {
+    const fetchImagePaths = async () => {
+      const paths = {};
+      for (const test of sortedTests) {
+        if (test.externalUrl) {
+          const path = await getExternalImagePath(test.externalUrl);
+          if (path) paths[test.id] = path;
+        }
+      }
+      setImagePaths(paths);
+    };
+
+    fetchImagePaths();
+  }, []);
+//}, [sortedTests]);
+
   // 전역 마우스 이벤트
   useEffect(() => {
     if (!isDragging) return;
@@ -891,8 +912,8 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
   }, [isDragging, dragStartX, dragOffsetX]);
 
   const handleDragStart = (e) => {
-    
-    console.log('handleDragStart',e);
+
+    console.log('handleDragStart', e);
     const x = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
     setDragStartX(x);
     lastClientXRef.current = x; // 초기값 설정
@@ -904,124 +925,158 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
 
   const handleDragging = (e) => {
     if (!isDragging || !scrollRef.current) return;
-  
-  // 모바일에서만 preventDefault
-  if (e.type === 'touchmove') {
-    e.preventDefault();
-  }
-  
-    console.log('handleDragging',e);
+
+    // 모바일에서만 preventDefault
+    if (e.type === 'touchmove') {
+      e.preventDefault();
+    }
+
+    console.log('handleDragging', e);
     console.log('scrollRef.current.scrollLeft', scrollRef.current.scrollLeft)
     console.log('scrollWidth:', scrollRef.current.scrollWidth);
     console.log('clientWidth:', scrollRef.current.clientWidth);
     const x = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
     const offset = x - lastClientXRef.current;
-  
+
     scrollRef.current.scrollLeft -= offset;
-  
+
     if (Math.abs(offset) > 5) { // 5px 이상 움직이면 드래그로 인식
       setWasDragging(true);
     }
-    lastClientXRef.current = x; 
+    lastClientXRef.current = x;
     setDragStartX(x); // ✅ 기준점 업데이트해서 부드럽게 이동
   };
 
   const handleDragEnd = (e) => {
-    console.log('handleDragEnd',e);
+    console.log('handleDragEnd', e);
     setIsDragging(false);
-      
+
     // 100ms 후 드래그 상태 초기화 (클릭과 시간 겹치지 않도록)
     setTimeout(() => setWasDragging(false), 100);
 
   };
-
   return (
     <ScrollSection>
       {(
         <ScrollRow>
-          <ScrollInner  ref={scrollRef}
-        onMouseDown={handleDragStart}
-        onMouseUp={handleDragEnd}
-        onTouchStart={handleDragStart}
-        onTouchEnd={handleDragEnd}
-        onContextMenu={(e) => e.preventDefault()} 
-        >
-          {sortedTests.map((test) => {
-            const isNew = new Date(test.createdAt).getTime() > weekAgo;
-            const isHot = hotIds.includes(test.id);
-            return (
-              <ScrollCard
-                key={test.id}
-                onClick={() => {
-                  try {
-                    if (wasDragging){
-                      return; //drag중 클릭 방지
+          <ScrollInner ref={scrollRef}
+            onMouseDown={handleDragStart}
+            onMouseUp={handleDragEnd}
+            onTouchStart={handleDragStart}
+            onTouchEnd={handleDragEnd}
+            onContextMenu={(e) => e.preventDefault()}
+          >
+            {sortedTests.map((test) => {
+              const isNew = new Date(test.createdAt).getTime() > weekAgo;
+              const isHot = hotIds.includes(test.id);
+
+              const resolvedPath = imagePaths[test.id]; // 비동기로 구한 이미지 경로
+
+              return (
+                <ScrollCard
+                  key={test.id}
+                  onClick={() => {
+                    try {
+                      if (wasDragging) {
+                        return; //drag중 클릭 방지
+                      }
+                      if (!test.id) {
+                        console.error('테스트 ID가 없습니다:', test);
+                        return;
+                      }
+                      let testPath = null;
+                      console.log(test.folder);
+                      testPath = `/testview/${getTestFolderName(test.id)}`;
+                      console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
+                      router.push(testPath);
+                    } catch (error) {
+                      console.error('테스트 클릭 에러:', error, '테스트 데이터:', test);
                     }
-                    if (!test.id) {
-                      console.error('테스트 ID가 없습니다:', test);
-                      return;
-                    }
-                    let testPath = null;
-                    console.log(test.folder);
-                    testPath = `/testview/${getTestFolderName(test.id)}`;
-                    console.log('테스트 클릭:', testPath, '원본 ID:', test.id);
-                    router.push(testPath);
-                  } catch (error) {
-                    console.error('테스트 클릭 에러:', error, '테스트 데이터:', test);
-                  }
-                }}
-              >
-                <ScrollTestCardContent>
-                  <ScrollThumbnailContainer>
-                    {test.thumbnail ? (
-                      <Image
-                        src={getImagePath(test.thumbnail)}
-                        alt={test.title}
-                        draggable={false}
-                        onContextMenu={handleDragStart}
-                        onTouchStart={handleDragStart}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                        layout="fill"
-                        style={{
-                          maxHeight: '100%', maxWidth: '100%',
-                           display: 'block', verticalAlign: 'middle',
-                          objectFit: 'cover'
-                        }}
+                  }}
+                >
+                  <ScrollTestCardContent>
+                    <ScrollThumbnailContainer>
+                      {//test.externalUrl?imgPath=test.externalUrl+'assets/start-images/ko_start.png'
+                        ///assets/start-images/ko_start.png
+                      }
+                      //버셀 이미지 가져오기
+                      {/*console.log(resolvedPath)||test.externalUrl ? (
+                        
+                        <img
+                          src={resolvedPath}
+                          
+                          alt={test.title}
+                          draggable={false}
+                          onContextMenu={handleDragStart}
+                          onTouchStart={handleDragStart}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                          layout="fill"
+                          style={{
+                            maxHeight: '100%',
+                            maxWidth: '100%',
+                            display: 'block',
+                            verticalAlign: 'middle',
+                            objectFit: 'cover',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                          }}
 
-                      />
-                    ) : null}
-                    <ScrollTestItemPlaceholder style={{ display: test.thumbnail ? 'none' : 'flex', maxHeight: '360px', maxWidth: '100%', }}>
-                      <Image src="/uploads/logo.png" alt="심풀 로고"
-                        layout="fixed" width={50} height={50} style={{ borderRadius: '10px', verticalAlign: 'middle' }} />
+                        />
+                      ) : */test.thumbnail ? (
+                        <Image
+                          src={getImagePath(test.thumbnail)}
+                          alt={test.title}
+                          draggable={false}
+                          onContextMenu={handleDragStart}
+                          onTouchStart={handleDragStart}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                          layout="fill"
+                          style={{
+                            maxHeight: '100%', maxWidth: '100%',
+                            display: 'block', verticalAlign: 'middle',
+                            objectFit: 'cover'
+                          }}
 
-                    </ScrollTestItemPlaceholder>
+                        />
+                      ) : (
+                        <ScrollTestItemPlaceholder style={{ display: test.thumbnail || resolvedPath ? 'none' : 'none', maxHeight: '360px', maxWidth: '100%', }}>
+                          <Image src="/uploads/logo.png" alt="심풀 로고"
+                            layout="fixed" width={50} height={50} style={{ borderRadius: '10px', verticalAlign: 'middle' }} />
 
-                    {(isNew || isHot) && (
-                      <ScrollBadges>
-                        {isNew && <ScrollBadge type="new">NEW</ScrollBadge>}
-                        {isHot && <ScrollBadge type="hot">HOT</ScrollBadge>}
-                      </ScrollBadges>
-                    )}
-                    <ScrollItemStats>
-                      <ScrollStat><ScrollIconStat><FaPlay style={{ marginRight: '3px' , fontSize: '0.5rem' }}></FaPlay></ScrollIconStat>{test?.views}</ScrollStat>
-                      <ScrollStat><ScrollIconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></ScrollIconStat>{test?.likes}</ScrollStat>
-                    </ScrollItemStats>
-                  </ScrollThumbnailContainer>
-                  <ScrollContent>
-                    <ScrollItemTitle>
-                      {test.title}
-                    </ScrollItemTitle>
-                    <ScrollItemDesc>{test.description}</ScrollItemDesc>
-                  </ScrollContent>
-                </ScrollTestCardContent>
-              </ScrollCard>
-            );
-          })}
+                        </ScrollTestItemPlaceholder>)
+                      }
+                      {(isNew || isHot) && (
+                        <ScrollBadges>
+                          {isNew && <ScrollBadge type="new">NEW</ScrollBadge>}
+                          {isHot && <ScrollBadge type="hot">HOT</ScrollBadge>}
+                        </ScrollBadges>
+                      )}
+                      <ScrollItemStats>
+                        <ScrollStat><ScrollIconStat><FaPlay style={{ marginRight: '3px', fontSize: '0.5rem' }}></FaPlay></ScrollIconStat>{test?.views}</ScrollStat>
+                        <ScrollStat><ScrollIconStat><FaHeart style={{ marginRight: '3px' }}></FaHeart></ScrollIconStat>{test?.likes}</ScrollStat>
+                      </ScrollItemStats>
+                    </ScrollThumbnailContainer>
+                    <ScrollContent>
+                      <ScrollItemTitle>
+                        {test.title}
+                      </ScrollItemTitle>
+                      <ScrollItemDesc>{test.description}</ScrollItemDesc>
+                    </ScrollContent>
+                  </ScrollTestCardContent>
+                </ScrollCard>
+              );
+            })}
 
-        </ScrollInner></ScrollRow>
+          </ScrollInner></ScrollRow>
       )}
     </ScrollSection>
   );
@@ -1031,6 +1086,63 @@ export const getImagePath = (path) => {
   if (!path) return null;
   path = `https://smartpick.website${path}`
   return path;
+};
+const getExternalImagePath = async (thumbnailPath) => {
+  if (!thumbnailPath) return null;
+
+  // 브라우저 언어 설정 확인
+  const language = navigator.language || navigator.userLanguage;
+
+  // 언어 코드 결정
+  let langCode = 'en'; // 기본값
+  if (language.startsWith('es')) {
+    langCode = 'es';
+  } else if (language.startsWith('ko')) {
+    langCode = 'ko';
+  }
+
+  const ext = '.png';
+  const imgPath = `${langCode}${ext}`;
+  try {
+  const res = await fetch(path, { method: 'HEAD' });
+
+      const contentType = res.headers.get('Content-Type');
+      
+      console.log('img : ', path);
+      console.log('img contentType : ', contentType);
+      if (res.ok && contentType?.startsWith('image/')) {
+        return path;
+      }
+    }catch (error) {
+      console.warn(`Failed to fetch ${path}`, error);
+    }
+
+    return null;
+    
+  const fallbackPaths = [
+    `assets/start-images/${langCode}_start.png`,
+    `assets/images/start/start-${langCode}.png`,
+    `images/start-${langCode}.png`,
+  ];
+
+  for (const imgPath of fallbackPaths) {
+    const path = `${thumbnailPath}${imgPath}`;
+    try {
+      const res = await fetch(path, { method: 'HEAD' });
+
+      const contentType = res.headers.get('Content-Type');
+      
+      console.log('img : ', path);
+      console.log('img contentType : ', contentType);
+      if (res.ok && contentType?.startsWith('image/')) {
+        return path;
+      }
+    } catch (error) {
+      console.warn(`Failed to fetch ${path}`, error);
+    }
+  }
+
+  return null;
 };
 
 // 카테고리별 아이콘 매핑
@@ -1281,9 +1393,9 @@ export default function Home() {
       });
 
       // 테스트 데이터 검증 및 로깅
-      console.log('받은 테스트 데이터:', response.data);
+      //console.log('받은 테스트 데이터:', response.data);
       const validatedTests = response.data.map(test => {
-        console.log('테스트 ID 타입:', typeof test.id, '값:', test.id);
+        //console.log('테스트 ID 타입:', typeof test.id, '값:', test.id);
         return {
           ...test,
           id: String(test.id) // ID를 문자열로 확실히 변환
@@ -1381,7 +1493,7 @@ export default function Home() {
       // 테스트 데이터 검증 및 로깅
       console.log('받은 테스트 데이터:', response.data);
       const validatedTests = response.data.map(test => {
-        console.log('테스트 ID 타입:', typeof test.id, '값:', test.id);
+        //console.log('테스트 ID 타입:', typeof test.id, '값:', test.id);
         return {
           ...test,
           id: String(test.id) // ID를 문자열로 확실히 변환
@@ -1490,7 +1602,6 @@ export default function Home() {
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
   const popularTests = [...fixedTests].sort((a, b) => {
-    console.log('pop');
     const local_sort = 'views';
     if (local_sort === 'views') return b.views - a.views;
     if (local_sort === 'likes') return b.likes - a.likes;
@@ -1499,7 +1610,6 @@ export default function Home() {
   });
 
   const latestTests = [...fixedTests].sort((a, b) => {
-    console.log('latest');
     const local_sort = 'latest';
     if (local_sort === 'views') return b.views - a.views;
     if (local_sort === 'likes') return b.likes - a.likes;
@@ -1693,53 +1803,51 @@ export default function Home() {
           {/*인기 테스트 영역*/}
           {
             <>
-            <Title style={{
-              position: 'relative',
-              display: 'flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-            }}>
-              <FaStar style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
-              인기 테스트
-            </Title>
-            {console.log("pop:",popularTests)}
-            <ScrollListSection
-              searching={searching}              
-              sortedTests={popularTests}
-              loadingMore={loadingMore}
-              error={error}
-              loadMore={loadMore}
-              getTestFolderName={getTestFolderName}
-              router={router}
-              getImagePath={getImagePath}
-              loading={loading}
-            /></>
+              <Title style={{
+                position: 'relative',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+              }}>
+                <FaStar style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
+                인기 테스트
+              </Title>
+              <ScrollListSection
+                searching={searching}
+                sortedTests={popularTests}
+                loadingMore={loadingMore}
+                error={error}
+                loadMore={loadMore}
+                getTestFolderName={getTestFolderName}
+                router={router}
+                getImagePath={getImagePath}
+                loading={loading}
+              /></>
           }
 
           {/*최신 테스트 영역*/}
           {
             <>
-            <Title style={{
-              position: 'relative',
-              display: 'flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-            }}>
-              <FaFire  style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
-              최신 테스트
-            </Title>
-            {console.log("latests:",latestTests)}
-            <ScrollListSection
-              searching={searching}              
-              sortedTests={latestTests}
-              loadingMore={loadingMore}
-              error={error}
-              loadMore={loadMore}
-              getTestFolderName={getTestFolderName}
-              router={router}
-              getImagePath={getImagePath}
-              loading={loading}
-            /></>
+              <Title style={{
+                position: 'relative',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+              }}>
+                <FaFire style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
+                최신 테스트
+              </Title>
+              <ScrollListSection
+                searching={searching}
+                sortedTests={latestTests}
+                loadingMore={loadingMore}
+                error={error}
+                loadMore={loadMore}
+                getTestFolderName={getTestFolderName}
+                router={router}
+                getImagePath={getImagePath}
+                loading={loading}
+              /></>
           }
 
 
