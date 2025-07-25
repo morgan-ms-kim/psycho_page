@@ -115,7 +115,8 @@ export default function TestManagement() {
       langCode = 'ko';
     }
     const homePage = 'https://smartpick.website/';
-    const ext = '.png';
+    //const ext = '.png';
+    const ext = '.webp';
     const imgPath = `${homePage}${thumbnailPath}/${langCode}${ext}`;
     try {
    // const res = await fetch(imgPath, { method: 'HEAD' });

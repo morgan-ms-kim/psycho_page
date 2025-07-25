@@ -516,7 +516,8 @@ app.get('/api/recommends', async (req, res, next) => {
       whereClause.category = category;
     }
 
-    let orderClause = [['views', 'DESC'], ['likes', 'DESC']];
+    //let orderClause = [['views', 'DESC'], ['likes', 'DESC']];
+    let orderClause = [['createdAt', 'DESC']]; // 최신순 정렬
     //if (sort === 'views') orderClause = [['views', 'DESC']];
     //if (sort === 'likes') orderClause = [['likes', 'DESC']];
     //if (sort === 'popular') orderClause = [['views', 'DESC'], ['likes', 'DESC']];
