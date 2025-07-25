@@ -1686,7 +1686,7 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
       console.log('📥 Downloading:', img.path, '➡️', destPath);
       await downloadImage(img.path, destPath);
     }
-    test.save();
+    await test.save();
     res.json({ success: true, test });
   } catch (error) {
     next(error);
