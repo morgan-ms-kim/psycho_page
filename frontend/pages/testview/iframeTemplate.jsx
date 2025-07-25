@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -10,7 +11,6 @@ import {
 } from 'react-icons/fa';
 import { SiKakaotalk } from 'react-icons/si';
 
-import Head from 'next/head';
 import Image from 'next/image';
 import Div100vh from 'react-div-100vh';
 import { ScrollListSection, getImagePath } from '../index';
@@ -378,6 +378,7 @@ export default function IframeTemplate({ src, test, ...props }) {
 
   const handleKakaoShare = () => {
     console.log(window.Kakao, window.Kakao.Share);
+    console.info('test.thumbnail:' , test.thumbnail);
     if (!window.Kakao.isInitialized()) {
       window.Kakao.init('74fb3033cd26d246d32ee28d6ea4586f');
     }
@@ -399,6 +400,51 @@ export default function IframeTemplate({ src, test, ...props }) {
     }
   };
 
+  function ResultPage({ test, shareUrl, shareTitle }) {
+    const handleFacebookShare = () => {
+      if (!shareUrl) {
+        toast.info('공유할 URL이 없습니다.');
+        return;
+      }
+  
+      const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  
+      const width = 500;
+      const height = 500;
+      const left = window.screenX + (window.innerWidth - width) / 2;
+      const top = window.screenY + (window.innerHeight - height) / 2;
+  
+      window.open(
+        facebookShareUrl,
+        '_blank',
+        `width=${width},height=${height},left=${left},top=${top},noopener,noreferrer`
+      );
+    };
+  
+    return (
+      <>
+        <Head>
+          {/* Open Graph 메타 태그 */}
+          
+          <meta property="og:description" content="재미있는 심리테스트를 공유해보세요!" />
+          <meta
+            property="og:image"
+            content={
+              test?.thumbnail?.startsWith('http')
+                ? test.thumbnail
+                : `https://smartpick.website${test.thumbnail}`
+            }
+          />
+          <meta property="og:url" content={window.location.href} />
+        </Head>
+  
+        <main>
+          <h1>{shareTitle}</h1>
+          <button onClick={handleFacebookShare}>페이스북 공유</button>
+        </main>
+      </>
+    );
+  }
   const handleFacebookShare = () => {
     try {
       if (!shareUrl) {
@@ -408,6 +454,8 @@ export default function IframeTemplate({ src, test, ...props }) {
   
       const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
   
+      console.info('Facebook 공유');
+      console.info('test.thumbnail:' , test.thumbnail);
       // 팝업을 화면 중앙에 띄우기
       const width = 500;
       const height = 500;
@@ -424,7 +472,24 @@ export default function IframeTemplate({ src, test, ...props }) {
       toast.info('페이스북 공유를 사용할 수 없습니다.');
     }
   };
+//"/assets/start-images/ko_start.png"
 
+async function getServerdSideProps(context) {
+  const { id } = context.params;
+
+  // 테스트 데이터 가져오기
+  const test = await fetchTestDataById(id);
+
+  // SSR 시점에서 정확한 URL 만들어서 전달
+  const shareUrl = `https://smartpick.website/result/${id}`;
+
+  return {
+    props: {
+      test,
+      shareUrl,
+    },
+  };
+}
   const handleFacebookShare1 = () => {
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'width=500,height=500');
   };

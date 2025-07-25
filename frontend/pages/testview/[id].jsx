@@ -169,18 +169,18 @@ export default function TestPage() {
         const commentsRes = await apiClient.get(`/tests/${testId}/comments`);
         // 3. 빌드 존재 여부 확인
         let buildOk = false;
-        console.log('id:',id);
+        console.log('id:', id);
         if (testData.externalUrl) {
           buildOk = false; // 외부 링크면 빌드 없음
         } else if (/^test\d+$/.test(id)) {
           const res = await fetch(`https://smartpick.website/tests/${id}`, { method: 'HEAD' });
-          console.log('res:',res);
+          console.log('res:', res);
           buildOk = res.ok;
         }
 
-        console.log('testRes:',testRes);
-        console.log('buildOk:',buildOk);
-        console.log('testData.externalUrl:',testData.externalUrl);
+        console.log('testRes:', testRes);
+        console.log('buildOk:', buildOk);
+        console.log('testData.externalUrl:', testData.externalUrl);
         setTest(testData);
         setLiked(Boolean(testData.userLiked));
         setComments(commentsRes.data.comments);
@@ -207,7 +207,7 @@ export default function TestPage() {
 
   // 템플릿 테스트 여부
   const isTemplateTest = test && test.folder && /^template\d+$/.test(test.folder);
-  
+
 
 
   // 광고 스크립트 중복 삽입 방지
@@ -256,10 +256,10 @@ export default function TestPage() {
     // 렌더링 분기
     if (loading) {
       return (
-        
+
         <MobileTestFrame><span>테스트를 불러오는 중...</span>
         </MobileTestFrame>
-        
+
       );
     }
     if (error) {
@@ -282,28 +282,30 @@ export default function TestPage() {
     if (test.externalUrl) {
       // 외부 링크 테스트
       iframeSection = (
-        <MobileTestFrame src={test.externalUrl} test={test} id={test.id}/>
+        <MobileTestFrame src={test.externalUrl} test={test} id={test.id} />
       );
     } else if (buildExists) {
       // 로컬 빌드 테스트
       iframeSection = (
-        <MobileTestFrame src={`https://smartpick.website/tests/test${test.id}/`} test={test} id={test.id}/>
+        <MobileTestFrame src={`https://smartpick.website/tests/test${test.id}/`} test={test} id={test.id} />
       );
     } else {
       // 빌드 결과 없음
       iframeSection = <div>테스트 파일이 존재하지 않습니다.</div>;
     }
 
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
     return (
       <>
         <Head>
           <title>{test?.title ? `${test.title} - 심풀` : '심풀 - 심심풀이에 좋은 심리테스트'}</title>
-        </Head>
-         {iframeSection}
 
-            {/* 광고 컨테이너 - 그대로 */}
-           
-         
+        </Head>
+        {iframeSection}
+
+        {/* 광고 컨테이너 - 그대로 */}
+
+
       </>
     );
   }
