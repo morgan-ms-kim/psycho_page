@@ -1665,8 +1665,8 @@ const getThumbnail = async (test, url, type) =>
 
       for (const lang of langPacks) {
         for (const template of fallbackTemplatePaths) {
-          const urlPath = `${url}${template(lang)}`;
-          urlPath = path.join(middlePath, url, template(lang));
+          //const urlPath = `${url}${template(lang)}`;
+          const urlPath = path.join(middlePath, url, template(lang));
           console.log(middlePath, ':join path:',urlPath);
           try {
             const res = await fetch(urlPath, { method: 'HEAD' });
