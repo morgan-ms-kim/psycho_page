@@ -740,7 +740,7 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     const folderName = `test${test.id}`;
     test.folder = folderName;
     
-    getThumbnail(test, gitUrl, 'external');
+    getThumbnail(test, gitUrl, 'git');
     // testGroup 경로로 변경
     const testsDir = path.join(process.cwd(), '..', 'testGroup', 'public', 'tests');
     const testPath = path.join(testsDir, folderName);
