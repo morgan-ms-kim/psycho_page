@@ -64,10 +64,10 @@ const RecommendSection = styled.div`
 const Title = styled.h2`
   position: relative;
   font-size: 1rem;
-  padding: 10px 2vw;
+  padding: 20px 2vw;
   justify-items: center;
   width:100%;
-  color:rgb(0, 0, 0);
+  color:rgb(66, 66, 66);
   font-weight: 600;
   justifyContent:flex-start;
   margin:0;
@@ -450,7 +450,7 @@ const getThumbnailByLang = async (thumbnailPath) => {
   }
   const homePage = 'https://smartpick.website/';
   //const ext = '.webp';
-  const ext = '.png'
+  const ext = '.webp'
   const imgPath = `${homePage}${thumbnailPath}/${langCode}${ext}`;
   try {
  // const res = await fetch(imgPath, { method: 'HEAD' });
@@ -530,6 +530,7 @@ const getThumbnailByLang = async (thumbnailPath) => {
       setCurrentSlide((prev) => (prev - 1 + recommendTests.length) % recommendTests.length);
     } else if (dragOffsetX === 0) {
       // 테스트로 이동
+      console.log('클릭으로 간주, 테스트로 이동')
       handleTestClick(recommendTests[currentSlide]);
     }
 
@@ -576,10 +577,11 @@ const getThumbnailByLang = async (thumbnailPath) => {
               padding: '0 2vw', // 좌우 여백 (선택사항)
             }}
           >
-            <Title>
+           {/* <Title>
               <FaThumbsUp style={{ marginRight: '5px', fontSize: '0.9rem' }} />
               추천해요
             </Title>
+            */}
           </div>
           <RecommendSlider>
             <RecommendSlide active="true">
@@ -617,7 +619,8 @@ const getThumbnailByLang = async (thumbnailPath) => {
           alignItems: 'between-space',
         }}
       >
-        <Title style={{
+      {/* 
+       <Title style={{
           position: 'relative',
           display: 'flex',
           justifyContent: 'flex-start',
@@ -626,8 +629,10 @@ const getThumbnailByLang = async (thumbnailPath) => {
         }}>
           <FaThumbsUp style={{ verticalAlign: 'middle', marginRight: '5px', fontSize: '0.9rem' }} />
           추천해요
-        </Title>
+        
 
+        </Title>
+  */}
         <div style={{
           width: '100%',
           position: 'relative',
@@ -643,7 +648,8 @@ const getThumbnailByLang = async (thumbnailPath) => {
               position: 'relative',
               alignItems: 'center',
             }}
-          >Lotto</PageLink>
+          >Lotto
+          </PageLink>
         </div>
       </TitleSection>
       <RecommendSection
@@ -689,10 +695,13 @@ const getThumbnailByLang = async (thumbnailPath) => {
                           e.target.style.display = 'none';
                           e.target.nextSibling.style.display = 'flex';
                         }}
-                        onClick={() => handleTestClick(test)}
+                        //onClick={() => handleTestClick(test)}
+
                         style={{
                           maxHeight: '100%', maxWidth: '100%', height: '100%', width: '100%',
-                          objectFit: 'fill',
+                          objectFit: 'cover',
+                          verticalAlign: 'middle',
+                          objectPosition: 'center center', // 👈 이미지 중앙 기준으로 크롭
                           display: 'block',
                         }}
                       />
@@ -708,7 +717,7 @@ const getThumbnailByLang = async (thumbnailPath) => {
                           e.target.style.display = 'none';
                           e.target.nextSibling.style.display = 'flex';
                         }}
-                        onClick={() => handleTestClick(test)}
+                        //onClick={() => handleTestClick(test)}
                         style={{
                           maxHeight: '100%', maxWidth: '100%', height: 'auto', width: 'auto',
                           objectFit: 'cover'
@@ -720,7 +729,7 @@ const getThumbnailByLang = async (thumbnailPath) => {
 
                     ):(<TestItemPlaceholder
                       style={{ display: test?.thumbnail ? 'none' : 'flex', cursor: 'pointer' }}
-                      onClick={() => handleTestClick(test)}
+                      //onClick={() => handleTestClick(test)}
                     >
                       <Image src="/uploads/logo.png" alt="심풀 로고"
                         style={{
@@ -1045,7 +1054,7 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
   };
 
   const handleDragEnd = (e) => {
-    console.log('handleDragEnd', e);
+    //console.log('handleDragEnd', e);
     setIsDragging(false);
 
     // 100ms 후 드래그 상태 초기화 (클릭과 시간 겹치지 않도록)
@@ -1168,7 +1177,7 @@ export function ScrollListSection({ searching, sortedTests, loadingMore, error, 
                       <ScrollItemTitle>
                         {test.title}
                       </ScrollItemTitle>
-                      <ScrollItemDesc>{test.description}</ScrollItemDesc>
+                      <ScrollItemDesc style={{display:'none',}}>{test.description}</ScrollItemDesc>
                     </ScrollContent>
                   </ScrollTestCardContent>
                 </ScrollCard>
@@ -2074,8 +2083,8 @@ const ScrollThumbnailContainer = styled.div`
   width: 100%;
   max-width:100%;
   min-width:100%;
-  max-height:70%;
-  min-height:70%;
+  max-height:80%;
+  min-height:80%;
   width: 100%;
   height:100%;
   display: block;
@@ -2091,6 +2100,7 @@ const ScrollContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 `;
 const ScrollItemTitle = styled.h3`
   font-size: 0.9rem;

@@ -739,6 +739,8 @@ app.post('/api/admin/tests/add', authenticateAdmin, async (req, res, next) => {
     // 2. 실제 id로 폴더명 생성
     const folderName = `test${test.id}`;
     test.folder = folderName;
+    
+    getThumbnail(test, externalUrl, 'external');
     // testGroup 경로로 변경
     const testsDir = path.join(process.cwd(), '..', 'testGroup', 'public', 'tests');
     const testPath = path.join(testsDir, folderName);
@@ -1590,8 +1592,6 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
 
 
 
-
-    let test = null;
     try {
       test = await Test.create({
         title,
@@ -1601,8 +1601,21 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
         folder: null,
         thumbnail: '/uploads/thumbnails/default-thumb.png',
       });
+//  getThumbnail(getThumbnail, 'git');
+      getThumbnail(test, externalUrl, 'external');
     } catch (error) {
       return res.status(500).json({ error: 'DB 저장 실패', detail: error.message });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+const getThumbnail = async (test, url, type) => 
+{
+    let middlePath = '';
+    if (type === 'git'){
+      middlePath = 'public'
     }
     // 2. 실제 id로 폴더명 생성
     const folderName = `test${test.id}`;
@@ -1638,8 +1651,8 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
       }
     }
 
-    const getValidImagePaths = async (externalUrl) => {
-      if (!externalUrl) return [];
+    const getValidImagePaths = async (url) => {
+      if (!url) return [];
 
       const langPacks = ['en', 'ko', 'es'];
       const fallbackTemplatePaths = [
@@ -1652,7 +1665,9 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
 
       for (const lang of langPacks) {
         for (const template of fallbackTemplatePaths) {
-          const path = `${externalUrl}${template(lang)}`;
+          const path = `${url}${template(lang)}`;
+          path = path.join(middlePath, url, template(lang));
+          console.log(middlePath, ':join path:',path);
           try {
             const res = await fetch(path, { method: 'HEAD' });
             const contentType = res.headers.get('Content-Type');
@@ -1703,7 +1718,7 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
       }
     };
     fs.mkdirSync(thumbnailPath);
-    const imgPaths = await getValidImagePaths(externalUrl);
+    const imgPaths = await getValidImagePaths(url);
     for (const img of imgPaths) {
       const pngPath = path.join(thumbnailPath, img.pngName);
       const webpPath = path.join(thumbnailPath, img.webpName);
@@ -1712,10 +1727,7 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
     }
     await test.save();
     res.json({ success: true, test });
-  } catch (error) {
-    next(error);
-  }
-});
+}
 
 app.get('/api/lotto/req', async (req, res) => {
   const drwNo = req.query.drwNo;

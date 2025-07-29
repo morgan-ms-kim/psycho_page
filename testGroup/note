@@ -1,0 +1,41 @@
+2025/07/27 작업
+
+[현재 이미지 경로들]
+external은 assets 또는 images
+git은 public/asstes 또는 public/images
+경로가 하나씩 더 있다.
+
+
+리눅스 상 썸네일 경로는
+/var/www/html/psycho_page/testGroup/public/uploads/thumbnails/test[id]
+
+[작업 1 : 깃에서도 썸네일 경로 external하고 같게 하기]
+getValidImagePaths() 인자에 
+
+-이미지 경로
+external:  
+경로 그대로 넣고 
+
+git: 
+public을 앞에 놓는다.
+
+
+horizontal_뭐시기를 넣어야할듯
+
+
+호출순서
+const imgPaths =
+await getValidImagePaths(url);
+downloadImage(img.path, pngPath, webpPath);
+convertToWebp(pngPath, webpPath);
+
+[작업 2]
+admin - test 추가 부분에 
+국가별로 넣는부분 만들기
+추가 하면
+앞에 말머리처럼 국가 띄우기
+
+
+[불가능]
+X -> 세로 이미지를 가지고 텍스트영역만 가로로 crop하는 기능
+OCI-텍스트 인식 기능이 들어가야함
