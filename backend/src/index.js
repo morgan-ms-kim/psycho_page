@@ -1606,6 +1606,9 @@ app.post('/api/admin/tests/add-external', authenticateAdmin, async (req, res, ne
     } catch (error) {
       return res.status(500).json({ error: 'DB 저장 실패', detail: error.message });
     }
+    
+    await test.save();
+    res.json({ success: true, test });
   } catch (error) {
     next(error);
   }
@@ -1725,8 +1728,6 @@ const getThumbnail = async (test, url, type) =>
       console.log('📥 Downloading:', img.path, '➡️', pngPath,'➡️', webpPath);
       await downloadImage(img.path, pngPath, webpPath);
     }
-    await test.save();
-    res.json({ success: true, test });
 }
 
 app.get('/api/lotto/req', async (req, res) => {
