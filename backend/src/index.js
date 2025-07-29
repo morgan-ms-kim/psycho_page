@@ -1665,24 +1665,24 @@ const getThumbnail = async (test, url, type) =>
 
       for (const lang of langPacks) {
         for (const template of fallbackTemplatePaths) {
-          const path = `${url}${template(lang)}`;
-          path = path.join(middlePath, url, template(lang));
-          console.log(middlePath, ':join path:',path);
+          const urlPath = `${url}${template(lang)}`;
+          urlPath = path.join(middlePath, url, template(lang));
+          console.log(middlePath, ':join path:',urlPath);
           try {
-            const res = await fetch(path, { method: 'HEAD' });
+            const res = await fetch(urlPath, { method: 'HEAD' });
             const contentType = res.headers.get('Content-Type');
 
             if (res.ok && contentType?.startsWith('image/')) {
-              console.log('exist img:', path);
+              console.log('exist img:', urlPath);
               results.push({
                 lang,
-                path,
+                path: urlPath,
                 pngName: `${lang}.png`,
                 webpName:`${lang}.webp`,
               });
             }
           } catch (error) {
-            console.warn(`Failed to fetch ${path}`, error);
+            console.warn(`Failed to fetch ${urlPath}`, error);
           }
         }
       }
